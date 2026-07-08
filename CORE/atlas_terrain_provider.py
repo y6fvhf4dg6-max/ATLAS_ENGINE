@@ -3,16 +3,26 @@
 
 class AtlasTerrainProvider:
     """
-    ATLAS Terrain Provider Interface v0.1
+    ATLAS Terrain Provider Interface v1.0
 
-    Terrain Engine bu sınıf üzerinden yükseklik ister.
-    Gerçek veri kaynağı SRTM, Copernicus veya LiDAR olabilir.
+    Terrain Engine yalnızca bu arayüzü bilir.
 
-    Ama Terrain Engine bunların hiçbirini doğrudan bilmez.
+    Gerçek yükseklik kaynağı:
+        - SRTM
+        - OpenTopography
+        - Copernicus
+        - ALOS
+        - LiDAR
+
+    olabilir.
+
+    Bu sınıf yalnızca ortak sözleşmeyi (interface) tanımlar.
     """
 
     def get_height(self, lat, lon):
         """
-        Returns elevation in meters for given latitude / longitude.
+        Verilen koordinat için metre cinsinden yükseklik döndürür.
+
+        Alt sınıflar bu metodu uygulamak zorundadır.
         """
-        raise NotImplementedError("Terrain provider must implement get_height()")
+        raise NotImplementedError("Terrain provider must implement get_height().")

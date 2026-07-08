@@ -1,6 +1,6 @@
 # CORE/atlas_terrain_pipeline.py
 
-from CORE.atlas_srtm_provider import AtlasSRTMProvider
+from CORE.providers.atlas_srtm_provider import AtlasSRTMProvider
 from CORE.atlas_terrain_mesh_generator import AtlasTerrainMeshGenerator
 
 
