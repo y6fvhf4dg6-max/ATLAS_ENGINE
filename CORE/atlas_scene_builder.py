@@ -4,7 +4,6 @@ from CORE.atlas_scene import AtlasScene
 from CORE.atlas_building import AtlasBuilding
 from CORE.atlas_mesh_builder import AtlasMeshBuilder
 from CORE.road_mesh_builder import AtlasRoadMeshBuilder
-from CORE.atlas_base_plate_builder import AtlasBasePlateBuilder
 
 
 class AtlasSceneBuilder:
@@ -49,15 +48,6 @@ class AtlasSceneBuilder:
             z_scale=z_scale,
             mode="area_first_product",
         )
-
-        base_plate = AtlasBasePlateBuilder.build(
-            width_mm=target_size_mm,
-            depth_mm=target_size_mm,
-            height_mm=AtlasSceneBuilder.BASE_PLATE_HEIGHT_MM,
-            origin_x=0.0,
-            origin_y=0.0,
-        )
-        # scene.add_base_plate_mesh(base_plate)
 
         accepted_buildings = 0
         skipped_buildings = 0
