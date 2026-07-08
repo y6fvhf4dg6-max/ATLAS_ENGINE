@@ -58,7 +58,20 @@ class AtlasFoundationEngine:
         if not terrain_values:
             return 0.0
 
-        foundation_z = min(terrain_values) - embed_depth_mm
+        terrain_values = sorted(terrain_values)
+
+        bounds_width = bounds["max_x"] - bounds["min_x"]
+        bounds_depth = bounds["max_y"] - bounds["min_y"]
+        bounds_area = bounds_width * bounds_depth
+
+        if bounds_area >= 80.0:
+            index = int(len(terrain_values) * 0.50)
+            index = min(index, len(terrain_values) - 1)
+            selected_terrain_z = terrain_values[index]
+        else:
+            selected_terrain_z = min(terrain_values)
+
+        foundation_z = selected_terrain_z - embed_depth_mm
 
         if foundation_z < 0.0:
             foundation_z = 0.0

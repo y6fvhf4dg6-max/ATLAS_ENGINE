@@ -26,10 +26,19 @@ class AtlasPlacementPipeline:
         scene_origin_y,
         embed_depth_mm=0.30,
         sample_grid=5,
+        debug=True,
     ):
         placed_meshes = []
 
-        for mesh in meshes:
+        if debug:
+            print("")
+            print("=" * 70)
+            print("ATLAS PLACEMENT PIPELINE DEBUG REPORT")
+            print("=" * 70)
+
+        for index, mesh in enumerate(meshes):
+            before_min_z = AtlasPlacementPipeline._mesh_min_z(mesh)
+
             foundation_z = AtlasFoundationEngine.calculate_foundation_z(
                 mesh=mesh,
                 terrain_mesh=terrain_mesh,
@@ -39,9 +48,28 @@ class AtlasPlacementPipeline:
                 sample_grid=sample_grid,
             )
 
-            placed_meshes.append(
-                AtlasPlacementPipeline._offset_mesh_z(mesh, foundation_z)
+            placed_mesh = AtlasPlacementPipeline._offset_mesh_z(
+                mesh,
+                foundation_z - before_min_z,
             )
+
+            after_min_z = AtlasPlacementPipeline._mesh_min_z(placed_mesh)
+
+            if debug and index < 50:
+                mesh_type = mesh.get("type", "unknown")
+
+                print(
+                    f"{index:03d} | {mesh_type:20s} | "
+                    f"before_min_z={before_min_z:7.3f} | "
+                    f"foundation_z={foundation_z:7.3f} | "
+                    f"after_min_z={after_min_z:7.3f}"
+                )
+
+            placed_meshes.append(placed_mesh)
+
+        if debug:
+            print("=" * 70)
+            print("")
 
         return placed_meshes
 
@@ -86,6 +114,21 @@ class AtlasPlacementPipeline:
             new_mesh["triangles"].append(tuple(new_triangle))
 
         return new_mesh
+
+    @staticmethod
+    def _mesh_min_z(mesh):
+        points = []
+
+        points.extend(mesh.get("bottom", []))
+        points.extend(mesh.get("top", []))
+
+        for triangle in mesh.get("triangles", []):
+            points.extend(triangle)
+
+        if not points:
+            return 0.0
+
+        return min(point[2] for point in points)
 
     @staticmethod
     def _offset_point_z(point, offset_z):
