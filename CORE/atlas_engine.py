@@ -13,6 +13,8 @@ from CORE.atlas_srtm_provider import AtlasSRTMProvider
 from CORE.atlas_terrain_mesh_generator import AtlasTerrainMeshGenerator
 from EXPORT.atlas_stl_writer import AtlasSTLWriter
 from CORE.atlas_foundation_engine import AtlasFoundationEngine
+from CORE.atlas_construction_engine import AtlasConstructionEngine
+from CORE.atlas_debug_reporter import AtlasDebugReporter
 
 
 class AtlasEngine:
@@ -37,7 +39,7 @@ class AtlasEngine:
         use_recessed_roads=False,
     ):
         if debug:
-            AtlasEngine._print_header()
+            AtlasDebugReporter.print_header()
 
         data = AtlasLocalOSMReader.read(pbf_path, bbox)
 
@@ -118,11 +120,11 @@ class AtlasEngine:
 
         if debug:
             print(f"Raw scene meshes    : {len(meshes)}")
-            print(f"Raw scene triangles : {AtlasEngine._count_triangles(meshes)}")
+            print(f"Raw scene triangles : {AtlasDebugReporter.count_triangles(meshes)}")
             print(f"Raw road groove meshes    : {len(road_groove_meshes)}")
             print(
                 f"Raw road groove triangles : "
-                f"{AtlasEngine._count_triangles(road_groove_meshes)}"
+                f"{AtlasDebugReporter.count_triangles(road_groove_meshes)}"
             )
 
         normalize_transform = AtlasSceneNormalizer.calculate_transform(meshes)
@@ -139,11 +141,13 @@ class AtlasEngine:
 
         if debug:
             print(f"After normalize meshes    : {len(meshes)}")
-            print(f"After normalize triangles : {AtlasEngine._count_triangles(meshes)}")
+            print(
+                f"After normalize triangles : {AtlasDebugReporter.count_triangles(meshes)}"
+            )
             print(f"After normalize road grooves    : {len(road_groove_meshes)}")
             print(
                 f"After normalize road groove triangles : "
-                f"{AtlasEngine._count_triangles(road_groove_meshes)}"
+                f"{AtlasDebugReporter.count_triangles(road_groove_meshes)}"
             )
 
         fit_transform = AtlasSceneFitter.calculate_transform(
@@ -165,11 +169,11 @@ class AtlasEngine:
 
         if debug:
             print(f"After fit meshes    : {len(meshes)}")
-            print(f"After fit triangles : {AtlasEngine._count_triangles(meshes)}")
+            print(f"After fit triangles : {AtlasDebugReporter.count_triangles(meshes)}")
             print(f"After fit road grooves    : {len(road_groove_meshes)}")
             print(
                 f"After fit road groove triangles : "
-                f"{AtlasEngine._count_triangles(road_groove_meshes)}"
+                f"{AtlasDebugReporter.count_triangles(road_groove_meshes)}"
             )
 
         # Temporary terrain integration:
@@ -190,7 +194,7 @@ class AtlasEngine:
             print(f"After city z-offset meshes    : {len(meshes)}")
             print(
                 f"After city z-offset triangles : "
-                f"{AtlasEngine._count_triangles(meshes)}"
+                f"{AtlasDebugReporter.count_triangles(meshes)}"
             )
 
         scene_origin_x = (bed_width_mm - target_size_mm) / 2.0
@@ -280,13 +284,13 @@ class AtlasEngine:
         if debug:
             print(f"After terrain meshes       : {len(meshes)}")
             print(
-                f"After terrain triangles    : {AtlasEngine._count_triangles(meshes)}"
+                f"After terrain triangles    : {AtlasDebugReporter.count_triangles(meshes)}"
             )
 
         AtlasSTLWriter.write(meshes, output_path)
 
         if debug:
-            AtlasEngine._print_footer(
+            AtlasDebugReporter.print_footer(
                 output_path=output_path,
                 xy_scale=xy_scale,
                 meshes=meshes,
@@ -302,7 +306,7 @@ class AtlasEngine:
             "reader_pedestrian_paths": len(pedestrian_paths),
             "scene": scene.summary(),
             "meshes": len(meshes),
-            "triangles": AtlasEngine._count_triangles(meshes),
+            "triangles": AtlasDebugReporter.count_triangles(meshes),
             "xy_scale": xy_scale,
             "mode": "area_first_scene_first_product",
         }
