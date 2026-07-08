@@ -268,7 +268,6 @@ class AtlasEngine:
             "ATLAS FINAL MESH DEBUG REPORT BEFORE STL WRITE",
         )
 
-        print("DEBUG >>> _print_z_report çağrılıyor")
         AtlasDebugReporter.print_z_report(
             meshes,
             "ATLAS FINAL Z REPORT BEFORE STL WRITE",
@@ -401,97 +400,6 @@ class AtlasEngine:
     def _offset_point_z(point, offset_z):
         x, y, z = point
         return (x, y, z + offset_z)
-
-    @staticmethod
-    def _print_z_report(meshes, title):
-        print("")
-        print("=" * 60)
-        print(title)
-        print("=" * 60)
-
-        for index, mesh in enumerate(meshes):
-            mesh_type = mesh.get("type", "unknown")
-            zs = []
-
-            for tri in mesh.get("triangles", []):
-                for point in tri:
-                    zs.append(point[2])
-
-            if not zs:
-                continue
-
-            print(
-                f"{index:03d} | {mesh_type:20s} | "
-                f"min_z={min(zs):.3f} | max_z={max(zs):.3f}"
-            )
-
-        print("=" * 60)
-
-    @staticmethod
-    def _print_xy_report(meshes, title):
-        print("")
-        print("=" * 60)
-        print(title)
-        print("=" * 60)
-
-        for index, mesh in enumerate(meshes):
-            mesh_type = mesh.get("type", "unknown")
-            points = []
-
-            points.extend(mesh.get("bottom", []))
-            points.extend(mesh.get("top", []))
-
-            for triangle in mesh.get("triangles", []):
-                points.extend(triangle)
-
-            if not points:
-                continue
-
-            xs = [p[0] for p in points]
-            ys = [p[1] for p in points]
-
-            print(
-                f"{index:03d} | {mesh_type:20s} | "
-                f"x={min(xs):.2f}..{max(xs):.2f} | "
-                f"y={min(ys):.2f}..{max(ys):.2f}"
-            )
-
-        print("=" * 60)
-
-    @staticmethod
-    def _print_mesh_debug_report(meshes, title):
-        print("")
-        print("=" * 60)
-        print(title)
-        print("=" * 60)
-
-        for index, mesh in enumerate(meshes):
-            mesh_type = mesh.get("type", "unknown")
-            triangles = mesh.get("triangles", [])
-
-            zs = []
-            xs = []
-            ys = []
-
-            for triangle in triangles:
-                for point in triangle:
-                    xs.append(point[0])
-                    ys.append(point[1])
-                    zs.append(point[2])
-
-            if not triangles:
-                print(f"{index:03d} | {mesh_type:20s} | " f"tri=0 | no triangle data")
-                continue
-
-            print(
-                f"{index:03d} | {mesh_type:20s} | "
-                f"tri={len(triangles):5d} | "
-                f"x={min(xs):7.2f}..{max(xs):7.2f} | "
-                f"y={min(ys):7.2f}..{max(ys):7.2f} | "
-                f"z={min(zs):7.2f}..{max(zs):7.2f}"
-            )
-
-        print("=" * 60)
 
     @staticmethod
     def _filter_meshes_inside_xy_bounds(
