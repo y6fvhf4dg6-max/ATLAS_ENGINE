@@ -259,17 +259,17 @@ class AtlasEngine:
 
         meshes.insert(0, terrain_slab)
 
-        AtlasEngine._print_xy_report(
+        AtlasDebugReporter.print_xy_report(
             meshes,
             "ATLAS FINAL XY REPORT BEFORE STL WRITE",
         )
-        AtlasEngine._print_mesh_debug_report(
+        AtlasDebugReporter.print_mesh_debug_report(
             meshes,
             "ATLAS FINAL MESH DEBUG REPORT BEFORE STL WRITE",
         )
 
         print("DEBUG >>> _print_z_report çağrılıyor")
-        AtlasEngine._print_z_report(
+        AtlasDebugReporter.print_z_report(
             meshes,
             "ATLAS FINAL Z REPORT BEFORE STL WRITE",
         )
