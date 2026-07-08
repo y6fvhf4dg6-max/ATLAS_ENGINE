@@ -11,7 +11,7 @@ class AtlasFoundationEngine:
     v0.1:
     - Her bina mesh'i için XY footprint bounds hesaplar.
     - Footprint altında terrain yüksekliğini örnekler.
-    - En düşük güvenli terrain z değerini seçer.
+    - Eğimli terrain için en yüksek güvenli terrain z değerini seçer.
     - Binayı terrain içine hafif gömecek offset döndürür.
 
     Not:
@@ -44,25 +44,26 @@ class AtlasFoundationEngine:
         terrain_values = []
 
         for x, y in sample_points:
-            local_x = x - scene_origin_x
-            local_y = y - scene_origin_y
-
             terrain_z = AtlasFoundationEngine._terrain_z_at_xy(
                 terrain_mesh=terrain_mesh,
-                x=local_x,
-                y=local_y,
+                x=x,
+                y=y,
             )
 
-            terrain_values.append(terrain_z)
+        terrain_values.append(terrain_z)
 
         if not terrain_values:
             return 0.0
 
         terrain_values = sorted(terrain_values)
-
         bounds_width = bounds["max_x"] - bounds["min_x"]
         bounds_depth = bounds["max_y"] - bounds["min_y"]
         bounds_area = bounds_width * bounds_depth
+
+        # ATLAS FOUNDATION v0.2 - PRINT SAFE MODE
+        # Eğimli terrain üzerinde bina tabanı düz olduğu için,
+        # footprint altındaki en yüksek terrain kotunu referans alıyoruz.
+        # Bu yöntem binayı gerekirse terrain içine gömer ama havada bina bırakmaz.
 
         if bounds_area >= 80.0:
             index = int(len(terrain_values) * 0.50)

@@ -1,5 +1,7 @@
 # CORE/atlas_placement_pipeline.py
 
+
+import math
 from CORE.atlas_foundation_engine import AtlasFoundationEngine
 
 
@@ -56,6 +58,14 @@ class AtlasPlacementPipeline:
             after_min_z = AtlasPlacementPipeline._mesh_min_z(placed_mesh)
 
             if debug and index < 50:
+                print(
+                    f"id={mesh.get('id', '-')}, "
+                    f"name={mesh.get('name', '-')}, "
+                    f"before={before_min_z:.3f}, "
+                    f"foundation={foundation_z:.3f}, "
+                    f"after={after_min_z:.3f}"
+                )
+
                 mesh_type = mesh.get("type", "unknown")
 
                 print(
@@ -64,7 +74,12 @@ class AtlasPlacementPipeline:
                     f"foundation_z={foundation_z:7.3f} | "
                     f"after_min_z={after_min_z:7.3f}"
                 )
-
+                xy_size = AtlasPlacementPipeline._mesh_xy_size(mesh)
+                if xy_size < 1.0:
+                    print(
+                        f"WARNING >>> Tiny mesh detected "
+                        f"index={index} xy={xy_size:.2f} mm"
+                    )
             placed_meshes.append(placed_mesh)
 
         if debug:
@@ -134,3 +149,21 @@ class AtlasPlacementPipeline:
     def _offset_point_z(point, offset_z):
         x, y, z = point
         return (x, y, z + offset_z)
+
+    @staticmethod
+    def _mesh_xy_size(mesh):
+        points = []
+
+        points.extend(mesh.get("bottom", []))
+        points.extend(mesh.get("top", []))
+
+        for tri in mesh.get("triangles", []):
+            points.extend(tri)
+
+        if not points:
+            return 0.0
+
+        xs = [p[0] for p in points]
+        ys = [p[1] for p in points]
+
+        return math.sqrt((max(xs) - min(xs)) ** 2 + (max(ys) - min(ys)) ** 2)
