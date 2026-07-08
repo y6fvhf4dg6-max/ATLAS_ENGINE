@@ -1,0 +1,35 @@
+{
+    "Europe": {
+        "Germany": {
+            "country_pbf": "",
+            "states": [
+                "Hessen"
+            ],
+            "cities": [
+                "Frankfurt"
+            ]
+        },
+
+        "Turkey": {
+            "country_pbf": "",
+            "regions": [],
+
+            "cities": [
+                "Istanbul",
+                "Ankara"
+            ]
+        }
+    },
+
+    "Asia": {},
+
+    "Africa": {},
+
+    "North_America": {},
+
+    "South_America": {},
+
+    "Oceania": {},
+
+    "Antarctica": {}
+}
