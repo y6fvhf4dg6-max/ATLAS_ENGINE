@@ -16,6 +16,7 @@ from CORE.atlas_foundation_engine import AtlasFoundationEngine
 from CORE.atlas_construction_engine import AtlasConstructionEngine
 from CORE.atlas_debug_reporter import AtlasDebugReporter
 from CORE.atlas_placement_pipeline import AtlasPlacementPipeline
+from CORE.atlas_terrain_pipeline import AtlasTerrainPipeline
 
 
 class AtlasEngine:
@@ -232,19 +233,14 @@ class AtlasEngine:
 
             # meshes.extend(road_groove_meshes)
 
-        terrain_provider = AtlasSRTMProvider(
-            data_dir="Data/TERRAIN/SRTM",
-            debug=debug,
-        )
-
-        terrain_slab = AtlasTerrainMeshGenerator.build_closed_slab_mesh(
-            terrain_provider=terrain_provider,
+        terrain_slab = AtlasTerrainPipeline.build_terrain_slab(
             bbox=bbox,
-            size_mm=target_size_mm,
-            grid_size=25,
+            target_size_mm=target_size_mm,
             z_scale=z_scale,
             base_z=AtlasEngine.BASE_PLATE_HEIGHT_MM,
             bottom_z=0.0,
+            grid_size=25,
+            debug=debug,
         )
         meshes = AtlasPlacementPipeline.place_meshes_on_terrain(
             meshes=meshes,
