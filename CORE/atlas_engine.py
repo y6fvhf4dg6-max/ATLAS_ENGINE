@@ -309,29 +309,6 @@ class AtlasEngine:
         }
 
     @staticmethod
-    def _place_meshes_on_terrain(
-        meshes,
-        terrain_mesh,
-        scene_origin_x,
-        scene_origin_y,
-    ):
-        placed_meshes = []
-
-        for mesh in meshes:
-            foundation_z = AtlasFoundationEngine.calculate_foundation_z(
-                mesh=mesh,
-                terrain_mesh=terrain_mesh,
-                scene_origin_x=scene_origin_x,
-                scene_origin_y=scene_origin_y,
-                embed_depth_mm=0.30,
-                sample_grid=5,
-            )
-
-            placed_meshes.append(AtlasEngine._offset_mesh_z(mesh, foundation_z))
-
-        return placed_meshes
-
-    @staticmethod
     def _mesh_centroid_xy(mesh):
         points = []
 
