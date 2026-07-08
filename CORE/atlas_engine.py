@@ -15,6 +15,7 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 from CORE.atlas_foundation_engine import AtlasFoundationEngine
 from CORE.atlas_construction_engine import AtlasConstructionEngine
 from CORE.atlas_debug_reporter import AtlasDebugReporter
+from CORE.atlas_placement_pipeline import AtlasPlacementPipeline
 
 
 class AtlasEngine:
@@ -245,7 +246,7 @@ class AtlasEngine:
             base_z=AtlasEngine.BASE_PLATE_HEIGHT_MM,
             bottom_z=0.0,
         )
-        meshes = AtlasEngine._place_meshes_on_terrain(
+        meshes = AtlasPlacementPipeline.place_meshes_on_terrain(
             meshes=meshes,
             terrain_mesh=terrain_slab,
             scene_origin_x=scene_origin_x,
