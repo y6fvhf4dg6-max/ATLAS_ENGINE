@@ -9,11 +9,7 @@ from CORE.atlas_scene_fitter import AtlasSceneFitter
 from CORE.atlas_surface_engine import AtlasSurfaceEngine
 from CORE.atlas_boolean_surface_builder import AtlasBooleanSurfaceBuilder
 from CORE.atlas_road_polygon_builder import AtlasRoadPolygonBuilder
-from CORE.atlas_srtm_provider import AtlasSRTMProvider
-from CORE.atlas_terrain_mesh_generator import AtlasTerrainMeshGenerator
 from EXPORT.atlas_stl_writer import AtlasSTLWriter
-from CORE.atlas_foundation_engine import AtlasFoundationEngine
-from CORE.atlas_construction_engine import AtlasConstructionEngine
 from CORE.atlas_debug_reporter import AtlasDebugReporter
 from CORE.atlas_placement_pipeline import AtlasPlacementPipeline
 from CORE.atlas_terrain_pipeline import AtlasTerrainPipeline
