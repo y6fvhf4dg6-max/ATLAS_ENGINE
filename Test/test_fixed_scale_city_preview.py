@@ -12,8 +12,8 @@ OUTPUT_PATH = "OUTPUT/STL/latest.stl"
 
 def main():
     # Current Frankfurt test center
-    center_lat = 39.925054
-    center_lon = 32.836944
+    center_lat = 39.94142
+    center_lon = 32.86549
 
     product_size_mm = 200
     scale_ratio = 5500
@@ -35,8 +35,9 @@ def main():
         bed_depth_mm=256,
         margin_mm=15,
         min_points=4,
-        max_points=80,
+        max_points=300,
         z_scale=5500,
+        terrain_provider_name="opentopography",
         debug=True,
         use_recessed_roads=False,
     )

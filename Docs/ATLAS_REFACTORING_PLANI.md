@@ -113,3 +113,166 @@ Triangles
 Buildings
 Output path
 Bambu Studio açılışı
+✓ Refactoring Aşama 1 tamamlandı.
+
+Commit:
+d2b4a63
+
+İşlem:
+- atlas_debug_reporter.py oluşturuldu.
+- İlk debug fonksiyonları AtlasEngine'den ayrılmaya başlandı.
+- Davranış değişmeden test edildi.
+- STL çıktısı birebir doğrulandı.
+✓ Refactoring Aşama 2 tamamlandı.
+
+Commit:
+d8a33be
+
+İşlem:
+- atlas_placement_pipeline.py oluşturuldu.
+- Terrain placement sorumluluğu AtlasEngine'den ayrılmaya başlandı.
+- Test başarılı.
+- STL çıktısı birebir doğrulandı.
+---
+
+# ✅ Refactoring Aşama 3 Tamamlandı
+
+## Commit
+
+```text
+373dc8f
+```
+
+## Başlık
+
+```text
+Refactor AtlasEngine terrain pipeline step 1
+```
+---
+
+# ✅ Refactoring Aşama 6 Tamamlandı
+
+## Commit
+
+```text
+bb265c1
+```
+
+## Başlık
+
+```text
+Move final debug reports to AtlasDebugReporter
+```
+
+## Amaç
+
+Final debug raporlarının üretimini `AtlasEngine` içerisinden çıkararak `AtlasDebugReporter` sınıfına taşımak.
+
+## Yapılan İşlemler
+
+- `print_xy_report()` fonksiyonu `AtlasDebugReporter` içerisine taşındı.
+- `print_z_report()` fonksiyonu `AtlasDebugReporter` içerisine taşındı.
+- `print_mesh_debug_report()` fonksiyonu `AtlasDebugReporter` içerisine taşındı.
+- `AtlasEngine` içerisindeki çağrılar yeni sınıfa yönlendirildi.
+- Debug sorumluluğu merkezi hale getirildi.
+
+## Test Sonucu
+
+- Test başarıyla tamamlandı.
+- STL üretimi sorunsuz gerçekleştirildi.
+- Triangle sayısı değişmedi.
+- Mesh sayısı değişmedi.
+- Refactoring öncesi ve sonrası çıktılar birebir doğrulandı.
+
+## Kazanımlar
+
+- Debug kodları tek merkezde toplandı.
+- `AtlasEngine` daha sade hale geldi.
+- Yeni debug raporları eklemek kolaylaştı.
+- Kodun bakım maliyeti azaltıldı.
+
+## Durum
+
+✅ Tamamlandı
+
+---
+## Amaç
+
+Terrain (arazi) oluşturma sorumluluğunu `AtlasEngine` içerisinden ayırarak bağımsız bir pipeline yapısına taşımaya başlamak.
+
+## Yapılan İşlemler
+
+- `CORE/atlas_terrain_pipeline.py` oluşturuldu.
+- Terrain oluşturma akışı bağımsız `AtlasTerrainPipeline` sınıfına taşındı.
+- `AtlasSRTMProvider` oluşturulması pipeline içerisine alındı.
+- `AtlasTerrainMeshGenerator.build_closed_slab_mesh()` çağrısı pipeline içerisine taşındı.
+- `AtlasEngine` yalnızca terrain üretimini başlatan orkestratör rolüne yaklaştırıldı.
+- Kod tekrarının azaltılması yönünde ilk adım atıldı.
+
+## Test Sonucu
+
+- Test başarıyla tamamlandı.
+- STL üretimi sorunsuz gerçekleştirildi.
+- Triangle sayısı değişmedi.
+- Mesh sayısı değişmedi.
+- Refactoring öncesi ve sonrası STL çıktıları birebir doğrulandı.
+
+## Kazanımlar
+
+- Terrain üretimi artık bağımsız geliştirilebilir hale geldi.
+- `AtlasEngine` daha okunabilir ve daha sade bir yapıya yaklaştı.
+- Gelecekte Copernicus, LiDAR ve farklı terrain sağlayıcılarının eklenmesi kolaylaştırıldı.
+- Terrain yönetimi için mimari katmanlaşma güçlendirildi.
+
+## Durum
+
+✅ Tamamlandı
+
+---
+---
+
+# ✅ Refactoring Aşama 7 Tamamlandı
+
+## Commit
+
+```text
+<commit_hash>
+```
+
+## Başlık
+
+```text
+Remove obsolete debug functions from AtlasEngine
+```
+
+## Amaç
+
+Debug raporlarının `AtlasDebugReporter` sınıfına taşınmasının ardından, `AtlasEngine` içerisinde artık kullanılmayan debug fonksiyonlarını kaldırmak.
+
+## Yapılan İşlemler
+
+- `_print_xy_report()` kaldırıldı.
+- `_print_z_report()` kaldırıldı.
+- `_print_mesh_debug_report()` kaldırıldı.
+- Geçici debug çıktısı (`DEBUG >>> _print_z_report çağrılıyor`) kaldırıldı.
+
+## Test Sonucu
+
+- Test başarıyla tamamlandı.
+- STL üretimi sorunsuz gerçekleştirildi.
+- Triangle sayısı değişmedi.
+- Mesh sayısı değişmedi.
+- Refactoring öncesi ve sonrası çıktılar birebir doğrulandı.
+
+## Kazanımlar
+
+- AtlasEngine daha da sadeleşti.
+- Debug sorumluluğu tamamen `AtlasDebugReporter` sınıfına taşındı.
+- Kullanılmayan kod tabandan kaldırıldı.
+- Kod okunabilirliği ve bakım kolaylığı artırıldı.
+
+## Durum
+
+✅ Tamamlandı
+
+---

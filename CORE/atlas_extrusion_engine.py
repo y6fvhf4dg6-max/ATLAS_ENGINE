@@ -24,7 +24,7 @@ class AtlasExtrusionEngine:
         return clean
 
     @staticmethod
-    def extrude(building, coordinate_engine=None):
+    def extrude(building, coordinate_engine=None, foundation_z=0.0):
         points = AtlasExtrusionEngine.clean_points(building.geometry)
         # points = AtlasGeometrySimplifier.simplify(points)
 
@@ -51,8 +51,8 @@ class AtlasExtrusionEngine:
         }
 
         for x, y in scaled_points:
-            mesh["bottom"].append((x, y, 0.0))
-            mesh["top"].append((x, y, height_mm))
+            mesh["bottom"].append((x, y, foundation_z))
+            mesh["top"].append((x, y, foundation_z + height_mm))
 
         for i in range(len(scaled_points)):
             p1 = mesh["bottom"][i]

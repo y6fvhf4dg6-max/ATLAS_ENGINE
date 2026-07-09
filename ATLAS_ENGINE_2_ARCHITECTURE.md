@@ -1,262 +1,247 @@
-# ATLAS ENGINE 2.0 MASTER ARCHITECTURE
-
-## Core Rule
-
-ATLAS is not a collection of scripts.
-
-ATLAS is a pipeline-based 3D city generation engine.
+# ATLAS FOUNDATION-FIRST ARCHITECTURE
+Version: v2.0
+Status: APPROVED
+Date: 2026-07-09
 
 ---
 
-## Main Principle
+# NEDEN BU MİMARİYE GEÇİYORUZ?
 
-No engine writes STL directly.
+Günler süren çalışmalar sonucunda görüldü ki mevcut sistem;
 
-Engines produce mesh data.
+Building
+→ Placement
+→ Terrain
 
-Only Export Engine writes final files.
+sıralaması nedeniyle sürekli düzeltme (offset, placement, embed vb.)
+gerektiriyor.
 
----
+Bu mimari;
 
-## Central Data Object
+- havada kalan binalar
+- terrain içine gömülen binalar
+- karmaşık placement algoritmaları
+- sürekli Z düzeltmeleri
 
-All shared data lives in:
+oluşturuyor.
 
-AtlasContext
-
-Context stores:
-
-- address
-- product
-- model size
-- coordinates
-- bounds
-- terrain mesh
-- terrain sampler
-- building mesh
-- road mesh
-- water mesh
-- park mesh
-- final scene mesh
+Bu nedenle mevcut yaklaşım terk edilmiştir.
 
 ---
 
-## Pipeline
+# YENİ HEDEF
 
-Address
+ATLAS artık:
+
+"Binaları terrain üzerine taşımayacak."
+
+ATLAS;
+
+"Terrain üzerinde foundation oluşturacak,
+binaları doğrudan bu foundation üzerinde üretecek."
+
+Bu karar ATLAS Engine'in temel mimari kararıdır.
+
+---
+
+# FOUNDATION-FIRST PIPELINE
+
+PBF
 
 ↓
 
-Geocoder
+AtlasLocalOSMReader
 
 ↓
 
-Area Engine
+Coordinate Engine
 
 ↓
 
-Terrain Engine
+Terrain oluştur
 
 ↓
 
-Terrain Sampler
+Foundation oluştur
 
 ↓
 
-Building Engine
+Building Mesh oluştur
 
 ↓
 
-Road Engine
+Road / Water / POI
 
 ↓
 
-Water Engine
+Scene oluştur
 
 ↓
 
-Park Engine
+STL Export
+
+---
+
+# FOUNDATION TANIMI
+
+Foundation;
+
+bir binanın 2D footprint alanının
+terrain üzerinde oluşturduğu düz baskı yüzeyidir.
+
+Her bina kendi foundation'ına sahip olacaktır.
+
+Foundation;
+
+- terrain'e bağlıdır
+- baskıya uygundur
+- gerektiğinde terrain içine gömülür
+- bina için referans düzlemdir
+
+---
+
+# BUILDING ÜRETİM PRENSİBİ
+
+Eski sistem
+
+Building
 
 ↓
 
-Scene Engine
+Placement
 
 ↓
 
-Export Engine
+Terrain
+
+Yeni sistem
+
+Terrain
+
+↓
+
+Foundation
+
+↓
+
+Building
+
+Artık bina hiçbir zaman
+0 kotunda oluşturulmayacaktır.
+
+Bina doğduğu anda foundation kotunda üretilecektir.
 
 ---
 
-## Engine Responsibilities
+# ESKİ SİSTEMDEN KALDIRILACAKLAR
 
-### AtlasCore
+Placement-first yaklaşımı
 
-Controls the full pipeline.
+CITY_Z_OFFSET
 
-Does not create geometry directly.
+Mesh aşağı taşıma mantığı
 
----
+Sonradan terrain'e oturtma
 
-### AtlasContext
-
-Stores shared state.
-
-All engines read from and write to context.
+Çoklu offset düzeltmeleri
 
 ---
 
-### TerrainEngine
+# YENİ MOTOR
 
-Creates terrain mesh once.
+Yeni motor eski motordan tamamen bağımsız geliştirilecektir.
 
-Never exports STL.
+Yeni dosya:
 
----
+CORE/atlas_foundation_first_engine.py
 
-### TerrainSampler
+Eski motor korunacaktır.
 
-Returns terrain height for any X/Y point.
-
-Used by buildings, roads, water, parks, bridges and future details.
-
----
-
-### BuildingEngine
-
-Creates building meshes.
-
-Uses context bounds, OSM data, model space, height engine and terrain sampler.
+Yeni motor başarılı olduktan sonra
+varsayılan motor olacaktır.
 
 ---
 
-### RoadEngine
+# FOUNDATION-FIRST MOTORUN GÖREVLERİ
 
-Creates road meshes.
+1.
+Terrain üret
 
-Uses context bounds, OSM data, model space and terrain sampler.
+2.
+Terrain'i referans kabul et
 
----
+3.
+Her bina için foundation oluştur
 
-### WaterEngine
+4.
+Foundation kotunu hesapla
 
-Creates rivers, lakes and sea surfaces.
+5.
+Building mesh'i foundation üzerinde üret
 
-Uses context bounds and terrain sampler.
+6.
+Road
 
----
+7.
+Scene
 
-### ParkEngine
-
-Creates park and green area surfaces.
-
-Uses context bounds and terrain sampler.
-
----
-
-### SceneEngine
-
-Combines all mesh layers into one scene.
+8.
+STL
 
 ---
 
-### ExportEngine
+# İLK GELİŞTİRME HEDEFLERİ
 
-Exports final scene as:
+Sprint 1
 
-- STL
-- later 3MF
-- later OBJ / GLB
+Foundation-first Engine
 
----
+Sprint 2
 
-## Product Logic
+Foundation Surface Builder
 
-ATLAS supports product tiers:
+Sprint 3
 
-- Basic
-- Realistic
-- Museum
-- Ultra
+Foundation Sampler
 
-These tiers control:
+Sprint 4
 
-- detail level
-- vertical scale
-- minimum printable height
-- roof detail
-- road detail
-- water detail
-- park detail
-- color / finish
-- memory highlight options
+Building Builder
+
+Sprint 5
+
+Road Integration
+
+Sprint 6
+
+Final STL Pipeline
 
 ---
 
-## Design Principle
+# VERİ STRATEJİSİ
 
-Real data is respected.
+Araştırılacak kaynaklar:
 
-But ATLAS optimizes geometry for:
+- Microsoft Global Building Footprints
+- Overture Maps
+- OpenStreetMap
+- OpenTopography
+- Türkiye ulusal yükseklik ve harita verileri
 
-- printability
-- durability
-- readability
-- aesthetics
+Uzun vadeli hedef:
 
-The goal is not blind copying.
-
-The goal is the best physical collectible model.
-
----
-
-## Memory Product Vision
-
-Every important memory has a location.
-
-ATLAS turns meaningful places into physical collectible models.
-
-Product lines:
-
-- My Life Map
-- Our Love Map
-- Family Heritage
-- Memory Highlight
+ATLAS Building Database
 
 ---
 
-## Internal Motto
+# MİMARİ PRENSİP
 
-Şeytan ayrıntıda.
+ATLAS'ta hiçbir bina havada doğmaz.
 
-The devil is in the details.
+Önce terrain vardır.
 
----
+Terrain üzerinde foundation oluşturulur.
 
-## Immediate Refactor Plan
+Bina foundation üzerinde doğar.
 
-1. Keep existing working files.
-2. Build AtlasContext as shared memory.
-3. Build AtlasCore as central controller.
-4. Move terrain generation into Core.
-5. Move buildings into BuildingEngine.
-6. Move roads into RoadEngine.
-7. All engines write mesh into context.
-8. Export only once at the end.
-
----
-
-## Current Priority
-
-ATLAS Engine 2.0 foundation.
-
-Goal:
-
-One address.
-
-One context.
-
-One terrain.
-
-One scene.
-
-One export.
+Bu kural ATLAS Engine'in değiştirilmeyecek temel prensibidir.

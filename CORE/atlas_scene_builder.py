@@ -4,6 +4,7 @@ from CORE.atlas_scene import AtlasScene
 from CORE.atlas_building import AtlasBuilding
 from CORE.atlas_mesh_builder import AtlasMeshBuilder
 from CORE.road_mesh_builder import AtlasRoadMeshBuilder
+from CORE.atlas_foundation_first_pipeline import AtlasFoundationFirstPipeline
 
 
 class AtlasSceneBuilder:
@@ -72,10 +73,7 @@ class AtlasSceneBuilder:
             )
 
             if mesh:
-                mesh = AtlasSceneBuilder._offset_mesh_z(
-                    mesh,
-                    AtlasSceneBuilder.BUILDING_Z_OFFSET_MM,
-                )
+
                 scene.add_building_mesh(mesh)
                 accepted_buildings += 1
             else:

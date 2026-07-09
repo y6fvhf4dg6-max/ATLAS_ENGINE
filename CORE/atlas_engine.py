@@ -32,6 +32,7 @@ class AtlasEngine:
         min_points=4,
         max_points=80,
         z_scale=5500,
+        terrain_provider_name="srtm",
         debug=True,
         use_raised_roads=False,
         use_recessed_roads=False,
@@ -236,13 +237,8 @@ class AtlasEngine:
             base_z=AtlasEngine.BASE_PLATE_HEIGHT_MM,
             bottom_z=0.0,
             grid_size=25,
+            terrain_provider_name=terrain_provider_name,
             debug=debug,
-        )
-        meshes = AtlasPlacementPipeline.place_meshes_on_terrain(
-            meshes=meshes,
-            terrain_mesh=terrain_slab,
-            scene_origin_x=scene_origin_x,
-            scene_origin_y=scene_origin_y,
         )
 
         terrain_slab = AtlasSceneFitter.apply_transform(
@@ -256,6 +252,15 @@ class AtlasEngine:
                 "offset_y": scene_origin_y,
             },
         )[0]
+
+        meshes = AtlasPlacementPipeline.place_meshes_on_terrain(
+            meshes=meshes,
+            terrain_mesh=terrain_slab,
+            scene_origin_x=0.0,
+            scene_origin_y=0.0,
+        )
+
+        meshes = list(meshes)
 
         meshes.insert(0, terrain_slab)
 

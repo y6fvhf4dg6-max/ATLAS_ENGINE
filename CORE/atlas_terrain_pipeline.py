@@ -1,22 +1,15 @@
 # CORE/atlas_terrain_pipeline.py
 
 from CORE.providers.atlas_srtm_provider import AtlasSRTMProvider
+from CORE.providers.atlas_opentopography_provider import (
+    AtlasOpenTopographyProvider,
+)
 from CORE.atlas_terrain_mesh_generator import AtlasTerrainMeshGenerator
 
 
 class AtlasTerrainPipeline:
     """
-    ATLAS Terrain Pipeline v1.0
-
-    Amaç:
-    - Terrain provider oluşturmak.
-    - Terrain slab mesh üretmek.
-    - AtlasEngine içindeki terrain sorumluluğunu azaltmak.
-
-    Bu sınıf bina üretmez.
-    Placement yapmaz.
-    STL yazmaz.
-    Sadece terrain mesh üretim sürecini yönetir.
+    ATLAS Terrain Pipeline v2.0
     """
 
     @staticmethod
@@ -28,12 +21,27 @@ class AtlasTerrainPipeline:
         bottom_z=0.0,
         grid_size=25,
         data_dir="Data/TERRAIN/SRTM",
+        terrain_provider_name="srtm",
         debug=True,
     ):
-        terrain_provider = AtlasSRTMProvider(
-            data_dir=data_dir,
-            debug=debug,
-        )
+        if terrain_provider_name.lower() == "opentopography":
+            terrain_provider = AtlasOpenTopographyProvider(
+                dataset="AW3D30",
+                debug=debug,
+            )
+
+            south, west, north, east = bbox
+            terrain_provider.download_dem_bbox(
+                south=south,
+                west=west,
+                north=north,
+                east=east,
+            )
+        else:
+            terrain_provider = AtlasSRTMProvider(
+                data_dir=data_dir,
+                debug=debug,
+            )
 
         return AtlasTerrainMeshGenerator.build_closed_slab_mesh(
             terrain_provider=terrain_provider,

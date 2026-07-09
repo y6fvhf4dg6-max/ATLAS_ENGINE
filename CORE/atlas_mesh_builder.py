@@ -1,8 +1,12 @@
 """
 ATLAS Engine
 
-Atlas Mesh Builder v3.3
+Atlas Mesh Builder v3.4
 Creates printable closed triangle meshes from AtlasBuilding objects.
+
+v3.4:
+- Adds foundation_z support.
+- Buildings can now be born directly on a foundation level.
 """
 
 from CORE.atlas_geometry_simplifier import AtlasGeometrySimplifier
@@ -64,8 +68,10 @@ class AtlasMeshBuilder:
     @staticmethod
     def prepare_geometry(building, coordinate_engine):
         points = AtlasPolygonCleaner.clean(building.geometry)
+
         if len(points) < AtlasMeshBuilder.MIN_POINT_COUNT:
             return None
+
         if building.area_m2 < AtlasMeshBuilder.MIN_BUILDING_AREA_M2:
             return None
 
@@ -75,12 +81,14 @@ class AtlasMeshBuilder:
             return None
 
         scaled_points = coordinate_engine.geometry_to_stl_mm(points)
+
         report = AtlasGeometryInspector.inspect_building(
             building,
             scaled_points,
         )
 
         AtlasGeometryInspector.print_report(report)
+
         bounds = AtlasMeshBuilder._bounds_2d(scaled_points)
 
         if bounds is None:
@@ -104,23 +112,25 @@ class AtlasMeshBuilder:
         return scaled_points
 
     @staticmethod
-    def _make_bottom_triangle(triangle):
+    def _make_bottom_triangle(triangle, foundation_z):
         p1, p2, p3 = triangle
 
         return (
-            (p3[0], p3[1], 0.0),
-            (p2[0], p2[1], 0.0),
-            (p1[0], p1[1], 0.0),
+            (p3[0], p3[1], foundation_z),
+            (p2[0], p2[1], foundation_z),
+            (p1[0], p1[1], foundation_z),
         )
 
     @staticmethod
-    def _make_top_triangle(triangle, height_mm):
+    def _make_top_triangle(triangle, height_mm, foundation_z):
         p1, p2, p3 = triangle
 
+        top_z = foundation_z + height_mm
+
         return (
-            (p1[0], p1[1], height_mm),
-            (p2[0], p2[1], height_mm),
-            (p3[0], p3[1], height_mm),
+            (p1[0], p1[1], top_z),
+            (p2[0], p2[1], top_z),
+            (p3[0], p3[1], top_z),
         )
 
     @staticmethod
@@ -131,7 +141,7 @@ class AtlasMeshBuilder:
         ]
 
     @staticmethod
-    def build_mesh(building, coordinate_engine):
+    def build_mesh(building, coordinate_engine, foundation_z=0.0):
         scaled_points = AtlasMeshBuilder.prepare_geometry(
             building,
             coordinate_engine,
@@ -155,14 +165,27 @@ class AtlasMeshBuilder:
         wall_quads = []
         triangles = []
 
+        top_z = foundation_z + height_mm
+
         for x, y in scaled_points:
-            bottom_points.append((x, y, 0.0))
-            top_points.append((x, y, height_mm))
+            bottom_points.append((x, y, foundation_z))
+            top_points.append((x, y, top_z))
 
         for triangle in flat_triangles:
-            triangles.append(AtlasMeshBuilder._make_bottom_triangle(triangle))
+            triangles.append(
+                AtlasMeshBuilder._make_bottom_triangle(
+                    triangle,
+                    foundation_z,
+                )
+            )
 
-            triangles.append(AtlasMeshBuilder._make_top_triangle(triangle, height_mm))
+            triangles.append(
+                AtlasMeshBuilder._make_top_triangle(
+                    triangle,
+                    height_mm,
+                    foundation_z,
+                )
+            )
 
         point_count = len(scaled_points)
 
@@ -188,6 +211,7 @@ class AtlasMeshBuilder:
             "top": top_points,
             "walls": wall_quads,
             "triangles": triangles,
+            "foundation_z": foundation_z,
         }
 
         report = AtlasMeshValidator.report(mesh)
@@ -197,21 +221,14 @@ class AtlasMeshBuilder:
             print("=" * 70)
             print("ATLAS INVALID BUILDING MESH")
             print("=" * 70)
-
             print(f"OSM ID        : {getattr(building, 'osm_id', 'unknown')}")
-
             print(f"Name          : {getattr(building, 'name', '-')}")
-
             print(f"Height        : {building.estimated_height:.2f} m")
-
+            print(f"Foundation Z  : {foundation_z:.3f} mm")
             print(f"Triangles     : {report.get('triangles', 0)}")
-
             print(f"Open edges    : {report.get('open_edge_count', 0)}")
-
             print(f"Non manifold  : {report.get('non_manifold_edge_count', 0)}")
-
             print(f"Reason        : {report.get('reason', '-')}")
-
             print("=" * 70)
             print("")
 

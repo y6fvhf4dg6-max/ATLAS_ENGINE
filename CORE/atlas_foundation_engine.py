@@ -50,7 +50,7 @@ class AtlasFoundationEngine:
                 y=y,
             )
 
-        terrain_values.append(terrain_z)
+            terrain_values.append(terrain_z)
 
         if not terrain_values:
             return 0.0
@@ -70,7 +70,7 @@ class AtlasFoundationEngine:
             index = min(index, len(terrain_values) - 1)
             selected_terrain_z = terrain_values[index]
         else:
-            selected_terrain_z = min(terrain_values)
+            selected_terrain_z = max(terrain_values)
 
         foundation_z = selected_terrain_z - embed_depth_mm
 
