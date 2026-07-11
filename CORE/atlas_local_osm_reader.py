@@ -3,7 +3,7 @@
 """
 ATLAS Engine
 
-Atlas Local OSM Reader v1.1
+Atlas Local OSM Reader v1.2
 Reads local .osm.pbf files without Overpass API.
 
 Supported objects:
@@ -11,6 +11,7 @@ Supported objects:
 - trees
 - roads
 - pedestrian paths
+- parks / green areas
 """
 
 import osmium
@@ -26,6 +27,11 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         self.trees = []
         self.roads = []
         self.pedestrian_paths = []
+        self.parks = []
+        self.waters = []
+        self.castles = []
+        self.castle_walls = []
+        self.defensive_towers = []
 
     def inside_bbox(self, lat, lon):
         return self.south <= lat <= self.north and self.west <= lon <= self.east
@@ -51,16 +57,70 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                     "tags": tags,
                 }
             )
+        if self._is_defensive_tower(tags):
+            self.defensive_towers.append(
+                {
+                    "id": n.id,
+                    "lat": lat,
+                    "lon": lon,
+                    "geometry_type": "node",
+                    "tags": tags,
+                }
+            )
 
     def way(self, w):
         tags = dict(w.tags)
+
+        if self._is_castle_wall(tags):
+            self._read_castle_wall(w, tags)
+            return
+
+        if self._is_defensive_tower(tags):
+            self._read_defensive_tower(w, tags)
+            return
+
+        if self._is_castle(tags):
+            self._read_castle(w, tags)
+            return
 
         if "building" in tags:
             self._read_building(w, tags)
             return
 
+        if self._is_water(tags):
+            self._read_water(w, tags)
+            return
+
         if "highway" in tags:
             self._read_highway(w, tags)
+            return
+
+        if self._is_park_or_green_area(tags):
+            self._read_park(w, tags)
+            return
+
+    def _read_water(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 3:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        self.waters.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tags": tags,
+            }
+        )
+
+        if self._is_park_or_green_area(tags):
+            self._read_park(w, tags)
             return
 
     def _read_building(self, w, tags):
@@ -105,6 +165,75 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             self.pedestrian_paths.append(item)
         elif self._is_vehicle_road(tags):
             self.roads.append(item)
+
+    def _read_water(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 3:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        self.waters.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tags": tags,
+                "water_type": self._water_type(tags),
+            }
+        )
+
+    @staticmethod
+    def _is_water(tags):
+
+        if tags.get("natural") == "water":
+            return True
+
+        if tags.get("water"):
+            return True
+
+        if tags.get("waterway") in {
+            "river",
+            "stream",
+            "canal",
+        }:
+            return True
+
+        if tags.get("landuse") == "reservoir":
+            return True
+
+        if tags.get("leisure") == "swimming_pool":
+            return True
+
+        if tags.get("amenity") == "fountain":
+            return True
+
+        return False
+
+    def _read_park(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 4:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        self.parks.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tags": tags,
+                "park_type": self._park_type(tags),
+            }
+        )
 
     def _extract_way_geometry(self, way):
         geometry = []
@@ -175,13 +304,371 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         return highway in vehicle_types
 
     @staticmethod
+    def _is_water(tags):
+        if tags.get("natural") == "water":
+            return True
+
+        if tags.get("water"):
+            return True
+
+        if tags.get("waterway") in {
+            "river",
+            "stream",
+            "canal",
+        }:
+            return True
+
+        if tags.get("landuse") == "reservoir":
+            return True
+
+        if tags.get("leisure") == "swimming_pool":
+            return True
+
+        if tags.get("amenity") == "fountain":
+            return True
+
+        return False
+
+    @staticmethod
+    def _water_type(tags):
+        if tags.get("water"):
+            return f"water:{tags.get('water')}"
+
+        if tags.get("waterway"):
+            return f"waterway:{tags.get('waterway')}"
+
+        if tags.get("leisure") == "swimming_pool":
+            return "leisure:swimming_pool"
+
+        if tags.get("amenity") == "fountain":
+            return "amenity:fountain"
+
+        if tags.get("landuse") == "reservoir":
+            return "landuse:reservoir"
+
+        if tags.get("natural") == "water":
+            return "natural:water"
+
+        return "water"
+
+    @staticmethod
+    def _is_park_or_green_area(tags):
+        leisure = tags.get("leisure")
+        landuse = tags.get("landuse")
+        natural = tags.get("natural")
+
+        if leisure in {
+            "park",
+            "garden",
+            "playground",
+            "recreation_ground",
+        }:
+            return True
+
+        if landuse in {
+            "grass",
+            "recreation_ground",
+            "forest",
+            "meadow",
+            "village_green",
+        }:
+            return True
+
+        if natural in {
+            "wood",
+            "grassland",
+            "scrub",
+        }:
+            return True
+
+        return False
+
+    @staticmethod
+    def _park_type(tags):
+        if tags.get("leisure"):
+            return f"leisure:{tags.get('leisure')}"
+
+        if tags.get("landuse"):
+            return f"landuse:{tags.get('landuse')}"
+
+        if tags.get("natural"):
+            return f"natural:{tags.get('natural')}"
+
+        return "green_area"
+
+    def _read_castle_wall(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 2:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        self.castle_walls.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tags": tags,
+                "wall_type": "city_wall",
+            }
+        )
+
+    def _read_castle(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 3:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        self.castles.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tags": tags,
+                "castle_type": tags.get("castle_type", "castle"),
+            }
+        )
+
+    def _read_defensive_tower(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 3:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        self.defensive_towers.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "geometry_type": "way",
+                "tags": tags,
+            }
+        )
+
+    @staticmethod
+    def _is_castle_wall(tags):
+        return tags.get("barrier") == "city_wall" or tags.get("historic") == "citywalls"
+
+    @staticmethod
+    def _is_castle(tags):
+        return tags.get("historic") == "castle" or tags.get("building") == "castle"
+
+    @staticmethod
+    def _is_defensive_tower(tags):
+        return tags.get("man_made") == "tower" and tags.get("tower:type") == "defensive"
+
+    @staticmethod
     def read(pbf_path, bbox):
+        class CastleRelationScanner(osmium.SimpleHandler):
+            def __init__(self):
+                super().__init__()
+
+                self.castle_relations = []
+                self.member_way_ids = set()
+
+            def relation(self, relation):
+                tags = dict(relation.tags)
+
+                is_castle = (
+                    tags.get("historic") == "castle" or tags.get("building") == "castle"
+                )
+
+                if not is_castle:
+                    return
+
+                if tags.get("type") != "multipolygon":
+                    return
+
+                members = []
+
+                for member in relation.members:
+                    if member.type != "w":
+                        continue
+
+                    members.append(
+                        {
+                            "ref": member.ref,
+                            "role": member.role or "",
+                        }
+                    )
+
+                    self.member_way_ids.add(member.ref)
+
+                if not members:
+                    return
+
+                self.castle_relations.append(
+                    {
+                        "id": relation.id,
+                        "tags": tags,
+                        "members": members,
+                    }
+                )
+
+        relation_scanner = CastleRelationScanner()
+
+        relation_scanner.apply_file(
+            pbf_path,
+            locations=False,
+        )
+
         reader = AtlasLocalOSMReader(bbox)
-        reader.apply_file(pbf_path, locations=True)
+
+        reader.apply_file(
+            pbf_path,
+            locations=True,
+        )
+
+        if relation_scanner.member_way_ids:
+
+            class CastleMemberWayScanner(osmium.SimpleHandler):
+                def __init__(self, target_way_ids):
+                    super().__init__()
+
+                    self.target_way_ids = target_way_ids
+                    self.way_geometries = {}
+
+                def way(self, way):
+                    if way.id not in self.target_way_ids:
+                        return
+
+                    geometry = []
+
+                    for node in way.nodes:
+                        if not node.location.valid():
+                            continue
+
+                        geometry.append(
+                            (
+                                node.location.lat,
+                                node.location.lon,
+                            )
+                        )
+
+                    if geometry:
+                        self.way_geometries[way.id] = geometry
+
+            way_scanner = CastleMemberWayScanner(relation_scanner.member_way_ids)
+
+            way_scanner.apply_file(
+                pbf_path,
+                locations=True,
+            )
+
+            for relation in relation_scanner.castle_relations:
+                outer_geometries = []
+                inner_geometries = []
+
+                for member in relation["members"]:
+                    geometry = way_scanner.way_geometries.get(member["ref"])
+
+                    if not geometry:
+                        continue
+
+                    geometry = list(geometry)
+
+                    if len(geometry) >= 2 and geometry[0] == geometry[-1]:
+                        geometry.pop()
+
+                    if len(geometry) < 3:
+                        continue
+
+                    if member["role"] == "inner":
+                        inner_geometries.append(geometry)
+                    else:
+                        outer_geometries.append(geometry)
+
+                if not outer_geometries:
+                    continue
+
+                if not any(
+                    reader._any_point_inside_bbox(geometry)
+                    for geometry in outer_geometries
+                ):
+                    continue
+
+                tags = relation["tags"]
+
+                reader.castles.append(
+                    {
+                        "id": relation["id"],
+                        "geometry": outer_geometries[0],
+                        "outer_geometries": outer_geometries,
+                        "inner_geometries": inner_geometries,
+                        "geometry_type": "relation",
+                        "tags": tags,
+                        "castle_type": tags.get(
+                            "castle_type",
+                            "castle",
+                        ),
+                    }
+                )
+
+                existing_wall_ids = {wall.get("id") for wall in reader.castle_walls}
+
+                for member in relation["members"]:
+                    geometry = way_scanner.way_geometries.get(member["ref"])
+
+                    if not geometry:
+                        continue
+
+                    if member["ref"] in existing_wall_ids:
+                        continue
+
+                    geometry = list(geometry)
+
+                    if len(geometry) >= 2 and geometry[0] == geometry[-1]:
+                        geometry.pop()
+
+                    if len(geometry) < 2:
+                        continue
+
+                    role = member["role"] or "outer"
+
+                    reader.castle_walls.append(
+                        {
+                            "id": member["ref"],
+                            "geometry": geometry,
+                            "tags": {
+                                **tags,
+                                "relation_id": relation["id"],
+                                "relation_role": role,
+                                "source": "castle_relation",
+                            },
+                            "wall_type": (
+                                "castle_relation_inner_wall"
+                                if role == "inner"
+                                else "castle_relation_outer_wall"
+                            ),
+                            "source_relation_id": relation["id"],
+                            "relation_role": role,
+                        }
+                    )
+
+                    existing_wall_ids.add(member["ref"])
 
         return {
             "buildings": reader.buildings,
             "trees": reader.trees,
             "roads": reader.roads,
             "pedestrian_paths": reader.pedestrian_paths,
+            "parks": reader.parks,
+            "waters": reader.waters,
+            "castles": reader.castles,
+            "castle_walls": reader.castle_walls,
+            "defensive_towers": reader.defensive_towers,
         }
