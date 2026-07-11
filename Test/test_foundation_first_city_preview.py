@@ -2,7 +2,7 @@
 
 from CORE.atlas_foundation_first_engine import AtlasFoundationFirstEngine
 
-PBF_PATH = "Data/OSM/turkey-latest.osm.pbf"
+PBF_PATH = "Data/OSM/anitkabir-test.osm.pbf"
 OUTPUT_PATH = "OUTPUT/STL/foundation_first_latest.stl"
 
 
@@ -10,10 +10,10 @@ def main():
     result = AtlasFoundationFirstEngine.generate_city_stl(
         pbf_path=PBF_PATH,
         bbox=(
-            39.93647928853755,
-            32.85904588432598,
-            39.946360711462454,
-            32.87193411567402,
+            39.92180,
+            32.83280,
+            39.92830,
+            32.84110,
         ),
         output_path=OUTPUT_PATH,
         target_size_mm=200,
