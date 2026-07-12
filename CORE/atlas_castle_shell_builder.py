@@ -53,7 +53,12 @@ class AtlasCastleShellBuilder:
         tower_points = 0
 
         for castle in castles:
-            if castle.get("geometry_type") != "relation":
+            geometry_type = castle.get("geometry_type")
+
+            if geometry_type not in (
+                "relation",
+                "way",
+            ):
                 skipped += 1
                 continue
 

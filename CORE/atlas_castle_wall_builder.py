@@ -72,12 +72,38 @@ class AtlasCastleWallBuilder:
 
         points = coordinate_engine.geometry_to_stl_mm(geometry)
 
+        metadata = terrain_mesh.get(
+            "metadata",
+            {},
+        )
+
+        legacy_size_mm = float(
+            metadata.get(
+                "size_mm",
+                200.0,
+            )
+        )
+
+        terrain_size_x_mm = float(
+            metadata.get(
+                "size_x_mm",
+                legacy_size_mm,
+            )
+        )
+
+        terrain_size_y_mm = float(
+            metadata.get(
+                "size_y_mm",
+                legacy_size_mm,
+            )
+        )
+
         points = AtlasCastleWallBuilder._clip_points_to_bounds(
             points=points,
             min_x=0.0,
-            max_x=200.0,
+            max_x=terrain_size_x_mm,
             min_y=0.0,
-            max_y=200.0,
+            max_y=terrain_size_y_mm,
         )
 
         if len(points) < 2:
@@ -149,7 +175,11 @@ class AtlasCastleWallBuilder:
 
         if tags.get("source") == "castle_relation":
             return True
-
+        if (
+            wall.get("inferred") is True
+            and wall.get("wall_type") == "inferred_castle_perimeter"
+        ):
+            return True
         geometry = wall.get("geometry", [])
 
         if len(geometry) >= 3 and geometry[0] == geometry[-1]:

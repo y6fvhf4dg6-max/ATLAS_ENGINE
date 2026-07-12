@@ -3,7 +3,7 @@
 
 class AtlasTerrainMeshGenerator:
     """
-    ATLAS Terrain Mesh Generator v0.2
+    ATLAS Terrain Mesh Generator v0.3
 
     Produces terrain meshes from any terrain provider.
 
@@ -18,6 +18,11 @@ class AtlasTerrainMeshGenerator:
     - Builds surface mesh
     - Builds closed printable terrain slab
     - Keeps metadata for future road/building/water placement
+
+    v0.3:
+    - Supports rectangular terrain dimensions
+    - Keeps legacy square size_mm behavior
+    - Supports independent size_x_mm and size_y_mm values
     """
 
     DEFAULT_GRID_SIZE = 25
@@ -25,18 +30,27 @@ class AtlasTerrainMeshGenerator:
     DEFAULT_BOTTOM_Z = 0.0
 
     @staticmethod
-    def build_height_grid(terrain_provider, bbox, grid_size=DEFAULT_GRID_SIZE):
+    def build_height_grid(
+        terrain_provider,
+        bbox,
+        grid_size=DEFAULT_GRID_SIZE,
+    ):
         south, west, north, east = bbox
 
         heights = []
 
         for row in range(grid_size):
-            lat = south + (north - south) * (row / (grid_size - 1))
+            lat = south + ((north - south) * (row / (grid_size - 1)))
+
             row_values = []
 
             for col in range(grid_size):
-                lon = west + (east - west) * (col / (grid_size - 1))
-                height = terrain_provider.get_height(lat, lon)
+                lon = west + ((east - west) * (col / (grid_size - 1)))
+
+                height = terrain_provider.get_height(
+                    lat,
+                    lon,
+                )
 
                 if height is None:
                     height = 0.0
@@ -51,13 +65,15 @@ class AtlasTerrainMeshGenerator:
             "heights": heights,
             "min_height_m": min(flat_heights),
             "max_height_m": max(flat_heights),
-            "delta_height_m": max(flat_heights) - min(flat_heights),
+            "delta_height_m": (max(flat_heights) - min(flat_heights)),
         }
 
     @staticmethod
     def build_points_from_grid(
         height_grid,
         size_mm=200.0,
+        size_x_mm=None,
+        size_y_mm=None,
         grid_size=DEFAULT_GRID_SIZE,
         z_scale=5500.0,
         base_z=DEFAULT_BASE_Z,
@@ -65,26 +81,43 @@ class AtlasTerrainMeshGenerator:
         heights = height_grid["heights"]
         min_height = height_grid["min_height_m"]
 
+        if size_x_mm is None:
+            size_x_mm = size_mm
+
+        if size_y_mm is None:
+            size_y_mm = size_mm
+
         points = []
 
         for row in range(grid_size):
-            y = size_mm * (row / (grid_size - 1))
+            y = size_y_mm * (row / (grid_size - 1))
+
             point_row = []
 
             for col in range(grid_size):
-                x = size_mm * (col / (grid_size - 1))
+                x = size_x_mm * (col / (grid_size - 1))
 
                 height = heights[row][col]
+
                 z = base_z + ((height - min_height) / z_scale) * 1000.0
 
-                point_row.append((x, y, z))
+                point_row.append(
+                    (
+                        x,
+                        y,
+                        z,
+                    )
+                )
 
             points.append(point_row)
 
         return points
 
     @staticmethod
-    def build_surface_triangles(points, grid_size):
+    def build_surface_triangles(
+        points,
+        grid_size,
+    ):
         triangles = []
 
         for row in range(grid_size - 1):
@@ -94,29 +127,65 @@ class AtlasTerrainMeshGenerator:
                 p01 = points[row + 1][col]
                 p11 = points[row + 1][col + 1]
 
-                triangles.append((p00, p10, p11))
-                triangles.append((p00, p11, p01))
+                triangles.append(
+                    (
+                        p00,
+                        p10,
+                        p11,
+                    )
+                )
+
+                triangles.append(
+                    (
+                        p00,
+                        p11,
+                        p01,
+                    )
+                )
 
         return triangles
 
     @staticmethod
-    def build_bottom_points(size_mm, grid_size, bottom_z=DEFAULT_BOTTOM_Z):
+    def build_bottom_points(
+        size_mm,
+        grid_size,
+        bottom_z=DEFAULT_BOTTOM_Z,
+        size_x_mm=None,
+        size_y_mm=None,
+    ):
+        if size_x_mm is None:
+            size_x_mm = size_mm
+
+        if size_y_mm is None:
+            size_y_mm = size_mm
+
         bottom_points = []
 
         for row in range(grid_size):
-            y = size_mm * (row / (grid_size - 1))
+            y = size_y_mm * (row / (grid_size - 1))
+
             bottom_row = []
 
             for col in range(grid_size):
-                x = size_mm * (col / (grid_size - 1))
-                bottom_row.append((x, y, bottom_z))
+                x = size_x_mm * (col / (grid_size - 1))
+
+                bottom_row.append(
+                    (
+                        x,
+                        y,
+                        bottom_z,
+                    )
+                )
 
             bottom_points.append(bottom_row)
 
         return bottom_points
 
     @staticmethod
-    def build_bottom_triangles(bottom_points, grid_size):
+    def build_bottom_triangles(
+        bottom_points,
+        grid_size,
+    ):
         triangles = []
 
         for row in range(grid_size - 1):
@@ -126,54 +195,123 @@ class AtlasTerrainMeshGenerator:
                 p01 = bottom_points[row + 1][col]
                 p11 = bottom_points[row + 1][col + 1]
 
-                triangles.append((p00, p11, p10))
-                triangles.append((p00, p01, p11))
+                triangles.append(
+                    (
+                        p00,
+                        p11,
+                        p10,
+                    )
+                )
+
+                triangles.append(
+                    (
+                        p00,
+                        p01,
+                        p11,
+                    )
+                )
 
         return triangles
 
     @staticmethod
-    def build_side_wall_triangles(top_points, bottom_points, grid_size):
+    def build_side_wall_triangles(
+        top_points,
+        bottom_points,
+        grid_size,
+    ):
         triangles = []
 
         # South and north walls
         for col in range(grid_size - 1):
-            # south
+            # South wall
             top_1 = top_points[0][col]
             top_2 = top_points[0][col + 1]
             bot_1 = bottom_points[0][col]
             bot_2 = bottom_points[0][col + 1]
 
-            triangles.append((bot_1, bot_2, top_2))
-            triangles.append((bot_1, top_2, top_1))
+            triangles.append(
+                (
+                    bot_1,
+                    bot_2,
+                    top_2,
+                )
+            )
 
-            # north
+            triangles.append(
+                (
+                    bot_1,
+                    top_2,
+                    top_1,
+                )
+            )
+
+            # North wall
             top_1 = top_points[-1][col]
             top_2 = top_points[-1][col + 1]
             bot_1 = bottom_points[-1][col]
             bot_2 = bottom_points[-1][col + 1]
 
-            triangles.append((bot_1, top_2, bot_2))
-            triangles.append((bot_1, top_1, top_2))
+            triangles.append(
+                (
+                    bot_1,
+                    top_2,
+                    bot_2,
+                )
+            )
+
+            triangles.append(
+                (
+                    bot_1,
+                    top_1,
+                    top_2,
+                )
+            )
 
         # West and east walls
         for row in range(grid_size - 1):
-            # west
+            # West wall
             top_1 = top_points[row][0]
             top_2 = top_points[row + 1][0]
             bot_1 = bottom_points[row][0]
             bot_2 = bottom_points[row + 1][0]
 
-            triangles.append((bot_1, top_2, bot_2))
-            triangles.append((bot_1, top_1, top_2))
+            triangles.append(
+                (
+                    bot_1,
+                    top_2,
+                    bot_2,
+                )
+            )
 
-            # east
+            triangles.append(
+                (
+                    bot_1,
+                    top_1,
+                    top_2,
+                )
+            )
+
+            # East wall
             top_1 = top_points[row][-1]
             top_2 = top_points[row + 1][-1]
             bot_1 = bottom_points[row][-1]
             bot_2 = bottom_points[row + 1][-1]
 
-            triangles.append((bot_1, bot_2, top_2))
-            triangles.append((bot_1, top_2, top_1))
+            triangles.append(
+                (
+                    bot_1,
+                    bot_2,
+                    top_2,
+                )
+            )
+
+            triangles.append(
+                (
+                    bot_1,
+                    top_2,
+                    top_1,
+                )
+            )
 
         return triangles
 
@@ -182,10 +320,18 @@ class AtlasTerrainMeshGenerator:
         terrain_provider,
         bbox,
         size_mm=200.0,
+        size_x_mm=None,
+        size_y_mm=None,
         grid_size=DEFAULT_GRID_SIZE,
         z_scale=5500.0,
         base_z=DEFAULT_BASE_Z,
     ):
+        if size_x_mm is None:
+            size_x_mm = size_mm
+
+        if size_y_mm is None:
+            size_y_mm = size_mm
+
         height_grid = AtlasTerrainMeshGenerator.build_height_grid(
             terrain_provider=terrain_provider,
             bbox=bbox,
@@ -195,6 +341,8 @@ class AtlasTerrainMeshGenerator:
         top_points = AtlasTerrainMeshGenerator.build_points_from_grid(
             height_grid=height_grid,
             size_mm=size_mm,
+            size_x_mm=size_x_mm,
+            size_y_mm=size_y_mm,
             grid_size=grid_size,
             z_scale=z_scale,
             base_z=base_z,
@@ -212,6 +360,8 @@ class AtlasTerrainMeshGenerator:
                 "bbox": bbox,
                 "grid_size": grid_size,
                 "size_mm": size_mm,
+                "size_x_mm": size_x_mm,
+                "size_y_mm": size_y_mm,
                 "z_scale": z_scale,
                 "base_z": base_z,
                 "bottom_z": None,
@@ -230,15 +380,25 @@ class AtlasTerrainMeshGenerator:
         terrain_provider,
         bbox,
         size_mm=200.0,
+        size_x_mm=None,
+        size_y_mm=None,
         grid_size=DEFAULT_GRID_SIZE,
         z_scale=5500.0,
         base_z=DEFAULT_BASE_Z,
         bottom_z=DEFAULT_BOTTOM_Z,
     ):
+        if size_x_mm is None:
+            size_x_mm = size_mm
+
+        if size_y_mm is None:
+            size_y_mm = size_mm
+
         surface_mesh = AtlasTerrainMeshGenerator.build_surface_mesh(
             terrain_provider=terrain_provider,
             bbox=bbox,
             size_mm=size_mm,
+            size_x_mm=size_x_mm,
+            size_y_mm=size_y_mm,
             grid_size=grid_size,
             z_scale=z_scale,
             base_z=base_z,
@@ -248,6 +408,8 @@ class AtlasTerrainMeshGenerator:
 
         bottom_points = AtlasTerrainMeshGenerator.build_bottom_points(
             size_mm=size_mm,
+            size_x_mm=size_x_mm,
+            size_y_mm=size_y_mm,
             grid_size=grid_size,
             bottom_z=bottom_z,
         )
@@ -277,6 +439,7 @@ class AtlasTerrainMeshGenerator:
         )
 
         metadata = dict(surface_mesh["metadata"])
+
         metadata["bottom_z"] = bottom_z
         metadata["closed"] = True
         metadata["triangle_count"] = len(triangles)

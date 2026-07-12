@@ -4,23 +4,41 @@ from CORE.atlas_local_osm_reader import AtlasLocalOSMReader
 from CORE.atlas_scale_engine import AtlasScaleEngine
 from CORE.atlas_coordinate_engine import AtlasCoordinateEngine
 from CORE.atlas_terrain_pipeline import AtlasTerrainPipeline
-from CORE.atlas_foundation_scene_builder import AtlasFoundationSceneBuilder
+from CORE.atlas_foundation_scene_builder import (
+    AtlasFoundationSceneBuilder,
+)
 from CORE.atlas_debug_reporter import AtlasDebugReporter
-from CORE.atlas_road_foundation_builder import AtlasRoadFoundationBuilder
-from CORE.atlas_park_foundation_builder import AtlasParkFoundationBuilder
-from CORE.atlas_tree_foundation_builder import AtlasTreeFoundationBuilder
+from CORE.atlas_road_foundation_builder import (
+    AtlasRoadFoundationBuilder,
+)
+from CORE.atlas_park_foundation_builder import (
+    AtlasParkFoundationBuilder,
+)
+from CORE.atlas_tree_foundation_builder import (
+    AtlasTreeFoundationBuilder,
+)
 from CORE.atlas_nature_pipeline import AtlasNaturePipeline
-from CORE.atlas_castle_wall_builder import AtlasCastleWallBuilder
-from CORE.atlas_castle_shell_builder import AtlasCastleShellBuilder
+from CORE.atlas_castle_wall_builder import (
+    AtlasCastleWallBuilder,
+)
+from CORE.atlas_castle_geometry_classifier import (
+    AtlasCastleGeometryClassifier,
+)
+from CORE.atlas_castle_shell_builder import (
+    AtlasCastleShellBuilder,
+)
 from CORE.atlas_castle_tower_cap_builder import (
     AtlasCastleTowerCapBuilder,
+)
+from CORE.atlas_castle_focus_engine import (
+    AtlasCastleFocusEngine,
 )
 from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
     """
-    ATLAS Foundation-First Engine v0.4
+    ATLAS Foundation-First Engine v0.5
 
     Akış:
     PBF
@@ -39,9 +57,14 @@ class AtlasFoundationFirstEngine:
     - barrier=city_wall gibi bağımsız surlar Wall Builder ile üretilir
     - relation outer/inner geometrileri Shell Builder ile tek kabuk yapılır
     - relation sınırları ayrıca ikinci kez sur olarak üretilmez
+
+    v0.5:
+    - İsteğe bağlı castle-focus bbox desteği
+    - Sabit XY ölçeğinde dikdörtgen terrain desteği
+    - Eski kare terrain davranışı varsayılan olarak korunur
     """
 
-    VERSION = "0.4"
+    VERSION = "0.5"
     BASE_PLATE_HEIGHT_MM = 0.80
 
     @staticmethod
@@ -58,50 +81,93 @@ class AtlasFoundationFirstEngine:
         max_points=300,
         z_scale=5500,
         terrain_provider_name="srtm",
+        nature_provider_names=("worldcover",),
+        castle_only=False,
+        castle_focus=False,
+        castle_focus_padding_m=10.0,
+        fixed_xy_scale=5500.0,
         debug=True,
     ):
+        source_bbox = bbox
+
         data = AtlasLocalOSMReader.read(
             pbf_path,
-            bbox,
+            source_bbox,
         )
 
-        raw_buildings = data.get("buildings", [])
-        trees = data.get("trees", [])
-        roads = data.get("roads", [])
+        raw_buildings = data.get(
+            "buildings",
+            [],
+        )
+
+        trees = data.get(
+            "trees",
+            [],
+        )
+
+        roads = data.get(
+            "roads",
+            [],
+        )
+
         pedestrian_paths = data.get(
             "pedestrian_paths",
             [],
         )
-        parks = data.get("parks", [])
-        waters = data.get("waters", [])
-        castles = data.get("castles", [])
+
+        parks = data.get(
+            "parks",
+            [],
+        )
+
+        waters = data.get(
+            "waters",
+            [],
+        )
+
+        castles = data.get(
+            "castles",
+            [],
+        )
+
         castle_walls = data.get(
             "castle_walls",
             [],
         )
+
         defensive_towers = data.get(
             "defensive_towers",
             [],
         )
 
         nature_data = AtlasNaturePipeline.fetch(
-            bbox=bbox,
-            provider_names=("worldcover",),
+            bbox=source_bbox,
+            provider_names=nature_provider_names,
             debug=debug,
         )
 
-        trees.extend(nature_data.get("trees", []))
+        trees.extend(
+            nature_data.get(
+                "trees",
+                [],
+            )
+        )
 
-        # Relation sınırları Castle Shell Builder tarafından
-        # tek kabuk olarak üretilecektir. Bunları ayrıca sur
-        # şeridi olarak üretmek çift geometri oluşturur.
-        independent_castle_walls = [
-            wall for wall in castle_walls if not wall.get("source_relation_id")
-        ]
+        castle_geometry = AtlasCastleGeometryClassifier.classify(
+            castles=castles,
+            castle_walls=castle_walls,
+            debug=debug,
+        )
 
-        relation_castle_walls = [
-            wall for wall in castle_walls if wall.get("source_relation_id")
-        ]
+        shell_castles = castle_geometry["shell_castles"]
+
+        independent_castle_walls = castle_geometry["independent_castle_walls"]
+
+        relation_castle_walls = castle_geometry["relation_castle_walls"]
+
+        inferred_perimeter_walls = castle_geometry["inferred_perimeter_walls"]
+
+        unknown_castles = castle_geometry["unknown_castles"]
 
         if debug:
             print("")
@@ -121,19 +187,56 @@ class AtlasFoundationFirstEngine:
             print(f"Reader castle walls     : " f"{len(castle_walls)}")
             print(f"Independent walls       : " f"{len(independent_castle_walls)}")
             print(f"Relation wall records   : " f"{len(relation_castle_walls)}")
+            print(f"Inferred perimeter walls: " f"{len(inferred_perimeter_walls)}")
+            print(f"Unknown castles         : " f"{len(unknown_castles)}")
             print(f"Reader defensive towers : " f"{len(defensive_towers)}")
             print("=" * 70)
 
-        xy_scale = AtlasScaleEngine.calculate_xy_scale_from_bbox(
-            bbox=bbox,
-            target_size_mm=target_size_mm,
-            bed_width_mm=bed_width_mm,
-            bed_depth_mm=bed_depth_mm,
-            margin_mm=margin_mm,
-            debug=debug,
-        )
+        working_bbox = source_bbox
+        size_x_mm = None
+        size_y_mm = None
+        focus_result = None
 
-        south, west, _north, _east = bbox
+        use_castle_focus = bool(castle_only and castle_focus)
+
+        if use_castle_focus:
+            focus_result = AtlasCastleFocusEngine.calculate_focus_bbox(
+                raw_buildings=raw_buildings,
+                castles=castles,
+                independent_castle_walls=(independent_castle_walls),
+                shell_castles=shell_castles,
+                source_bbox=source_bbox,
+                min_points=min_points,
+                max_points=max_points,
+                padding_m=castle_focus_padding_m,
+                debug=debug,
+            )
+
+            working_bbox = focus_result["bbox"]
+
+            fixed_dimensions = AtlasScaleEngine.calculate_dimensions_from_scale(
+                bbox=working_bbox,
+                xy_scale=fixed_xy_scale,
+                debug=debug,
+            )
+
+            xy_scale = fixed_dimensions["xy_scale"]
+
+            size_x_mm = fixed_dimensions["size_x_mm"]
+
+            size_y_mm = fixed_dimensions["size_y_mm"]
+
+        else:
+            xy_scale = AtlasScaleEngine.calculate_xy_scale_from_bbox(
+                bbox=working_bbox,
+                target_size_mm=target_size_mm,
+                bed_width_mm=bed_width_mm,
+                bed_depth_mm=bed_depth_mm,
+                margin_mm=margin_mm,
+                debug=debug,
+            )
+
+        south, west, _north, _east = working_bbox
 
         coordinate_engine = AtlasCoordinateEngine(
             origin_lat=south,
@@ -143,8 +246,10 @@ class AtlasFoundationFirstEngine:
         )
 
         terrain_slab = AtlasTerrainPipeline.build_terrain_slab(
-            bbox=bbox,
+            bbox=working_bbox,
             target_size_mm=target_size_mm,
+            size_x_mm=size_x_mm,
+            size_y_mm=size_y_mm,
             z_scale=z_scale,
             base_z=(AtlasFoundationFirstEngine.BASE_PLATE_HEIGHT_MM),
             bottom_z=0.0,
@@ -157,7 +262,8 @@ class AtlasFoundationFirstEngine:
             raw_buildings=raw_buildings,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
-            bbox=bbox,
+            castles=castles,
+            bbox=working_bbox,
             target_size_mm=target_size_mm,
             bed_width_mm=bed_width_mm,
             bed_depth_mm=bed_depth_mm,
@@ -167,27 +273,41 @@ class AtlasFoundationFirstEngine:
             max_buildings=max_buildings,
             min_points=min_points,
             max_points=max_points,
+            castle_only=castle_only,
             debug=debug,
         )
 
         building_meshes = scene.get_all_meshes()
 
+        if castle_only:
+            road_input = []
+            park_input = []
+            tree_input = []
+        else:
+            road_input = [
+                *roads,
+                *pedestrian_paths,
+            ]
+
+            park_input = parks
+            tree_input = trees
+
         road_meshes = AtlasRoadFoundationBuilder.build_roads(
-            roads=roads,
+            roads=road_input,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
         )
 
         park_meshes = AtlasParkFoundationBuilder.build_parks(
-            parks=parks,
+            parks=park_input,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
         )
 
         tree_meshes = AtlasTreeFoundationBuilder.build_trees(
-            trees=trees,
+            trees=tree_input,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
@@ -201,25 +321,33 @@ class AtlasFoundationFirstEngine:
         )
 
         castle_shell_meshes = AtlasCastleShellBuilder.build_shells(
-            castles=castles,
+            castles=shell_castles,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
         )
+
         castle_tower_cap_meshes = AtlasCastleTowerCapBuilder.build_caps(
-            castles=castles,
+            castles=shell_castles,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
         )
 
         meshes = [terrain_slab]
+
         meshes.extend(building_meshes)
+
         meshes.extend(road_meshes)
+
         meshes.extend(park_meshes)
+
         meshes.extend(tree_meshes)
+
         meshes.extend(castle_wall_meshes)
+
         meshes.extend(castle_shell_meshes)
+
         meshes.extend(castle_tower_cap_meshes)
 
         triangle_count = AtlasDebugReporter.count_triangles(meshes)
@@ -239,6 +367,15 @@ class AtlasFoundationFirstEngine:
             print(f"Castle tower caps  : " f"{len(castle_tower_cap_meshes)}")
             print(f"Total meshes       : " f"{len(meshes)}")
             print(f"Triangles          : " f"{triangle_count}")
+            print(f"Castle focus       : " f"{use_castle_focus}")
+            print(f"XY scale           : " f"1:{xy_scale:.2f}")
+
+            if size_x_mm is not None:
+                print(f"Terrain width      : " f"{size_x_mm:.2f} mm")
+
+            if size_y_mm is not None:
+                print(f"Terrain depth      : " f"{size_y_mm:.2f} mm")
+
             print("=" * 70)
 
         AtlasSTLWriter.write(
@@ -252,10 +389,15 @@ class AtlasFoundationFirstEngine:
             print("ATLAS FOUNDATION-FIRST " "STL EXPORTED")
             print("=" * 70)
             print(f"Output    : {output_path}")
-            print(f"XY scale  : {xy_scale:.2f}")
+            print(f"XY scale  : 1:{xy_scale:.2f}")
             print(f"Meshes    : {len(meshes)}")
             print(f"Triangles : {triangle_count}")
             print("=" * 70)
+
+        terrain_metadata = terrain_slab.get(
+            "metadata",
+            {},
+        )
 
         return {
             "output_path": output_path,
@@ -275,7 +417,33 @@ class AtlasFoundationFirstEngine:
             "castle_shell_meshes": len(castle_shell_meshes),
             "castle_tower_cap_meshes": len(castle_tower_cap_meshes),
             "meshes": len(meshes),
+            "mesh_groups": {
+                "terrain": [terrain_slab],
+                "buildings": building_meshes,
+                "roads": road_meshes,
+                "parks": park_meshes,
+                "trees": tree_meshes,
+                "castle_walls": (castle_wall_meshes),
+                "castle_shells": (castle_shell_meshes),
+                "castle_tower_caps": (castle_tower_cap_meshes),
+            },
             "triangles": triangle_count,
             "xy_scale": xy_scale,
+            "source_bbox": source_bbox,
+            "working_bbox": working_bbox,
+            "castle_focus": use_castle_focus,
+            "castle_focus_result": focus_result,
+            "terrain_size_x_mm": (
+                terrain_metadata.get(
+                    "size_x_mm",
+                    terrain_metadata.get("size_mm"),
+                )
+            ),
+            "terrain_size_y_mm": (
+                terrain_metadata.get(
+                    "size_y_mm",
+                    terrain_metadata.get("size_mm"),
+                )
+            ),
             "mode": "foundation_first",
         }

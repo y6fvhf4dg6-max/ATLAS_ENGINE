@@ -1,0 +1,190 @@
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+
+from CORE.atlas_foundation_first_engine import (
+    AtlasFoundationFirstEngine,
+)
+from CORE.atlas_mesh_validator import AtlasMeshValidator
+
+PBF_PATH = PROJECT_ROOT / "Data/OSM/burghausen-test.osm.pbf"
+
+OUTPUT_PATH = PROJECT_ROOT / "OUTPUT/STL/burghausen_castle_focus.stl"
+
+BBOX = (
+    48.1500,
+    12.8240,
+    48.1628,
+    12.8345,
+)
+
+
+def main():
+    if not PBF_PATH.exists():
+        raise FileNotFoundError(f"PBF bulunamadı: {PBF_PATH}")
+
+    result = AtlasFoundationFirstEngine.generate_city_stl(
+        pbf_path=str(PBF_PATH),
+        bbox=BBOX,
+        output_path=str(OUTPUT_PATH),
+        target_size_mm=180,
+        bed_width_mm=256,
+        bed_depth_mm=256,
+        margin_mm=10,
+        max_buildings=None,
+        min_points=3,
+        max_points=500,
+        z_scale=5500,
+        terrain_provider_name="srtm",
+        nature_provider_names=(),
+        castle_only=True,
+        debug=True,
+    )
+
+    print("")
+    print("=" * 88)
+    print("ATLAS BURGHAUSEN MESH TOPOLOGY DIAGNOSTIC")
+    print("=" * 88)
+
+    mesh_groups = result.get("mesh_groups", {})
+
+    total_open_edges = 0
+    total_non_manifold_edges = 0
+
+    for group_name, group_meshes in mesh_groups.items():
+        print("")
+        print(f"[GROUP] {group_name}")
+        print("-" * 88)
+
+        for mesh_index, mesh in enumerate(group_meshes):
+            report = AtlasMeshValidator.report(mesh)
+
+            open_edge_count = report.get("open_edge_count", 0)
+            non_manifold_count = report.get(
+                "non_manifold_edge_count",
+                0,
+            )
+
+            total_open_edges += open_edge_count
+            total_non_manifold_edges += non_manifold_count
+
+            print(
+                f"{group_name}[{mesh_index}] "
+                f"source_id={mesh.get('source_id')} "
+                f"name={mesh.get('name')} "
+                f"profile={mesh.get('castle_profile')} "
+                f"roof_profile={mesh.get('castle_roof_profile')} "
+                f"tower_roof={mesh.get('castle_roof_applied', False)} "
+                f"gable_roof={mesh.get('castle_gable_roof_applied', False)} "
+                f"multi_gable={mesh.get('castle_multi_gable_roof_applied', False)} "
+                f"triangles={report.get('triangles', 0)} "
+                f"open_edges={open_edge_count} "
+                f"non_manifold={non_manifold_count} "
+                f"valid={report.get('valid', False)}"
+            )
+
+            if open_edge_count > 0:
+                print("  sample_open_edges=" f"{report.get('sample_open_edges', [])}")
+
+            if non_manifold_count > 0:
+                print(
+                    "  sample_non_manifold_edges="
+                    f"{report.get('sample_non_manifold_edges', [])}"
+                )
+
+    print("")
+    print("-" * 88)
+    print(f"Total diagnostic open edges      : {total_open_edges}")
+    print("Total diagnostic non-manifold   : " f"{total_non_manifold_edges}")
+    print("=" * 88)
+    print("ATLAS BURGHAUSEN FULL SCENE REPORT")
+    focus_meshes = []
+
+    for group_name in (
+        "buildings",
+        "castle_walls",
+        "castle_shells",
+        "castle_tower_caps",
+    ):
+        focus_meshes.extend(mesh_groups.get(group_name, []))
+
+    focus_points = []
+
+    for mesh in focus_meshes:
+        for triangle in mesh.get("triangles", []):
+            focus_points.extend(triangle)
+
+    if focus_points:
+        min_x = min(point[0] for point in focus_points)
+        max_x = max(point[0] for point in focus_points)
+        min_y = min(point[1] for point in focus_points)
+        max_y = max(point[1] for point in focus_points)
+
+        focus_width_mm = max_x - min_x
+        focus_depth_mm = max_y - min_y
+
+        print("")
+        print("=" * 88)
+        print("ATLAS BURGHAUSEN CASTLE-FOCUS BOUNDS")
+        print("=" * 88)
+        print(f"Minimum X                     : {min_x:.3f} mm")
+        print(f"Maximum X                     : {max_x:.3f} mm")
+        print(f"Minimum Y                     : {min_y:.3f} mm")
+        print(f"Maximum Y                     : {max_y:.3f} mm")
+        print(f"Castle-focus width            : {focus_width_mm:.3f} mm")
+        print(f"Castle-focus depth            : {focus_depth_mm:.3f} mm")
+        print(
+            f"Largest occupied dimension    : "
+            f"{max(focus_width_mm, focus_depth_mm):.3f} mm"
+        )
+        print(
+            f"Current 180 mm utilization    : "
+            f"{max(focus_width_mm, focus_depth_mm) / 180.0 * 100.0:.2f}%"
+        )
+        print("=" * 88)
+    print("=" * 88)
+
+    print(f"Reader buildings              : " f"{result.get('reader_buildings', 0)}")
+
+    print(f"Reader trees                  : " f"{result.get('reader_trees', 0)}")
+
+    print(f"Reader roads                  : " f"{result.get('reader_roads', 0)}")
+
+    print(
+        f"Reader pedestrian paths       : "
+        f"{result.get('reader_pedestrian_paths', 0)}"
+    )
+
+    print(f"Reader parks                  : " f"{result.get('reader_parks', 0)}")
+
+    print(f"Reader castles                : " f"{result.get('reader_castles', 0)}")
+
+    print(f"Reader castle walls           : " f"{result.get('reader_castle_walls', 0)}")
+
+    print(f"Building meshes               : " f"{result.get('buildings', 0)}")
+
+    print(f"Castle wall meshes            : " f"{result.get('castle_wall_meshes', 0)}")
+
+    print(f"Castle shell meshes           : " f"{result.get('castle_shell_meshes', 0)}")
+
+    print(
+        f"Castle tower cap meshes       : "
+        f"{result.get('castle_tower_cap_meshes', 0)}"
+    )
+
+    print(f"Total meshes                  : " f"{result.get('meshes', 0)}")
+
+    print(f"Total triangles               : " f"{result.get('triangles', 0)}")
+
+    print(f"Output                        : " f"{OUTPUT_PATH}")
+
+    print("=" * 88)
+
+
+if __name__ == "__main__":
+    main()

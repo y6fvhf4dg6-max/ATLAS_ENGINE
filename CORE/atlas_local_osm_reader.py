@@ -71,16 +71,20 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
     def way(self, w):
         tags = dict(w.tags)
 
+        if self._is_castle(tags):
+            self._read_castle(w, tags)
+
+        if self._is_castle_wall(tags):
+            self._read_castle_wall(w, tags)
+
+            return
+
         if self._is_castle_wall(tags):
             self._read_castle_wall(w, tags)
             return
 
         if self._is_defensive_tower(tags):
             self._read_defensive_tower(w, tags)
-            return
-
-        if self._is_castle(tags):
-            self._read_castle(w, tags)
             return
 
         if "building" in tags:
@@ -433,8 +437,14 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             {
                 "id": w.id,
                 "geometry": geometry,
+                "outer_geometries": [geometry],
+                "inner_geometries": [],
+                "geometry_type": "way",
                 "tags": tags,
-                "castle_type": tags.get("castle_type", "castle"),
+                "castle_type": tags.get(
+                    "castle_type",
+                    "castle",
+                ),
             }
         )
 

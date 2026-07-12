@@ -9,7 +9,11 @@ from CORE.atlas_terrain_mesh_generator import AtlasTerrainMeshGenerator
 
 class AtlasTerrainPipeline:
     """
-    ATLAS Terrain Pipeline v2.0
+    ATLAS Terrain Pipeline v2.1
+
+    v2.1:
+    - Supports rectangular terrain dimensions
+    - Keeps legacy square target_size_mm behavior
     """
 
     @staticmethod
@@ -22,6 +26,8 @@ class AtlasTerrainPipeline:
         grid_size=25,
         data_dir="Data/TERRAIN/SRTM",
         terrain_provider_name="srtm",
+        size_x_mm=None,
+        size_y_mm=None,
         debug=True,
     ):
         if terrain_provider_name.lower() == "opentopography":
@@ -31,6 +37,7 @@ class AtlasTerrainPipeline:
             )
 
             south, west, north, east = bbox
+
             terrain_provider.download_dem_bbox(
                 south=south,
                 west=west,
@@ -47,6 +54,8 @@ class AtlasTerrainPipeline:
             terrain_provider=terrain_provider,
             bbox=bbox,
             size_mm=target_size_mm,
+            size_x_mm=size_x_mm,
+            size_y_mm=size_y_mm,
             grid_size=grid_size,
             z_scale=z_scale,
             base_z=base_z,
