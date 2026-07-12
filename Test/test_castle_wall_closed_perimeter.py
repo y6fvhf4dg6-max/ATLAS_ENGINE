@@ -46,3 +46,58 @@ if __name__ == "__main__":
     test_inferred_perimeter_wall_is_closed()
 
     print("PASS: " "test_inferred_perimeter_wall_is_closed")
+
+
+def test_historic_castle_wall_tag_is_recognized():
+    from CORE.atlas_local_osm_reader import (
+        AtlasLocalOSMReader,
+    )
+
+    assert (
+        AtlasLocalOSMReader._is_castle_wall(
+            {
+                "building": "yes",
+                "historic": "castle_wall",
+            }
+        )
+        is True
+    )
+
+
+def test_existing_city_wall_tags_remain_supported():
+    from CORE.atlas_local_osm_reader import (
+        AtlasLocalOSMReader,
+    )
+
+    assert (
+        AtlasLocalOSMReader._is_castle_wall(
+            {
+                "barrier": "city_wall",
+            }
+        )
+        is True
+    )
+
+    assert (
+        AtlasLocalOSMReader._is_castle_wall(
+            {
+                "historic": "citywalls",
+            }
+        )
+        is True
+    )
+
+
+def test_regular_building_is_not_castle_wall():
+    from CORE.atlas_local_osm_reader import (
+        AtlasLocalOSMReader,
+    )
+
+    assert (
+        AtlasLocalOSMReader._is_castle_wall(
+            {
+                "building": "yes",
+            }
+        )
+        is False
+    )

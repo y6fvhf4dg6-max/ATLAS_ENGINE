@@ -17,6 +17,12 @@ from CORE.atlas_foundation_first_engine import (
 from CORE.atlas_castle_shell_builder import (
     AtlasCastleShellBuilder,
 )
+from CORE.atlas_coastline_water_builder import (
+    AtlasCoastlineWaterBuilder,
+)
+from CORE.atlas_water_foundation_builder import (
+    AtlasWaterFoundationBuilder,
+)
 from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 RECONSTRUCTION_PATH = (
@@ -134,6 +140,26 @@ def main():
         debug=False,
     )
 
+    coastline_water_polygons = (
+        AtlasCoastlineWaterBuilder.build_water_polygons(
+            coastlines=data.get(
+                "coastlines",
+                [],
+            ),
+            bbox=reconstruction.BBOX,
+            debug=True,
+        )
+    )
+
+    water_meshes = (
+        AtlasWaterFoundationBuilder.build_coastline_water_meshes(
+            water_polygons=coastline_water_polygons,
+            coordinate_engine=coordinate_engine,
+            terrain_mesh=terrain_mesh,
+            debug=True,
+        )
+    )
+
     shell_meshes = AtlasCastleShellBuilder.build_shells(
         castles=[castle],
         coordinate_engine=(coordinate_engine),
@@ -205,6 +231,7 @@ def main():
 
     meshes = [
         terrain_mesh,
+        *water_meshes,
         *shell_meshes,
         *tower_meshes,
     ]
@@ -216,6 +243,8 @@ def main():
     )
 
     terrain_triangle_count = count_triangles([terrain_mesh])
+
+    water_triangle_count = count_triangles(water_meshes)
 
     shell_triangle_count = count_triangles(shell_meshes)
 
@@ -230,6 +259,8 @@ def main():
 
     print(f"Terrain meshes                : 1")
 
+    print(f"Water meshes                  : " f"{len(water_meshes)}")
+
     print(f"Castle shell meshes           : " f"{len(shell_meshes)}")
 
     print(f"Tower meshes                  : " f"{len(tower_meshes)}")
@@ -241,6 +272,8 @@ def main():
     print(f"Cap extra height              : " f"{cap_extra_height_mm:.6f} mm")
 
     print(f"Terrain triangles             : " f"{terrain_triangle_count}")
+
+    print(f"Water triangles               : " f"{water_triangle_count}")
 
     print(f"Shell triangles               : " f"{shell_triangle_count}")
 

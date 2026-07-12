@@ -29,7 +29,9 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         self.pedestrian_paths = []
         self.parks = []
         self.waters = []
+        self.coastlines = []
         self.castles = []
+        self.castle_metadata = []
         self.castle_walls = []
         self.defensive_towers = []
 
@@ -47,6 +49,22 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             return
 
         tags = dict(n.tags)
+
+        if self._is_castle(tags):
+            self.castle_metadata.append(
+                {
+                    "id": n.id,
+                    "lat": lat,
+                    "lon": lon,
+                    "geometry_type": "node",
+                    "tags": tags,
+                    "castle_type": tags.get(
+                        "castle_type",
+                        "castle",
+                    ),
+                    "name": tags.get("name"),
+                }
+            )
 
         if tags.get("natural") == "tree":
             self.trees.append(
@@ -91,6 +109,10 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             self._read_building(w, tags)
             return
 
+        if tags.get("natural") == "coastline":
+            self._read_coastline(w, tags)
+            return
+
         if self._is_water(tags):
             self._read_water(w, tags)
             return
@@ -126,6 +148,24 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         if self._is_park_or_green_area(tags):
             self._read_park(w, tags)
             return
+
+    def _read_coastline(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 2:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        self.coastlines.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "geometry_type": "way",
+                "tags": tags,
+            }
+        )
 
     def _read_building(self, w, tags):
         geometry = self._extract_way_geometry(w)
@@ -471,7 +511,14 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
 
     @staticmethod
     def _is_castle_wall(tags):
-        return tags.get("barrier") == "city_wall" or tags.get("historic") == "citywalls"
+        historic = tags.get("historic")
+        barrier = tags.get("barrier")
+
+        return (
+            barrier == "city_wall"
+            or historic == "citywalls"
+            or historic == "castle_wall"
+        )
 
     @staticmethod
     def _is_castle(tags):
@@ -678,7 +725,9 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             "pedestrian_paths": reader.pedestrian_paths,
             "parks": reader.parks,
             "waters": reader.waters,
+            "coastlines": reader.coastlines,
             "castles": reader.castles,
+            "castle_metadata": reader.castle_metadata,
             "castle_walls": reader.castle_walls,
             "defensive_towers": reader.defensive_towers,
         }

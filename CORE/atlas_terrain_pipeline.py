@@ -30,9 +30,11 @@ class AtlasTerrainPipeline:
         size_y_mm=None,
         debug=True,
     ):
-        if terrain_provider_name.lower() == "opentopography":
+        provider_name = terrain_provider_name.lower()
+
+        if provider_name == "opentopography":
             terrain_provider = AtlasOpenTopographyProvider(
-                dataset="AW3D30",
+                dataset="COP30",
                 debug=debug,
             )
 
@@ -44,20 +46,90 @@ class AtlasTerrainPipeline:
                 north=north,
                 east=east,
             )
-        else:
-            terrain_provider = AtlasSRTMProvider(
-                data_dir=data_dir,
-                debug=debug,
+
+            return AtlasTerrainMeshGenerator.build_closed_slab_mesh(
+                terrain_provider=terrain_provider,
+                bbox=bbox,
+                size_mm=target_size_mm,
+                size_x_mm=size_x_mm,
+                size_y_mm=size_y_mm,
+                grid_size=grid_size,
+                z_scale=z_scale,
+                base_z=base_z,
+                bottom_z=bottom_z,
             )
 
-        return AtlasTerrainMeshGenerator.build_closed_slab_mesh(
-            terrain_provider=terrain_provider,
-            bbox=bbox,
-            size_mm=target_size_mm,
-            size_x_mm=size_x_mm,
-            size_y_mm=size_y_mm,
-            grid_size=grid_size,
-            z_scale=z_scale,
-            base_z=base_z,
-            bottom_z=bottom_z,
+        if provider_name != "srtm":
+            raise ValueError(
+                "Unsupported terrain provider: " f"{terrain_provider_name}"
+            )
+
+        srtm_provider = AtlasSRTMProvider(
+            data_dir=data_dir,
+            debug=debug,
         )
+
+        try:
+            return AtlasTerrainMeshGenerator.build_closed_slab_mesh(
+                terrain_provider=srtm_provider,
+                bbox=bbox,
+                size_mm=target_size_mm,
+                size_x_mm=size_x_mm,
+                size_y_mm=size_y_mm,
+                grid_size=grid_size,
+                z_scale=z_scale,
+                base_z=base_z,
+                bottom_z=bottom_z,
+            )
+
+        except RuntimeError as error:
+            if "Terrain height data unavailable" not in str(error):
+                raise
+
+            if debug:
+                print("")
+                print("=" * 72)
+                print("ATLAS TERRAIN PROVIDER FALLBACK")
+                print("=" * 72)
+                print("Local SRTM data unavailable.")
+                print("Falling back to OpenTopography COP30.")
+                print(f"BBOX: {bbox}")
+                print("=" * 72)
+                print("")
+
+            try:
+                opentopography_provider = AtlasOpenTopographyProvider(
+                    dataset="COP30",
+                    debug=debug,
+                )
+
+                south, west, north, east = bbox
+
+                opentopography_provider.download_dem_bbox(
+                    south=south,
+                    west=west,
+                    north=north,
+                    east=east,
+                )
+
+                return AtlasTerrainMeshGenerator.build_closed_slab_mesh(
+                    terrain_provider=opentopography_provider,
+                    bbox=bbox,
+                    size_mm=target_size_mm,
+                    size_x_mm=size_x_mm,
+                    size_y_mm=size_y_mm,
+                    grid_size=grid_size,
+                    z_scale=z_scale,
+                    base_z=base_z,
+                    bottom_z=bottom_z,
+                )
+
+            except Exception as fallback_error:
+                raise RuntimeError(
+                    "Terrain generation failed. "
+                    "Local SRTM data is unavailable and "
+                    "OpenTopography fallback also failed. "
+                    f"BBOX={bbox}. "
+                    f"SRTM error: {error}. "
+                    f"OpenTopography error: {fallback_error}"
+                ) from fallback_error

@@ -71,23 +71,30 @@ class AtlasOpenTopographyProvider(AtlasTerrainProvider):
         return output_path
 
     def _find_grid_for_point(self, lat, lon):
+        if not os.path.isdir(self.cache_dir):
+            return None
+
         for filename in os.listdir(self.cache_dir):
             if not filename.startswith(self.dataset):
                 continue
 
-            if not filename.endswith("_asc"):
+            if not (filename.endswith(".asc") or filename.endswith("_asc")):
                 continue
 
-            path = os.path.join(self.cache_dir, filename)
+            path = os.path.join(
+                self.cache_dir,
+                filename,
+            )
+
             grid = self._load_ascii_grid(path)
 
             tolerance = grid["cellsize"] * 2
 
-        if (
-            grid["south"] - tolerance <= lat <= grid["north"] + tolerance
-            and grid["west"] - tolerance <= lon <= grid["east"] + tolerance
-        ):
-            return grid
+            if (
+                grid["south"] - tolerance <= lat <= grid["north"] + tolerance
+                and grid["west"] - tolerance <= lon <= grid["east"] + tolerance
+            ):
+                return grid
 
         return None
 
@@ -183,12 +190,29 @@ class AtlasOpenTopographyProvider(AtlasTerrainProvider):
 
         return float(value)
 
-    def _cache_path(self, south, west, north, east):
-        safe_name = (
-            f"{self.dataset}_" f"{south:.6f}_{west:.6f}_{north:.6f}_{east:.6f}.asc"
+    def _cache_path(
+        self,
+        south,
+        west,
+        north,
+        east,
+    ):
+        stem = (
+            f"{self.dataset}_"
+            f"{south:.6f}_"
+            f"{west:.6f}_"
+            f"{north:.6f}_"
+            f"{east:.6f}"
         )
-        safe_name = safe_name.replace("-", "m").replace(".", "_")
-        return os.path.join(self.cache_dir, safe_name)
+
+        stem = stem.replace("-", "m").replace(".", "_")
+
+        filename = f"{stem}.asc"
+
+        return os.path.join(
+            self.cache_dir,
+            filename,
+        )
 
     @staticmethod
     def _load_api_key():

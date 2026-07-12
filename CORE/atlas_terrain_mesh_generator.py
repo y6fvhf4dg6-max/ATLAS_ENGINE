@@ -38,6 +38,7 @@ class AtlasTerrainMeshGenerator:
         south, west, north, east = bbox
 
         heights = []
+        missing_samples = []
 
         for row in range(grid_size):
             lat = south + ((north - south) * (row / (grid_size - 1)))
@@ -53,19 +54,70 @@ class AtlasTerrainMeshGenerator:
                 )
 
                 if height is None:
-                    height = 0.0
+                    missing_samples.append(
+                        (
+                            lat,
+                            lon,
+                        )
+                    )
 
-                row_values.append(height)
+                    row_values.append(None)
+                else:
+                    row_values.append(float(height))
 
             heights.append(row_values)
 
-        flat_heights = [height for row_values in heights for height in row_values]
+        valid_heights = [
+            height
+            for row_values in heights
+            for height in row_values
+            if height is not None
+        ]
+
+        total_sample_count = grid_size * grid_size
+
+        missing_sample_count = len(missing_samples)
+
+        if not valid_heights:
+            provider_name = terrain_provider.__class__.__name__
+
+            raise RuntimeError(
+                "Terrain height data unavailable. "
+                f"Provider={provider_name}, "
+                f"bbox={bbox}, "
+                f"missing_samples="
+                f"{missing_sample_count}/"
+                f"{total_sample_count}. "
+                "Required DEM/SRTM data must be "
+                "downloaded before STL generation."
+            )
+
+        fallback_height = min(valid_heights)
+
+        normalized_heights = []
+
+        for row_values in heights:
+            normalized_row = []
+
+            for height in row_values:
+                if height is None:
+                    normalized_row.append(fallback_height)
+                else:
+                    normalized_row.append(height)
+
+            normalized_heights.append(normalized_row)
+
+        min_height = min(valid_heights)
+
+        max_height = max(valid_heights)
 
         return {
-            "heights": heights,
-            "min_height_m": min(flat_heights),
-            "max_height_m": max(flat_heights),
-            "delta_height_m": (max(flat_heights) - min(flat_heights)),
+            "heights": normalized_heights,
+            "min_height_m": min_height,
+            "max_height_m": max_height,
+            "delta_height_m": (max_height - min_height),
+            "sample_count": total_sample_count,
+            "missing_sample_count": (missing_sample_count),
         }
 
     @staticmethod

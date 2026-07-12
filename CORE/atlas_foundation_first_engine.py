@@ -33,6 +33,12 @@ from CORE.atlas_castle_tower_cap_builder import (
 from CORE.atlas_castle_focus_engine import (
     AtlasCastleFocusEngine,
 )
+from CORE.atlas_coastline_water_builder import (
+    AtlasCoastlineWaterBuilder,
+)
+from CORE.atlas_water_foundation_builder import (
+    AtlasWaterFoundationBuilder,
+)
 from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
@@ -122,6 +128,11 @@ class AtlasFoundationFirstEngine:
 
         waters = data.get(
             "waters",
+            [],
+        )
+
+        coastlines = data.get(
+            "coastlines",
             [],
         )
 
@@ -258,6 +269,23 @@ class AtlasFoundationFirstEngine:
             debug=debug,
         )
 
+        coastline_water_polygons = (
+            AtlasCoastlineWaterBuilder.build_water_polygons(
+                coastlines=coastlines,
+                bbox=working_bbox,
+                debug=debug,
+            )
+        )
+
+        water_meshes = (
+            AtlasWaterFoundationBuilder.build_coastline_water_meshes(
+                water_polygons=coastline_water_polygons,
+                coordinate_engine=coordinate_engine,
+                terrain_mesh=terrain_slab,
+                debug=debug,
+            )
+        )
+
         scene = AtlasFoundationSceneBuilder.build_scene(
             raw_buildings=raw_buildings,
             coordinate_engine=coordinate_engine,
@@ -344,6 +372,8 @@ class AtlasFoundationFirstEngine:
 
         meshes.extend(tree_meshes)
 
+        meshes.extend(water_meshes)
+
         meshes.extend(castle_wall_meshes)
 
         meshes.extend(castle_shell_meshes)
@@ -362,6 +392,7 @@ class AtlasFoundationFirstEngine:
             print(f"Road meshes        : " f"{len(road_meshes)}")
             print(f"Park meshes        : " f"{len(park_meshes)}")
             print(f"Tree meshes        : " f"{len(tree_meshes)}")
+            print(f"Water meshes       : " f"{len(water_meshes)}")
             print(f"Castle wall meshes : " f"{len(castle_wall_meshes)}")
             print(f"Castle shell meshes: " f"{len(castle_shell_meshes)}")
             print(f"Castle tower caps  : " f"{len(castle_tower_cap_meshes)}")
@@ -407,12 +438,14 @@ class AtlasFoundationFirstEngine:
             "reader_pedestrian_paths": len(pedestrian_paths),
             "reader_parks": len(parks),
             "reader_waters": len(waters),
+            "reader_coastlines": len(coastlines),
             "reader_castles": len(castles),
             "reader_castle_walls": len(castle_walls),
             "reader_independent_castle_walls": len(independent_castle_walls),
             "reader_relation_castle_walls": len(relation_castle_walls),
             "reader_defensive_towers": len(defensive_towers),
             "buildings": len(building_meshes),
+            "water_meshes": len(water_meshes),
             "castle_wall_meshes": len(castle_wall_meshes),
             "castle_shell_meshes": len(castle_shell_meshes),
             "castle_tower_cap_meshes": len(castle_tower_cap_meshes),
@@ -423,6 +456,7 @@ class AtlasFoundationFirstEngine:
                 "roads": road_meshes,
                 "parks": park_meshes,
                 "trees": tree_meshes,
+                "waters": water_meshes,
                 "castle_walls": (castle_wall_meshes),
                 "castle_shells": (castle_shell_meshes),
                 "castle_tower_caps": (castle_tower_cap_meshes),
