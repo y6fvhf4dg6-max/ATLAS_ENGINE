@@ -214,6 +214,76 @@ def main():
         f"{result.get('terrain_smoothing_passes', 0)}"
     )
 
+    input_quality_report = result.get(
+        "input_quality_report",
+        {},
+    )
+
+    geometry_quality = input_quality_report.get(
+        "geometry",
+        {},
+    )
+
+    semantic_quality = input_quality_report.get(
+        "semantics",
+        {},
+    )
+
+    terrain_quality = input_quality_report.get(
+        "terrain",
+        {},
+    )
+
+    quality_policy = input_quality_report.get(
+        "policy",
+        {},
+    )
+
+    print(
+        f"Input geometry valid percent  : "
+        f"{geometry_quality.get('valid_percent')}"
+    )
+
+    print(
+        f"Input invalid geometries      : "
+        f"{geometry_quality.get('invalid_count')}"
+    )
+
+    print(
+        f"Height coverage percent       : "
+        f"{semantic_quality.get('height_coverage_percent')}"
+    )
+
+    print(
+        f"Roof coverage percent         : "
+        f"{semantic_quality.get('roof_coverage_percent')}"
+    )
+
+    print(
+        f"Unknown castle records        : "
+        f"{semantic_quality.get('unknown_castle_count')}"
+    )
+
+    print(
+        f"Terrain coverage percent      : "
+        f"{terrain_quality.get('coverage_percent')}"
+    )
+
+    print(
+        f"Input quality risk            : "
+        f"{quality_policy.get('risk_level')}"
+    )
+
+    print(
+        f"Input quality action          : "
+        f"{quality_policy.get('action')}"
+    )
+
+    print(
+        f"Input quality reasons         : "
+        f"{quality_policy.get('reasons')}"
+    )
+
     print(
         f"Output                        : "
         f"{OUTPUT_PATH}"

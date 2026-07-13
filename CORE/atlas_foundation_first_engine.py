@@ -39,6 +39,9 @@ from CORE.atlas_coastline_water_builder import (
 from CORE.atlas_water_foundation_builder import (
     AtlasWaterFoundationBuilder,
 )
+from CORE.atlas_input_quality_report import (
+    AtlasInputQualityReport,
+)
 from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
@@ -272,6 +275,26 @@ class AtlasFoundationFirstEngine:
             debug=debug,
         )
 
+        input_quality_report = AtlasInputQualityReport.build(
+            buildings=raw_buildings,
+            castles=castles,
+            castle_geometry=castle_geometry,
+            terrain_grid=terrain_slab.get(
+                "grid",
+                {},
+            ),
+        )
+
+        input_quality_policy = (
+            AtlasInputQualityReport.evaluate_policy(
+                input_quality_report
+            )
+        )
+
+        input_quality_report["policy"] = (
+            input_quality_policy
+        )
+
         coastline_water_polygons = (
             AtlasCoastlineWaterBuilder.build_water_polygons(
                 coastlines=coastlines,
@@ -495,5 +518,6 @@ class AtlasFoundationFirstEngine:
                 "smoothing_passes",
                 0,
             ),
+            "input_quality_report": input_quality_report,
             "mode": "foundation_first",
         }
