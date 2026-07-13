@@ -70,6 +70,21 @@ class AtlasFoundationMeshExtruder:
             coordinate_engine,
         )
 
+        base_offset_mm = (
+            AtlasFoundationMeshExtruder._calculate_base_offset(
+                building,
+                coordinate_engine,
+            )
+        )
+
+        if base_offset_mm >= height_mm:
+            return AtlasFoundationMeshExtruder._reject(
+                diagnostics,
+                "invalid_vertical_range",
+                base_offset_mm=base_offset_mm,
+                top_offset_mm=height_mm,
+            )
+
         flat_triangles = AtlasPolygonTriangulator.triangulate(scaled_points)
 
         if not flat_triangles:
@@ -78,7 +93,7 @@ class AtlasFoundationMeshExtruder:
                 "triangulation_failed",
             )
 
-        bottom_z = foundation_z
+        bottom_z = foundation_z + base_offset_mm
         top_z = foundation_z + height_mm
 
         bottom_points = []
@@ -131,6 +146,7 @@ class AtlasFoundationMeshExtruder:
             "walls": wall_quads,
             "triangles": triangles,
             "foundation_z": foundation_z,
+            "base_offset_mm": base_offset_mm,
             "bottom_z": bottom_z,
             "top_z": top_z,
             "placement_mode": "foundation_first",
@@ -166,6 +182,37 @@ class AtlasFoundationMeshExtruder:
             print("")
 
         return mesh
+
+    @staticmethod
+    def _calculate_base_offset(building, coordinate_engine):
+        min_height = getattr(
+            building,
+            "min_height",
+            None,
+        )
+
+        if min_height is not None and min_height > 0.0:
+            return coordinate_engine.height_to_stl_mm(
+                min_height
+            )
+
+        min_level = getattr(
+            building,
+            "min_level",
+            None,
+        )
+
+        if min_level is not None and min_level > 0:
+            min_level_height_m = (
+                min_level
+                * 3.0
+            )
+
+            return coordinate_engine.height_to_stl_mm(
+                min_level_height_m
+            )
+
+        return 0.0
 
     @staticmethod
     def _calculate_height(building, coordinate_engine):

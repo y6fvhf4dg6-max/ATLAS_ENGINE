@@ -34,10 +34,14 @@ class DummyBuilding:
         geometry,
         area_m2=100.0,
         estimated_height=8.0,
+        min_height=None,
+        min_level=None,
     ):
         self.geometry = geometry
         self.area_m2 = area_m2
         self.estimated_height = estimated_height
+        self.min_height = min_height
+        self.min_level = min_level
 
         self.is_castle_building = False
         self.castle_profile = None
@@ -163,3 +167,109 @@ def test_narrow_building_reports_width_rejection_reason():
     assert diagnostics["reason"] == "model_width_below_minimum"
     assert diagnostics["model_width_mm"] == 0.80
     assert diagnostics["minimum_width_mm"] == 1.20
+
+
+
+def test_building_part_starts_at_explicit_min_height():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=25.0,
+        min_height=22.0,
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=1.0,
+    )
+
+    assert mesh is not None
+    assert mesh["base_offset_mm"] == 22.0
+    assert mesh["bottom_z"] == 23.0
+    assert mesh["top_z"] == 26.0
+
+    report = AtlasMeshValidator.report(mesh)
+
+    assert report["valid"] is True
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0
+
+
+def test_building_part_uses_min_level_when_min_height_is_missing():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=12.0,
+        min_level=2,
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.5,
+    )
+
+    assert mesh is not None
+    assert mesh["base_offset_mm"] == 6.0
+    assert mesh["bottom_z"] == 6.5
+    assert mesh["top_z"] == 12.5
+
+
+def test_explicit_min_height_has_priority_over_min_level():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=25.0,
+        min_height=22.0,
+        min_level=6,
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+    )
+
+    assert mesh is not None
+    assert mesh["base_offset_mm"] == 22.0
+    assert mesh["bottom_z"] == 22.0
+    assert mesh["top_z"] == 25.0
+
+
+def test_invalid_vertical_range_is_rejected():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=10.0,
+        min_height=12.0,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics["accepted"] is False
+    assert diagnostics["reason"] == "invalid_vertical_range"
