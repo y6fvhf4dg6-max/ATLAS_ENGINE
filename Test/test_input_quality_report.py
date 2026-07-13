@@ -585,3 +585,66 @@ def test_input_quality_policy_warns_for_non_structural_semantic_issues():
     assert policy["action"] == "WARN"
     assert "invalid_building_height_present" in policy["reasons"]
     assert "castle_record_missing_tag" in policy["reasons"]
+
+
+def test_strict_input_quality_rejects_structural_castle_semantic_failure():
+    report = {
+        "geometry": {
+            "valid_percent": 100.0,
+        },
+        "semantics": {
+            "building_count": 0,
+            "height_coverage_percent": 100.0,
+            "roof_coverage_percent": 100.0,
+            "unknown_castle_count": 0,
+            "issue_counts": {
+                "invalid_height": 0,
+                "non_positive_height": 0,
+                "invalid_levels": 0,
+                "non_positive_levels": 0,
+                "unknown_roof_shape": 0,
+                "relation_missing_outer_geometry": 0,
+                "way_has_inner_geometry": 1,
+                "unsupported_castle_geometry_type": 0,
+                "missing_castle_tag": 0,
+            },
+        },
+        "terrain": {
+            "coverage_percent": 100.0,
+        },
+    }
+
+    policy = AtlasInputQualityReport.evaluate_policy(
+        report
+    )
+
+    try:
+        AtlasInputQualityReport.enforce_policy(
+            policy,
+            strict=True,
+        )
+    except RuntimeError as error:
+        assert (
+            "castle_way_has_inner_geometry"
+            in str(error)
+        )
+    else:
+        raise AssertionError(
+            "Strict input quality did not reject "
+            "structural castle semantic failure."
+        )
+
+
+def test_non_strict_input_quality_allows_structural_castle_semantic_failure():
+    policy = {
+        "risk_level": "HIGH",
+        "action": "FAIL",
+        "reasons": [
+            "castle_relation_missing_outer_geometry",
+        ],
+    }
+
+    AtlasInputQualityReport.enforce_policy(
+        policy,
+        strict=False,
+    )
