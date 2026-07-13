@@ -122,3 +122,50 @@ def test_wall_builder_creates_crenellations_from_wall_mesh():
         for mesh in meshes
     )
     assert sum(mesh["tooth_count"] for mesh in meshes) > 0
+
+
+def test_crenellations_distribute_equal_edge_and_inner_gaps():
+    mesh = AtlasCastleCrenellationBuilder.build_crenellations(
+        start_left=(0.0, 1.0, 10.0),
+        start_right=(0.0, -1.0, 10.0),
+        end_left=(20.0, 1.0, 10.0),
+        end_right=(20.0, -1.0, 10.0),
+        tooth_width_mm=2.0,
+        gap_width_mm=2.0,
+        tooth_height_mm=1.2,
+    )
+
+    assert mesh is not None
+    assert mesh["tooth_count"] == 5
+
+    expected_gap = (20.0 - 5 * 2.0) / 6.0
+
+    assert abs(
+        mesh["actual_gap_width_mm"] - expected_gap
+    ) < 1e-9
+    assert abs(
+        mesh["start_offset_mm"] - expected_gap
+    ) < 1e-9
+
+
+def test_crenellation_depth_is_reduced_and_centered_on_wall():
+    mesh = AtlasCastleCrenellationBuilder.build_crenellations(
+        start_left=(0.0, 1.0, 10.0),
+        start_right=(0.0, -1.0, 10.0),
+        end_left=(12.0, 1.0, 10.0),
+        end_right=(12.0, -1.0, 10.0),
+        tooth_width_mm=2.0,
+        gap_width_mm=2.0,
+        tooth_height_mm=1.2,
+    )
+
+    assert mesh is not None
+
+    y_values = [
+        point[1]
+        for triangle in mesh["triangles"]
+        for point in triangle
+    ]
+
+    assert abs(max(y_values) - 0.55) < 1e-9
+    assert abs(min(y_values) + 0.55) < 1e-9

@@ -44,6 +44,8 @@ def main():
         nature_provider_names=(),
         strict_input_quality=True,
         castle_only=True,
+        castle_focus=True,
+        castle_focus_padding_m=70.0,
         debug=True,
     )
 

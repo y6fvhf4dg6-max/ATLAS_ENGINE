@@ -55,16 +55,16 @@ class AtlasCastleWallBuilder:
                 )
 
                 tooth_width_mm = max(
-                    1.20,
-                    min(2.40, wall_width_mm * 1.10),
+                    0.75,
+                    min(1.35, wall_width_mm * 0.70),
                 )
                 gap_width_mm = max(
-                    0.80,
-                    tooth_width_mm * 0.75,
+                    0.50,
+                    tooth_width_mm * 0.60,
                 )
                 tooth_height_mm = max(
-                    0.80,
-                    min(1.80, wall_height_mm * 0.35),
+                    0.50,
+                    min(0.95, wall_height_mm * 0.16),
                 )
 
                 crenellation_meshes = (

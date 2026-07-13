@@ -8,6 +8,8 @@ tekrarlanan mazgal dişleri üretir.
 
 class AtlasCastleCrenellationBuilder:
     TRIANGLES_PER_TOOTH = 12
+    MIN_SEGMENT_LENGTH_MM = 3.0
+    TOOTH_DEPTH_RATIO = 0.55
     EPSILON = 1e-9
 
     @staticmethod
@@ -20,11 +22,7 @@ class AtlasCastleCrenellationBuilder:
         gap_width_mm,
         tooth_height_mm,
     ):
-        if (
-            tooth_width_mm <= 0.0
-            or gap_width_mm < 0.0
-            or tooth_height_mm <= 0.0
-        ):
+        if tooth_width_mm <= 0.0 or gap_width_mm < 0.0 or tooth_height_mm <= 0.0:
             return None
 
         start_center = AtlasCastleCrenellationBuilder._midpoint(
@@ -42,7 +40,7 @@ class AtlasCastleCrenellationBuilder:
 
         length = (dx * dx + dy * dy + dz * dz) ** 0.5
 
-        if length <= AtlasCastleCrenellationBuilder.EPSILON:
+        if length < AtlasCastleCrenellationBuilder.MIN_SEGMENT_LENGTH_MM:
             return None
 
         pitch = tooth_width_mm + gap_width_mm
@@ -55,6 +53,24 @@ class AtlasCastleCrenellationBuilder:
         if tooth_count < 1:
             return None
 
+        tooth_total_width = tooth_count * tooth_width_mm
+
+        if tooth_count == 1:
+            actual_gap_width_mm = 0.0
+            start_offset = max(
+                0.0,
+                (length - tooth_width_mm) / 2.0,
+            )
+        else:
+            remaining_length = max(
+                0.0,
+                length - tooth_total_width,
+            )
+
+            actual_gap_width_mm = remaining_length / (tooth_count + 1)
+
+            start_offset = actual_gap_width_mm
+
         ux = dx / length
         uy = dy / length
         uz = dz / length
@@ -62,7 +78,9 @@ class AtlasCastleCrenellationBuilder:
         triangles = []
 
         for tooth_index in range(tooth_count):
-            start_distance = tooth_index * pitch
+            start_distance = start_offset + tooth_index * (
+                tooth_width_mm + actual_gap_width_mm
+            )
             end_distance = start_distance + tooth_width_mm
 
             if end_distance > length + AtlasCastleCrenellationBuilder.EPSILON:
@@ -90,6 +108,20 @@ class AtlasCastleCrenellationBuilder:
                 start_right,
                 end_right,
                 ratio_end,
+            )
+
+            base_start_left, base_start_right = (
+                AtlasCastleCrenellationBuilder._shrink_pair(
+                    base_start_left,
+                    base_start_right,
+                    AtlasCastleCrenellationBuilder.TOOTH_DEPTH_RATIO,
+                )
+            )
+
+            base_end_left, base_end_right = AtlasCastleCrenellationBuilder._shrink_pair(
+                base_end_left,
+                base_end_right,
+                AtlasCastleCrenellationBuilder.TOOTH_DEPTH_RATIO,
             )
 
             top_start_left = (
@@ -129,8 +161,7 @@ class AtlasCastleCrenellationBuilder:
             return None
 
         actual_tooth_count = (
-            len(triangles)
-            // AtlasCastleCrenellationBuilder.TRIANGLES_PER_TOOTH
+            len(triangles) // AtlasCastleCrenellationBuilder.TRIANGLES_PER_TOOTH
         )
 
         return {
@@ -139,8 +170,10 @@ class AtlasCastleCrenellationBuilder:
             "tooth_count": actual_tooth_count,
             "tooth_width_mm": tooth_width_mm,
             "gap_width_mm": gap_width_mm,
+            "actual_gap_width_mm": actual_gap_width_mm,
             "tooth_height_mm": tooth_height_mm,
             "segment_length_mm": length,
+            "start_offset_mm": start_offset,
         }
 
     @staticmethod
@@ -149,6 +182,26 @@ class AtlasCastleCrenellationBuilder:
             (first[0] + second[0]) / 2.0,
             (first[1] + second[1]) / 2.0,
             (first[2] + second[2]) / 2.0,
+        )
+
+    @staticmethod
+    def _shrink_pair(first, second, ratio):
+        center = AtlasCastleCrenellationBuilder._midpoint(
+            first,
+            second,
+        )
+
+        return (
+            AtlasCastleCrenellationBuilder._lerp(
+                center,
+                first,
+                ratio,
+            ),
+            AtlasCastleCrenellationBuilder._lerp(
+                center,
+                second,
+                ratio,
+            ),
         )
 
     @staticmethod
