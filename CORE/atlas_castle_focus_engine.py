@@ -8,6 +8,9 @@ from CORE.atlas_castle_building_profiler import (
 from CORE.atlas_castle_footprint_regularizer import (
     AtlasCastleFootprintRegularizer,
 )
+from CORE.atlas_castle_shell_triangulator import (
+    AtlasCastleShellTriangulator,
+)
 
 
 class AtlasCastleFocusEngine:
@@ -107,12 +110,32 @@ class AtlasCastleFocusEngine:
                 if geometry:
                     outer_geometries = [geometry]
 
-            for geometry in outer_geometries:
-                if len(geometry) < 3:
-                    continue
+            inner_geometries = castle.get(
+                "inner_geometries",
+                [],
+            )
 
-                geometries.append(geometry)
-                shell_geometry_count += 1
+            if not outer_geometries:
+                continue
+
+            normalized = AtlasCastleShellTriangulator.normalize_rings(
+                outer_ring=outer_geometries[0],
+                inner_rings=[
+                    *outer_geometries[1:],
+                    *inner_geometries,
+                ],
+            )
+
+            real_outer_ring = normalized.get(
+                "outer_ring",
+                [],
+            )
+
+            if len(real_outer_ring) < 3:
+                continue
+
+            geometries.append(real_outer_ring)
+            shell_geometry_count += 1
 
         raw_focus_bbox = AtlasCastleFocusEngine._bbox_from_geometries(geometries)
 
