@@ -87,6 +87,7 @@ class AtlasFoundationFirstEngine:
         max_points=300,
         z_scale=5500,
         terrain_provider_name="srtm",
+        terrain_smoothing_passes=0,
         nature_provider_names=("worldcover",),
         castle_only=False,
         castle_focus=False,
@@ -267,6 +268,7 @@ class AtlasFoundationFirstEngine:
             bottom_z=0.0,
             grid_size=25,
             terrain_provider_name=(terrain_provider_name),
+            smoothing_passes=terrain_smoothing_passes,
             debug=debug,
         )
 
@@ -479,6 +481,19 @@ class AtlasFoundationFirstEngine:
                     "size_y_mm",
                     terrain_metadata.get("size_mm"),
                 )
+            ),
+            "terrain_min_height_m": terrain_metadata.get(
+                "min_height_m"
+            ),
+            "terrain_max_height_m": terrain_metadata.get(
+                "max_height_m"
+            ),
+            "terrain_delta_height_m": terrain_metadata.get(
+                "delta_height_m"
+            ),
+            "terrain_smoothing_passes": terrain_metadata.get(
+                "smoothing_passes",
+                0,
             ),
             "mode": "foundation_first",
         }

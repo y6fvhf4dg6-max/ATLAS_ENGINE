@@ -28,6 +28,7 @@ class AtlasTerrainPipeline:
         terrain_provider_name="srtm",
         size_x_mm=None,
         size_y_mm=None,
+        smoothing_passes=0,
         debug=True,
     ):
         provider_name = terrain_provider_name.lower()
@@ -57,6 +58,7 @@ class AtlasTerrainPipeline:
                 z_scale=z_scale,
                 base_z=base_z,
                 bottom_z=bottom_z,
+                smoothing_passes=smoothing_passes,
             )
 
         if provider_name != "srtm":
@@ -80,6 +82,7 @@ class AtlasTerrainPipeline:
                 z_scale=z_scale,
                 base_z=base_z,
                 bottom_z=bottom_z,
+                smoothing_passes=smoothing_passes,
             )
 
         except RuntimeError as error:
@@ -122,6 +125,7 @@ class AtlasTerrainPipeline:
                     z_scale=z_scale,
                     base_z=base_z,
                     bottom_z=bottom_z,
+                    smoothing_passes=smoothing_passes,
                 )
 
             except Exception as fallback_error:

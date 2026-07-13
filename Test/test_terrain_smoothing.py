@@ -59,3 +59,48 @@ def test_smoothing_preserves_grid_dimensions():
 
     assert len(smoothed) == 3
     assert all(len(row) == 4 for row in smoothed)
+
+
+class SpikeTerrainProvider:
+    def get_height(
+        self,
+        lat,
+        lon,
+    ):
+        if lat == pytest.approx(0.5) and lon == pytest.approx(0.5):
+            return 130.0
+
+        return 100.0
+
+
+def test_surface_mesh_applies_optional_smoothing_and_updates_metadata():
+    mesh = AtlasTerrainMeshGenerator.build_surface_mesh(
+        terrain_provider=SpikeTerrainProvider(),
+        bbox=(
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+        ),
+        size_mm=100.0,
+        grid_size=3,
+        z_scale=5500.0,
+        base_z=0.8,
+        smoothing_passes=1,
+    )
+
+    height_grid = mesh["grid"]
+
+    assert height_grid["heights"][1][1] == pytest.approx(
+        100.0 + (30.0 / 9.0)
+    )
+
+    assert height_grid["max_height_m"] == pytest.approx(
+        100.0 + (30.0 / 9.0)
+    )
+
+    assert height_grid["delta_height_m"] == pytest.approx(
+        30.0 / 9.0
+    )
+
+    assert mesh["metadata"]["smoothing_passes"] == 1

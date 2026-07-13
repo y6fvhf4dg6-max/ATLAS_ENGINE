@@ -91,6 +91,7 @@ def main():
             max_points=500,
             z_scale=5500,
             terrain_provider_name="srtm",
+            terrain_smoothing_passes=1,
             nature_provider_names=(),
             castle_only=False,
             castle_focus=True,
@@ -191,6 +192,26 @@ def main():
     print(
         f"Total triangles               : "
         f"{result.get('triangles', 0)}"
+    )
+
+    print(
+        f"Terrain min height            : "
+        f"{result.get('terrain_min_height_m')}"
+    )
+
+    print(
+        f"Terrain max height            : "
+        f"{result.get('terrain_max_height_m')}"
+    )
+
+    print(
+        f"Terrain height delta          : "
+        f"{result.get('terrain_delta_height_m')}"
+    )
+
+    print(
+        f"Terrain smoothing passes      : "
+        f"{result.get('terrain_smoothing_passes', 0)}"
     )
 
     print(

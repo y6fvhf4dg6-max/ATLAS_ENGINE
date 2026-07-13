@@ -57,6 +57,19 @@ class AtlasTerrainMeshGenerator:
                 smoothed_row = []
 
                 for column_index in range(column_count):
+                    is_boundary = (
+                        row_index == 0
+                        or row_index == row_count - 1
+                        or column_index == 0
+                        or column_index == column_count - 1
+                    )
+
+                    if is_boundary:
+                        smoothed_row.append(
+                            current[row_index][column_index]
+                        )
+                        continue
+
                     neighbor_values = []
 
                     for row_offset in (-1, 0, 1):
@@ -445,6 +458,7 @@ class AtlasTerrainMeshGenerator:
         grid_size=DEFAULT_GRID_SIZE,
         z_scale=5500.0,
         base_z=DEFAULT_BASE_Z,
+        smoothing_passes=0,
     ):
         if size_x_mm is None:
             size_x_mm = size_mm
@@ -457,6 +471,36 @@ class AtlasTerrainMeshGenerator:
             bbox=bbox,
             grid_size=grid_size,
         )
+
+        smoothing_passes = max(
+            0,
+            int(smoothing_passes),
+        )
+
+        if smoothing_passes > 0:
+            smoothed_heights = (
+                AtlasTerrainMeshGenerator.smooth_heights(
+                    heights=height_grid["heights"],
+                    passes=smoothing_passes,
+                )
+            )
+
+            flat_heights = [
+                height
+                for row in smoothed_heights
+                for height in row
+            ]
+
+            min_height_m = min(flat_heights)
+            max_height_m = max(flat_heights)
+
+            height_grid["heights"] = smoothed_heights
+            height_grid["min_height_m"] = min_height_m
+            height_grid["max_height_m"] = max_height_m
+            height_grid["delta_height_m"] = (
+                max_height_m
+                - min_height_m
+            )
 
         top_points = AtlasTerrainMeshGenerator.build_points_from_grid(
             height_grid=height_grid,
@@ -489,6 +533,7 @@ class AtlasTerrainMeshGenerator:
                 "min_height_m": height_grid["min_height_m"],
                 "max_height_m": height_grid["max_height_m"],
                 "delta_height_m": height_grid["delta_height_m"],
+                "smoothing_passes": smoothing_passes,
                 "triangle_count": len(triangles),
             },
             "grid": height_grid,
@@ -506,6 +551,7 @@ class AtlasTerrainMeshGenerator:
         z_scale=5500.0,
         base_z=DEFAULT_BASE_Z,
         bottom_z=DEFAULT_BOTTOM_Z,
+        smoothing_passes=0,
     ):
         if size_x_mm is None:
             size_x_mm = size_mm
@@ -522,6 +568,7 @@ class AtlasTerrainMeshGenerator:
             grid_size=grid_size,
             z_scale=z_scale,
             base_z=base_z,
+            smoothing_passes=smoothing_passes,
         )
 
         top_points = surface_mesh["top_points"]
