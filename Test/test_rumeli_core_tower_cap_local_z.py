@@ -215,6 +215,27 @@ def main():
     if not tower_cap_meshes:
         raise RuntimeError("CORE tower caps were not generated.")
 
+    shell_mesh = shell_meshes[0]
+
+    expected_cap_extra_height_mm = (
+        float(shell_mesh["tower_height_mm"])
+        - float(shell_mesh["shell_height_mm"])
+    )
+
+    for tower_cap_mesh in tower_cap_meshes:
+        actual_cap_extra_height_mm = float(
+            tower_cap_mesh["cap_extra_height_mm"]
+        )
+
+        assert round(actual_cap_extra_height_mm, 6) == round(
+            expected_cap_extra_height_mm,
+            6,
+        ), (
+            "Tower-cap yüksekliği shell builder ile uyumlu olmalı; "
+            f"beklenen={expected_cap_extra_height_mm:.6f} mm, "
+            f"mevcut={actual_cap_extra_height_mm:.6f} mm"
+        )
+
     meshes = [
         terrain_mesh,
         *shell_meshes,

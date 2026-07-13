@@ -26,6 +26,7 @@ from shapely.ops import unary_union
 
 from CORE.atlas_castle_shell_triangulator import AtlasCastleShellTriangulator
 from CORE.atlas_castle_shell_height_profiler import AtlasCastleShellHeightProfiler
+from CORE.atlas_castle_shell_builder import AtlasCastleShellBuilder
 from CORE.atlas_foundation_sampler import AtlasFoundationSampler
 
 
@@ -150,7 +151,7 @@ class AtlasCastleTowerCapBuilder:
 
         shell_height_mm = max(
             coordinate_engine.height_to_stl_mm(shell_height_m),
-            1.80,
+            AtlasCastleShellBuilder.MIN_SHELL_HEIGHT_MM,
         )
 
         tower_height_mm = (
