@@ -112,11 +112,37 @@ class AtlasRoadFoundationBuilder:
             p1 = points[index]
             p2 = points[index + 1]
 
+            start_is_straight_join = (
+                index > 0
+                and AtlasRoadFoundationBuilder
+                ._segments_continue_straight(
+                    points[index - 1],
+                    points[index],
+                    points[index + 1],
+                )
+            )
+
+            end_is_straight_join = (
+                index < len(points) - 2
+                and AtlasRoadFoundationBuilder
+                ._segments_continue_straight(
+                    points[index],
+                    points[index + 1],
+                    points[index + 2],
+                )
+            )
+
             segment = AtlasRoadFoundationExtruder.build_segment(
                 p1=p1,
                 p2=p2,
                 terrain_mesh=terrain_mesh,
                 width_mm=width_mm,
+                include_start_cap=(
+                    not start_is_straight_join
+                ),
+                include_end_cap=(
+                    not end_is_straight_join
+                ),
             )
 
             if not segment:
@@ -126,6 +152,13 @@ class AtlasRoadFoundationBuilder:
             top.extend(segment["top"])
             walls.extend(segment["walls"])
             triangles.extend(segment["triangles"])
+
+        triangles = (
+            AtlasRoadFoundationBuilder
+            ._remove_duplicate_triangle_pairs(
+                triangles
+            )
+        )
 
         if not triangles:
             return None
@@ -139,6 +172,98 @@ class AtlasRoadFoundationBuilder:
             "road_type": road_type,
             "placement_mode": "foundation_first",
         }
+
+    @staticmethod
+    def _segments_continue_straight(
+        p1,
+        p2,
+        p3,
+        tolerance=1e-9,
+    ):
+        first_x = float(p2[0]) - float(p1[0])
+        first_y = float(p2[1]) - float(p1[1])
+
+        second_x = float(p3[0]) - float(p2[0])
+        second_y = float(p3[1]) - float(p2[1])
+
+        first_length = (
+            first_x * first_x
+            + first_y * first_y
+        ) ** 0.5
+
+        second_length = (
+            second_x * second_x
+            + second_y * second_y
+        ) ** 0.5
+
+        if (
+            first_length <= tolerance
+            or second_length <= tolerance
+        ):
+            return False
+
+        cross = (
+            first_x * second_y
+            - first_y * second_x
+        )
+
+        dot = (
+            first_x * second_x
+            + first_y * second_y
+        )
+
+        return (
+            abs(cross)
+            <= (
+                tolerance
+                * first_length
+                * second_length
+            )
+            and dot > 0.0
+        )
+
+    @staticmethod
+    def _remove_duplicate_triangle_pairs(
+        triangles,
+        precision=9,
+    ):
+        triangle_counts = {}
+
+        def triangle_key(triangle):
+            points = [
+                tuple(
+                    round(
+                        float(value),
+                        precision,
+                    )
+                    for value in point
+                )
+                for point in triangle
+            ]
+
+            return tuple(
+                sorted(points)
+            )
+
+        for triangle in triangles:
+            key = triangle_key(triangle)
+
+            triangle_counts[key] = (
+                triangle_counts.get(
+                    key,
+                    0,
+                )
+                + 1
+            )
+
+        return [
+            triangle
+            for triangle in triangles
+            if triangle_counts[
+                triangle_key(triangle)
+            ]
+            == 1
+        ]
 
     @staticmethod
     def _clip_points_to_bounds(points, min_x, max_x, min_y, max_y):

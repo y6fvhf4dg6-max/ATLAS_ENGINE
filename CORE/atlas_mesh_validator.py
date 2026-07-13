@@ -44,6 +44,46 @@ class AtlasMeshValidator:
 
     @staticmethod
     def _structure_report(mesh):
+        if mesh.get("type") == "castle_wall_crenellations":
+            triangles = mesh.get("triangles")
+
+            if triangles is None:
+                return {
+                    "structure_valid": False,
+                    "reason": "missing_key_triangles",
+                }
+
+            if len(triangles) < 4:
+                return {
+                    "structure_valid": False,
+                    "reason": "triangles_too_small",
+                }
+
+            for triangle in triangles:
+                if triangle is None or len(triangle) != 3:
+                    return {
+                        "structure_valid": False,
+                        "reason": "bad_triangle_size",
+                    }
+
+                for point in triangle:
+                    if point is None or len(point) != 3:
+                        return {
+                            "structure_valid": False,
+                            "reason": "bad_point_size",
+                        }
+
+                    if any(value is None for value in point):
+                        return {
+                            "structure_valid": False,
+                            "reason": "point_has_none",
+                        }
+
+            return {
+                "structure_valid": True,
+                "triangles": len(triangles),
+            }
+
         required_keys = ("bottom", "top", "walls", "triangles")
 
         for key in required_keys:
@@ -67,8 +107,27 @@ class AtlasMeshValidator:
         if len(bottom) != len(top):
             return {"structure_valid": False, "reason": "bottom_top_mismatch"}
 
-        if len(walls) != len(bottom):
-            return {"structure_valid": False, "reason": "wall_count_mismatch"}
+        mesh_type = mesh.get(
+            "type",
+        )
+
+        if (
+            mesh_type != "road_foundation"
+            and len(walls) != len(bottom)
+        ):
+            return {
+                "structure_valid": False,
+                "reason": "wall_count_mismatch",
+            }
+
+        if (
+            mesh_type == "road_foundation"
+            and len(walls) < 4
+        ):
+            return {
+                "structure_valid": False,
+                "reason": "road_wall_count_too_small",
+            }
 
         if len(triangles) < 4:
             return {"structure_valid": False, "reason": "triangles_too_small"}

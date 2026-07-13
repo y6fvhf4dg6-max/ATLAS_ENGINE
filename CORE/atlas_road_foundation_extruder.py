@@ -22,6 +22,8 @@ class AtlasRoadFoundationExtruder:
         terrain_mesh,
         width_mm,
         road_height_mm=DEFAULT_ROAD_HEIGHT_MM,
+        include_start_cap=True,
+        include_end_cap=True,
     ):
         x1, y1 = p1
         x2, y2 = p2
@@ -73,6 +75,12 @@ class AtlasRoadFoundationExtruder:
         walls = []
 
         for i in range(4):
+            if i == 0 and not include_start_cap:
+                continue
+
+            if i == 2 and not include_end_cap:
+                continue
+
             j = (i + 1) % 4
 
             wall = (
@@ -84,8 +92,21 @@ class AtlasRoadFoundationExtruder:
 
             walls.append(wall)
 
-            triangles.append((bottom[i], bottom[j], top[j]))
-            triangles.append((bottom[i], top[j], top[i]))
+            triangles.append(
+                (
+                    bottom[i],
+                    bottom[j],
+                    top[j],
+                )
+            )
+
+            triangles.append(
+                (
+                    bottom[i],
+                    top[j],
+                    top[i],
+                )
+            )
 
         return {
             "bottom": bottom,

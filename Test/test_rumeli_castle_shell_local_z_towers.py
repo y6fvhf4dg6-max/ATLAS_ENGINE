@@ -35,6 +35,22 @@ OUTPUT_PATH = (
     PROJECT_ROOT / "OUTPUT/STL/" "rumeli_hisari_castle_shell_local_z_towers_test.stl"
 )
 
+TERRAIN_OUTPUT_PATH = (
+    PROJECT_ROOT / "OUTPUT/STL/" "rumeli_hisari_terrain.stl"
+)
+
+WATER_OUTPUT_PATH = (
+    PROJECT_ROOT / "OUTPUT/STL/" "rumeli_hisari_water.stl"
+)
+
+CASTLE_SHELL_OUTPUT_PATH = (
+    PROJECT_ROOT / "OUTPUT/STL/" "rumeli_hisari_castle_shell.stl"
+)
+
+TOWERS_OUTPUT_PATH = (
+    PROJECT_ROOT / "OUTPUT/STL/" "rumeli_hisari_towers.stl"
+)
+
 
 def load_module(
     module_name,
@@ -240,6 +256,30 @@ def main():
         meshes=meshes,
         output_path=str(OUTPUT_PATH),
         solid_name=("ATLAS_RUMELI_CASTLE_" "SHELL_LOCAL_Z_TOWERS"),
+    )
+
+    AtlasSTLWriter.write(
+        meshes=[terrain_mesh],
+        output_path=str(TERRAIN_OUTPUT_PATH),
+        solid_name="ATLAS_RUMELI_TERRAIN",
+    )
+
+    AtlasSTLWriter.write(
+        meshes=water_meshes,
+        output_path=str(WATER_OUTPUT_PATH),
+        solid_name="ATLAS_RUMELI_WATER",
+    )
+
+    AtlasSTLWriter.write(
+        meshes=shell_meshes,
+        output_path=str(CASTLE_SHELL_OUTPUT_PATH),
+        solid_name="ATLAS_RUMELI_CASTLE_SHELL",
+    )
+
+    AtlasSTLWriter.write(
+        meshes=tower_meshes,
+        output_path=str(TOWERS_OUTPUT_PATH),
+        solid_name="ATLAS_RUMELI_TOWERS",
     )
 
     terrain_triangle_count = count_triangles([terrain_mesh])

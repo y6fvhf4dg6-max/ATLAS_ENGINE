@@ -195,26 +195,96 @@ def terrain_z_at_point(
     )
 
 
+def clean_ring_points(
+    ring,
+    minimum_distance_mm=0.01,
+):
+    if not ring:
+        return []
+
+    cleaned = [
+        (
+            float(ring[0][0]),
+            float(ring[0][1]),
+        )
+    ]
+
+    for point in ring[1:]:
+        candidate = (
+            float(point[0]),
+            float(point[1]),
+        )
+
+        previous = cleaned[-1]
+
+        distance = (
+            (
+                candidate[0]
+                - previous[0]
+            )
+            ** 2
+            + (
+                candidate[1]
+                - previous[1]
+            )
+            ** 2
+        ) ** 0.5
+
+        if distance < minimum_distance_mm:
+            continue
+
+        cleaned.append(candidate)
+
+    if len(cleaned) >= 2:
+        closing_distance = (
+            (
+                cleaned[-1][0]
+                - cleaned[0][0]
+            )
+            ** 2
+            + (
+                cleaned[-1][1]
+                - cleaned[0][1]
+            )
+            ** 2
+        ) ** 0.5
+
+        if closing_distance < minimum_distance_mm:
+            cleaned.pop()
+
+    return cleaned
+
+
 def region_rings(
     region,
 ):
-    outer_ring = [
-        (
-            float(x),
-            float(y),
-        )
-        for x, y in list(region.exterior.coords)[:-1]
-    ]
-
-    inner_rings = [
+    outer_ring = clean_ring_points(
         [
             (
                 float(x),
                 float(y),
             )
-            for x, y in list(interior.coords)[:-1]
+            for x, y in list(region.exterior.coords)[:-1]
         ]
+    )
+
+    inner_rings = [
+        clean_ring_points(
+            [
+                (
+                    float(x),
+                    float(y),
+                )
+                for x, y in list(interior.coords)[:-1]
+            ]
+        )
         for interior in region.interiors
+    ]
+
+    inner_rings = [
+        ring
+        for ring in inner_rings
+        if len(ring) >= 3
     ]
 
     return (
@@ -669,15 +739,26 @@ def build_local_z_cap(
             )
         )
 
-    boundary_edges = extract_directed_boundary_edges(flat_triangles)
-    add_local_boundary_walls(
-        boundary_edges=boundary_edges,
+    add_local_ring_walls(
+        ring=outer_ring,
         local_bottom_z=local_bottom_z,
         top_z=flat_top_z,
         x_offset=x_offset,
         z_offset=z_offset,
         triangles=triangles,
+        is_hole=False,
     )
+
+    for inner_ring in inner_rings:
+        add_local_ring_walls(
+            ring=inner_ring,
+            local_bottom_z=local_bottom_z,
+            top_z=flat_top_z,
+            x_offset=x_offset,
+            z_offset=z_offset,
+            triangles=triangles,
+            is_hole=True,
+        )
 
     return {
         "triangles": triangles,
