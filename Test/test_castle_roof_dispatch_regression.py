@@ -224,9 +224,125 @@ def test_irregular_tower_gable_rectangle_is_dynamically_reduced():
     assert reduced_polygon.area >= polygon.area * 0.70
 
 
+def build_triangular_castle_wing_mesh():
+    bottom = [
+        (0.0, 0.0, 0.0),
+        (5.0, 0.0, 0.0),
+        (1.2, 2.0, 0.0),
+    ]
+
+    top = [
+        (0.0, 0.0, 2.0),
+        (5.0, 0.0, 2.0),
+        (1.2, 2.0, 2.0),
+    ]
+
+    bottom_triangles = [
+        (
+            bottom[0],
+            bottom[2],
+            bottom[1],
+        ),
+    ]
+
+    top_triangles = [
+        (
+            top[0],
+            top[1],
+            top[2],
+        ),
+    ]
+
+    walls = []
+    wall_triangles = []
+
+    for index in range(3):
+        next_index = (index + 1) % 3
+
+        b1 = bottom[index]
+        b2 = bottom[next_index]
+        t1 = top[index]
+        t2 = top[next_index]
+
+        walls.append(
+            (
+                b1,
+                b2,
+                t2,
+                t1,
+            )
+        )
+
+        wall_triangles.extend(
+            [
+                (
+                    b1,
+                    b2,
+                    t2,
+                ),
+                (
+                    b1,
+                    t2,
+                    t1,
+                ),
+            ]
+        )
+
+    return {
+        "bottom": bottom,
+        "top": top,
+        "walls": walls,
+        "triangles": [
+            *bottom_triangles,
+            *top_triangles,
+            *wall_triangles,
+        ],
+        "bottom_z": 0.0,
+        "top_z": 2.0,
+        "castle_profile": "castle_wing",
+        "castle_roof_profile": "pitched",
+    }
+
+
+def test_triangular_castle_wing_receives_valid_gable_roof():
+    mesh = build_triangular_castle_wing_mesh()
+
+    before_report = AtlasMeshValidator.report(
+        mesh
+    )
+
+    assert before_report["open_edge_count"] == 0
+
+    assert before_report["non_manifold_edge_count"] == 0
+
+    result = AtlasCastleGableRoofBuilder.apply(
+        mesh=mesh,
+        castle_profile="castle_wing",
+    )
+
+    assert result.get(
+        "castle_gable_roof_applied"
+    ) is True
+
+    assert result.get(
+        "roof_geometry"
+    ) == "triangular_hip"
+
+    after_report = AtlasMeshValidator.report(
+        result
+    )
+
+    assert after_report["open_edge_count"] == 0
+
+    assert after_report["non_manifold_edge_count"] == 0
+
+    assert after_report["valid"] is True
+
 if __name__ == "__main__":
     test_elongated_tower_routes_to_gable_and_remains_valid()
 
     test_irregular_tower_gable_rectangle_is_dynamically_reduced()
+
+    test_triangular_castle_wing_receives_valid_gable_roof()
 
     print("PASS: " "test_castle_roof_dispatch_regression")

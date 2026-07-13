@@ -102,6 +102,15 @@ class AtlasCastleGableRoofBuilder:
         if len(ring) < 3:
             return mesh
 
+        if len(ring) == 3:
+            return AtlasCastleGableRoofBuilder._apply_triangular_roof(
+                mesh=mesh,
+                ring=ring,
+                castle_profile=castle_profile,
+                top_z=float(top_z),
+                bottom_z=float(bottom_z),
+            )
+
         rectangle = AtlasCastleGableRoofBuilder._minimum_rotated_rectangle(
             ring=ring,
             castle_profile=castle_profile,
@@ -276,6 +285,161 @@ class AtlasCastleGableRoofBuilder:
 
         mesh["roof_geometry"] = roof_geometry
 
+        mesh["castle_gable_roof_applied"] = True
+
+        return mesh
+
+    @staticmethod
+    def _apply_triangular_roof(
+        mesh,
+        ring,
+        castle_profile,
+        top_z,
+        bottom_z,
+    ):
+        coordinates = [
+            (
+                float(point[0]),
+                float(point[1]),
+            )
+            for point in ring
+        ]
+
+        edge_lengths = []
+
+        for index, point_1 in enumerate(coordinates):
+            point_2 = coordinates[
+                (index + 1) % len(coordinates)
+            ]
+
+            edge_lengths.append(
+                math.hypot(
+                    point_2[0] - point_1[0],
+                    point_2[1] - point_1[1],
+                )
+            )
+
+        long_side_mm = max(edge_lengths)
+        short_side_mm = min(edge_lengths)
+
+        if (
+            long_side_mm
+            < AtlasCastleGableRoofBuilder.MIN_RECTANGLE_SIDE_MM
+            or short_side_mm
+            < AtlasCastleGableRoofBuilder.MIN_RECTANGLE_SIDE_MM
+        ):
+            return mesh
+
+        body_height_mm = max(
+            0.0,
+            float(top_z) - float(bottom_z),
+        )
+
+        span_height_mm = (
+            short_side_mm
+            * AtlasCastleGableRoofBuilder
+            .ROOF_SHORT_SPAN_RATIO[castle_profile]
+        )
+
+        body_height_target_mm = (
+            body_height_mm
+            * AtlasCastleGableRoofBuilder
+            .ROOF_BODY_HEIGHT_RATIO[castle_profile]
+        )
+
+        roof_height_mm = max(
+            span_height_mm,
+            body_height_target_mm,
+        )
+
+        roof_height_mm = max(
+            roof_height_mm,
+            AtlasCastleGableRoofBuilder
+            .MIN_ROOF_HEIGHT_MM[castle_profile],
+        )
+
+        roof_height_mm = min(
+            roof_height_mm,
+            AtlasCastleGableRoofBuilder
+            .MAX_ROOF_HEIGHT_MM[castle_profile],
+        )
+
+        base_z = (
+            float(top_z)
+            - AtlasCastleGableRoofBuilder.EMBED_DEPTH_MM
+        )
+
+        ridge_z = float(top_z) + roof_height_mm
+
+        base_points = [
+            (
+                point[0],
+                point[1],
+                base_z,
+            )
+            for point in coordinates
+        ]
+
+        centroid_x = sum(
+            point[0]
+            for point in coordinates
+        ) / 3.0
+
+        centroid_y = sum(
+            point[1]
+            for point in coordinates
+        ) / 3.0
+
+        apex = (
+            centroid_x,
+            centroid_y,
+            ridge_z,
+        )
+
+        a, b, c = base_points
+
+        roof_triangles = [
+            (
+                a,
+                b,
+                apex,
+            ),
+            (
+                b,
+                c,
+                apex,
+            ),
+            (
+                c,
+                a,
+                apex,
+            ),
+            (
+                a,
+                c,
+                b,
+            ),
+        ]
+
+        mesh["triangles"] = [
+            *mesh.get(
+                "triangles",
+                [],
+            ),
+            *roof_triangles,
+        ]
+
+        mesh["body_top_z"] = float(top_z)
+        mesh["roof_top_z"] = ridge_z
+        mesh["top_z"] = ridge_z
+
+        mesh["gable_roof_triangles"] = roof_triangles
+        mesh["roof_height_mm"] = roof_height_mm
+        mesh["roof_long_side_mm"] = long_side_mm
+        mesh["roof_short_side_mm"] = short_side_mm
+        mesh["roof_ridge_start"] = apex
+        mesh["roof_ridge_end"] = apex
+        mesh["roof_geometry"] = "triangular_hip"
         mesh["castle_gable_roof_applied"] = True
 
         return mesh
