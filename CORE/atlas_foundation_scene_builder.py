@@ -86,6 +86,15 @@ class AtlasFoundationSceneBuilder:
             if max_buildings is not None and accepted_buildings >= max_buildings:
                 break
 
+            if bbox is not None and not (
+                AtlasFoundationSceneBuilder._geometry_intersects_bbox(
+                    geometry=raw_building.get("geometry", []),
+                    bbox=bbox,
+                )
+            ):
+                skipped_buildings += 1
+                continue
+
             if not AtlasSceneBuilder._is_raw_building_usable(
                 raw_building,
                 min_points=min_points,
@@ -266,3 +275,31 @@ class AtlasFoundationSceneBuilder:
             print("=" * 70)
 
         return scene
+
+    @staticmethod
+    def _geometry_intersects_bbox(geometry, bbox):
+        if not geometry or bbox is None:
+            return False
+
+        points = [
+            point
+            for point in geometry
+            if point is not None and len(point) >= 2
+        ]
+
+        if not points:
+            return False
+
+        geometry_south = min(float(point[0]) for point in points)
+        geometry_west = min(float(point[1]) for point in points)
+        geometry_north = max(float(point[0]) for point in points)
+        geometry_east = max(float(point[1]) for point in points)
+
+        south, west, north, east = bbox
+
+        return not (
+            geometry_north < south
+            or geometry_south > north
+            or geometry_east < west
+            or geometry_west > east
+        )

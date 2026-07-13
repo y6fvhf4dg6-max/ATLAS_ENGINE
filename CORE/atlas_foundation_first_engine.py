@@ -208,7 +208,7 @@ class AtlasFoundationFirstEngine:
         size_y_mm = None
         focus_result = None
 
-        use_castle_focus = bool(castle_only and castle_focus)
+        use_castle_focus = bool(castle_focus)
 
         if use_castle_focus:
             focus_result = AtlasCastleFocusEngine.calculate_focus_bbox(
@@ -225,6 +225,7 @@ class AtlasFoundationFirstEngine:
 
             working_bbox = focus_result["bbox"]
 
+        if use_castle_focus and castle_only:
             fixed_dimensions = AtlasScaleEngine.calculate_dimensions_from_scale(
                 bbox=working_bbox,
                 xy_scale=fixed_xy_scale,

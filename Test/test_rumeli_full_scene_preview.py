@@ -63,10 +63,10 @@ LAYER_OUTPUT_PATHS = {
 }
 
 BBOX = (
-    41.08317068,
-    29.05452733,
-    41.08665972,
-    29.05766147,
+    41.08050,
+    29.04850,
+    41.08850,
+    29.05950,
 )
 
 
@@ -93,9 +93,25 @@ def main():
             terrain_provider_name="srtm",
             nature_provider_names=(),
             castle_only=False,
+            castle_focus=True,
+            castle_focus_padding_m=70.0,
             debug=True,
         )
     )
+
+    expected_focus_bbox = (
+        41.08317068,
+        29.05452733,
+        41.08665972,
+        29.05766147,
+    )
+
+    assert result["castle_focus"] is True
+
+    assert tuple(
+        round(value, 8)
+        for value in result["working_bbox"]
+    ) == expected_focus_bbox
 
     print("")
     print("=" * 88)
