@@ -290,6 +290,36 @@ def main():
         f"{semantic_quality.get('roof_coverage_percent')}"
     )
 
+    semantic_issues = semantic_quality.get(
+        "issue_counts",
+        {},
+    )
+
+    print(
+        f"Invalid building heights      : "
+        f"{semantic_issues.get('invalid_height', 0)}"
+    )
+
+    print(
+        f"Non-positive building heights : "
+        f"{semantic_issues.get('non_positive_height', 0)}"
+    )
+
+    print(
+        f"Invalid building levels       : "
+        f"{semantic_issues.get('invalid_levels', 0)}"
+    )
+
+    print(
+        f"Non-positive building levels  : "
+        f"{semantic_issues.get('non_positive_levels', 0)}"
+    )
+
+    print(
+        f"Unknown roof shapes           : "
+        f"{semantic_issues.get('unknown_roof_shape', 0)}"
+    )
+
     print(
         f"Unknown castle records        : "
         f"{semantic_quality.get('unknown_castle_count')}"

@@ -88,6 +88,25 @@ class AtlasInputQualityReport:
             )
         )
 
+        semantic_issue_counts = {
+            "invalid_height": 0,
+            "non_positive_height": 0,
+            "invalid_levels": 0,
+            "non_positive_levels": 0,
+            "unknown_roof_shape": 0,
+        }
+
+        for building in buildings:
+            building_issues = (
+                AtlasInputQualityReport
+                ._classify_building_semantic_issues(
+                    building
+                )
+            )
+
+            for issue_name in building_issues:
+                semantic_issue_counts[issue_name] += 1
+
         height_coverage_percent = (
             height_count
             / building_count
@@ -187,6 +206,7 @@ class AtlasInputQualityReport:
                 "unknown_castle_count": len(
                     unknown_castles
                 ),
+                "issue_counts": semantic_issue_counts,
             },
             "terrain": {
                 "sample_count": sample_count,
@@ -436,6 +456,95 @@ class AtlasInputQualityReport:
             "Input quality policy failed: "
             f"{reason_text}"
         )
+
+    @staticmethod
+    def _classify_building_semantic_issues(
+        building,
+    ):
+        tags = building.get(
+            "tags",
+            {},
+        )
+
+        issues = []
+
+        height_value = tags.get("height")
+
+        if height_value is not None:
+            parsed_height = (
+                AtlasInputQualityReport._parse_numeric_value(
+                    height_value,
+                    remove_meter_suffix=True,
+                )
+            )
+
+            if parsed_height is None:
+                issues.append("invalid_height")
+            elif parsed_height <= 0.0:
+                issues.append("non_positive_height")
+
+        levels_value = tags.get("building:levels")
+
+        if levels_value is not None:
+            parsed_levels = (
+                AtlasInputQualityReport._parse_numeric_value(
+                    levels_value,
+                )
+            )
+
+            if parsed_levels is None:
+                issues.append("invalid_levels")
+            elif parsed_levels <= 0.0:
+                issues.append("non_positive_levels")
+
+        roof_shape = (
+            tags.get("roof:shape")
+            or tags.get("roof:type")
+        )
+
+        if roof_shape is not None:
+            normalized_roof_shape = str(
+                roof_shape
+            ).strip().lower()
+
+            known_roof_shapes = {
+                "flat",
+                "pitched",
+                "gable",
+                "gabled",
+                "hipped",
+                "half-hipped",
+                "pyramidal",
+                "skillion",
+                "gambrel",
+                "mansard",
+                "dome",
+                "onion",
+                "round",
+                "saltbox",
+            }
+
+            if normalized_roof_shape not in known_roof_shapes:
+                issues.append("unknown_roof_shape")
+
+        return issues
+
+    @staticmethod
+    def _parse_numeric_value(
+        value,
+        remove_meter_suffix=False,
+    ):
+        value_text = str(value).strip().lower()
+
+        if remove_meter_suffix:
+            value_text = value_text.removesuffix(
+                "m"
+            ).strip()
+
+        try:
+            return float(value_text)
+        except (TypeError, ValueError):
+            return None
 
     @staticmethod
     def _has_height(building):

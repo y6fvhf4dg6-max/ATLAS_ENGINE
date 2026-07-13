@@ -360,3 +360,70 @@ def test_input_quality_report_classifies_geometry_issues():
     assert issues["duplicate_points"] == 1
     assert issues["zero_area"] == 1
     assert issues["self_intersection"] == 1
+
+
+def test_input_quality_report_classifies_semantic_issues():
+    buildings = [
+        {
+            "id": 1,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "abc",
+                "building:levels": "3",
+                "roof:shape": "gable",
+            },
+        },
+        {
+            "id": 2,
+            "geometry": [
+                (2.0, 2.0),
+                (2.0, 3.0),
+                (3.0, 3.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "-5",
+                "building:levels": "0",
+                "roof:shape": "mystery_roof",
+            },
+        },
+        {
+            "id": 3,
+            "geometry": [
+                (4.0, 4.0),
+                (4.0, 5.0),
+                (5.0, 5.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "12 m",
+                "building:levels": "three",
+                "roof:shape": "hipped",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=[],
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    issues = report["semantics"]["issue_counts"]
+
+    assert issues["invalid_height"] == 1
+    assert issues["non_positive_height"] == 1
+    assert issues["invalid_levels"] == 1
+    assert issues["non_positive_levels"] == 1
+    assert issues["unknown_roof_shape"] == 1
