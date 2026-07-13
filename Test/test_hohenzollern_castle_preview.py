@@ -42,6 +42,9 @@ def main():
         terrain_provider_name="srtm",
         nature_provider_names=(),
         strict_input_quality=True,
+        castle_only=False,
+        castle_focus=True,
+        castle_focus_padding_m=70.0,
         debug=True,
     )
 
