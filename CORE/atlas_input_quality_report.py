@@ -152,6 +152,51 @@ class AtlasInputQualityReport:
                     )
                 )
 
+        semantic_issue_severity = {
+            "complex_roof_shape": "INFO",
+            "invalid_height": "WARN",
+            "non_positive_height": "WARN",
+            "invalid_levels": "WARN",
+            "non_positive_levels": "WARN",
+            "unknown_roof_shape": "WARN",
+            "conflicting_height_values": "WARN",
+            "conflicting_roof_shapes": "WARN",
+            "missing_castle_tag": "WARN",
+            "relation_missing_outer_geometry": "FAIL",
+            "way_has_inner_geometry": "FAIL",
+            "unsupported_castle_geometry_type": "FAIL",
+        }
+
+        semantic_severity_issues = {
+            "INFO": {},
+            "WARN": {},
+            "FAIL": {},
+        }
+
+        for issue_name, issue_count in (
+            semantic_issue_counts.items()
+        ):
+            issue_count = int(issue_count or 0)
+
+            if issue_count <= 0:
+                continue
+
+            severity = semantic_issue_severity[
+                issue_name
+            ]
+
+            semantic_severity_issues[
+                severity
+            ][issue_name] = issue_count
+
+        semantic_severity_counts = {
+            severity: sum(
+                issue_counts_by_name.values()
+            )
+            for severity, issue_counts_by_name
+            in semantic_severity_issues.items()
+        }
+
         height_coverage_percent = (
             height_count
             / building_count
@@ -253,6 +298,12 @@ class AtlasInputQualityReport:
                 ),
                 "issue_counts": semantic_issue_counts,
                 "issue_records": semantic_issue_records,
+                "severity_counts": (
+                    semantic_severity_counts
+                ),
+                "severity_issues": (
+                    semantic_severity_issues
+                ),
             },
             "terrain": {
                 "sample_count": sample_count,

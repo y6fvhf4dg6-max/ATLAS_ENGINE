@@ -993,3 +993,72 @@ def test_input_quality_report_records_semantic_issue_details():
             "value": None,
         },
     ]
+
+
+def test_input_quality_report_groups_semantic_issues_by_severity():
+    buildings = [
+        {
+            "id": 101,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "abc",
+                "roof:shape": "many",
+            },
+        },
+    ]
+
+    castles = [
+        {
+            "id": 202,
+            "geometry_type": "relation",
+            "geometry": [],
+            "outer_geometries": [],
+            "inner_geometries": [],
+            "tags": {
+                "historic": "castle",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=castles,
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    severity_counts = (
+        report["semantics"]["severity_counts"]
+    )
+
+    assert severity_counts == {
+        "INFO": 1,
+        "WARN": 1,
+        "FAIL": 1,
+    }
+
+    severity_issues = (
+        report["semantics"]["severity_issues"]
+    )
+
+    assert severity_issues["INFO"] == {
+        "complex_roof_shape": 1,
+    }
+
+    assert severity_issues["WARN"] == {
+        "invalid_height": 1,
+    }
+
+    assert severity_issues["FAIL"] == {
+        "relation_missing_outer_geometry": 1,
+    }

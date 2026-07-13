@@ -209,6 +209,16 @@ def main():
         {},
     )
 
+    semantic_severity_counts = semantic_quality.get(
+        "severity_counts",
+        {},
+    )
+
+    semantic_severity_issues = semantic_quality.get(
+        "severity_issues",
+        {},
+    )
+
     print("")
     print("INPUT QUALITY")
     print("-" * 88)
@@ -264,6 +274,16 @@ def main():
         in semantic_issue_records.items()
         if records
     }
+
+    print(
+        f"Semantic severity counts      : "
+        f"{semantic_severity_counts}"
+    )
+
+    print(
+        f"Semantic severity issues      : "
+        f"{semantic_severity_issues}"
+    )
 
     print(
         f"Semantic issue record groups  : "
