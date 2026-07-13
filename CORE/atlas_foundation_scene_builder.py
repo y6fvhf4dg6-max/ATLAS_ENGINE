@@ -76,6 +76,19 @@ class AtlasFoundationSceneBuilder:
         skipped_buildings = 0
         castle_buildings = 0
 
+        building_rejection_counts = {}
+
+        def record_building_rejection(reason):
+            rejection_reason = reason or "unknown_rejection"
+
+            building_rejection_counts[rejection_reason] = (
+                building_rejection_counts.get(
+                    rejection_reason,
+                    0,
+                )
+                + 1
+            )
+
         castle_profile_counts = {}
         tower_roof_count = 0
         gable_roof_count = 0
@@ -93,6 +106,7 @@ class AtlasFoundationSceneBuilder:
                 )
             ):
                 skipped_buildings += 1
+                record_building_rejection("outside_bbox")
                 continue
 
             if not AtlasSceneBuilder._is_raw_building_usable(
@@ -101,6 +115,7 @@ class AtlasFoundationSceneBuilder:
                 max_points=max_points,
             ):
                 skipped_buildings += 1
+                record_building_rejection("raw_building_unusable")
                 continue
 
             prepared_building = AtlasCastleFootprintRegularizer.prepare(
@@ -121,17 +136,28 @@ class AtlasFoundationSceneBuilder:
                 False,
             ):
                 skipped_buildings += 1
+                record_building_rejection("outside_castle_scope")
                 continue
+
+            building_diagnostics = {}
+
             mesh = AtlasFoundationFirstPipeline.build_building_mesh(
                 building=atlas_building,
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_mesh,
                 sample_grid=5,
                 embed_depth_mm=0.30,
+                diagnostics=building_diagnostics,
             )
 
             if not mesh:
                 skipped_buildings += 1
+                record_building_rejection(
+                    building_diagnostics.get(
+                        "reason",
+                        "mesh_generation_failed",
+                    )
+                )
                 continue
 
             tags = prepared_building.get(
@@ -247,6 +273,15 @@ class AtlasFoundationSceneBuilder:
 
             accepted_buildings += 1
 
+        scene.metadata["building_report"] = {
+            "accepted": accepted_buildings,
+            "skipped": skipped_buildings,
+            "castle_buildings": castle_buildings,
+            "rejection_counts": dict(
+                sorted(building_rejection_counts.items())
+            ),
+        }
+
         if debug:
             print("")
             print("=" * 70)
@@ -256,6 +291,12 @@ class AtlasFoundationSceneBuilder:
             print(f"Accepted buildings : " f"{accepted_buildings}")
 
             print(f"Skipped buildings  : " f"{skipped_buildings}")
+
+            for reason in sorted(building_rejection_counts):
+                print(
+                    f"  rejected/{reason:<30}: "
+                    f"{building_rejection_counts[reason]}"
+                )
 
             print(f"Castle buildings   : " f"{castle_buildings}")
 

@@ -18,6 +18,7 @@ class AtlasFoundationFirstPipeline:
         terrain_mesh,
         sample_grid=5,
         embed_depth_mm=0.30,
+        diagnostics=None,
     ):
         temporary_mesh = AtlasMeshBuilder.build_mesh(
             building,
@@ -54,6 +55,7 @@ class AtlasFoundationFirstPipeline:
             building=building,
             coordinate_engine=coordinate_engine,
             foundation_z=foundation_z,
+            diagnostics=diagnostics,
         )
 
         if final_mesh is not None:
