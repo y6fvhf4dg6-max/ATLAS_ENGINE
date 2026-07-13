@@ -703,24 +703,9 @@ class AtlasInputQualityReport:
                 roof_shape
             ).strip().lower()
 
-            known_roof_shapes = {
-                "flat",
-                "pitched",
-                "gable",
-                "gabled",
-                "hipped",
-                "half-hipped",
-                "pyramidal",
-                "skillion",
-                "gambrel",
-                "mansard",
-                "dome",
-                "onion",
-                "round",
-                "saltbox",
-            }
-
-            if normalized_roof_shape not in known_roof_shapes:
+            if not AtlasInputQualityReport._is_known_roof_shape(
+                normalized_roof_shape
+            ):
                 issues.append("unknown_roof_shape")
 
         return issues
@@ -743,8 +728,59 @@ class AtlasInputQualityReport:
             return None
 
     @staticmethod
+    def _is_positive_numeric_value(
+        value,
+        remove_meter_suffix=False,
+    ):
+        if value is None:
+            return False
+
+        parsed_value = (
+            AtlasInputQualityReport._parse_numeric_value(
+                value,
+                remove_meter_suffix=remove_meter_suffix,
+            )
+        )
+
+        return (
+            parsed_value is not None
+            and parsed_value > 0.0
+        )
+
+    @staticmethod
+    def _is_known_roof_shape(value):
+        if value is None:
+            return False
+
+        normalized_value = str(
+            value
+        ).strip().lower()
+
+        known_roof_shapes = {
+            "flat",
+            "pitched",
+            "gable",
+            "gabled",
+            "hipped",
+            "half-hipped",
+            "pyramidal",
+            "skillion",
+            "gambrel",
+            "mansard",
+            "dome",
+            "onion",
+            "round",
+            "saltbox",
+        }
+
+        return normalized_value in known_roof_shapes
+
+    @staticmethod
     def _has_height(building):
-        if building.get("height") is not None:
+        if AtlasInputQualityReport._is_positive_numeric_value(
+            building.get("height"),
+            remove_meter_suffix=True,
+        ):
             return True
 
         tags = building.get(
@@ -752,14 +788,21 @@ class AtlasInputQualityReport:
             {},
         )
 
-        return (
-            tags.get("height") is not None
-            or tags.get("building:levels") is not None
+        if AtlasInputQualityReport._is_positive_numeric_value(
+            tags.get("height"),
+            remove_meter_suffix=True,
+        ):
+            return True
+
+        return AtlasInputQualityReport._is_positive_numeric_value(
+            tags.get("building:levels")
         )
 
     @staticmethod
     def _has_roof(building):
-        if building.get("roof_type") is not None:
+        if AtlasInputQualityReport._is_known_roof_shape(
+            building.get("roof_type")
+        ):
             return True
 
         tags = building.get(
@@ -767,7 +810,11 @@ class AtlasInputQualityReport:
             {},
         )
 
-        return (
-            tags.get("roof:shape") is not None
-            or tags.get("roof:type") is not None
+        roof_shape = (
+            tags.get("roof:shape")
+            or tags.get("roof:type")
+        )
+
+        return AtlasInputQualityReport._is_known_roof_shape(
+            roof_shape
         )

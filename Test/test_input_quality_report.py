@@ -648,3 +648,73 @@ def test_non_strict_input_quality_allows_structural_castle_semantic_failure():
         policy,
         strict=False,
     )
+
+
+def test_semantic_coverage_excludes_invalid_values():
+    buildings = [
+        {
+            "id": 1,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "abc",
+                "roof:shape": "mystery_roof",
+            },
+        },
+        {
+            "id": 2,
+            "geometry": [
+                (2.0, 2.0),
+                (2.0, 3.0),
+                (3.0, 3.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "building:levels": "0",
+                "roof:shape": "gable",
+            },
+        },
+        {
+            "id": 3,
+            "geometry": [
+                (4.0, 4.0),
+                (4.0, 5.0),
+                (5.0, 5.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "12 m",
+                "roof:shape": "hipped",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=[],
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    semantics = report["semantics"]
+
+    assert semantics["height_count"] == 1
+    assert abs(
+        semantics["height_coverage_percent"]
+        - (100.0 / 3.0)
+    ) < 1e-9
+
+    assert semantics["roof_count"] == 2
+    assert abs(
+        semantics["roof_coverage_percent"]
+        - (200.0 / 3.0)
+    ) < 1e-9
