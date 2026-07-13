@@ -48,6 +48,83 @@ def main():
         debug=True,
     )
 
+    expected_focus_bbox = (
+        48.32241718,
+        8.96547520,
+        48.32469742,
+        8.96959170,
+    )
+
+    assert result["castle_focus"] is True
+
+    assert tuple(
+        round(value, 8)
+        for value in result["working_bbox"]
+    ) == expected_focus_bbox
+
+    assert round(result["xy_scale"], 2) == 1692.78
+
+    assert result["buildings"] == 14
+
+    building_meshes = result["mesh_groups"]["buildings"]
+
+    tower_roof_count = sum(
+        1
+        for mesh in building_meshes
+        if mesh.get("castle_roof_applied")
+    )
+
+    single_gable_roof_count = sum(
+        1
+        for mesh in building_meshes
+        if mesh.get("castle_gable_roof_applied")
+    )
+
+    multi_gable_roof_count = sum(
+        1
+        for mesh in building_meshes
+        if mesh.get("castle_multi_gable_roof_applied")
+    )
+
+    multi_gable_piece_count = sum(
+        int(
+            mesh.get(
+                "multi_gable_roof_piece_count",
+                0,
+            )
+        )
+        for mesh in building_meshes
+    )
+
+    assert tower_roof_count == 7
+
+    assert single_gable_roof_count == 2
+
+    assert multi_gable_roof_count == 3
+
+    assert multi_gable_piece_count == 4
+
+    topology_meshes = [
+        *building_meshes,
+        *result["mesh_groups"]["castle_walls"],
+    ]
+
+    for mesh in topology_meshes:
+        report = mesh.get(
+            "validation_report",
+            {},
+        )
+
+        assert report.get(
+            "open_edge_count",
+            0,
+        ) == 0
+
+        assert report.get(
+            "non_manifold_edge_count",
+            0,
+        ) == 0
+
     print("")
     print("=" * 88)
     print("ATLAS HOHENZOLLERN FULL SCENE REPORT")
