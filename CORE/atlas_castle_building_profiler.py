@@ -193,6 +193,16 @@ class AtlasCastleBuildingProfiler:
             )
         )
 
+        historic = AtlasCastleBuildingProfiler._normalize_text(
+            tags.get(
+                "historic",
+                "",
+            )
+        )
+
+        if historic == "city_gate":
+            return "gate_tower"
+
         if AtlasCastleBuildingProfiler._contains_any(
             name,
             AtlasCastleBuildingProfiler.MAIN_TOWER_WORDS,
