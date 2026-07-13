@@ -427,3 +427,85 @@ def test_input_quality_report_classifies_semantic_issues():
     assert issues["invalid_levels"] == 1
     assert issues["non_positive_levels"] == 1
     assert issues["unknown_roof_shape"] == 1
+
+
+def test_input_quality_report_classifies_castle_semantic_issues():
+    castles = [
+        {
+            "id": 1,
+            "geometry_type": "relation",
+            "geometry": [],
+            "outer_geometries": [],
+            "inner_geometries": [],
+            "tags": {
+                "historic": "castle",
+            },
+        },
+        {
+            "id": 2,
+            "geometry_type": "way",
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "outer_geometries": [],
+            "inner_geometries": [
+                [
+                    (0.2, 0.2),
+                    (0.2, 0.4),
+                    (0.4, 0.4),
+                ],
+            ],
+            "tags": {
+                "historic": "castle",
+            },
+        },
+        {
+            "id": 3,
+            "geometry_type": "collection",
+            "geometry": [
+                (2.0, 2.0),
+                (2.0, 3.0),
+                (3.0, 3.0),
+            ],
+            "outer_geometries": [],
+            "inner_geometries": [],
+            "tags": {
+                "historic": "castle",
+            },
+        },
+        {
+            "id": 4,
+            "geometry_type": "way",
+            "geometry": [
+                (4.0, 4.0),
+                (4.0, 5.0),
+                (5.0, 5.0),
+            ],
+            "outer_geometries": [],
+            "inner_geometries": [],
+            "tags": {
+                "tourism": "attraction",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=[],
+        castles=castles,
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    issues = report["semantics"]["issue_counts"]
+
+    assert issues["relation_missing_outer_geometry"] == 1
+    assert issues["way_has_inner_geometry"] == 1
+    assert issues["unsupported_castle_geometry_type"] == 1
+    assert issues["missing_castle_tag"] == 1

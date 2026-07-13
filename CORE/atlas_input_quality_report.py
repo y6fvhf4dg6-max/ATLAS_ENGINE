@@ -94,6 +94,10 @@ class AtlasInputQualityReport:
             "invalid_levels": 0,
             "non_positive_levels": 0,
             "unknown_roof_shape": 0,
+            "relation_missing_outer_geometry": 0,
+            "way_has_inner_geometry": 0,
+            "unsupported_castle_geometry_type": 0,
+            "missing_castle_tag": 0,
         }
 
         for building in buildings:
@@ -105,6 +109,17 @@ class AtlasInputQualityReport:
             )
 
             for issue_name in building_issues:
+                semantic_issue_counts[issue_name] += 1
+
+        for castle in castles:
+            castle_issues = (
+                AtlasInputQualityReport
+                ._classify_castle_semantic_issues(
+                    castle
+                )
+            )
+
+            for issue_name in castle_issues:
                 semantic_issue_counts[issue_name] += 1
 
         height_coverage_percent = (
@@ -456,6 +471,65 @@ class AtlasInputQualityReport:
             "Input quality policy failed: "
             f"{reason_text}"
         )
+
+    @staticmethod
+    def _classify_castle_semantic_issues(
+        castle,
+    ):
+        issues = []
+
+        tags = castle.get(
+            "tags",
+            {},
+        )
+
+        geometry_type = castle.get(
+            "geometry_type"
+        )
+
+        outer_geometries = castle.get(
+            "outer_geometries",
+            [],
+        ) or []
+
+        inner_geometries = castle.get(
+            "inner_geometries",
+            [],
+        ) or []
+
+        is_castle_tagged = (
+            tags.get("historic") == "castle"
+            or tags.get("building") == "castle"
+        )
+
+        if not is_castle_tagged:
+            issues.append("missing_castle_tag")
+
+        if geometry_type not in (
+            "way",
+            "relation",
+        ):
+            issues.append(
+                "unsupported_castle_geometry_type"
+            )
+
+        if (
+            geometry_type == "relation"
+            and not outer_geometries
+        ):
+            issues.append(
+                "relation_missing_outer_geometry"
+            )
+
+        if (
+            geometry_type == "way"
+            and inner_geometries
+        ):
+            issues.append(
+                "way_has_inner_geometry"
+            )
+
+        return issues
 
     @staticmethod
     def _classify_building_semantic_issues(

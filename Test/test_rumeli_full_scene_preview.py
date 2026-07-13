@@ -321,6 +321,26 @@ def main():
     )
 
     print(
+        f"Castle relations missing outer: "
+        f"{semantic_issues.get('relation_missing_outer_geometry', 0)}"
+    )
+
+    print(
+        f"Castle ways with inner rings  : "
+        f"{semantic_issues.get('way_has_inner_geometry', 0)}"
+    )
+
+    print(
+        f"Unsupported castle geometries : "
+        f"{semantic_issues.get('unsupported_castle_geometry_type', 0)}"
+    )
+
+    print(
+        f"Castle records missing tag    : "
+        f"{semantic_issues.get('missing_castle_tag', 0)}"
+    )
+
+    print(
         f"Unknown castle records        : "
         f"{semantic_quality.get('unknown_castle_count')}"
     )
