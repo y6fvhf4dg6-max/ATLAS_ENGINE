@@ -917,3 +917,79 @@ def test_osm_cone_roof_is_known_and_many_roof_is_complex():
 
     assert semantics["roof_count"] == 2
     assert semantics["roof_coverage_percent"] == 100.0
+
+
+def test_input_quality_report_records_semantic_issue_details():
+    buildings = [
+        {
+            "id": 101,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "abc",
+                "roof:shape": "many",
+            },
+        },
+    ]
+
+    castles = [
+        {
+            "id": 202,
+            "geometry_type": "way",
+            "geometry": [
+                (2.0, 2.0),
+                (2.0, 3.0),
+                (3.0, 3.0),
+            ],
+            "outer_geometries": [],
+            "inner_geometries": [],
+            "tags": {
+                "tourism": "attraction",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=castles,
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    records = report["semantics"]["issue_records"]
+
+    assert records["invalid_height"] == [
+        {
+            "record_type": "building",
+            "id": 101,
+            "field": "height",
+            "value": "abc",
+        },
+    ]
+
+    assert records["complex_roof_shape"] == [
+        {
+            "record_type": "building",
+            "id": 101,
+            "field": "roof:shape",
+            "value": "many",
+        },
+    ]
+
+    assert records["missing_castle_tag"] == [
+        {
+            "record_type": "castle",
+            "id": 202,
+            "field": "historic/building",
+            "value": None,
+        },
+    ]

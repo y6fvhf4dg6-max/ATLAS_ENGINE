@@ -108,6 +108,29 @@ def test_burghausen_real_fixture_input_quality():
     assert issues["unknown_roof_shape"] == 0
     assert issues["complex_roof_shape"] == 5
 
+    complex_roof_records = (
+        semantics["issue_records"]
+        ["complex_roof_shape"]
+    )
+
+    assert [
+        record["id"]
+        for record in complex_roof_records
+    ] == [
+        122098764,
+        122098773,
+        122155613,
+        122507266,
+        123098479,
+    ]
+
+    assert all(
+        record["record_type"] == "building"
+        and record["field"] == "roof:shape"
+        and record["value"] == "many"
+        for record in complex_roof_records
+    )
+
     assert semantics["building_count"] == 505
     assert semantics["height_count"] == 227
     assert semantics["roof_count"] == 113

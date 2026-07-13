@@ -103,6 +103,11 @@ class AtlasInputQualityReport:
             "missing_castle_tag": 0,
         }
 
+        semantic_issue_records = {
+            issue_name: []
+            for issue_name in semantic_issue_counts
+        }
+
         for building in buildings:
             building_issues = (
                 AtlasInputQualityReport
@@ -114,6 +119,17 @@ class AtlasInputQualityReport:
             for issue_name in building_issues:
                 semantic_issue_counts[issue_name] += 1
 
+                semantic_issue_records[
+                    issue_name
+                ].append(
+                    AtlasInputQualityReport
+                    ._build_semantic_issue_record(
+                        record_type="building",
+                        record=building,
+                        issue_name=issue_name,
+                    )
+                )
+
         for castle in castles:
             castle_issues = (
                 AtlasInputQualityReport
@@ -124,6 +140,17 @@ class AtlasInputQualityReport:
 
             for issue_name in castle_issues:
                 semantic_issue_counts[issue_name] += 1
+
+                semantic_issue_records[
+                    issue_name
+                ].append(
+                    AtlasInputQualityReport
+                    ._build_semantic_issue_record(
+                        record_type="castle",
+                        record=castle,
+                        issue_name=issue_name,
+                    )
+                )
 
         height_coverage_percent = (
             height_count
@@ -225,6 +252,7 @@ class AtlasInputQualityReport:
                     unknown_castles
                 ),
                 "issue_counts": semantic_issue_counts,
+                "issue_records": semantic_issue_records,
             },
             "terrain": {
                 "sample_count": sample_count,
@@ -622,6 +650,92 @@ class AtlasInputQualityReport:
             "Input quality policy failed: "
             f"{reason_text}"
         )
+
+    @staticmethod
+    def _build_semantic_issue_record(
+        record_type,
+        record,
+        issue_name,
+    ):
+        tags = record.get(
+            "tags",
+            {},
+        )
+
+        field_name = None
+        value = None
+
+        if issue_name in (
+            "invalid_height",
+            "non_positive_height",
+        ):
+            field_name = "height"
+            value = (
+                record.get("height")
+                if record.get("height") is not None
+                else tags.get("height")
+            )
+
+        elif issue_name in (
+            "invalid_levels",
+            "non_positive_levels",
+        ):
+            field_name = "building:levels"
+            value = tags.get("building:levels")
+
+        elif issue_name in (
+            "unknown_roof_shape",
+            "complex_roof_shape",
+        ):
+            if record.get("roof_type") is not None:
+                field_name = "roof_type"
+                value = record.get("roof_type")
+            elif tags.get("roof:shape") is not None:
+                field_name = "roof:shape"
+                value = tags.get("roof:shape")
+            else:
+                field_name = "roof:type"
+                value = tags.get("roof:type")
+
+        elif issue_name == "conflicting_height_values":
+            field_name = "height"
+            value = {
+                "direct": record.get("height"),
+                "tag": tags.get("height"),
+            }
+
+        elif issue_name == "conflicting_roof_shapes":
+            field_name = "roof"
+            value = {
+                "direct": record.get("roof_type"),
+                "tag": (
+                    tags.get("roof:shape")
+                    or tags.get("roof:type")
+                ),
+            }
+
+        elif issue_name == "relation_missing_outer_geometry":
+            field_name = "outer_geometries"
+            value = record.get("outer_geometries")
+
+        elif issue_name == "way_has_inner_geometry":
+            field_name = "inner_geometries"
+            value = record.get("inner_geometries")
+
+        elif issue_name == "unsupported_castle_geometry_type":
+            field_name = "geometry_type"
+            value = record.get("geometry_type")
+
+        elif issue_name == "missing_castle_tag":
+            field_name = "historic/building"
+            value = None
+
+        return {
+            "record_type": record_type,
+            "id": record.get("id"),
+            "field": field_name,
+            "value": value,
+        }
 
     @staticmethod
     def _classify_castle_semantic_issues(
