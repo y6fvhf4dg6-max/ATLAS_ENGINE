@@ -91,6 +91,7 @@ class AtlasFoundationFirstEngine:
         z_scale=5500,
         terrain_provider_name="srtm",
         terrain_smoothing_passes=0,
+        strict_input_quality=False,
         nature_provider_names=("worldcover",),
         castle_only=False,
         castle_focus=False,
@@ -293,6 +294,11 @@ class AtlasFoundationFirstEngine:
 
         input_quality_report["policy"] = (
             input_quality_policy
+        )
+
+        AtlasInputQualityReport.enforce_policy(
+            policy=input_quality_policy,
+            strict=strict_input_quality,
         )
 
         coastline_water_polygons = (

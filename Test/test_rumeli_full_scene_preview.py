@@ -92,6 +92,7 @@ def main():
             z_scale=5500,
             terrain_provider_name="srtm",
             terrain_smoothing_passes=1,
+            strict_input_quality=True,
             nature_provider_names=(),
             castle_only=False,
             castle_focus=True,

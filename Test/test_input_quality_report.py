@@ -189,3 +189,46 @@ def test_input_quality_policy_warns_for_low_semantic_coverage():
         "building_roof_coverage_below_10"
         in result["reasons"]
     )
+
+
+def test_enforce_policy_allows_warn_and_blocks_fail():
+    warn_policy = {
+        "risk_level": "MEDIUM",
+        "action": "WARN",
+        "reasons": [
+            "building_height_coverage_below_25",
+        ],
+    }
+
+    fail_policy = {
+        "risk_level": "HIGH",
+        "action": "FAIL",
+        "reasons": [
+            "terrain_coverage_percent_below_80",
+        ],
+    }
+
+    assert (
+        AtlasInputQualityReport.enforce_policy(
+            policy=warn_policy,
+            strict=True,
+        )
+        is None
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="Input quality policy failed",
+    ):
+        AtlasInputQualityReport.enforce_policy(
+            policy=fail_policy,
+            strict=True,
+        )
+
+    assert (
+        AtlasInputQualityReport.enforce_policy(
+            policy=fail_policy,
+            strict=False,
+        )
+        is None
+    )

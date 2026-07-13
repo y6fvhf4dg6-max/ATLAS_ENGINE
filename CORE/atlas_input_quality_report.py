@@ -285,6 +285,40 @@ class AtlasInputQualityReport:
         }
 
     @staticmethod
+    def enforce_policy(
+        policy,
+        strict=False,
+    ):
+        if not strict:
+            return None
+
+        action = str(
+            policy.get(
+                "action",
+                "",
+            )
+        ).upper()
+
+        if action != "FAIL":
+            return None
+
+        reasons = policy.get(
+            "reasons",
+            [],
+        )
+
+        reason_text = (
+            ", ".join(str(reason) for reason in reasons)
+            if reasons
+            else "unspecified"
+        )
+
+        raise RuntimeError(
+            "Input quality policy failed: "
+            f"{reason_text}"
+        )
+
+    @staticmethod
     def _has_height(building):
         if building.get("height") is not None:
             return True
