@@ -94,6 +94,8 @@ class AtlasInputQualityReport:
             "invalid_levels": 0,
             "non_positive_levels": 0,
             "unknown_roof_shape": 0,
+            "conflicting_height_values": 0,
+            "conflicting_roof_shapes": 0,
             "relation_missing_outer_geometry": 0,
             "way_has_inner_geometry": 0,
             "unsupported_castle_geometry_type": 0,
@@ -386,6 +388,22 @@ class AtlasInputQualityReport:
             or 0
         )
 
+        conflicting_height_values_count = int(
+            semantic_issues.get(
+                "conflicting_height_values",
+                0,
+            )
+            or 0
+        )
+
+        conflicting_roof_shapes_count = int(
+            semantic_issues.get(
+                "conflicting_roof_shapes",
+                0,
+            )
+            or 0
+        )
+
         reasons = []
 
         if valid_percent < 70.0:
@@ -474,6 +492,16 @@ class AtlasInputQualityReport:
         if unknown_roof_shape_count > 0:
             reasons.append(
                 "unknown_building_roof_shape_present"
+            )
+
+        if conflicting_height_values_count > 0:
+            reasons.append(
+                "conflicting_building_height_values_present"
+            )
+
+        if conflicting_roof_shapes_count > 0:
+            reasons.append(
+                "conflicting_building_roof_shapes_present"
             )
 
         if missing_castle_tag_count > 0:
@@ -665,11 +693,42 @@ class AtlasInputQualityReport:
         issues = []
 
         direct_height = building.get("height")
+        tagged_height = tags.get("height")
+
+        if (
+            direct_height is not None
+            and tagged_height is not None
+        ):
+            parsed_direct_height = (
+                AtlasInputQualityReport._parse_numeric_value(
+                    direct_height,
+                    remove_meter_suffix=True,
+                )
+            )
+
+            parsed_tagged_height = (
+                AtlasInputQualityReport._parse_numeric_value(
+                    tagged_height,
+                    remove_meter_suffix=True,
+                )
+            )
+
+            if (
+                parsed_direct_height is not None
+                and parsed_tagged_height is not None
+                and abs(
+                    parsed_direct_height
+                    - parsed_tagged_height
+                ) > 1e-9
+            ):
+                issues.append(
+                    "conflicting_height_values"
+                )
 
         height_value = (
             direct_height
             if direct_height is not None
-            else tags.get("height")
+            else tagged_height
         )
 
         if height_value is not None:
@@ -701,13 +760,35 @@ class AtlasInputQualityReport:
 
         direct_roof_type = building.get("roof_type")
 
+        tagged_roof_shape = (
+            tags.get("roof:shape")
+            or tags.get("roof:type")
+        )
+
+        if (
+            direct_roof_type is not None
+            and tagged_roof_shape is not None
+        ):
+            normalized_direct_roof = str(
+                direct_roof_type
+            ).strip().lower()
+
+            normalized_tagged_roof = str(
+                tagged_roof_shape
+            ).strip().lower()
+
+            if (
+                normalized_direct_roof
+                != normalized_tagged_roof
+            ):
+                issues.append(
+                    "conflicting_roof_shapes"
+                )
+
         roof_shape = (
             direct_roof_type
             if direct_roof_type is not None
-            else (
-                tags.get("roof:shape")
-                or tags.get("roof:type")
-            )
+            else tagged_roof_shape
         )
 
         if roof_shape is not None:

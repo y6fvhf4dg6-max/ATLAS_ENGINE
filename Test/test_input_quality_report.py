@@ -770,3 +770,100 @@ def test_semantic_issues_include_direct_building_fields():
 
     assert report["semantics"]["height_count"] == 0
     assert report["semantics"]["roof_count"] == 1
+
+
+def test_semantic_issues_detect_conflicting_direct_and_tag_values():
+    buildings = [
+        {
+            "id": 1,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "height": 10.0,
+            "roof_type": "gable",
+            "tags": {
+                "building": "yes",
+                "height": "12 m",
+                "roof:shape": "hipped",
+            },
+        },
+        {
+            "id": 2,
+            "geometry": [
+                (2.0, 2.0),
+                (2.0, 3.0),
+                (3.0, 3.0),
+            ],
+            "height": 8.0,
+            "roof_type": "flat",
+            "tags": {
+                "building": "yes",
+                "height": "8 m",
+                "roof:shape": "flat",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=[],
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    issues = report["semantics"]["issue_counts"]
+
+    assert issues["conflicting_height_values"] == 1
+    assert issues["conflicting_roof_shapes"] == 1
+
+
+def test_input_quality_policy_warns_for_conflicting_semantic_values():
+    report = {
+        "geometry": {
+            "valid_percent": 100.0,
+        },
+        "semantics": {
+            "building_count": 2,
+            "height_coverage_percent": 100.0,
+            "roof_coverage_percent": 100.0,
+            "unknown_castle_count": 0,
+            "issue_counts": {
+                "invalid_height": 0,
+                "non_positive_height": 0,
+                "invalid_levels": 0,
+                "non_positive_levels": 0,
+                "unknown_roof_shape": 0,
+                "conflicting_height_values": 1,
+                "conflicting_roof_shapes": 1,
+                "relation_missing_outer_geometry": 0,
+                "way_has_inner_geometry": 0,
+                "unsupported_castle_geometry_type": 0,
+                "missing_castle_tag": 0,
+            },
+        },
+        "terrain": {
+            "coverage_percent": 100.0,
+        },
+    }
+
+    policy = AtlasInputQualityReport.evaluate_policy(
+        report
+    )
+
+    assert policy["risk_level"] == "MEDIUM"
+    assert policy["action"] == "WARN"
+    assert (
+        "conflicting_building_height_values_present"
+        in policy["reasons"]
+    )
+    assert (
+        "conflicting_building_roof_shapes_present"
+        in policy["reasons"]
+    )

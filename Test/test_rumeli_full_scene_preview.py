@@ -321,6 +321,16 @@ def main():
     )
 
     print(
+        f"Conflicting height values     : "
+        f"{semantic_issues.get('conflicting_height_values', 0)}"
+    )
+
+    print(
+        f"Conflicting roof shapes       : "
+        f"{semantic_issues.get('conflicting_roof_shapes', 0)}"
+    )
+
+    print(
         f"Castle relations missing outer: "
         f"{semantic_issues.get('relation_missing_outer_geometry', 0)}"
     )
