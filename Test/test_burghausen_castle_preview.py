@@ -78,6 +78,7 @@ def main():
                 f"source_id={mesh.get('source_id')} "
                 f"name={mesh.get('name')} "
                 f"profile={mesh.get('castle_profile')} "
+                f"height_mm={mesh.get('top_z', 0.0) - mesh.get('bottom_z', 0.0):.3f} "
                 f"roof_profile={mesh.get('castle_roof_profile')} "
                 f"tower_roof={mesh.get('castle_roof_applied', False)} "
                 f"gable_roof={mesh.get('castle_gable_roof_applied', False)} "

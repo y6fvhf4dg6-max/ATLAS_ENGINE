@@ -24,6 +24,26 @@ class AtlasFoundationMeshExtruder:
 
     MIN_HEIGHT_MM = 2.0
     MAX_HEIGHT_MM = 35.0
+
+    CASTLE_HEIGHT_MULTIPLIERS = {
+        "main_tower": 2.00,
+        "defensive_tower": 1.80,
+        "gate_tower": 1.70,
+        "chapel": 1.50,
+        "castle_wing": 1.40,
+        "service_building": 1.10,
+        "unknown_castle_building": 1.25,
+    }
+
+    CASTLE_MIN_HEIGHTS_MM = {
+        "main_tower": 18.0,
+        "defensive_tower": 12.0,
+        "gate_tower": 10.0,
+        "chapel": 8.0,
+        "castle_wing": 6.0,
+        "service_building": 3.0,
+        "unknown_castle_building": 5.0,
+    }
     MIN_BUILDING_AREA_M2 = 20.0
     MIN_MODEL_WIDTH_MM = 1.20
     MIN_MODEL_DEPTH_MM = 1.20
@@ -129,7 +149,35 @@ class AtlasFoundationMeshExtruder:
 
     @staticmethod
     def _calculate_height(building, coordinate_engine):
-        height_mm = coordinate_engine.height_to_stl_mm(building.estimated_height)
+        height_mm = coordinate_engine.height_to_stl_mm(
+            building.estimated_height
+        )
+
+        if getattr(building, "is_castle_building", False):
+            castle_profile = getattr(
+                building,
+                "castle_profile",
+                None,
+            )
+
+            multiplier = (
+                AtlasFoundationMeshExtruder
+                .CASTLE_HEIGHT_MULTIPLIERS
+                .get(castle_profile, 1.25)
+            )
+
+            height_mm *= multiplier
+
+            minimum_castle_height_mm = (
+                AtlasFoundationMeshExtruder
+                .CASTLE_MIN_HEIGHTS_MM
+                .get(castle_profile, 5.0)
+            )
+
+            height_mm = max(
+                height_mm,
+                minimum_castle_height_mm,
+            )
 
         if height_mm < AtlasFoundationMeshExtruder.MIN_HEIGHT_MM:
             return AtlasFoundationMeshExtruder.MIN_HEIGHT_MM
