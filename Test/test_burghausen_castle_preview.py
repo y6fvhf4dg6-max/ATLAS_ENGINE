@@ -204,6 +204,11 @@ def main():
         {},
     )
 
+    semantic_issue_records = semantic_quality.get(
+        "issue_records",
+        {},
+    )
+
     print("")
     print("INPUT QUALITY")
     print("-" * 88)
@@ -252,6 +257,33 @@ def main():
         "unknown_castles",
         [],
     )
+
+    nonempty_semantic_records = {
+        issue_name: records
+        for issue_name, records
+        in semantic_issue_records.items()
+        if records
+    }
+
+    print(
+        f"Semantic issue record groups  : "
+        f"{len(nonempty_semantic_records)}"
+    )
+
+    for issue_name, records in (
+        nonempty_semantic_records.items()
+    ):
+        print(
+            f"  {issue_name} ({len(records)})"
+        )
+
+        for record in records:
+            print(
+                f"    type={record.get('record_type')} "
+                f"id={record.get('id')} "
+                f"field={record.get('field')} "
+                f"value={record.get('value')}"
+            )
 
     print(
         f"Unknown castle count          : "

@@ -295,6 +295,11 @@ def main():
         {},
     )
 
+    semantic_issue_records = semantic_quality.get(
+        "issue_records",
+        {},
+    )
+
     print(
         f"Invalid building heights      : "
         f"{semantic_issues.get('invalid_height', 0)}"
@@ -349,6 +354,33 @@ def main():
         f"Castle records missing tag    : "
         f"{semantic_issues.get('missing_castle_tag', 0)}"
     )
+
+    nonempty_semantic_records = {
+        issue_name: records
+        for issue_name, records
+        in semantic_issue_records.items()
+        if records
+    }
+
+    print(
+        f"Semantic issue record groups  : "
+        f"{len(nonempty_semantic_records)}"
+    )
+
+    for issue_name, records in (
+        nonempty_semantic_records.items()
+    ):
+        print(
+            f"  {issue_name} ({len(records)})"
+        )
+
+        for record in records:
+            print(
+                f"    type={record.get('record_type')} "
+                f"id={record.get('id')} "
+                f"field={record.get('field')} "
+                f"value={record.get('value')}"
+            )
 
     print(
         f"Unknown castle records        : "
