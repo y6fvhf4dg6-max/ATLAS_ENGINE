@@ -24,6 +24,7 @@ class AtlasFoundationMeshExtruder:
 
     MIN_HEIGHT_MM = 2.0
     MAX_HEIGHT_MM = 35.0
+    MIN_VERTICAL_PART_THICKNESS_MM = 0.80
 
     CASTLE_HEIGHT_MULTIPLIERS = {
         "main_tower": 2.00,
@@ -96,6 +97,24 @@ class AtlasFoundationMeshExtruder:
         bottom_z = foundation_z + base_offset_mm
         top_z = foundation_z + height_mm
 
+        vertical_part_thickness_mm = top_z - bottom_z
+        vertical_part_thickness_adjusted = False
+
+        if (
+            base_offset_mm > 0.0
+            and vertical_part_thickness_mm
+            < AtlasFoundationMeshExtruder.MIN_VERTICAL_PART_THICKNESS_MM
+        ):
+            bottom_z = max(
+                foundation_z,
+                top_z
+                - AtlasFoundationMeshExtruder.MIN_VERTICAL_PART_THICKNESS_MM,
+            )
+
+            base_offset_mm = bottom_z - foundation_z
+            vertical_part_thickness_mm = top_z - bottom_z
+            vertical_part_thickness_adjusted = True
+
         bottom_points = []
         top_points = []
         wall_quads = []
@@ -149,6 +168,12 @@ class AtlasFoundationMeshExtruder:
             "base_offset_mm": base_offset_mm,
             "bottom_z": bottom_z,
             "top_z": top_z,
+            "vertical_part_thickness_mm": (
+                vertical_part_thickness_mm
+            ),
+            "vertical_part_thickness_adjusted": (
+                vertical_part_thickness_adjusted
+            ),
             "placement_mode": "foundation_first",
         }
 

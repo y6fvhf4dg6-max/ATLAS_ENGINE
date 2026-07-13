@@ -5,6 +5,8 @@ Genel bina gövdesi motorunun basit ve konkav footprint'lerden
 kapalı, manifold ve doğru yükseklikte mesh üretmesini doğrular.
 """
 
+import pytest
+
 from CORE.atlas_foundation_mesh_extruder import (
     AtlasFoundationMeshExtruder,
 )
@@ -273,3 +275,61 @@ def test_invalid_vertical_range_is_rejected():
     assert mesh is None
     assert diagnostics["accepted"] is False
     assert diagnostics["reason"] == "invalid_vertical_range"
+
+
+
+def test_thin_elevated_part_is_thickened_downward():
+    class ScaledCoordinateEngine(DummyCoordinateEngine):
+        @staticmethod
+        def height_to_stl_mm(height_m):
+            return float(height_m) * 1000.0 / 5500.0
+
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=25.0,
+        min_height=22.0,
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=ScaledCoordinateEngine(),
+        foundation_z=0.0,
+    )
+
+    assert mesh is not None
+    assert mesh["top_z"] == 25.0 * 1000.0 / 5500.0
+    assert mesh["vertical_part_thickness_mm"] == pytest.approx(0.80)
+    assert mesh["vertical_part_thickness_adjusted"] is True
+    assert mesh["bottom_z"] == pytest.approx(
+        mesh["top_z"] - 0.80
+    )
+
+
+def test_thick_elevated_part_keeps_original_vertical_range():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=25.0,
+        min_height=22.0,
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+    )
+
+    assert mesh is not None
+    assert mesh["bottom_z"] == 22.0
+    assert mesh["top_z"] == 25.0
+    assert mesh["vertical_part_thickness_mm"] == 3.0
+    assert mesh["vertical_part_thickness_adjusted"] is False
