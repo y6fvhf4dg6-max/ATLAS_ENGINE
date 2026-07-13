@@ -101,3 +101,7 @@ def test_regular_building_is_not_castle_wall():
         )
         is False
     )
+
+
+def test_castle_wall_has_minimum_printable_height():
+    assert AtlasCastleWallBuilder.MIN_WALL_HEIGHT_MM >= 6.0

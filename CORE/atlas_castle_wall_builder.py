@@ -18,7 +18,7 @@ class AtlasCastleWallBuilder:
     DEFAULT_WALL_HEIGHT_M = 10.0
 
     MIN_WALL_WIDTH_MM = 1.20
-    MIN_WALL_HEIGHT_MM = 1.80
+    MIN_WALL_HEIGHT_MM = 6.00
 
     @staticmethod
     def build_walls(
