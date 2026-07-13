@@ -108,3 +108,58 @@ def test_l_shaped_building_produces_closed_manifold_mesh():
     assert report["valid"] is True
     assert report["open_edge_count"] == 0
     assert report["non_manifold_edge_count"] == 0
+
+
+
+def test_small_building_reports_area_rejection_reason():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        area_m2=12.0,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics["accepted"] is False
+    assert diagnostics["reason"] == "building_area_below_minimum"
+    assert diagnostics["area_m2"] == 12.0
+    assert diagnostics["minimum_area_m2"] == 20.0
+
+
+def test_narrow_building_reports_width_rejection_reason():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.80),
+            (6.0, 0.80),
+            (6.0, 0.0),
+        ],
+        area_m2=100.0,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics["accepted"] is False
+    assert diagnostics["reason"] == "model_width_below_minimum"
+    assert diagnostics["model_width_mm"] == 0.80
+    assert diagnostics["minimum_width_mm"] == 1.20
