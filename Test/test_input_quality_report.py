@@ -867,3 +867,53 @@ def test_input_quality_policy_warns_for_conflicting_semantic_values():
         "conflicting_building_roof_shapes_present"
         in policy["reasons"]
     )
+
+
+def test_osm_cone_roof_is_known_and_many_roof_is_complex():
+    buildings = [
+        {
+            "id": 1,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "tags": {
+                "building": "tower",
+                "roof:shape": "cone",
+            },
+        },
+        {
+            "id": 2,
+            "geometry": [
+                (2.0, 2.0),
+                (2.0, 3.0),
+                (3.0, 3.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "roof:shape": "many",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=[],
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    semantics = report["semantics"]
+    issues = semantics["issue_counts"]
+
+    assert issues["unknown_roof_shape"] == 0
+    assert issues["complex_roof_shape"] == 1
+
+    assert semantics["roof_count"] == 2
+    assert semantics["roof_coverage_percent"] == 100.0

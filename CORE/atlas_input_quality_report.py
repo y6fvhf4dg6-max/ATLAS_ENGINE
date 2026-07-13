@@ -94,6 +94,7 @@ class AtlasInputQualityReport:
             "invalid_levels": 0,
             "non_positive_levels": 0,
             "unknown_roof_shape": 0,
+            "complex_roof_shape": 0,
             "conflicting_height_values": 0,
             "conflicting_roof_shapes": 0,
             "relation_missing_outer_geometry": 0,
@@ -796,7 +797,11 @@ class AtlasInputQualityReport:
                 roof_shape
             ).strip().lower()
 
-            if not AtlasInputQualityReport._is_known_roof_shape(
+            if normalized_roof_shape == "many":
+                issues.append(
+                    "complex_roof_shape"
+                )
+            elif not AtlasInputQualityReport._is_known_roof_shape(
                 normalized_roof_shape
             ):
                 issues.append("unknown_roof_shape")
@@ -863,6 +868,8 @@ class AtlasInputQualityReport:
             "dome",
             "onion",
             "round",
+            "cone",
+            "many",
             "saltbox",
         }
 

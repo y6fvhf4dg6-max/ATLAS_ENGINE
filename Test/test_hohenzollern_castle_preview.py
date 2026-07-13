@@ -41,6 +41,7 @@ def main():
         z_scale=5500,
         terrain_provider_name="srtm",
         nature_provider_names=(),
+        strict_input_quality=True,
         debug=True,
     )
 
@@ -80,6 +81,100 @@ def main():
     print(f"Total meshes                  : " f"{result.get('meshes', 0)}")
 
     print(f"Total triangles               : " f"{result.get('triangles', 0)}")
+
+    input_quality = result.get(
+        "input_quality_report",
+        {},
+    )
+
+    quality_policy = input_quality.get(
+        "policy",
+        {},
+    )
+
+    semantic_quality = input_quality.get(
+        "semantics",
+        {},
+    )
+
+    semantic_issues = semantic_quality.get(
+        "issue_counts",
+        {},
+    )
+
+    print("")
+    print("INPUT QUALITY")
+    print("-" * 88)
+
+    print(
+        f"Geometry valid percent        : "
+        f"{input_quality.get('geometry', {}).get('valid_percent')}"
+    )
+
+    print(
+        f"Terrain coverage percent      : "
+        f"{input_quality.get('terrain', {}).get('coverage_percent')}"
+    )
+
+    print(
+        f"Height coverage percent       : "
+        f"{semantic_quality.get('height_coverage_percent')}"
+    )
+
+    print(
+        f"Roof coverage percent         : "
+        f"{semantic_quality.get('roof_coverage_percent')}"
+    )
+
+    print(
+        f"Semantic issue total          : "
+        f"{sum(int(value or 0) for value in semantic_issues.values())}"
+    )
+
+    nonzero_semantic_issues = {
+        issue_name: int(issue_count or 0)
+        for issue_name, issue_count
+        in semantic_issues.items()
+        if int(issue_count or 0) > 0
+    }
+
+    print(
+        f"Nonzero semantic issues       : "
+        f"{nonzero_semantic_issues}"
+    )
+
+    unknown_castles = input_quality.get(
+        "castle_geometry",
+        {},
+    ).get(
+        "unknown_castles",
+        [],
+    )
+
+    print(
+        f"Unknown castle count          : "
+        f"{semantic_quality.get('unknown_castle_count', 0)}"
+    )
+
+    print(
+        f"Unknown castle records        : "
+        f"{unknown_castles}"
+    )
+
+    print(
+        f"Input quality risk            : "
+        f"{quality_policy.get('risk_level')}"
+    )
+
+    print(
+        f"Input quality action          : "
+        f"{quality_policy.get('action')}"
+    )
+
+    print(
+        f"Input quality reasons         : "
+        f"{quality_policy.get('reasons', [])}"
+    )
 
     print(f"Output                        : " f"{OUTPUT_PATH}")
 

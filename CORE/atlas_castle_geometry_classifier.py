@@ -55,7 +55,12 @@ class AtlasCastleGeometryClassifier:
         unknown_castles = AtlasCastleGeometryClassifier._find_unknown_castles(
             castles=castles,
             shell_castles=shell_castles,
-            inferred_perimeter_walls=inferred_perimeter_walls,
+            independent_castle_walls=(
+                independent_castle_walls
+            ),
+            inferred_perimeter_walls=(
+                inferred_perimeter_walls
+            ),
         )
 
         result = {
@@ -192,11 +197,20 @@ class AtlasCastleGeometryClassifier:
     def _find_unknown_castles(
         castles,
         shell_castles,
+        independent_castle_walls,
         inferred_perimeter_walls,
     ):
         recognized_ids = {
-            castle.get("id") for castle in shell_castles if castle.get("id") is not None
+            castle.get("id")
+            for castle in shell_castles
+            if castle.get("id") is not None
         }
+
+        recognized_ids.update(
+            wall.get("id")
+            for wall in independent_castle_walls
+            if wall.get("id") is not None
+        )
 
         recognized_ids.update(
             wall.get("source_castle_id")
@@ -207,7 +221,11 @@ class AtlasCastleGeometryClassifier:
         return [
             castle
             for castle in castles
-            if (castle.get("id") is not None and castle.get("id") not in recognized_ids)
+            if (
+                castle.get("id") is not None
+                and castle.get("id")
+                not in recognized_ids
+            )
         ]
 
     @staticmethod

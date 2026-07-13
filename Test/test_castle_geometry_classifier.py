@@ -245,3 +245,45 @@ if __name__ == "__main__":
 
     print("")
     print(f"ALL TESTS PASSED: {len(tests)}")
+
+
+def test_castle_way_matching_explicit_city_wall_is_not_unknown():
+    castle = {
+        "id": 93612350,
+        "geometry_type": "way",
+        "geometry": closed_geometry(),
+        "tags": {
+            "historic": "castle",
+            "barrier": "city_wall",
+            "castle_type": "defensive",
+        },
+    }
+
+    castle_wall = {
+        "id": 93612350,
+        "geometry_type": "way",
+        "geometry": closed_geometry(),
+        "wall_type": "city_wall",
+        "tags": {
+            "historic": "castle",
+            "barrier": "city_wall",
+            "castle_type": "defensive",
+        },
+    }
+
+    result = AtlasCastleGeometryClassifier.classify(
+        castles=[castle],
+        castle_walls=[castle_wall],
+        debug=False,
+    )
+
+    assert len(
+        result["independent_castle_walls"]
+    ) == 1
+
+    assert (
+        result["independent_castle_walls"][0]["id"]
+        == 93612350
+    )
+
+    assert result["unknown_castles"] == []
