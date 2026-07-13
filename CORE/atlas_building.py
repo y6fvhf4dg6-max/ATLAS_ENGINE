@@ -20,6 +20,8 @@ class AtlasBuilding:
         self.building_type = self.tags.get("building")
         self.height = self.parse_height()
         self.levels = self.parse_levels()
+        self.min_height = self.parse_min_height()
+        self.min_level = self.parse_min_level()
         self.roof_type = self.tags.get("roof:shape")
 
         self.centroid = self.calculate_centroid()
@@ -49,6 +51,32 @@ class AtlasBuilding:
 
         try:
             return int(float(levels_value))
+        except ValueError:
+            return None
+
+    def parse_min_height(self):
+        min_height_value = self.tags.get("min_height")
+
+        if min_height_value is None:
+            return None
+
+        try:
+            return float(
+                str(min_height_value)
+                .replace("m", "")
+                .strip()
+            )
+        except ValueError:
+            return None
+
+    def parse_min_level(self):
+        min_level_value = self.tags.get("building:min_level")
+
+        if min_level_value is None:
+            return None
+
+        try:
+            return int(float(min_level_value))
         except ValueError:
             return None
 
@@ -96,5 +124,7 @@ class AtlasBuilding:
             "building": self.building_type,
             "height": self.height,
             "levels": self.levels,
+            "min_height": self.min_height,
+            "min_level": self.min_level,
             "roof": self.roof_type,
         }
