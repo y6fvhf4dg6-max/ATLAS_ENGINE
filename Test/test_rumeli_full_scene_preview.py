@@ -240,6 +240,11 @@ def main():
         {},
     )
 
+    automatic_corrections = input_quality_report.get(
+        "automatic_corrections",
+        {},
+    )
+
     print(
         f"Input geometry valid percent  : "
         f"{geometry_quality.get('valid_percent')}"
@@ -283,6 +288,31 @@ def main():
     print(
         f"Input quality reasons         : "
         f"{quality_policy.get('reasons')}"
+    )
+
+    print(
+        f"Terrain samples auto-filled   : "
+        f"{automatic_corrections.get('terrain_missing_samples_filled', 0)}"
+    )
+
+    print(
+        f"Inferred perimeter walls      : "
+        f"{automatic_corrections.get('inferred_perimeter_walls', 0)}"
+    )
+
+    print(
+        f"Castle focus fallback used    : "
+        f"{automatic_corrections.get('castle_focus_fallback_used', False)}"
+    )
+
+    print(
+        f"Castle relation roles corrected: "
+        f"{automatic_corrections.get('castle_relation_roles_corrected', 0)}"
+    )
+
+    print(
+        f"Automatic corrections total  : "
+        f"{automatic_corrections.get('total_count', 0)}"
     )
 
     print(

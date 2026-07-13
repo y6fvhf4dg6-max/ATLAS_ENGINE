@@ -232,3 +232,64 @@ def test_enforce_policy_allows_warn_and_blocks_fail():
         )
         is None
     )
+
+
+def test_input_quality_report_records_automatic_corrections():
+    report = AtlasInputQualityReport.build(
+        buildings=[],
+        castles=[],
+        castle_geometry={
+            "unknown_castles": [],
+            "inferred_perimeter_walls": [
+                {"id": 10},
+                {"id": 11},
+            ],
+        },
+        terrain_grid={
+            "sample_count": 100,
+            "missing_sample_count": 5,
+        },
+        castle_focus_result={
+            "used_fallback": True,
+        },
+    )
+
+    corrections = report["automatic_corrections"]
+
+    assert corrections["terrain_missing_samples_filled"] == 5
+    assert corrections["inferred_perimeter_walls"] == 2
+    assert corrections["castle_focus_fallback_used"] is True
+    assert corrections["total_count"] == 8
+
+
+def test_input_quality_report_adds_corrected_castle_roles():
+    report = {
+        "automatic_corrections": {
+            "terrain_missing_samples_filled": 2,
+            "inferred_perimeter_walls": 1,
+            "castle_focus_fallback_used": False,
+            "total_count": 3,
+        },
+    }
+
+    shell_meshes = [
+        {
+            "roles_corrected": True,
+        },
+        {
+            "roles_corrected": False,
+        },
+        {
+            "roles_corrected": True,
+        },
+    ]
+
+    AtlasInputQualityReport.add_shell_corrections(
+        report=report,
+        shell_meshes=shell_meshes,
+    )
+
+    corrections = report["automatic_corrections"]
+
+    assert corrections["castle_relation_roles_corrected"] == 2
+    assert corrections["total_count"] == 5

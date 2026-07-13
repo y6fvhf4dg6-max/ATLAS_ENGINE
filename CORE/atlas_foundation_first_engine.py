@@ -284,6 +284,7 @@ class AtlasFoundationFirstEngine:
                 "grid",
                 {},
             ),
+            castle_focus_result=focus_result,
         )
 
         input_quality_policy = (
@@ -385,6 +386,11 @@ class AtlasFoundationFirstEngine:
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
+        )
+
+        AtlasInputQualityReport.add_shell_corrections(
+            report=input_quality_report,
+            shell_meshes=castle_shell_meshes,
         )
 
         castle_tower_cap_meshes = AtlasCastleTowerCapBuilder.build_caps(

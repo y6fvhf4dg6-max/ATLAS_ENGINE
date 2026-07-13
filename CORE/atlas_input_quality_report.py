@@ -19,11 +19,13 @@ class AtlasInputQualityReport:
         castles=None,
         castle_geometry=None,
         terrain_grid=None,
+        castle_focus_result=None,
     ):
         buildings = buildings or []
         castles = castles or []
         castle_geometry = castle_geometry or {}
         terrain_grid = terrain_grid or {}
+        castle_focus_result = castle_focus_result or {}
 
         geometry_records = list(buildings) + list(castles)
 
@@ -91,6 +93,11 @@ class AtlasInputQualityReport:
             [],
         )
 
+        inferred_perimeter_walls = castle_geometry.get(
+            "inferred_perimeter_walls",
+            [],
+        )
+
         sample_count = int(
             terrain_grid.get(
                 "sample_count",
@@ -124,6 +131,23 @@ class AtlasInputQualityReport:
             else 0.0
         )
 
+        inferred_perimeter_wall_count = len(
+            inferred_perimeter_walls
+        )
+
+        castle_focus_fallback_used = bool(
+            castle_focus_result.get(
+                "used_fallback",
+                False,
+            )
+        )
+
+        automatic_correction_count = (
+            missing_sample_count
+            + inferred_perimeter_wall_count
+            + int(castle_focus_fallback_used)
+        )
+
         return {
             "version": AtlasInputQualityReport.VERSION,
             "geometry": {
@@ -153,6 +177,18 @@ class AtlasInputQualityReport:
                     missing_sample_count
                 ),
                 "coverage_percent": coverage_percent,
+            },
+            "automatic_corrections": {
+                "terrain_missing_samples_filled": (
+                    missing_sample_count
+                ),
+                "inferred_perimeter_walls": (
+                    inferred_perimeter_wall_count
+                ),
+                "castle_focus_fallback_used": (
+                    castle_focus_fallback_used
+                ),
+                "total_count": automatic_correction_count,
             },
         }
 
@@ -283,6 +319,48 @@ class AtlasInputQualityReport:
             "action": "CONTINUE",
             "reasons": [],
         }
+
+    @staticmethod
+    def add_shell_corrections(
+        report,
+        shell_meshes,
+    ):
+        corrections = report.setdefault(
+            "automatic_corrections",
+            {},
+        )
+
+        corrected_role_count = sum(
+            1
+            for mesh in (shell_meshes or [])
+            if mesh.get("roles_corrected") is True
+        )
+
+        previous_count = int(
+            corrections.get(
+                "castle_relation_roles_corrected",
+                0,
+            )
+            or 0
+        )
+
+        total_count = int(
+            corrections.get(
+                "total_count",
+                0,
+            )
+            or 0
+        )
+
+        corrections[
+            "castle_relation_roles_corrected"
+        ] = corrected_role_count
+
+        corrections["total_count"] = (
+            total_count
+            - previous_count
+            + corrected_role_count
+        )
 
     @staticmethod
     def enforce_policy(
