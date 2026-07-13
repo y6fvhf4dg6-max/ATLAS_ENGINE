@@ -22,14 +22,18 @@ class AtlasGeometrySimplifier:
 
     @staticmethod
     def triangle_area(a, b, c):
-        ax, ay = a
-        bx, by = b
-        cx, cy = c
+        ab_x = b[0] - a[0]
+        ab_y = b[1] - a[1]
+        ac_x = c[0] - a[0]
+        ac_y = c[1] - a[1]
 
-        return abs((ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) / 2.0)
+        return abs(
+            ab_x * ac_y
+            - ab_y * ac_x
+        ) / 2.0
 
     @staticmethod
-    def remove_collinear_points(points, tolerance=0.00000001):
+    def remove_collinear_points(points, tolerance=0.0):
         if len(points) < 4:
             return points
 
