@@ -309,6 +309,83 @@ class AtlasInputQualityReport:
             or 0.0
         )
 
+        semantic_issues = semantics.get(
+            "issue_counts",
+            {},
+        ) or {}
+
+        relation_missing_outer_count = int(
+            semantic_issues.get(
+                "relation_missing_outer_geometry",
+                0,
+            )
+            or 0
+        )
+
+        way_has_inner_count = int(
+            semantic_issues.get(
+                "way_has_inner_geometry",
+                0,
+            )
+            or 0
+        )
+
+        unsupported_castle_geometry_count = int(
+            semantic_issues.get(
+                "unsupported_castle_geometry_type",
+                0,
+            )
+            or 0
+        )
+
+        missing_castle_tag_count = int(
+            semantic_issues.get(
+                "missing_castle_tag",
+                0,
+            )
+            or 0
+        )
+
+        invalid_height_count = int(
+            semantic_issues.get(
+                "invalid_height",
+                0,
+            )
+            or 0
+        )
+
+        non_positive_height_count = int(
+            semantic_issues.get(
+                "non_positive_height",
+                0,
+            )
+            or 0
+        )
+
+        invalid_levels_count = int(
+            semantic_issues.get(
+                "invalid_levels",
+                0,
+            )
+            or 0
+        )
+
+        non_positive_levels_count = int(
+            semantic_issues.get(
+                "non_positive_levels",
+                0,
+            )
+            or 0
+        )
+
+        unknown_roof_shape_count = int(
+            semantic_issues.get(
+                "unknown_roof_shape",
+                0,
+            )
+            or 0
+        )
+
         reasons = []
 
         if valid_percent < 70.0:
@@ -319,6 +396,21 @@ class AtlasInputQualityReport:
         if terrain_coverage_percent < 80.0:
             reasons.append(
                 "terrain_coverage_percent_below_80"
+            )
+
+        if relation_missing_outer_count > 0:
+            reasons.append(
+                "castle_relation_missing_outer_geometry"
+            )
+
+        if way_has_inner_count > 0:
+            reasons.append(
+                "castle_way_has_inner_geometry"
+            )
+
+        if unsupported_castle_geometry_count > 0:
+            reasons.append(
+                "unsupported_castle_geometry_type_present"
             )
 
         if reasons:
@@ -357,6 +449,36 @@ class AtlasInputQualityReport:
         ):
             reasons.append(
                 "building_roof_coverage_below_10"
+            )
+
+        if invalid_height_count > 0:
+            reasons.append(
+                "invalid_building_height_present"
+            )
+
+        if non_positive_height_count > 0:
+            reasons.append(
+                "non_positive_building_height_present"
+            )
+
+        if invalid_levels_count > 0:
+            reasons.append(
+                "invalid_building_levels_present"
+            )
+
+        if non_positive_levels_count > 0:
+            reasons.append(
+                "non_positive_building_levels_present"
+            )
+
+        if unknown_roof_shape_count > 0:
+            reasons.append(
+                "unknown_building_roof_shape_present"
+            )
+
+        if missing_castle_tag_count > 0:
+            reasons.append(
+                "castle_record_missing_tag"
             )
 
         if reasons:

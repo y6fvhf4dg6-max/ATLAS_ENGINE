@@ -509,3 +509,79 @@ def test_input_quality_report_classifies_castle_semantic_issues():
     assert issues["way_has_inner_geometry"] == 1
     assert issues["unsupported_castle_geometry_type"] == 1
     assert issues["missing_castle_tag"] == 1
+
+
+def test_input_quality_policy_fails_for_structural_castle_semantic_issues():
+    report = {
+        "geometry": {
+            "valid_percent": 100.0,
+        },
+        "semantics": {
+            "building_count": 0,
+            "height_coverage_percent": 100.0,
+            "roof_coverage_percent": 100.0,
+            "unknown_castle_count": 0,
+            "issue_counts": {
+                "invalid_height": 0,
+                "non_positive_height": 0,
+                "invalid_levels": 0,
+                "non_positive_levels": 0,
+                "unknown_roof_shape": 0,
+                "relation_missing_outer_geometry": 1,
+                "way_has_inner_geometry": 0,
+                "unsupported_castle_geometry_type": 0,
+                "missing_castle_tag": 0,
+            },
+        },
+        "terrain": {
+            "coverage_percent": 100.0,
+        },
+    }
+
+    policy = AtlasInputQualityReport.evaluate_policy(
+        report
+    )
+
+    assert policy["risk_level"] == "HIGH"
+    assert policy["action"] == "FAIL"
+    assert (
+        "castle_relation_missing_outer_geometry"
+        in policy["reasons"]
+    )
+
+
+def test_input_quality_policy_warns_for_non_structural_semantic_issues():
+    report = {
+        "geometry": {
+            "valid_percent": 100.0,
+        },
+        "semantics": {
+            "building_count": 1,
+            "height_coverage_percent": 100.0,
+            "roof_coverage_percent": 100.0,
+            "unknown_castle_count": 0,
+            "issue_counts": {
+                "invalid_height": 1,
+                "non_positive_height": 0,
+                "invalid_levels": 0,
+                "non_positive_levels": 0,
+                "unknown_roof_shape": 0,
+                "relation_missing_outer_geometry": 0,
+                "way_has_inner_geometry": 0,
+                "unsupported_castle_geometry_type": 0,
+                "missing_castle_tag": 1,
+            },
+        },
+        "terrain": {
+            "coverage_percent": 100.0,
+        },
+    }
+
+    policy = AtlasInputQualityReport.evaluate_policy(
+        report
+    )
+
+    assert policy["risk_level"] == "MEDIUM"
+    assert policy["action"] == "WARN"
+    assert "invalid_building_height_present" in policy["reasons"]
+    assert "castle_record_missing_tag" in policy["reasons"]
