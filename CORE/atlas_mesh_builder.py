@@ -66,19 +66,35 @@ class AtlasMeshBuilder:
         }
 
     @staticmethod
-    def prepare_geometry(building, coordinate_engine):
+    def prepare_geometry(
+        building,
+        coordinate_engine,
+        diagnostics=None,
+    ):
         points = AtlasPolygonCleaner.clean(building.geometry)
 
         if len(points) < AtlasMeshBuilder.MIN_POINT_COUNT:
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "too_few_points_after_cleaning",
+                point_count=len(points),
+            )
 
         if building.area_m2 < AtlasMeshBuilder.MIN_BUILDING_AREA_M2:
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "building_area_below_minimum",
+                area_m2=building.area_m2,
+                minimum_area_m2=AtlasMeshBuilder.MIN_BUILDING_AREA_M2,
+            )
 
         points = AtlasGeometrySimplifier.simplify(points)
 
         if not AtlasPolygonValidator.validate(points):
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "invalid_polygon",
+            )
 
         scaled_points = coordinate_engine.geometry_to_stl_mm(points)
 
@@ -92,24 +108,55 @@ class AtlasMeshBuilder:
         bounds = AtlasMeshBuilder._bounds_2d(scaled_points)
 
         if bounds is None:
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "missing_scaled_bounds",
+            )
 
         width_mm = bounds["max_x"] - bounds["min_x"]
         depth_mm = bounds["max_y"] - bounds["min_y"]
 
         if width_mm < AtlasMeshBuilder.MIN_MODEL_WIDTH_MM:
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "model_width_below_minimum",
+                model_width_mm=width_mm,
+                minimum_width_mm=AtlasMeshBuilder.MIN_MODEL_WIDTH_MM,
+            )
 
         if depth_mm < AtlasMeshBuilder.MIN_MODEL_DEPTH_MM:
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "model_depth_below_minimum",
+                model_depth_mm=depth_mm,
+                minimum_depth_mm=AtlasMeshBuilder.MIN_MODEL_DEPTH_MM,
+            )
 
         if len(scaled_points) < 3:
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "too_few_scaled_points",
+                point_count=len(scaled_points),
+            )
 
         if AtlasMeshBuilder.polygon_area(scaled_points) < 0:
             scaled_points.reverse()
 
         return scaled_points
+
+    @staticmethod
+    def _reject(diagnostics, reason, **details):
+        if diagnostics is not None:
+            diagnostics.clear()
+            diagnostics.update(
+                {
+                    "accepted": False,
+                    "reason": reason,
+                }
+            )
+            diagnostics.update(details)
+
+        return None
 
     @staticmethod
     def _make_bottom_triangle(triangle, foundation_z):
@@ -141,10 +188,16 @@ class AtlasMeshBuilder:
         ]
 
     @staticmethod
-    def build_mesh(building, coordinate_engine, foundation_z=0.0):
+    def build_mesh(
+        building,
+        coordinate_engine,
+        foundation_z=0.0,
+        diagnostics=None,
+    ):
         scaled_points = AtlasMeshBuilder.prepare_geometry(
             building,
             coordinate_engine,
+            diagnostics=diagnostics,
         )
 
         if scaled_points is None:
@@ -158,7 +211,10 @@ class AtlasMeshBuilder:
         flat_triangles = AtlasPolygonTriangulator.triangulate(scaled_points)
 
         if not flat_triangles:
-            return None
+            return AtlasMeshBuilder._reject(
+                diagnostics,
+                "triangulation_failed",
+            )
 
         bottom_points = []
         top_points = []

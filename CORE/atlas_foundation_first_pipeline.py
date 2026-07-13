@@ -24,15 +24,25 @@ class AtlasFoundationFirstPipeline:
             building,
             coordinate_engine,
             foundation_z=0.0,
+            diagnostics=diagnostics,
         )
 
         if temporary_mesh is None:
-            return None
+            if diagnostics and diagnostics.get("reason"):
+                return None
+
+            return AtlasFoundationFirstPipeline._reject(
+                diagnostics,
+                "temporary_mesh_failed",
+            )
 
         bounds = AtlasFoundationFirstPipeline._mesh_xy_bounds(temporary_mesh)
 
         if bounds is None:
-            return None
+            return AtlasFoundationFirstPipeline._reject(
+                diagnostics,
+                "temporary_mesh_bounds_missing",
+            )
 
         foundation_surface = AtlasFoundationSurfaceBuilder.build_surface(
             terrain_mesh=terrain_mesh,
@@ -42,7 +52,10 @@ class AtlasFoundationFirstPipeline:
         )
 
         if foundation_surface is None:
-            return None
+            return AtlasFoundationFirstPipeline._reject(
+                diagnostics,
+                "foundation_surface_failed",
+            )
 
         foundation_z = foundation_surface["foundation_z"]
 
@@ -65,6 +78,20 @@ class AtlasFoundationFirstPipeline:
             final_mesh["placement_mode"] = "foundation_first"
 
         return final_mesh
+
+    @staticmethod
+    def _reject(diagnostics, reason, **details):
+        if diagnostics is not None:
+            diagnostics.clear()
+            diagnostics.update(
+                {
+                    "accepted": False,
+                    "reason": reason,
+                }
+            )
+            diagnostics.update(details)
+
+        return None
 
     @staticmethod
     def _mesh_xy_bounds(mesh):

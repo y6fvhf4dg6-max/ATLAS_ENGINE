@@ -137,3 +137,97 @@ def test_scene_counts_bbox_rejection():
     assert report["rejection_counts"] == {
         "outside_bbox": 1,
     }
+
+
+
+def test_pipeline_reports_temporary_mesh_failure(monkeypatch):
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline.AtlasMeshBuilder.build_mesh",
+        lambda *args, **kwargs: None,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationFirstPipeline.build_building_mesh(
+        building=object(),
+        coordinate_engine=object(),
+        terrain_mesh=object(),
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics == {
+        "accepted": False,
+        "reason": "temporary_mesh_failed",
+    }
+
+
+def test_pipeline_reports_foundation_surface_failure(monkeypatch):
+    temporary_mesh = {
+        "bottom": [
+            (0.0, 0.0, 0.0),
+            (2.0, 0.0, 0.0),
+            (2.0, 2.0, 0.0),
+        ],
+        "top": [],
+        "triangles": [],
+    }
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline.AtlasMeshBuilder.build_mesh",
+        lambda *args, **kwargs: temporary_mesh,
+    )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline."
+        "AtlasFoundationSurfaceBuilder.build_surface",
+        lambda *args, **kwargs: None,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationFirstPipeline.build_building_mesh(
+        building=object(),
+        coordinate_engine=object(),
+        terrain_mesh=object(),
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics == {
+        "accepted": False,
+        "reason": "foundation_surface_failed",
+    }
+
+
+
+def test_pipeline_preserves_temporary_mesh_rejection_reason(monkeypatch):
+    def reject_mesh(*args, **kwargs):
+        diagnostics = kwargs["diagnostics"]
+        diagnostics.update(
+            {
+                "accepted": False,
+                "reason": "building_area_below_minimum",
+            }
+        )
+        return None
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline.AtlasMeshBuilder.build_mesh",
+        reject_mesh,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationFirstPipeline.build_building_mesh(
+        building=object(),
+        coordinate_engine=object(),
+        terrain_mesh=object(),
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics == {
+        "accepted": False,
+        "reason": "building_area_below_minimum",
+    }
