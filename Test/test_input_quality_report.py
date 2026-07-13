@@ -718,3 +718,55 @@ def test_semantic_coverage_excludes_invalid_values():
         semantics["roof_coverage_percent"]
         - (200.0 / 3.0)
     ) < 1e-9
+
+
+def test_semantic_issues_include_direct_building_fields():
+    buildings = [
+        {
+            "id": 1,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+            ],
+            "height": "abc",
+            "roof_type": "mystery_roof",
+            "tags": {
+                "building": "yes",
+            },
+        },
+        {
+            "id": 2,
+            "geometry": [
+                (2.0, 2.0),
+                (2.0, 3.0),
+                (3.0, 3.0),
+            ],
+            "height": -4.0,
+            "roof_type": "gable",
+            "tags": {
+                "building": "yes",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=[],
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    issues = report["semantics"]["issue_counts"]
+
+    assert issues["invalid_height"] == 1
+    assert issues["non_positive_height"] == 1
+    assert issues["unknown_roof_shape"] == 1
+
+    assert report["semantics"]["height_count"] == 0
+    assert report["semantics"]["roof_count"] == 1

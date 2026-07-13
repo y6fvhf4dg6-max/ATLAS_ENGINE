@@ -664,7 +664,13 @@ class AtlasInputQualityReport:
 
         issues = []
 
-        height_value = tags.get("height")
+        direct_height = building.get("height")
+
+        height_value = (
+            direct_height
+            if direct_height is not None
+            else tags.get("height")
+        )
 
         if height_value is not None:
             parsed_height = (
@@ -693,9 +699,15 @@ class AtlasInputQualityReport:
             elif parsed_levels <= 0.0:
                 issues.append("non_positive_levels")
 
+        direct_roof_type = building.get("roof_type")
+
         roof_shape = (
-            tags.get("roof:shape")
-            or tags.get("roof:type")
+            direct_roof_type
+            if direct_roof_type is not None
+            else (
+                tags.get("roof:shape")
+                or tags.get("roof:type")
+            )
         )
 
         if roof_shape is not None:
