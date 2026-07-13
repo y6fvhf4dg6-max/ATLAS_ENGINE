@@ -17,6 +17,7 @@ def make_building(
     width=1.0,
     depth=1.0,
     quality_score=100,
+    geometry=None,
 ):
     return SimpleNamespace(
         building_id="test-building",
@@ -28,6 +29,7 @@ def make_building(
         roof_type=None,
         quality_score=quality_score,
         tags={"building": building_type},
+        geometry=geometry,
         bbox={
             "west": 0.0,
             "east": width,
@@ -79,3 +81,65 @@ def test_quality_score_caps_print_score():
     )
 
     assert AtlasBuildingAnalyzer.print_score(building) == 72
+
+
+
+def test_aspect_ratio_uses_real_meter_dimensions():
+    building = make_building(
+        geometry=[
+            (60.0000, 10.0000),
+            (60.0000, 10.0020),
+            (60.0010, 10.0020),
+            (60.0010, 10.0000),
+        ],
+    )
+
+    assert AtlasBuildingAnalyzer.aspect_ratio(building) == 1.0
+
+
+def test_rectangular_footprint_is_not_concave():
+    building = make_building(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.0020),
+            (0.0010, 0.0020),
+            (0.0010, 0.0),
+        ],
+    )
+
+    assert AtlasBuildingAnalyzer.reflex_vertex_count(building) == 0
+    assert AtlasBuildingAnalyzer.is_concave(building) is False
+
+
+def test_l_shaped_footprint_has_one_reflex_vertex():
+    building = make_building(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.0030),
+            (0.0010, 0.0030),
+            (0.0010, 0.0010),
+            (0.0030, 0.0010),
+            (0.0030, 0.0),
+        ],
+    )
+
+    assert AtlasBuildingAnalyzer.reflex_vertex_count(building) == 1
+    assert AtlasBuildingAnalyzer.is_concave(building) is True
+
+
+def test_analysis_includes_footprint_complexity_metrics():
+    building = make_building(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.0030),
+            (0.0010, 0.0030),
+            (0.0010, 0.0010),
+            (0.0030, 0.0010),
+            (0.0030, 0.0),
+        ],
+    )
+
+    result = AtlasBuildingAnalyzer.analyze(building)
+
+    assert result["reflex_vertices"] == 1
+    assert result["is_concave"] is True
