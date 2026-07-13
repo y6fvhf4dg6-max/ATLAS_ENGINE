@@ -255,6 +255,31 @@ def main():
         f"{geometry_quality.get('invalid_count')}"
     )
 
+    geometry_issues = geometry_quality.get(
+        "issue_counts",
+        {},
+    )
+
+    print(
+        f"Geometry not enough points    : "
+        f"{geometry_issues.get('not_enough_points', 0)}"
+    )
+
+    print(
+        f"Geometry duplicate points     : "
+        f"{geometry_issues.get('duplicate_points', 0)}"
+    )
+
+    print(
+        f"Geometry self intersections   : "
+        f"{geometry_issues.get('self_intersection', 0)}"
+    )
+
+    print(
+        f"Geometry zero area            : "
+        f"{geometry_issues.get('zero_area', 0)}"
+    )
+
     print(
         f"Height coverage percent       : "
         f"{semantic_quality.get('height_coverage_percent')}"

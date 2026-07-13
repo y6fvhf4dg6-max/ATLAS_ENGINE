@@ -8,6 +8,9 @@ metriklerini tek raporda toplar.
 from CORE.atlas_polygon_validator import (
     AtlasPolygonValidator,
 )
+from CORE.atlas_geometry_simplifier import (
+    AtlasGeometrySimplifier,
+)
 
 
 class AtlasInputQualityReport:
@@ -29,7 +32,13 @@ class AtlasInputQualityReport:
 
         geometry_records = list(buildings) + list(castles)
 
-        valid_geometry_count = 0
+        issue_counts = {
+            "valid": 0,
+            "not_enough_points": 0,
+            "duplicate_points": 0,
+            "zero_area": 0,
+            "self_intersection": 0,
+        }
 
         for record in geometry_records:
             geometry = record.get(
@@ -37,8 +46,15 @@ class AtlasInputQualityReport:
                 [],
             )
 
-            if AtlasPolygonValidator.validate(geometry):
-                valid_geometry_count += 1
+            issue_name = (
+                AtlasInputQualityReport._classify_geometry_issue(
+                    geometry
+                )
+            )
+
+            issue_counts[issue_name] += 1
+
+        valid_geometry_count = issue_counts["valid"]
 
         total_geometry_count = len(geometry_records)
         invalid_geometry_count = (
@@ -155,6 +171,7 @@ class AtlasInputQualityReport:
                 "valid_count": valid_geometry_count,
                 "invalid_count": invalid_geometry_count,
                 "valid_percent": valid_percent,
+                "issue_counts": issue_counts,
             },
             "semantics": {
                 "building_count": building_count,
@@ -319,6 +336,30 @@ class AtlasInputQualityReport:
             "action": "CONTINUE",
             "reasons": [],
         }
+
+    @staticmethod
+    def _classify_geometry_issue(geometry):
+        if not AtlasPolygonValidator.has_enough_points(
+            geometry
+        ):
+            return "not_enough_points"
+
+        if AtlasPolygonValidator.has_duplicate_points(
+            geometry
+        ):
+            return "duplicate_points"
+
+        if AtlasGeometrySimplifier.has_self_intersection(
+            geometry
+        ):
+            return "self_intersection"
+
+        if not AtlasPolygonValidator.has_valid_area(
+            geometry
+        ):
+            return "zero_area"
+
+        return "valid"
 
     @staticmethod
     def add_shell_corrections(

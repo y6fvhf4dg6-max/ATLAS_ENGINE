@@ -293,3 +293,70 @@ def test_input_quality_report_adds_corrected_castle_roles():
 
     assert corrections["castle_relation_roles_corrected"] == 2
     assert corrections["total_count"] == 5
+
+
+def test_input_quality_report_classifies_geometry_issues():
+    buildings = [
+        {
+            "id": 1,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (1.0, 1.0),
+                (1.0, 0.0),
+            ],
+        },
+        {
+            "id": 2,
+            "geometry": [
+                (0.0, 0.0),
+                (1.0, 1.0),
+            ],
+        },
+        {
+            "id": 3,
+            "geometry": [
+                (0.0, 0.0),
+                (0.0, 1.0),
+                (0.0, 1.0),
+                (1.0, 0.0),
+            ],
+        },
+        {
+            "id": 4,
+            "geometry": [
+                (0.0, 0.0),
+                (1.0, 1.0),
+                (2.0, 2.0),
+            ],
+        },
+        {
+            "id": 5,
+            "geometry": [
+                (0.0, 0.0),
+                (1.0, 1.0),
+                (0.0, 1.0),
+                (1.0, 0.0),
+            ],
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=[],
+        castle_geometry={
+            "unknown_castles": [],
+        },
+        terrain_grid={
+            "sample_count": 1,
+            "missing_sample_count": 0,
+        },
+    )
+
+    issues = report["geometry"]["issue_counts"]
+
+    assert issues["valid"] == 1
+    assert issues["not_enough_points"] == 1
+    assert issues["duplicate_points"] == 1
+    assert issues["zero_area"] == 1
+    assert issues["self_intersection"] == 1
