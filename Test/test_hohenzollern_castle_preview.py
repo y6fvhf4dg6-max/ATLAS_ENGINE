@@ -39,6 +39,7 @@ def main():
         min_points=3,
         max_points=500,
         z_scale=5500,
+        terrain_smoothing_passes=1,
         terrain_provider_name="srtm",
         nature_provider_names=(),
         strict_input_quality=True,
@@ -63,6 +64,8 @@ def main():
     ) == expected_focus_bbox
 
     assert round(result["xy_scale"], 2) == 1692.78
+
+    assert result["terrain_smoothing_passes"] == 1
 
     assert result["buildings"] == 14
 
