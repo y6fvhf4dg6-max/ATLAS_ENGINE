@@ -16,6 +16,8 @@ Genel kuralları sabitler:
    dikdörtgen dinamik olarak küçültülmelidir.
 """
 
+import warnings
+
 from shapely.geometry import Polygon
 
 from CORE.atlas_castle_roof_builder import (
@@ -184,7 +186,27 @@ def test_irregular_tower_gable_rectangle_is_dynamically_reduced():
         ]
     )
 
-    raw_rectangle = polygon.minimum_rotated_rectangle
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message=(
+                "divide by zero encountered "
+                "in oriented_envelope"
+            ),
+            category=RuntimeWarning,
+        )
+        warnings.filterwarnings(
+            "ignore",
+            message=(
+                "invalid value encountered "
+                "in oriented_envelope"
+            ),
+            category=RuntimeWarning,
+        )
+
+        raw_rectangle = (
+            polygon.minimum_rotated_rectangle
+        )
 
     reduced_rectangle = AtlasCastleGableRoofBuilder._minimum_rotated_rectangle(
         ring=ring,

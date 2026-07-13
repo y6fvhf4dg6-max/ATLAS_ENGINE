@@ -13,6 +13,7 @@ Temel ilkeler:
 """
 
 import math
+import warnings
 
 from shapely.geometry import Polygon
 
@@ -303,7 +304,27 @@ class AtlasCastleGableRoofBuilder:
         if polygon.is_empty or not polygon.is_valid or polygon.area <= 0.0:
             return None
 
-        rectangle = polygon.minimum_rotated_rectangle
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=(
+                    "divide by zero encountered "
+                    "in oriented_envelope"
+                ),
+                category=RuntimeWarning,
+            )
+            warnings.filterwarnings(
+                "ignore",
+                message=(
+                    "invalid value encountered "
+                    "in oriented_envelope"
+                ),
+                category=RuntimeWarning,
+            )
+
+            rectangle = (
+                polygon.minimum_rotated_rectangle
+            )
 
         if rectangle.is_empty or not rectangle.is_valid:
             return None
