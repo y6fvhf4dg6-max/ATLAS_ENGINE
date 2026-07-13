@@ -160,19 +160,39 @@ def run_test(test_record, environment):
 
     relative_path = test_path.relative_to(PROJECT_ROOT)
 
+    source_text = test_path.read_text(
+        encoding="utf-8",
+    )
+
+    uses_pytest = "def test_" in source_text
+
+    if uses_pytest:
+        command = [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            str(relative_path),
+        ]
+        runner_name = "pytest"
+    else:
+        command = [
+            sys.executable,
+            str(relative_path),
+        ]
+        runner_name = "python"
+
     print("")
     print("=" * 78)
     print(f"RUNNING : {relative_path}")
     print(f"GROUPS  : {groups}")
+    print(f"RUNNER  : {runner_name}")
     print("=" * 78)
 
     started_at = time.perf_counter()
 
     result = subprocess.run(
-        [
-            sys.executable,
-            str(relative_path),
-        ],
+        command,
         cwd=PROJECT_ROOT,
         env=environment,
         check=False,
