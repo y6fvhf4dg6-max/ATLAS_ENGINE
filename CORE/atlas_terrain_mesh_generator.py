@@ -30,6 +30,74 @@ class AtlasTerrainMeshGenerator:
     DEFAULT_BOTTOM_Z = 0.0
 
     @staticmethod
+    def smooth_heights(
+        heights,
+        passes=1,
+    ):
+        if not heights:
+            return []
+
+        current = [
+            [float(value) for value in row]
+            for row in heights
+        ]
+
+        pass_count = max(
+            0,
+            int(passes),
+        )
+
+        for _ in range(pass_count):
+            row_count = len(current)
+
+            smoothed = []
+
+            for row_index, row in enumerate(current):
+                column_count = len(row)
+                smoothed_row = []
+
+                for column_index in range(column_count):
+                    neighbor_values = []
+
+                    for row_offset in (-1, 0, 1):
+                        neighbor_row = row_index + row_offset
+
+                        if not 0 <= neighbor_row < row_count:
+                            continue
+
+                        neighbor_column_count = len(
+                            current[neighbor_row]
+                        )
+
+                        for column_offset in (-1, 0, 1):
+                            neighbor_column = (
+                                column_index
+                                + column_offset
+                            )
+
+                            if not (
+                                0
+                                <= neighbor_column
+                                < neighbor_column_count
+                            ):
+                                continue
+
+                            neighbor_values.append(
+                                current[neighbor_row][neighbor_column]
+                            )
+
+                    smoothed_row.append(
+                        sum(neighbor_values)
+                        / len(neighbor_values)
+                    )
+
+                smoothed.append(smoothed_row)
+
+            current = smoothed
+
+        return current
+
+    @staticmethod
     def build_height_grid(
         terrain_provider,
         bbox,
