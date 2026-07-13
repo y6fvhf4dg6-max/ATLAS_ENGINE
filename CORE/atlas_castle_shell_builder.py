@@ -33,7 +33,7 @@ from CORE.atlas_foundation_sampler import (
 
 class AtlasCastleShellBuilder:
     DEFAULT_SHELL_HEIGHT_M = 10.0
-    MIN_SHELL_HEIGHT_MM = 1.80
+    MIN_SHELL_HEIGHT_MM = 6.00
 
     POINT_PRECISION = 9
     HEIGHT_PRECISION = 6

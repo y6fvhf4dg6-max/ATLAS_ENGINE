@@ -190,6 +190,11 @@ def main():
 
     shell_height_mm = float(shell_mesh["shell_height_mm"])
 
+    assert shell_height_mm >= 6.0, (
+        "Relation tabanlı kale kabuğu baskıda en az "
+        f"6.0 mm olmalı; mevcut={shell_height_mm:.6f} mm"
+    )
+
     tower_height_mm = float(shell_mesh["tower_height_mm"])
 
     cap_extra_height_mm = tower_height_mm - shell_height_mm
