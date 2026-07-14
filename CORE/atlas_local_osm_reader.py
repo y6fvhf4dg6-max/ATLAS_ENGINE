@@ -609,7 +609,87 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         return tags.get("man_made") == "tower" and tags.get("tower:type") == "defensive"
 
     @staticmethod
+    def _is_building_relation(tags):
+        if tags.get("type") != "multipolygon":
+            return False
+
+        return (
+            "building" in tags
+            or "building:part" in tags
+        )
+
+    @staticmethod
+    def _create_building_relation_record(
+        relation_id,
+        tags,
+        outer_geometries,
+        inner_geometries,
+    ):
+        valid_outer_geometries = [
+            list(geometry)
+            for geometry in outer_geometries
+            if len(geometry) >= 3
+        ]
+
+        if not valid_outer_geometries:
+            return None
+
+        valid_inner_geometries = [
+            list(geometry)
+            for geometry in inner_geometries
+            if len(geometry) >= 3
+        ]
+
+        return {
+            "id": relation_id,
+            "geometry": valid_outer_geometries[0],
+            "outer_geometries": valid_outer_geometries,
+            "inner_geometries": valid_inner_geometries,
+            "geometry_type": "relation",
+            "tags": dict(tags),
+        }
+
+    @staticmethod
     def read(pbf_path, bbox):
+        class BuildingRelationScanner(osmium.SimpleHandler):
+            def __init__(self):
+                super().__init__()
+
+                self.building_relations = []
+                self.member_way_ids = set()
+
+            def relation(self, relation):
+                tags = dict(relation.tags)
+
+                if not AtlasLocalOSMReader._is_building_relation(tags):
+                    return
+
+                members = []
+
+                for member in relation.members:
+                    if member.type != "w":
+                        continue
+
+                    members.append(
+                        {
+                            "ref": member.ref,
+                            "role": member.role or "",
+                        }
+                    )
+
+                    self.member_way_ids.add(member.ref)
+
+                if not members:
+                    return
+
+                self.building_relations.append(
+                    {
+                        "id": relation.id,
+                        "tags": tags,
+                        "members": members,
+                    }
+                )
+
         class CastleRelationScanner(osmium.SimpleHandler):
             def __init__(self):
                 super().__init__()
@@ -656,6 +736,13 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                     }
                 )
 
+        building_relation_scanner = BuildingRelationScanner()
+
+        building_relation_scanner.apply_file(
+            pbf_path,
+            locations=False,
+        )
+
         relation_scanner = CastleRelationScanner()
 
         relation_scanner.apply_file(
@@ -669,6 +756,102 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             pbf_path,
             locations=True,
         )
+
+        if building_relation_scanner.member_way_ids:
+
+            class BuildingMemberWayScanner(osmium.SimpleHandler):
+                def __init__(self, target_way_ids):
+                    super().__init__()
+
+                    self.target_way_ids = target_way_ids
+                    self.way_geometries = {}
+
+                def way(self, way):
+                    if way.id not in self.target_way_ids:
+                        return
+
+                    geometry = []
+
+                    for node in way.nodes:
+                        if not node.location.valid():
+                            continue
+
+                        geometry.append(
+                            (
+                                node.location.lat,
+                                node.location.lon,
+                            )
+                        )
+
+                    if geometry:
+                        self.way_geometries[way.id] = geometry
+
+            building_way_scanner = BuildingMemberWayScanner(
+                building_relation_scanner.member_way_ids
+            )
+
+            building_way_scanner.apply_file(
+                pbf_path,
+                locations=True,
+            )
+
+            existing_building_ids = {
+                building.get("id")
+                for building in reader.buildings
+            }
+
+            for relation in building_relation_scanner.building_relations:
+                if relation["id"] in existing_building_ids:
+                    continue
+
+                outer_geometries = []
+                inner_geometries = []
+
+                for member in relation["members"]:
+                    geometry = building_way_scanner.way_geometries.get(
+                        member["ref"]
+                    )
+
+                    if not geometry:
+                        continue
+
+                    geometry = list(geometry)
+
+                    if (
+                        len(geometry) >= 2
+                        and geometry[0] == geometry[-1]
+                    ):
+                        geometry.pop()
+
+                    if len(geometry) < 3:
+                        continue
+
+                    if member["role"] == "inner":
+                        inner_geometries.append(geometry)
+                    else:
+                        outer_geometries.append(geometry)
+
+                if not outer_geometries:
+                    continue
+
+                if not any(
+                    reader._any_point_inside_bbox(geometry)
+                    for geometry in outer_geometries
+                ):
+                    continue
+
+                record = AtlasLocalOSMReader._create_building_relation_record(
+                    relation_id=relation["id"],
+                    tags=relation["tags"],
+                    outer_geometries=outer_geometries,
+                    inner_geometries=inner_geometries,
+                )
+
+                if record is None:
+                    continue
+
+                reader.buildings.append(record)
+                existing_building_ids.add(relation["id"])
 
         if relation_scanner.member_way_ids:
 

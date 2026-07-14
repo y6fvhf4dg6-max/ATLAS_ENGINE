@@ -21,6 +21,7 @@ class AtlasBuildingPartHierarchyProfiler:
     """
 
     CONTAINMENT_RATIO_MINIMUM = 0.999
+    BOUNDARY_OVERLAP_RATIO_MINIMUM = 0.50
 
     FULL_DECOMPOSITION_COVERAGE_MINIMUM = 0.95
     FULL_DECOMPOSITION_PART_COUNT_MINIMUM = 2
@@ -121,10 +122,21 @@ class AtlasBuildingPartHierarchyProfiler:
                     intersection.area / part_polygon.area
                 )
 
-                if (
+                is_contained = (
                     containment_ratio
-                    < AtlasBuildingPartHierarchyProfiler
+                    >= AtlasBuildingPartHierarchyProfiler
                     .CONTAINMENT_RATIO_MINIMUM
+                )
+
+                is_boundary_overlap = (
+                    containment_ratio
+                    >= AtlasBuildingPartHierarchyProfiler
+                    .BOUNDARY_OVERLAP_RATIO_MINIMUM
+                )
+
+                if not (
+                    is_contained
+                    or is_boundary_overlap
                 ):
                     continue
 

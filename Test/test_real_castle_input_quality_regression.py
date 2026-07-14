@@ -131,7 +131,7 @@ def test_burghausen_real_fixture_input_quality():
         for record in complex_roof_records
     )
 
-    assert semantics["building_count"] == 505
+    assert semantics["building_count"] == 507
     assert semantics["height_count"] == 227
     assert semantics["roof_count"] == 113
 

@@ -1249,3 +1249,49 @@ Bir sonraki çalışma noktası:
 Temel ilke korunmaktadır:
 
 > Anıtkabir’de bulunan hiçbir sorun yalnızca Anıtkabir’e özel biçimde çözülmeyecektir. Her çözüm ana motora genellenecek, regresyon testine dönüştürülecek ve önceki gerçek sahnelerde yeniden doğrulanacaktır.
+
+---
+
+# Anıtkabir Foundation-First Son Durum
+
+## Yapılanlar
+
+- `building:part` desteği genel motora eklendi.
+- Normal binalarda `20 m²` ve `1.20 mm` sınırları korundu.
+- `building:part` kayıtlarında alan filtresi kaldırıldı ve `1.00 mm` fiziksel minimum uygulandı.
+- Anıtkabir fixture’ındaki `53 building:part` kaydının tamamı kabul edildi.
+- Mozole çevresindeki `44` küçük sütun STL’de görünür hale getirildi.
+- Ana bina dış zarfı ile yapı parçaları arasındaki parent–child ilişkisi analiz edildi.
+- Çok parçalı yapılarda yanlış masif parent gövdesini kaldıran konservatif outline suppression sistemi eklendi.
+- Aynı parent’a bağlı yapı parçaları için ortak `foundation_z` desteği eklendi.
+- Sütun tabanlarının ortak kotta hizalanması sağlandı.
+- Elevated-area ve artwork sistemleri Anıtkabir sahnesine entegre edildi.
+- Gerçek STL sayısal ve görsel olarak doğrulandı.
+- Tam regresyon sonucu: `148 passed`.
+- Değişiklikler Git commit’i ile güvenli noktaya alındı.
+
+## Ana Motora Kazanımlar
+
+- Küçük fakat mimari açıdan önemli yapı parçaları artık kaybolmuyor.
+- Parent bina ile `building:part` geometrileri otomatik ilişkilendirilebiliyor.
+- Eksik parçalanmış yapılarda parent bina korunuyor.
+- Tam veya tekrarlayan parça tanımı bulunan yapılarda yanlış dış zarf mesh’i bastırılıyor.
+- Bir yapı kompleksine bağlı parçalar ortak düşey referans kullanabiliyor.
+- Çözüm Anıtkabir’e özel OSM ID veya sütun hard-code’u içermiyor.
+- Aynı altyapı saray, müze, tapınak, istasyon, anıt ve tarihî yapı komplekslerinde kullanılabilir.
+
+## Mevcut Tamamlanma Tahmini
+
+- `building:part` motor özelliği: `%90`
+- Anıtkabir mozole gövdesi ve sütunları: `%80–85`
+- Anıtkabir bütün mimari modeli: `%65–70`
+- Teknik regresyon güvenilirliği: `%95`
+
+## Sonraki Hedefler
+
+- U biçimli tören alanı çevresindeki sütunlu ve revaklı yapıların genel motorla üretilmesi.
+- Sütun, paye, arkad ve üst kiriş tekrarlarının semantik olarak tanınması.
+- `15 m` ve `22 m` building-part yükseklik gruplarının üst örtü ilişkilerinin iyileştirilmesi.
+- Çatı ve sütun birleşimlerinin baskı ölçeğine göre optimize edilmesi.
+- Nihai plaka, yazı, tarih, ölçek ve fiziksel test baskısının tamamlanması.
+
