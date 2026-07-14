@@ -11,14 +11,20 @@ from CORE.atlas_castle_wall_extruder import (
 from CORE.atlas_castle_crenellation_builder import (
     AtlasCastleCrenellationBuilder,
 )
+from CORE.atlas_castle_wall_physical_state_classifier import (
+    AtlasCastleWallPhysicalStateClassifier,
+)
 
 
 class AtlasCastleWallBuilder:
     DEFAULT_WALL_WIDTH_M = 4.0
     DEFAULT_WALL_HEIGHT_M = 10.0
 
+    DEFAULT_REMAINS_HEIGHT_M = 2.50
+    DEFAULT_UNCERTAIN_HEIGHT_M = 1.50
+
     MIN_WALL_WIDTH_MM = 1.20
-    MIN_WALL_HEIGHT_MM = 6.00
+    MIN_WALL_HEIGHT_MM = 0.80
 
     @staticmethod
     def build_walls(
@@ -67,14 +73,17 @@ class AtlasCastleWallBuilder:
                     min(0.95, wall_height_mm * 0.16),
                 )
 
-                crenellation_meshes = (
-                    AtlasCastleWallBuilder._build_crenellation_meshes(
-                        wall_mesh=mesh,
-                        tooth_width_mm=tooth_width_mm,
-                        gap_width_mm=gap_width_mm,
-                        tooth_height_mm=tooth_height_mm,
+                crenellation_meshes = []
+
+                if mesh.get("allow_crenellations") is True:
+                    crenellation_meshes = (
+                        AtlasCastleWallBuilder._build_crenellation_meshes(
+                            wall_mesh=mesh,
+                            tooth_width_mm=tooth_width_mm,
+                            gap_width_mm=gap_width_mm,
+                            tooth_height_mm=tooth_height_mm,
+                        )
                     )
-                )
 
                 for crenellation_mesh in crenellation_meshes:
                     crenellation_mesh.update(
@@ -83,6 +92,7 @@ class AtlasCastleWallBuilder:
                             "wall_type": mesh.get("wall_type"),
                             "placement_mode": "foundation_first",
                             "parent_type": "castle_wall_foundation",
+                            "physical_state": mesh.get("physical_state"),
                         }
                     )
 
@@ -161,14 +171,19 @@ class AtlasCastleWallBuilder:
 
         tags = wall.get("tags", {})
 
+        physical_policy = (
+            AtlasCastleWallBuilder._resolve_physical_policy(
+                tags=tags,
+                coordinate_engine=coordinate_engine,
+            )
+        )
+
+        if physical_policy["allow_wall"] is not True:
+            return None
+
         width_m = AtlasCastleWallBuilder._read_positive_float(
             tags.get("width"),
             AtlasCastleWallBuilder.DEFAULT_WALL_WIDTH_M,
-        )
-
-        height_m = AtlasCastleWallBuilder._read_positive_float(
-            tags.get("height"),
-            AtlasCastleWallBuilder.DEFAULT_WALL_HEIGHT_M,
         )
 
         width_mm = max(
@@ -176,10 +191,7 @@ class AtlasCastleWallBuilder:
             AtlasCastleWallBuilder.MIN_WALL_WIDTH_MM,
         )
 
-        height_mm = max(
-            coordinate_engine.height_to_stl_mm(height_m),
-            AtlasCastleWallBuilder.MIN_WALL_HEIGHT_MM,
-        )
+        height_mm = physical_policy["height_mm"]
 
         closed = AtlasCastleWallBuilder._is_closed_wall(
             wall=wall,
@@ -208,11 +220,75 @@ class AtlasCastleWallBuilder:
                 "placement_mode": "foundation_first",
                 "wall_width_mm": width_mm,
                 "wall_height_mm": height_mm,
+                "wall_height_m": physical_policy["height_m"],
+                "physical_state": physical_policy["state"],
+                "physical_state_reason": physical_policy["reason"],
+                "allow_crenellations": (
+                    physical_policy["allow_crenellations"]
+                ),
                 "relation_role": wall.get("relation_role"),
             }
         )
 
         return mesh
+
+    @staticmethod
+    def _resolve_physical_policy(
+        tags,
+        coordinate_engine,
+    ):
+        classification = (
+            AtlasCastleWallPhysicalStateClassifier.classify(
+                tags
+            )
+        )
+
+        state = classification["state"]
+
+        if state == AtlasCastleWallPhysicalStateClassifier.CURRENT_PHYSICAL:
+            height_m = (
+                classification["height_representative_m"]
+                or AtlasCastleWallBuilder.DEFAULT_WALL_HEIGHT_M
+            )
+            allow_wall = classification["allow_full_wall"]
+
+        elif state == AtlasCastleWallPhysicalStateClassifier.RUIN_OR_REMAINS:
+            height_m = (
+                classification["height_representative_m"]
+                or AtlasCastleWallBuilder.DEFAULT_REMAINS_HEIGHT_M
+            )
+            allow_wall = classification["allow_low_remains"]
+
+        elif state == AtlasCastleWallPhysicalStateClassifier.UNCERTAIN:
+            height_m = (
+                classification["height_representative_m"]
+                or AtlasCastleWallBuilder.DEFAULT_UNCERTAIN_HEIGHT_M
+            )
+            allow_wall = classification["allow_low_remains"]
+
+        else:
+            height_m = 0.0
+            allow_wall = False
+
+        if allow_wall:
+            height_mm = max(
+                coordinate_engine.height_to_stl_mm(height_m),
+                AtlasCastleWallBuilder.MIN_WALL_HEIGHT_MM,
+            )
+        else:
+            height_mm = 0.0
+
+        return {
+            "state": state,
+            "reason": classification["reason"],
+            "height_m": height_m,
+            "height_mm": height_mm,
+            "allow_wall": allow_wall,
+            "allow_crenellations": (
+                allow_wall
+                and classification["allow_crenellations"]
+            ),
+        }
 
     @staticmethod
     def _build_crenellation_meshes(

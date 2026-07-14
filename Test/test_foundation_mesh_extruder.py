@@ -40,6 +40,7 @@ class DummyBuilding:
         min_height=None,
         min_level=None,
         is_building_part=False,
+        tags=None,
     ):
         self.geometry = geometry
         self.area_m2 = area_m2
@@ -47,6 +48,7 @@ class DummyBuilding:
         self.min_height = min_height
         self.min_level = min_level
         self.is_building_part = is_building_part
+        self.tags = dict(tags or {})
 
         self.is_castle_building = False
         self.castle_profile = None
@@ -499,3 +501,83 @@ def test_legacy_mesh_builder_accepts_printable_narrow_column_dimensions():
 
     assert points is not None
     assert diagnostics == {}
+
+
+
+def test_submillimeter_minaret_footprint_is_preserved():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.70),
+            (0.70, 0.70),
+            (0.70, 0.0),
+        ],
+        area_m2=10.0,
+        estimated_height=12.0,
+        is_building_part=True,
+        tags={
+            "building:part": "yes",
+            "man_made": "tower",
+            "tower:type": "minaret",
+            "height": "72",
+            "roof:shape": "pyramidal",
+        },
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is not None
+    assert diagnostics["accepted"] is True
+    assert mesh["bottom_z"] == pytest.approx(0.0)
+    assert mesh["top_z"] == pytest.approx(12.0)
+
+    report = AtlasMeshValidator.report(mesh)
+
+    assert report["valid"] is True
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0
+
+
+def test_legacy_mesh_builder_preserves_submillimeter_minaret_footprint():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.70),
+            (0.70, 0.70),
+            (0.70, 0.0),
+        ],
+        area_m2=10.0,
+        estimated_height=12.0,
+        is_building_part=True,
+        tags={
+            "building:part": "yes",
+            "man_made": "tower",
+            "tower:type": "minaret",
+            "height": "72",
+            "roof:shape": "pyramidal",
+        },
+    )
+
+    diagnostics = {}
+
+    points = AtlasMeshBuilder.prepare_geometry(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        diagnostics=diagnostics,
+    )
+
+    assert points is not None
+    assert diagnostics == {}
+
+    xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
+
+    assert max(xs) - min(xs) == pytest.approx(1.0)
+    assert max(ys) - min(ys) == pytest.approx(1.0)

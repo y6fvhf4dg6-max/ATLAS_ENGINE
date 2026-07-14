@@ -181,5 +181,40 @@ def test_real_ayasofya_sultanahmet_hierarchy_is_complete():
 
     assert result["part_to_parent"][776020486] == ayasofya_id
 
-    assert ayasofya_id in result["suppressed_parent_ids"]
-    assert sultanahmet_id in result["suppressed_parent_ids"]
+    assert ayasofya_id not in result["suppressed_parent_ids"]
+    assert sultanahmet_id not in result["suppressed_parent_ids"]
+
+    assert result["suppressed_parent_ids"] == [
+        1318101891,
+    ]
+
+    assert result["residual_replacement_parent_ids"] == [
+        sultanahmet_id,
+        ayasofya_id,
+    ]
+
+    residual_counts = {
+        parent_id: sum(
+            1
+            for record in result["residual_parent_records"]
+            if record.get("source_parent_id") == parent_id
+        )
+        for parent_id in (
+            ayasofya_id,
+            sultanahmet_id,
+        )
+    }
+
+    assert residual_counts[sultanahmet_id] == 4
+    assert residual_counts[ayasofya_id] == 89
+
+    assert (
+        result["parent_metrics"][sultanahmet_id]
+        ["should_create_residual"]
+        is True
+    )
+    assert (
+        result["parent_metrics"][ayasofya_id]
+        ["should_create_residual"]
+        is True
+    )

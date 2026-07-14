@@ -1,3 +1,5 @@
+import pytest
+
 from CORE.atlas_building_part_hierarchy_profiler import (
     AtlasBuildingPartHierarchyProfiler,
 )
@@ -393,3 +395,258 @@ def test_does_not_assign_boundary_crossing_part_when_only_minority_overlaps():
     assert result["unassigned_part_ids"] == [
         200,
     ]
+
+
+def test_repeated_small_parts_with_incomplete_coverage_create_residual_parent():
+    parent = _record(
+        100,
+        [
+            (39.0, 32.0),
+            (39.0, 32.1),
+            (39.1, 32.1),
+            (39.1, 32.0),
+        ],
+        {
+            "building": "mosque",
+            "height": "20",
+        },
+    )
+
+    parts = []
+
+    # Parent alanının yalnızca sol yaklaşık %80 bölümünü,
+    # çok sayıda küçük building:part ile doldur.
+    row_count = 10
+    column_count = 10
+
+    lat_step = 0.1 / row_count
+    lon_step = 0.08 / column_count
+
+    source_id = 200
+
+    for row in range(row_count):
+        for column in range(column_count):
+            lat_1 = 39.0 + row * lat_step
+            lat_2 = lat_1 + lat_step
+            lon_1 = 32.0 + column * lon_step
+            lon_2 = lon_1 + lon_step
+
+            parts.append(
+                _record(
+                    source_id,
+                    [
+                        (lat_1, lon_1),
+                        (lat_1, lon_2),
+                        (lat_2, lon_2),
+                        (lat_2, lon_1),
+                    ],
+                    {
+                        "building:part": "yes",
+                        "height": "10",
+                    },
+                )
+            )
+
+            source_id += 1
+
+    result = AtlasBuildingPartHierarchyProfiler.analyze(
+        [
+            parent,
+            *parts,
+        ]
+    )
+
+    metrics = result["parent_metrics"][100]
+
+    assert metrics["repeated_detail_decomposition"] is True
+    assert 0.75 <= metrics["coverage_ratio"] <= 0.85
+
+    # Eksik kapsamada parent bütünüyle mesh dışına atılmamalı;
+    # yalnızca uncovered alan residual kayıt olarak üretilmeli.
+    assert result["suppressed_parent_ids"] == []
+    assert len(result["residual_parent_records"]) == 1
+
+    residual = result["residual_parent_records"][0]
+
+    assert residual["source_parent_id"] == 100
+    assert residual["tags"]["building"] == "mosque"
+    assert residual["tags"]["atlas:residual_parent"] == "yes"
+
+    residual_polygon = (
+        AtlasBuildingPartHierarchyProfiler._make_polygon(
+            residual
+        )
+    )
+
+    assert residual_polygon is not None
+    assert residual_polygon.area > 0.0
+
+    parent_polygon = (
+        AtlasBuildingPartHierarchyProfiler._make_polygon(
+            parent
+        )
+    )
+
+    assert residual_polygon.area / parent_polygon.area == pytest.approx(
+        0.20,
+        abs=0.02,
+    )
+
+    mesh_ids = [
+        record["id"]
+        for record in result["mesh_buildings"]
+    ]
+
+    assert 100 not in mesh_ids
+    assert residual["id"] in mesh_ids
+
+
+def test_residual_parent_height_uses_lowest_positive_part_min_height():
+    parent = _record(
+        100,
+        [
+            (39.0, 32.0),
+            (39.0, 32.1),
+            (39.1, 32.1),
+            (39.1, 32.0),
+        ],
+        {
+            "building": "mosque",
+        },
+    )
+
+    parts = []
+    source_id = 200
+
+    row_count = 10
+    column_count = 10
+
+    lat_step = 0.1 / row_count
+    lon_step = 0.08 / column_count
+
+    for row in range(row_count):
+        for column in range(column_count):
+            lat_1 = 39.0 + row * lat_step
+            lat_2 = lat_1 + lat_step
+            lon_1 = 32.0 + column * lon_step
+            lon_2 = lon_1 + lon_step
+
+            min_height = "5" if source_id == 200 else "12"
+
+            parts.append(
+                _record(
+                    source_id,
+                    [
+                        (lat_1, lon_1),
+                        (lat_1, lon_2),
+                        (lat_2, lon_2),
+                        (lat_2, lon_1),
+                    ],
+                    {
+                        "building:part": "yes",
+                        "height": "20",
+                        "min_height": min_height,
+                    },
+                )
+            )
+
+            source_id += 1
+
+    result = AtlasBuildingPartHierarchyProfiler.analyze(
+        [
+            parent,
+            *parts,
+        ]
+    )
+
+    residuals = result["residual_parent_records"]
+
+    assert residuals
+    assert all(
+        record["tags"]["height"] == "5.0"
+        for record in residuals
+    )
+    assert all(
+        record["tags"].get("min_height") is None
+        for record in residuals
+    )
+
+    metrics = result["parent_metrics"][100]
+
+    assert metrics["residual_height_m"] == pytest.approx(5.0)
+    assert metrics["residual_height_source"] == "minimum_part_min_height"
+
+
+def test_attached_minaret_components_are_not_independent_mesh_buildings():
+    parent = _record(
+        100,
+        [
+            (41.0, 29.0),
+            (41.0, 29.001),
+            (41.001, 29.001),
+            (41.001, 29.0),
+        ],
+        {
+            "building": "mosque",
+        },
+    )
+
+    minaret = _record(
+        200,
+        [
+            (41.00010, 29.00010),
+            (41.00010, 29.00014),
+            (41.00014, 29.00014),
+            (41.00014, 29.00010),
+        ],
+        {
+            "building:part": "yes",
+            "tower:type": "minaret",
+            "height": "72",
+        },
+    )
+
+    balcony_ring = _record(
+        201,
+        [
+            (41.00009, 29.00009),
+            (41.00009, 29.00015),
+            (41.00015, 29.00015),
+            (41.00015, 29.00009),
+        ],
+        {
+            "barrier": "wall",
+            "building:part": "yes",
+            "height": "52",
+            "min_height": "50",
+        },
+    )
+
+    result = AtlasBuildingPartHierarchyProfiler.analyze(
+        [
+            parent,
+            minaret,
+            balcony_ring,
+        ]
+    )
+
+    assert result["attached_minaret_component_ids"] == [
+        201,
+    ]
+
+    assert result["minaret_component_to_minaret"] == {
+        201: 200,
+    }
+
+    mesh_ids = [
+        record["id"]
+        for record in result["mesh_buildings"]
+    ]
+
+    assert 200 in mesh_ids
+    assert 201 not in mesh_ids
+
+    assert (
+        result["minaret_components_by_minaret"][200][0]["id"]
+        == 201
+    )

@@ -343,9 +343,6 @@ class AtlasFoundationMeshExtruder:
                 "missing_scaled_bounds",
             )
 
-        width_mm = bounds["max_x"] - bounds["min_x"]
-        depth_mm = bounds["max_y"] - bounds["min_y"]
-
         minimum_width_mm = (
             AtlasFoundationMeshExtruder.MIN_BUILDING_PART_WIDTH_MM
             if is_building_part
@@ -357,6 +354,31 @@ class AtlasFoundationMeshExtruder:
             if is_building_part
             else AtlasFoundationMeshExtruder.MIN_MODEL_DEPTH_MM
         )
+
+        is_minaret = (
+            AtlasFoundationMeshExtruder._is_minaret(
+                building
+            )
+        )
+
+        if is_minaret:
+            scaled_points = (
+                AtlasFoundationMeshExtruder
+                ._expand_to_minimum_dimensions(
+                    points=scaled_points,
+                    minimum_width_mm=minimum_width_mm,
+                    minimum_depth_mm=minimum_depth_mm,
+                )
+            )
+
+            bounds = (
+                AtlasFoundationMeshExtruder._bounds_2d(
+                    scaled_points
+                )
+            )
+
+        width_mm = bounds["max_x"] - bounds["min_x"]
+        depth_mm = bounds["max_y"] - bounds["min_y"]
 
         if width_mm < minimum_width_mm:
             return AtlasFoundationMeshExtruder._reject(
@@ -385,6 +407,68 @@ class AtlasFoundationMeshExtruder:
             scaled_points.reverse()
 
         return scaled_points
+
+    @staticmethod
+    def _is_minaret(building):
+        tags = getattr(
+            building,
+            "tags",
+            {},
+        ) or {}
+
+        return (
+            tags.get("tower:type") == "minaret"
+            and (
+                tags.get("man_made") == "tower"
+                or tags.get("building:part") is not None
+            )
+        )
+
+    @staticmethod
+    def _expand_to_minimum_dimensions(
+        points,
+        minimum_width_mm,
+        minimum_depth_mm,
+    ):
+        bounds = AtlasFoundationMeshExtruder._bounds_2d(
+            points
+        )
+
+        if bounds is None:
+            return points
+
+        width_mm = bounds["max_x"] - bounds["min_x"]
+        depth_mm = bounds["max_y"] - bounds["min_y"]
+
+        if width_mm <= 0.0 or depth_mm <= 0.0:
+            return points
+
+        scale_x = max(
+            1.0,
+            minimum_width_mm / width_mm,
+        )
+        scale_y = max(
+            1.0,
+            minimum_depth_mm / depth_mm,
+        )
+
+        if scale_x == 1.0 and scale_y == 1.0:
+            return points
+
+        center_x = (
+            bounds["min_x"] + bounds["max_x"]
+        ) / 2.0
+        center_y = (
+            bounds["min_y"] + bounds["max_y"]
+        ) / 2.0
+
+        return [
+            (
+                center_x + (x - center_x) * scale_x,
+                center_y + (y - center_y) * scale_y,
+            )
+            for x, y in points
+        ]
 
     @staticmethod
     def _reject(diagnostics, reason, **details):

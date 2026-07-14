@@ -13,6 +13,15 @@ from CORE.atlas_castle_gable_roof_builder import (
 from CORE.atlas_castle_multi_gable_roof_builder import (
     AtlasCastleMultiGableRoofBuilder,
 )
+from CORE.atlas_monument_dome_roof_builder import (
+    AtlasMonumentDomeRoofBuilder,
+)
+from CORE.atlas_minaret_roof_builder import (
+    AtlasMinaretRoofBuilder,
+)
+from CORE.atlas_minaret_balcony_builder import (
+    AtlasMinaretBalconyBuilder,
+)
 from CORE.atlas_castle_building_profiler import (
     AtlasCastleBuildingProfiler,
 )
@@ -329,6 +338,80 @@ class AtlasFoundationSceneBuilder:
                 "is_castle_building",
                 False,
             )
+
+            if not mesh["is_castle_building"]:
+                mesh = AtlasMinaretRoofBuilder.apply(
+                    mesh=mesh,
+                    tower_type=tags.get("tower:type"),
+                    roof_shape=tags.get("roof:shape"),
+                    roof_height_m=tags.get("roof:height"),
+                    coordinate_engine=coordinate_engine,
+                )
+
+                minaret_component_records = (
+                    building_part_hierarchy[
+                        "minaret_components_by_minaret"
+                    ].get(
+                        raw_building.get("id"),
+                        [],
+                    )
+                )
+
+                minaret_component_meshes = []
+
+                for component_record in minaret_component_records:
+                    component_building = (
+                        AtlasSceneBuilder._to_atlas_building(
+                            component_record
+                        )
+                    )
+
+                    component_diagnostics = {}
+
+                    component_mesh = (
+                        AtlasFoundationFirstPipeline
+                        .build_building_mesh(
+                            building=component_building,
+                            coordinate_engine=coordinate_engine,
+                            terrain_mesh=terrain_mesh,
+                            sample_grid=5,
+                            embed_depth_mm=0.30,
+                            foundation_z_override=mesh.get(
+                                "foundation_z"
+                            ),
+                            diagnostics=component_diagnostics,
+                        )
+                    )
+
+                    if component_mesh is None:
+                        continue
+
+                    component_mesh["source_id"] = (
+                        component_record.get("id")
+                    )
+                    component_mesh[
+                        "minaret_component_type"
+                    ] = "balcony_ring"
+
+                    minaret_component_meshes.append(
+                        component_mesh
+                    )
+
+                mesh = AtlasMinaretBalconyBuilder.attach(
+                    minaret_mesh=mesh,
+                    component_meshes=(
+                        minaret_component_meshes
+                    ),
+                )
+
+                mesh = AtlasMonumentDomeRoofBuilder.apply(
+                    mesh=mesh,
+                    roof_shape=tags.get("roof:shape"),
+                    roof_height_m=tags.get("roof:height"),
+                    coordinate_engine=coordinate_engine,
+                    total_height_m=tags.get("height"),
+                    min_height_m=tags.get("min_height"),
+                )
 
             if mesh["is_castle_building"]:
                 castle_buildings += 1

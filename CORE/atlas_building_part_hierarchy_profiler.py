@@ -12,7 +12,16 @@ Bu sınıf yalnızca analiz yapar.
 Herhangi bir bina kaydını mesh üretiminden çıkarmaz.
 """
 
-from shapely.geometry import Polygon
+from shapely.geometry import (
+    GeometryCollection,
+    MultiPolygon,
+    Polygon,
+)
+from shapely.ops import triangulate
+
+from CORE.atlas_minaret_component_profiler import (
+    AtlasMinaretComponentProfiler,
+)
 
 
 class AtlasBuildingPartHierarchyProfiler:
@@ -179,8 +188,46 @@ class AtlasBuildingPartHierarchyProfiler:
             for parent_id, parent_data in parents.items()
         }
 
+        attached_minaret_component_ids = set()
+        minaret_component_to_minaret = {}
+        minaret_components_by_minaret = {}
+
+        for parent_data in parents.values():
+            minaret_result = (
+                AtlasMinaretComponentProfiler.analyze(
+                    parent_data["parts"]
+                )
+            )
+
+            attached_minaret_component_ids.update(
+                minaret_result[
+                    "attached_component_ids"
+                ]
+            )
+
+            minaret_component_to_minaret.update(
+                minaret_result[
+                    "component_to_minaret"
+                ]
+            )
+
+            for (
+                minaret_id,
+                component_records,
+            ) in minaret_result[
+                "components_by_minaret"
+            ].items():
+                if not component_records:
+                    continue
+
+                minaret_components_by_minaret[
+                    minaret_id
+                ] = list(component_records)
+
         parent_metrics = {}
         suppression_candidate_ids = set()
+        residual_replacement_parent_ids = set()
+        residual_parent_records = []
 
         for parent_id, parent_data in parents.items():
             parent_polygon = (
@@ -249,8 +296,45 @@ class AtlasBuildingPartHierarchyProfiler:
 
             should_suppress = bool(
                 full_decomposition
-                or repeated_detail_decomposition
             )
+
+            should_create_residual = bool(
+                repeated_detail_decomposition
+                and not full_decomposition
+                and coverage_ratio
+                < AtlasBuildingPartHierarchyProfiler
+                .FULL_DECOMPOSITION_COVERAGE_MINIMUM
+            )
+
+            residual_record_count = 0
+
+            if should_create_residual:
+                residual_geometry = (
+                    parent_polygon.difference(
+                        part_union
+                    )
+                )
+
+                new_residual_records = (
+                    AtlasBuildingPartHierarchyProfiler
+                    ._make_residual_parent_records(
+                        parent_id=parent_id,
+                        parent_record=parent_data["parent"],
+                        part_records=parent_data["parts"],
+                        residual_geometry=residual_geometry,
+                    )
+                )
+
+                if new_residual_records:
+                    residual_parent_records.extend(
+                        new_residual_records
+                    )
+                    residual_replacement_parent_ids.add(
+                        parent_id
+                    )
+                    residual_record_count = len(
+                        new_residual_records
+                    )
 
             parent_metrics[parent_id] = {
                 "part_count": part_count,
@@ -261,6 +345,28 @@ class AtlasBuildingPartHierarchyProfiler:
                     repeated_detail_decomposition
                 ),
                 "should_suppress": should_suppress,
+                "should_create_residual": (
+                    should_create_residual
+                ),
+                "residual_record_count": (
+                    residual_record_count
+                ),
+                "residual_height_m": (
+                    AtlasBuildingPartHierarchyProfiler
+                    ._resolve_residual_height(
+                        parent_data["parts"]
+                    )[0]
+                    if should_create_residual
+                    else None
+                ),
+                "residual_height_source": (
+                    AtlasBuildingPartHierarchyProfiler
+                    ._resolve_residual_height(
+                        parent_data["parts"]
+                    )[1]
+                    if should_create_residual
+                    else None
+                ),
             }
 
             if should_suppress:
@@ -280,11 +386,26 @@ class AtlasBuildingPartHierarchyProfiler:
 
             if (
                 not is_building_part
-                and record_id in suppression_candidate_ids
+                and (
+                    record_id in suppression_candidate_ids
+                    or record_id
+                    in residual_replacement_parent_ids
+                )
+            ):
+                continue
+
+            if (
+                is_building_part
+                and record_id
+                in attached_minaret_component_ids
             ):
                 continue
 
             mesh_buildings.append(record)
+
+        mesh_buildings.extend(
+            residual_parent_records
+        )
 
         return {
             "main_buildings": main_buildings,
@@ -293,6 +414,21 @@ class AtlasBuildingPartHierarchyProfiler:
             "parent_metrics": parent_metrics,
             "suppressed_parent_ids": sorted(
                 suppression_candidate_ids
+            ),
+            "residual_replacement_parent_ids": sorted(
+                residual_replacement_parent_ids
+            ),
+            "residual_parent_records": (
+                residual_parent_records
+            ),
+            "attached_minaret_component_ids": sorted(
+                attached_minaret_component_ids
+            ),
+            "minaret_component_to_minaret": (
+                minaret_component_to_minaret
+            ),
+            "minaret_components_by_minaret": (
+                minaret_components_by_minaret
             ),
             "parents": parents,
             "part_to_parent": part_to_parent,
@@ -305,8 +441,20 @@ class AtlasBuildingPartHierarchyProfiler:
                 "suppressed_parent_count": len(
                     suppression_candidate_ids
                 ),
+                "residual_replacement_parent_count": len(
+                    residual_replacement_parent_ids
+                ),
+                "residual_parent_record_count": len(
+                    residual_parent_records
+                ),
                 "mesh_building_count": len(
                     mesh_buildings
+                ),
+                "attached_minaret_component_count": len(
+                    attached_minaret_component_ids
+                ),
+                "minaret_with_component_count": len(
+                    minaret_components_by_minaret
                 ),
                 "assigned_building_part_count": len(
                     part_to_parent
@@ -317,6 +465,228 @@ class AtlasBuildingPartHierarchyProfiler:
                 "parent_part_counts": parent_part_counts,
             },
         }
+
+    @staticmethod
+    def _resolve_residual_height(
+        part_records,
+    ):
+        min_heights = []
+        heights = []
+
+        for record in part_records or []:
+            tags = record.get("tags", {})
+
+            min_height = (
+                AtlasBuildingPartHierarchyProfiler
+                ._read_positive_float(
+                    tags.get("min_height")
+                )
+            )
+
+            height = (
+                AtlasBuildingPartHierarchyProfiler
+                ._read_positive_float(
+                    tags.get("height")
+                )
+            )
+
+            if min_height is not None:
+                min_heights.append(min_height)
+
+            if height is not None:
+                heights.append(height)
+
+        if min_heights:
+            return (
+                min(min_heights),
+                "minimum_part_min_height",
+            )
+
+        if heights:
+            return (
+                min(heights),
+                "minimum_part_height",
+            )
+
+        return (
+            3.0,
+            "default_low_base_height",
+        )
+
+    @staticmethod
+    def _read_positive_float(value):
+        if value is None:
+            return None
+
+        try:
+            parsed = float(
+                str(value)
+                .replace("m", "")
+                .strip()
+            )
+        except (TypeError, ValueError):
+            return None
+
+        if parsed <= 0.0:
+            return None
+
+        return parsed
+
+    @staticmethod
+    def _make_residual_parent_records(
+        parent_id,
+        parent_record,
+        part_records,
+        residual_geometry,
+    ):
+        polygons = (
+            AtlasBuildingPartHierarchyProfiler
+            ._extract_residual_polygons(
+                residual_geometry
+            )
+        )
+
+        records = []
+
+        for index, polygon in enumerate(polygons):
+            if polygon.is_empty or polygon.area <= 0.0:
+                continue
+
+            coordinates = [
+                (
+                    float(lat),
+                    float(lon),
+                )
+                for lon, lat in list(
+                    polygon.exterior.coords
+                )[:-1]
+            ]
+
+            if len(coordinates) < 3:
+                continue
+
+            residual_height_m, residual_height_source = (
+                AtlasBuildingPartHierarchyProfiler
+                ._resolve_residual_height(
+                    part_records
+                )
+            )
+
+            tags = dict(
+                parent_record.get(
+                    "tags",
+                    {},
+                )
+            )
+
+            for key in (
+                "min_height",
+                "building:min_level",
+                "building:levels",
+                "roof:height",
+                "roof:levels",
+                "roof:shape",
+            ):
+                tags.pop(key, None)
+
+            tags["height"] = str(
+                float(residual_height_m)
+            )
+            tags["atlas:residual_parent"] = "yes"
+            tags["atlas:residual_height_source"] = (
+                residual_height_source
+            )
+
+            records.append(
+                {
+                    **parent_record,
+                    "id": (
+                        f"atlas_residual_parent_"
+                        f"{parent_id}_{index}"
+                    ),
+                    "geometry": coordinates,
+                    "geometry_type": (
+                        "residual_parent"
+                    ),
+                    "source_parent_id": parent_id,
+                    "tags": tags,
+                }
+            )
+
+        return records
+
+    @staticmethod
+    def _extract_residual_polygons(
+        geometry,
+    ):
+        if geometry is None or geometry.is_empty:
+            return []
+
+        if isinstance(geometry, Polygon):
+            if not geometry.interiors:
+                return [geometry]
+
+            return (
+                AtlasBuildingPartHierarchyProfiler
+                ._triangulate_residual_polygon(
+                    geometry
+                )
+            )
+
+        if isinstance(geometry, MultiPolygon):
+            polygons = []
+
+            for polygon in geometry.geoms:
+                polygons.extend(
+                    AtlasBuildingPartHierarchyProfiler
+                    ._extract_residual_polygons(
+                        polygon
+                    )
+                )
+
+            return polygons
+
+        if isinstance(geometry, GeometryCollection):
+            polygons = []
+
+            for item in geometry.geoms:
+                polygons.extend(
+                    AtlasBuildingPartHierarchyProfiler
+                    ._extract_residual_polygons(
+                        item
+                    )
+                )
+
+            return polygons
+
+        return []
+
+    @staticmethod
+    def _triangulate_residual_polygon(
+        polygon,
+    ):
+        result = []
+
+        for triangle in triangulate(polygon):
+            clipped = triangle.intersection(
+                polygon
+            )
+
+            if clipped.is_empty:
+                continue
+
+            if isinstance(clipped, Polygon):
+                if clipped.area > 0.0:
+                    result.append(clipped)
+
+            elif isinstance(clipped, MultiPolygon):
+                result.extend(
+                    item
+                    for item in clipped.geoms
+                    if item.area > 0.0
+                )
+
+        return result
 
     @staticmethod
     def _make_polygon(record):
