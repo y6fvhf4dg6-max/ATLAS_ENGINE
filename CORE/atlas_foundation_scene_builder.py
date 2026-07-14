@@ -31,6 +31,12 @@ from CORE.atlas_castle_footprint_regularizer import (
 from CORE.atlas_building_part_hierarchy_profiler import (
     AtlasBuildingPartHierarchyProfiler,
 )
+from CORE.atlas_ancient_theatre_profiler import (
+    AtlasAncientTheatreProfiler,
+)
+from CORE.atlas_ancient_theatre_stage_builder import (
+    AtlasAncientTheatreStageBuilder,
+)
 
 
 class AtlasFoundationSceneBuilder:
@@ -260,6 +266,11 @@ class AtlasFoundationSceneBuilder:
                 raw_building=prepared_building,
                 castles=castles,
             )
+
+            atlas_building = AtlasAncientTheatreProfiler.apply_to_building(
+                atlas_building=atlas_building,
+                raw_building=prepared_building,
+            )
             if castle_only and not getattr(
                 atlas_building,
                 "is_castle_building",
@@ -267,6 +278,41 @@ class AtlasFoundationSceneBuilder:
             ):
                 skipped_buildings += 1
                 record_building_rejection("outside_castle_scope")
+                continue
+
+            if getattr(
+                atlas_building,
+                "is_ancient_theatre",
+                False,
+            ):
+                theatre_diagnostics = {}
+
+                stage_mesh = (
+                    AtlasAncientTheatreStageBuilder.build(
+                        raw_building=prepared_building,
+                        coordinate_engine=coordinate_engine,
+                        terrain_mesh=terrain_mesh,
+                        diagnostics=theatre_diagnostics,
+                    )
+                )
+
+                if not stage_mesh:
+                    skipped_buildings += 1
+
+                    record_building_rejection(
+                        theatre_diagnostics.get(
+                            "reason",
+                            "ancient_theatre_stage_failed",
+                        )
+                    )
+
+                    continue
+
+                scene.add_building_mesh(stage_mesh)
+
+                accepted_buildings += 1
+                accepted_main_buildings += 1
+
                 continue
 
             building_diagnostics = {}
