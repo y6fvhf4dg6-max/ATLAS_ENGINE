@@ -11,6 +11,7 @@ from CORE.atlas_foundation_mesh_extruder import (
     AtlasFoundationMeshExtruder,
 )
 from CORE.atlas_mesh_validator import AtlasMeshValidator
+from CORE.atlas_mesh_builder import AtlasMeshBuilder
 
 
 class DummyCoordinateEngine:
@@ -38,12 +39,14 @@ class DummyBuilding:
         estimated_height=8.0,
         min_height=None,
         min_level=None,
+        is_building_part=False,
     ):
         self.geometry = geometry
         self.area_m2 = area_m2
         self.estimated_height = estimated_height
         self.min_height = min_height
         self.min_level = min_level
+        self.is_building_part = is_building_part
 
         self.is_castle_building = False
         self.castle_profile = None
@@ -333,3 +336,166 @@ def test_thick_elevated_part_keeps_original_vertical_range():
     assert mesh["top_z"] == 25.0
     assert mesh["vertical_part_thickness_mm"] == 3.0
     assert mesh["vertical_part_thickness_adjusted"] is False
+
+
+def test_small_building_part_bypasses_area_filter_when_physically_printable():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 1.30),
+            (1.20, 1.30),
+            (1.20, 0.0),
+        ],
+        area_m2=7.5,
+        estimated_height=4.0,
+        is_building_part=True,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is not None
+    assert diagnostics["accepted"] is True
+
+    report = AtlasMeshValidator.report(mesh)
+
+    assert report["valid"] is True
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0
+
+
+def test_small_regular_building_still_uses_area_filter():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 1.30),
+            (1.20, 1.30),
+            (1.20, 0.0),
+        ],
+        area_m2=7.5,
+        estimated_height=4.0,
+        is_building_part=False,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics["reason"] == "building_area_below_minimum"
+
+
+
+def test_tiny_building_part_still_uses_physical_dimension_filter():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 1.30),
+            (0.80, 1.30),
+            (0.80, 0.0),
+        ],
+        area_m2=5.0,
+        estimated_height=4.0,
+        is_building_part=True,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is None
+    assert diagnostics["accepted"] is False
+    assert diagnostics["reason"] == "model_depth_below_minimum"
+
+
+
+def test_legacy_mesh_builder_allows_physically_printable_building_part():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 1.30),
+            (1.20, 1.30),
+            (1.20, 0.0),
+        ],
+        area_m2=7.5,
+        estimated_height=4.0,
+        is_building_part=True,
+    )
+
+    diagnostics = {}
+
+    points = AtlasMeshBuilder.prepare_geometry(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        diagnostics=diagnostics,
+    )
+
+    assert points is not None
+    assert diagnostics == {}
+
+
+def test_building_part_accepts_printable_narrow_column_dimensions():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 1.27),
+            (1.13, 1.27),
+            (1.13, 0.0),
+        ],
+        area_m2=7.5,
+        estimated_height=22.0,
+        is_building_part=True,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is not None
+    assert diagnostics["accepted"] is True
+
+
+def test_legacy_mesh_builder_accepts_printable_narrow_column_dimensions():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 1.27),
+            (1.13, 1.27),
+            (1.13, 0.0),
+        ],
+        area_m2=7.5,
+        estimated_height=22.0,
+        is_building_part=True,
+    )
+
+    diagnostics = {}
+
+    points = AtlasMeshBuilder.prepare_geometry(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        diagnostics=diagnostics,
+    )
+
+    assert points is not None
+    assert diagnostics == {}

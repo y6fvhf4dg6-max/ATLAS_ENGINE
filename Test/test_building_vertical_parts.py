@@ -90,3 +90,45 @@ def test_summary_contains_vertical_part_fields():
 
     assert summary["min_height"] == 22.0
     assert summary["min_level"] == 6
+
+
+def test_building_exposes_building_part_semantics():
+    building = AtlasBuilding(
+        building_id=5001,
+        source="test",
+        geometry=[
+            (39.0, 32.0),
+            (39.0, 32.0001),
+            (39.0001, 32.0001),
+            (39.0001, 32.0),
+        ],
+        tags={
+            "building:part": "yes",
+            "height": "22",
+        },
+    )
+
+    assert building.building_part_type == "yes"
+    assert building.is_building_part is True
+    assert building.building_type is None
+
+
+def test_regular_building_is_not_classified_as_building_part():
+    building = AtlasBuilding(
+        building_id=5002,
+        source="test",
+        geometry=[
+            (39.0, 32.0),
+            (39.0, 32.0001),
+            (39.0001, 32.0001),
+            (39.0001, 32.0),
+        ],
+        tags={
+            "building": "yes",
+            "height": "10",
+        },
+    )
+
+    assert building.building_part_type is None
+    assert building.is_building_part is False
+    assert building.building_type == "yes"

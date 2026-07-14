@@ -18,6 +18,7 @@ class AtlasFoundationFirstPipeline:
         terrain_mesh,
         sample_grid=5,
         embed_depth_mm=0.30,
+        foundation_z_override=None,
         diagnostics=None,
     ):
         temporary_mesh = AtlasMeshBuilder.build_mesh(
@@ -44,20 +45,43 @@ class AtlasFoundationFirstPipeline:
                 "temporary_mesh_bounds_missing",
             )
 
-        foundation_surface = AtlasFoundationSurfaceBuilder.build_surface(
-            terrain_mesh=terrain_mesh,
-            bounds=bounds,
-            sample_grid=sample_grid,
-            embed_depth_mm=embed_depth_mm,
-        )
+        footprint_points = [
+            (point[0], point[1])
+            for point in temporary_mesh.get("bottom", [])
+        ]
 
-        if foundation_surface is None:
-            return AtlasFoundationFirstPipeline._reject(
-                diagnostics,
-                "foundation_surface_failed",
+        if foundation_z_override is None:
+            foundation_surface = AtlasFoundationSurfaceBuilder.build_surface(
+                terrain_mesh=terrain_mesh,
+                bounds=bounds,
+                footprint_points=footprint_points,
+                sample_grid=sample_grid,
+                embed_depth_mm=embed_depth_mm,
             )
 
-        foundation_z = foundation_surface["foundation_z"]
+            if foundation_surface is None:
+                return AtlasFoundationFirstPipeline._reject(
+                    diagnostics,
+                    "foundation_surface_failed",
+                )
+
+            foundation_z = foundation_surface["foundation_z"]
+        else:
+            foundation_z = float(
+                foundation_z_override
+            )
+
+            foundation_surface = {
+                "foundation_z": foundation_z,
+                "reference_z": None,
+                "placement_percentile": None,
+                "sample_mode": "override",
+                "highest_z": None,
+                "lowest_z": None,
+                "average_z": None,
+                "sample_count": 0,
+                "terrain_values": [],
+            }
 
         foundation_mesh = AtlasFoundationMeshBuilder.build(
             footprint_points=temporary_mesh.get("bottom", []),

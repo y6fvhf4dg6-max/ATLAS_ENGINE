@@ -113,6 +113,129 @@ class AtlasFoundationSampler:
         return z0 * (1.0 - ty) + z1 * ty
 
     @staticmethod
+    def sample_polygon(
+        terrain_mesh,
+        footprint_points,
+        sample_grid=5,
+    ):
+        if not footprint_points or len(footprint_points) < 3:
+            return []
+
+        if sample_grid < 2:
+            sample_grid = 2
+
+        xs = [point[0] for point in footprint_points]
+        ys = [point[1] for point in footprint_points]
+
+        min_x = min(xs)
+        max_x = max(xs)
+        min_y = min(ys)
+        max_y = max(ys)
+
+        values = []
+
+        for row in range(sample_grid):
+            y = min_y + (
+                (max_y - min_y)
+                * row
+                / (sample_grid - 1)
+            )
+
+            for col in range(sample_grid):
+                x = min_x + (
+                    (max_x - min_x)
+                    * col
+                    / (sample_grid - 1)
+                )
+
+                if not AtlasFoundationSampler._point_in_polygon(
+                    x=x,
+                    y=y,
+                    polygon=footprint_points,
+                ):
+                    continue
+
+                values.append(
+                    AtlasFoundationSampler.terrain_z_at_xy(
+                        terrain_mesh=terrain_mesh,
+                        x=x,
+                        y=y,
+                    )
+                )
+
+        return values
+
+    @staticmethod
+    def _point_in_polygon(
+        x,
+        y,
+        polygon,
+    ):
+        inside = False
+        count = len(polygon)
+        previous_index = count - 1
+
+        for index in range(count):
+            x1, y1 = polygon[index]
+            x2, y2 = polygon[previous_index]
+
+            if AtlasFoundationSampler._point_on_segment(
+                x=x,
+                y=y,
+                x1=x1,
+                y1=y1,
+                x2=x2,
+                y2=y2,
+            ):
+                return True
+
+            crosses = (
+                (y1 > y) != (y2 > y)
+                and x
+                < (
+                    (x2 - x1)
+                    * (y - y1)
+                    / ((y2 - y1) or 1e-15)
+                    + x1
+                )
+            )
+
+            if crosses:
+                inside = not inside
+
+            previous_index = index
+
+        return inside
+
+    @staticmethod
+    def _point_on_segment(
+        x,
+        y,
+        x1,
+        y1,
+        x2,
+        y2,
+        tolerance=1e-9,
+    ):
+        cross = (
+            (x - x1) * (y2 - y1)
+            - (y - y1) * (x2 - x1)
+        )
+
+        if abs(cross) > tolerance:
+            return False
+
+        return (
+            min(x1, x2) - tolerance
+            <= x
+            <= max(x1, x2) + tolerance
+            and min(y1, y2) - tolerance
+            <= y
+            <= max(y1, y2) + tolerance
+        )
+
+
+    @staticmethod
     def sample_bounds(
         terrain_mesh,
         bounds,

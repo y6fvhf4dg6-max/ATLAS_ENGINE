@@ -23,6 +23,8 @@ class AtlasMeshBuilder:
     MIN_BUILDING_AREA_M2 = 20.0
     MIN_MODEL_WIDTH_MM = 1.20
     MIN_MODEL_DEPTH_MM = 1.20
+    MIN_BUILDING_PART_WIDTH_MM = 1.00
+    MIN_BUILDING_PART_DEPTH_MM = 1.00
     MIN_POINT_COUNT = 4
 
     @staticmethod
@@ -80,7 +82,19 @@ class AtlasMeshBuilder:
                 point_count=len(points),
             )
 
-        if building.area_m2 < AtlasMeshBuilder.MIN_BUILDING_AREA_M2:
+        is_building_part = bool(
+            getattr(
+                building,
+                "is_building_part",
+                False,
+            )
+        )
+
+        if (
+            building.area_m2
+            < AtlasMeshBuilder.MIN_BUILDING_AREA_M2
+            and not is_building_part
+        ):
             return AtlasMeshBuilder._reject(
                 diagnostics,
                 "building_area_below_minimum",
@@ -116,20 +130,32 @@ class AtlasMeshBuilder:
         width_mm = bounds["max_x"] - bounds["min_x"]
         depth_mm = bounds["max_y"] - bounds["min_y"]
 
-        if width_mm < AtlasMeshBuilder.MIN_MODEL_WIDTH_MM:
+        minimum_width_mm = (
+            AtlasMeshBuilder.MIN_BUILDING_PART_WIDTH_MM
+            if is_building_part
+            else AtlasMeshBuilder.MIN_MODEL_WIDTH_MM
+        )
+
+        minimum_depth_mm = (
+            AtlasMeshBuilder.MIN_BUILDING_PART_DEPTH_MM
+            if is_building_part
+            else AtlasMeshBuilder.MIN_MODEL_DEPTH_MM
+        )
+
+        if width_mm < minimum_width_mm:
             return AtlasMeshBuilder._reject(
                 diagnostics,
                 "model_width_below_minimum",
                 model_width_mm=width_mm,
-                minimum_width_mm=AtlasMeshBuilder.MIN_MODEL_WIDTH_MM,
+                minimum_width_mm=minimum_width_mm,
             )
 
-        if depth_mm < AtlasMeshBuilder.MIN_MODEL_DEPTH_MM:
+        if depth_mm < minimum_depth_mm:
             return AtlasMeshBuilder._reject(
                 diagnostics,
                 "model_depth_below_minimum",
                 model_depth_mm=depth_mm,
-                minimum_depth_mm=AtlasMeshBuilder.MIN_MODEL_DEPTH_MM,
+                minimum_depth_mm=minimum_depth_mm,
             )
 
         if len(scaled_points) < 3:

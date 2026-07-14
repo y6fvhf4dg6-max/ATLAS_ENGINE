@@ -30,6 +30,21 @@ class AtlasInputQualityReport:
         terrain_grid = terrain_grid or {}
         castle_focus_result = castle_focus_result or {}
 
+        main_buildings = []
+        building_parts = []
+
+        for building in buildings:
+            tags = building.get(
+                "tags",
+                {},
+            )
+
+            if tags.get("building") is not None:
+                main_buildings.append(building)
+
+            if tags.get("building:part") is not None:
+                building_parts.append(building)
+
         geometry_records = list(buildings) + list(castles)
 
         issue_counts = {
@@ -70,11 +85,12 @@ class AtlasInputQualityReport:
             else 100.0
         )
 
-        building_count = len(buildings)
+        building_count = len(main_buildings)
+        building_part_count = len(building_parts)
 
         height_count = sum(
             1
-            for building in buildings
+            for building in main_buildings
             if AtlasInputQualityReport._has_height(
                 building
             )
@@ -82,7 +98,7 @@ class AtlasInputQualityReport:
 
         roof_count = sum(
             1
-            for building in buildings
+            for building in main_buildings
             if AtlasInputQualityReport._has_roof(
                 building
             )
@@ -108,7 +124,7 @@ class AtlasInputQualityReport:
             for issue_name in semantic_issue_counts
         }
 
-        for building in buildings:
+        for building in main_buildings:
             building_issues = (
                 AtlasInputQualityReport
                 ._classify_building_semantic_issues(
@@ -284,6 +300,7 @@ class AtlasInputQualityReport:
             },
             "semantics": {
                 "building_count": building_count,
+                "building_part_count": building_part_count,
                 "height_count": height_count,
                 "roof_count": roof_count,
                 "height_coverage_percent": (

@@ -568,3 +568,684 @@ Bugünün ana kazanımları:
 Bir sonraki çalışma noktası:
 
 > Hohenzollern şapel ve uzun kanat binalarının mevcut çatı karar akışını incelemek ve genel Castle Engine’i bozmadan eğimli/gable çatı sistemini geliştirmek.
+
+---
+
+## 12. 14 Temmuz 2026 — Foundation-First ve Anıtkabir Çalışmaları
+
+Castle Engine çalışmaları dondurulduktan sonra ana odak, genel şehir ve anıtsal yapı motorunun Foundation-First mimarisi üzerinde geliştirilmesine çevrildi.
+
+Bu çalışmanın temel amacı yalnızca Anıtkabir’i düzeltmek değil; eğimli arazide bulunan bütün bina, platform, merdiven, anıt, heykel ve tarihî yapı bileşenlerinin dünya genelinde kullanılabilecek genel kurallarla üretilmesini sağlamaktır.
+
+Castle Engine kodu bu süreçte değiştirilmedi.
+
+---
+
+## 13. Foundation Placement Sisteminin Düzeltilmesi
+
+Binaların yalnızca tek bir terrain noktasına göre yerleştirilmesi, özellikle geniş veya U biçimli footprint’lerde bazı yapıların arazi içine gömülmesine neden oluyordu.
+
+Bu sorun için footprint-aware terrain örnekleme sistemi geliştirildi.
+
+Yapılan değişiklikler:
+
+- `CORE/atlas_foundation_sampler.py` genişletildi
+- poligon içinden terrain örneği alınması sağlandı
+- poligon sınırındaki noktalar hesaba katıldı
+- tek nokta yerine footprint genelini temsil eden terrain değerleri kullanılmaya başlandı
+- aşırı yüksek veya düşük tekil örneklerin etkisini azaltmak için robust referans politikası eklendi
+- placement metadata kayıtları geliştirildi
+
+Yeni metadata alanları:
+
+- `reference_z`
+- `placement_percentile`
+- `sample_mode`
+
+Foundation surface builder gerçek footprint noktalarını kullanacak şekilde güncellendi.
+
+Bu değişiklik sonucunda Anıtkabir çevresindeki U biçimli ve geniş yapıların terrain içine gömülme sorunu giderildi.
+
+---
+
+## 14. Elevated Pedestrian Area Okuma Sistemi
+
+Anıtkabir’de merdiven, platform ve terasların önemli bir bölümü OSM verisinde bina olarak değil şu biçimde tutuluyordu:
+
+    highway=pedestrian
+    area=yes
+    height=<pozitif değer>
+
+Bu kayıtlar daha önce normal pedestrian path olarak okunuyor ve üç boyutlu yapı hâline getirilmiyordu.
+
+`CORE/atlas_local_osm_reader.py` içinde yeni elevated-area okuma sistemi geliştirildi.
+
+Eklenen davranışlar:
+
+- kapalı `highway=pedestrian` alanları tespit edildi
+- `area=yes` şartı eklendi
+- yalnızca pozitif ve sayısal `height` değerleri kabul edildi
+- bu kayıtlar normal pedestrian path listesinden ayrıldı
+- yeni `elevated_areas` veri grubu oluşturuldu
+- engine sonuç raporuna `reader_elevated_areas` alanı eklendi
+
+Anıtkabir fixture’ında:
+
+    elevated area sayısı : 57
+    pedestrian path sayısı: 32
+
+olarak doğrulandı.
+
+Bu ayrım sayesinde merdiven ve platform kayıtları, yol yüzeyi yerine gerçek hacimli geometriler olarak işlenebilir hâle geldi.
+
+---
+
+## 15. Elevated Area Foundation Builder
+
+Yeni dosya oluşturuldu:
+
+    CORE/atlas_elevated_area_foundation_builder.py
+
+Builder’ın temel görevleri:
+
+- elevated-area poligonlarını terrain üzerine yerleştirmek
+- düz üst yüzey üretmek
+- kapalı ve manifold hacim oluşturmak
+- iç içe elevated-area kayıtlarında parent/child ilişkisi kurmak
+- ardışık basamakların gerçek yükseklik farkını korumak
+
+Parent seçimi şu genel kurallarla yapılıyor:
+
+- parent poligonu child’dan daha büyük olmalı
+- parent yüksekliği child yüksekliğinden düşük olmalı
+- child merkez noktası parent poligonu içinde bulunmalı
+- birden fazla aday varsa en küçük kapsayıcı parent seçilmeli
+
+Child alanların terrain’den yeniden başlaması engellendi.
+
+Yeni davranış:
+
+    child bottom Z = parent top Z
+    child top Z    = parent top Z + ölçeklenmiş yükseklik farkı
+
+Bu sayede iç içe OSM platformları bağımsız dev bloklar yerine birbirine bağlı kademeler olarak üretildi.
+
+---
+
+## 16. Basamak Yüksekliği Hatasının Düzeltilmesi
+
+İlk elevated-area sürümünde her child basamağa minimum yazdırılabilir kalınlık uygulanıyordu.
+
+Bu davranış gerçek ölçekte 0,25 metre olan bir basamağı yaklaşık:
+
+    gerçek ölçeklenmiş değer : 0,045 mm
+    önceki zorunlu değer     : 0,180 mm
+
+yüksekliğe çıkarıyordu.
+
+Sonuç olarak merdivenler yaklaşık dört kat fazla yükseliyor ve yapı silueti bozuluyordu.
+
+Bu hata giderildi.
+
+Child alanlarda artık:
+
+    height_increment_mm =
+        child_height_mm - parent_height_mm
+
+değeri korunuyor.
+
+Minimum yazdırılabilir kalınlık yalnızca terrain üzerine doğrudan oturan bağımsız kök alanlarda kullanılıyor.
+
+Bu değişiklikten sonra:
+
+- Aslanlı Yol giriş basamakları oluştu
+- tören alanına çıkan basamaklar okunabilir hâle geldi
+- mozole giriş merdivenleri gerçek kademelerine yaklaştı
+- platformlar ayrı hacimler olarak görünmeye başladı
+
+---
+
+## 17. Root Elevated Area Terrain Referansı
+
+Terrain üzerine doğrudan oturan büyük elevated-area poligonlarında ilk politika şuydu:
+
+    top_z = highest_terrain_z + printable_height
+
+Bu yöntem poligon içindeki tek bir yüksek terrain köşesinin bütün platformu yukarı taşımasına neden oluyordu.
+
+Örnek sorunlu kayıt:
+
+    OSM ID       : 396671950
+    height       : 1.25 m
+    footprint    : yaklaşık 16.660 × 17.197 mm
+    terrain farkı: yaklaşık 1.350 mm
+    maksimum duvar yüksekliği: yaklaşık 1.577 mm
+
+Bu nedenle bazı platformlarda gereksiz yüksek istinat duvarları oluşuyordu.
+
+MAX, P90, median ve merkez terrain referansları karşılaştırıldı.
+
+Karar:
+
+- kök elevated-area üst kotu median terrain değerinden hesaplanacak
+- üst yüzeyin üzerinde kalan terrain noktaları sınırlandırılacak
+- minimum fiziksel kalınlık korunacak
+- platform terrain içine kontrollü biçimde gömülebilecek
+
+Yeni metadata:
+
+- `terrain_reference_mode`
+- `terrain_reference_z`
+- `highest_terrain_z`
+
+Yeni root politikası:
+
+    terrain_reference_mode = median
+
+Bu değişiklik sonucunda büyük platformların terrain tabanına kadar uzanan gereksiz duvarları önemli ölçüde azaldı.
+
+---
+
+## 18. Artwork ve Heykel Okuma Sistemi
+
+Anıtkabir’deki Aslanlı Yol heykellerinin bina veya alan geometrisi olmadığı tespit edildi.
+
+OSM kayıt biçimleri:
+
+    tourism=artwork
+    artwork_type=statue
+    statue=animal
+
+Anıtkabir fixture’ında:
+
+    hayvan heykeli : 24
+    diğer artwork  : 2
+    toplam artwork : 26
+
+olarak bulundu.
+
+`CORE/atlas_local_osm_reader.py` içine artwork node desteği eklendi.
+
+Her artwork kaydında şu bilgiler korunuyor:
+
+- OSM ID
+- latitude
+- longitude
+- geometry type
+- bütün OSM tag’leri
+- artwork type
+- statue type
+- name
+
+Reader sonucu içine yeni grup eklendi:
+
+    artworks
+
+Artwork kayıtları bina alan filtresinden bağımsız çalışıyor.
+
+Bu özellikle küçük heykel, anıt, sütun ve benzeri noktasal tarihî öğeler için genel bir altyapı oluşturdu.
+
+---
+
+## 19. Artwork Foundation Builder
+
+Yeni dosya oluşturuldu:
+
+    CORE/atlas_artwork_foundation_builder.py
+
+İlk sürümün görevi artwork node’larını terrain üzerine kapalı ve yazdırılabilir küçük hacimler olarak yerleştirmekti.
+
+İlk profiller:
+
+    animal_statue:
+        width  = 0.90 mm
+        depth  = 1.40 mm
+        height = 1.00 mm
+
+    generic_statue:
+        width  = 0.90 mm
+        depth  = 0.90 mm
+        height = 1.40 mm
+
+Üretilen her artwork mesh’i:
+
+- terrain Z değerine oturuyor
+- kapalı hacim oluşturuyor
+- 12 üçgen içeriyor
+- open edge üretmiyor
+- non-manifold edge üretmiyor
+- bina alan filtresinden etkilenmiyor
+
+Builder ana Foundation-First engine’e bağlandı.
+
+Yeni engine rapor alanları:
+
+- `reader_artworks`
+- `artwork_meshes`
+
+Yeni mesh grubu:
+
+    mesh_groups["artworks"]
+
+---
+
+## 20. Hayvan Heykeli Yönlendirmesi
+
+İlk artwork meshleri doğru koordinatlarda fakat dünya X/Y eksenlerine paralel dikdörtgen bloklar olarak görünüyordu.
+
+Aslanlı Yol heykelleri analiz edildi.
+
+Sonuç:
+
+    toplam heykel : 24
+    sıra sayısı   : 2
+    yol doğrultusu: yaklaşık -52.478 derece
+    sıra uzaklığı : yaklaşık ±2.1 mm
+
+Genel ve Anıtkabir’e özel olmayan bir yönlendirme politikası geliştirildi.
+
+Her `animal_statue` için:
+
+- en yakın aynı profilli artwork bulunuyor
+- iki nokta arasındaki eksen hesaplanıyor
+- açı `-90° ile +90°` aralığında normalize ediliyor
+- footprint bu eksene göre döndürülüyor
+
+Bu sayede Aslanlı Yol’daki iki heykel sırası yol doğrultusuna paralel hâle geldi.
+
+Aslanlar henüz ayrıntılı hayvan geometrisi değil, ölçeklenmiş ve yönlendirilmiş düşük detaylı hacimlerdir.
+
+Ayrıntılı heykel profili daha sonraki bir geliştirme aşamasına bırakıldı.
+
+---
+
+## 21. Anıtkabir Elevated-Area Geometri Teşhisi
+
+Anıtkabir ana merdivenlerinde yelpaze veya ışın biçiminde çizgiler görüldü.
+
+İlk olası nedenler ayrı ayrı araştırıldı:
+
+- terrain çakışması
+- bina çakışması
+- eş düzlemli yüzeyler
+- STL görüntüleyici z-fighting
+- parent/child taban çakışması
+- yanlış parent ilişkisi
+- aşırı yüksek root platformlar
+
+Yalnızca elevated-area meshlerinden oluşan ayrı STL üretildi:
+
+    OUTPUT/STL/anitkabir_elevated_areas_only.stl
+
+İzole STL sonucu:
+
+    elevated mesh : 55
+    triangles     : 6208
+
+Yelpaze biçimlerinin bu izole STL’de de bulunduğu doğrulandı.
+
+Böylece sorunların:
+
+- terrain’den
+- binalardan
+- artwork meshlerinden
+- genel STL katman çakışmasından
+
+kaynaklanmadığı kesinleşti.
+
+---
+
+## 22. İç İçe Basamak Poligonlarının Yapısı
+
+Basamak zincirindeki parent ve child poligonlar ayrıntılı biçimde karşılaştırıldı.
+
+Ana zincir:
+
+    1.25 m
+    1.50 m
+    1.75 m
+    2.00 m
+    ...
+    11.50 m
+
+seviyelerine kadar ilerliyor.
+
+Zincirin büyük bölümünde child poligonlar parent poligonun:
+
+    yüzde 80–94
+
+oranında aynı sınırlarını tekrar kullanıyor.
+
+Birçok seviyede:
+
+- 50’den fazla child kenarı bulunuyor
+- bunların yalnızca 2–7 tanesi yeni kenar
+- kalan kenarlar parent sınırıyla ortak
+- her yeni seviyede genellikle yalnızca birkaç köşe geri çekiliyor
+
+Örnek:
+
+    height       : 1.50 m
+    child edges  : 67
+    shared edges : 63
+    new edges    : 4
+    shared ratio : %94.0
+
+Başka bir örnek:
+
+    height       : 7.25 m
+    child edges  : 28
+    shared edges : 26
+    new edges    : 2
+    shared ratio : %92.9
+
+Bu sonuç, OSM kayıtlarının ayrı basamak şeritleri değil, birikimli üst platform poligonları olduğunu gösterdi.
+
+Ham OSM poligonları her seviyede birkaç köşe kaybederek küçülüyor.
+
+Builder bu ham sınırları aynen hacme dönüştürdüğü için bazı seviyelerde düz basamak cephesi yerine tek noktaya yönelen yelpaze biçimleri oluşuyor.
+
+---
+
+## 23. Ortak Parent Kenarı Metadata Sistemi
+
+Child poligon kenarlarının parent sınırında bulunup bulunmadığını belirleyen genel geometri fonksiyonları eklendi.
+
+Yeni yardımcı fonksiyonlar:
+
+- `_edge_lies_on_polygon_boundary`
+- `_point_lies_on_segment`
+
+Bu sistem yalnızca uç noktaları birebir aynı olan kenarları değil, daha uzun bir parent kenarının üzerinde kısmen bulunan child kenarlarını da ortak sınır olarak kabul ediyor.
+
+Yeni mesh metadata alanları:
+
+- `shared_parent_edge_count`
+- `new_step_edge_count`
+- `shared_parent_edge_indices`
+- `new_step_edge_indices`
+
+Bu metadata şu aşamada geometriyi değiştirmiyor.
+
+Ama bir sonraki geliştirmede:
+
+- gerçek yeni basamak cephesini
+- parent ile ortak dış sınırı
+- yapısal geçiş seviyelerini
+
+birbirinden ayırmak için kullanılacak.
+
+---
+
+## 24. Parent Embed Deneyi ve Geri Alınması
+
+Yelpaze çizgilerinin eş düzlemli parent ve child yüzeylerinden kaynaklanabileceği ihtimali test edildi.
+
+Geçici olarak şu sabit eklendi:
+
+    PARENT_EMBED_MM = 0.01
+
+Child mesh alt yüzeyi parent üst yüzeyinden 0,01 mm aşağı gömüldü.
+
+Bu deney:
+
+- basamak üst kotunu değiştirmedi
+- child yükseklik farkını korudu
+- regresyon testlerinden geçti
+
+Ancak görsel sonuçta yelpaze biçimleri devam etti.
+
+Daha sonra şüpheli üst yüzeylerde dihredral açı analizi yapıldı.
+
+Sonuç:
+
+    non_coplanar = 0
+    max_angle    = 0.000000°
+
+Bu, yelpaze veya ışın biçiminde görünen çizgilerin gerçek yüzey kırıkları olmadığını; tamamen düz üst yüzeylerin triangülasyon kenarları olduğunu doğruladı.
+
+Bu nedenle:
+
+- `PARENT_EMBED_MM` çözüm olarak kabul edilmedi
+- gereksiz parent/child örtüşmesi oluşturduğu için geri alındı
+- child tabanı tekrar doğrudan parent üst kotundan başlatıldı
+- ilgili regresyon testi eski doğru davranışa döndürüldü
+
+Güncel durumda kodda `PARENT_EMBED_MM` bulunmamaktadır.
+
+---
+
+## 25. Building Part ve Anıtsal Yapı İstisnası
+
+Anıtkabir fixture’ında 53 adet `building:part` way bulundu.
+
+Bunların önemli bir bölümü:
+
+- kolon
+- pilaster
+- yatay yapı parçası
+- küçük anıtsal mimari öğe
+
+niteliğindedir.
+
+Mevcut reader yalnızca doğrudan `building=*` etiketi bulunan kayıtları normal bina olarak kabul ediyor.
+
+Ayrıca genel şehir politikası:
+
+    MIN_BUILDING_AREA_M2 = 20.0
+
+olarak korunuyor.
+
+Karar:
+
+- normal binalar için 20 m² filtresi değişmeyecek
+- tarihî ve anıtsal kompleks parçaları için genel bir istisna sistemi geliştirilecek
+- istisna OSM ID hard-code’u kullanmayacak
+- fiziksel minimum genişlik, derinlik ve yükseklik kontrolü uygulanacak
+- geçerli küçük mimari parçalar ana bina motoruna dahil edilecek
+
+Anıtkabir’de görülen havada kalan yatay `building:part` ve eksik kolonlar bu aşamada henüz çözülmedi.
+
+Bu çalışma elevated-area ve artwork sistemleri tamamlandıktan sonra ele alınacak.
+
+---
+
+## 26. Test Durumu
+
+Bu çalışma sırasında yeni regresyon testleri eklendi.
+
+Başlıca test dosyaları:
+
+- `Test/test_foundation_surface_builder.py`
+- `Test/test_local_osm_reader_elevated_areas.py`
+- `Test/test_elevated_area_foundation_builder.py`
+- `Test/test_local_osm_reader_artworks.py`
+- `Test/test_artwork_foundation_builder.py`
+
+Doğrulanan davranışlar:
+
+- footprint-aware foundation placement
+- elevated-area reader ayrımı
+- parent/child platform ilişkisi
+- gerçek ölçeklenmiş basamak farkı
+- median terrain referansı
+- yüksek terrain noktalarının sınırlandırılması
+- artwork node okuma
+- kapalı artwork mesh üretimi
+- animal statue yönlendirmesi
+- ortak parent sınırlarının tespiti
+- child tabanının doğrudan parent üst kotundan başlaması
+- düz elevated-area üst yüzeylerinin coplanar olması
+
+Şüpheli üst yüzeylerde yapılan dihredral açı analizinde:
+
+    non_coplanar = 0
+    max_angle    = 0.000000°
+
+sonucu alındı.
+
+Son tam regresyon sonucu:
+
+    130 passed in 0.48s
+
+Bu aşamada test paketi temizdir.
+
+---
+
+
+## 27. Henüz Commit Edilmemiş Çalışmalar
+
+Foundation-First, elevated-area ve artwork geliştirmeleri çalışma ağacında bulunmaktadır.
+
+Bu bölüm için henüz nihai commit oluşturulmadı.
+
+Elevated-area yelpaze çizgileri üzerindeki teknik inceleme tamamlandı:
+
+- izole elevated-area STL üretildi
+- sorunlu seviyelerin yeni kenarları ölçüldü
+- üst yüzeylerde dihredral açı analizi yapıldı
+- bütün şüpheli üst yüzeylerin coplanar olduğu doğrulandı
+- `PARENT_EMBED_MM` deneyi geri alındı
+- elevated-area geometrisini yalnızca triangülasyon çizgileri nedeniyle değiştirmeme kararı alındı
+
+Commit öncesinde yapılması gerekenler:
+
+1. durum dosyasındaki son teknik sonuçları doğrulamak
+2. küçük anıtsal `building:part` çalışmalarını tamamlamak
+3. Anıtkabir görsel sonucunu yeniden doğrulamak
+4. tam pytest paketini çalıştırmak
+5. eski şehir ve kale fixture’larını doğrulamak
+6. `git diff --check` çalıştırmak
+7. değişiklikleri mantıksal commit gruplarına ayırmak
+8. kontrollü commit oluşturmak
+
+Castle Engine mantığı bu süreçte değiştirilmedi.
+
+---
+
+
+## 28. Mevcut Kesin Teşhis
+
+Anıtkabir ana merdivenlerinde görülen yelpaze veya ışın biçimli çizgiler ayrıntılı olarak incelendi.
+
+Yalnızca elevated-area meshlerinden oluşan ayrı STL üretildi:
+
+    OUTPUT/STL/anitkabir_elevated_areas_only.stl
+
+Bu STL:
+
+    elevated mesh : 55
+    triangles     : 6208
+
+içermektedir.
+
+Şüpheli seviyelerdeki üst yüzey üçgenlerinin komşu yüzey normalleri karşılaştırıldı.
+
+Sonuç:
+
+    non_coplanar = 0
+    max_angle    = 0.000000°
+
+Kesin teşhis:
+
+> Yelpaze veya ışın biçiminde görünen çizgiler gerçek yüzey kırıkları, oluklar ya da basamak cepheleri değildir. Tamamen düz ve coplanar üst yüzeylerin STL triangülasyon kenarlarıdır.
+
+Bu çizgiler STL görüntüleyicinin üçgen sınırlarını göstermesi nedeniyle görünür.
+
+Fiziksel baskıda:
+
+- ek basamak oluşturmaz
+- oluk oluşturmaz
+- kabartı oluşturmaz
+- yüzey eğimi oluşturmaz
+
+Bu nedenle elevated-area poligonlarını yalnızca bu çizgileri kaldırmak amacıyla değiştirmemek kararı alındı.
+
+Sorun değildir:
+
+- terrain örnekleme
+- root platform yüksekliği
+- parent seçimi
+- child yükseklik farkı
+- bina çakışması
+- artwork çakışması
+- STL writer
+- z-fighting
+- parent/child alt yüzey eş düzlemliliği
+- gerçek non-coplanar yüzey kırığı
+
+---
+
+
+## 29. Son Kalınan Nokta
+
+Sorunlu elevated-area seviyelerindeki yeni kenarların uzunluk ve açı analizi tamamlandı.
+
+İncelenen seviyeler:
+
+    1.50 m
+    4.25 m
+    7.00 m
+    8.50 m
+    9.25 m
+    9.50 m
+
+Bu seviyelerde parent sınırında bulunmayan child kenarları çıkarıldı ve ölçüldü.
+
+Ölçülen bilgiler:
+
+- edge index
+- başlangıç koordinatı
+- bitiş koordinatı
+- uzunluk
+- normalize edilmiş açı
+
+Analiz, bazı poligonların birkaç uzun kenarı ortak bir noktada birleştirdiğini gösterdi. Ancak daha sonra yapılan yüzey normali analizi, görüntüleyicideki yelpaze çizgilerinin bu sınırların oluşturduğu gerçek kırıklar olmadığını kesinleştirdi.
+
+`PARENT_EMBED_MM = 0.01` deneyi geri alındı.
+
+Güncel doğru davranış:
+
+    child bottom Z = parent top Z
+
+Elevated-area sistemi şu anda:
+
+- parent/child zincirini doğru kuruyor
+- gerçek ölçeklenmiş yükseklik farkını koruyor
+- root alanlarda median terrain referansı kullanıyor
+- kapalı ve manifold mesh üretiyor
+- düz üst yüzeyleri coplanar üretiyor
+
+Son tam regresyon:
+
+    130 passed in 0.48s
+
+---
+
+
+## 30. Güncel Çalışma Önceliği
+
+Elevated-area yelpaze çizgileri artık motor hatası olarak değerlendirilmemektedir.
+
+Bir sonraki çalışma noktası:
+
+> Anıtkabir’de eksik kalan küçük anıtsal `building:part` kayıtlarını genel bina motoruna dahil edecek, normal şehir binalarındaki 20 m² alan filtresini bozmayan semantik ve fiziksel istisna sistemini geliştirmek.
+
+Öncelik sırası:
+
+1. `building:part` kayıtlarının reader karar akışını incelemek
+2. küçük anıtsal parçalar için genel kabul kriterlerini tanımlamak
+3. normal binalar için `MIN_BUILDING_AREA_M2 = 20.0` politikasını korumak
+4. minimum fiziksel genişlik, derinlik ve yükseklik kontrollerini eklemek
+5. kolon ve pilaster niteliğindeki parçaları sınıflandırmak
+6. havada kalan yatay yapı parçasının parent/body bağlantısını çözmek
+7. Anıtkabir görsel doğrulamasını tekrarlamak
+8. artwork/aslan profilinin fiziksel baskı değerlendirmesini yapmak
+9. tam regresyonu çalıştırmak
+10. eski şehir ve kale fixture’larını yeniden doğrulamak
+11. `git diff --check` çalıştırmak
+12. değişiklikleri kontrollü biçimde commit etmek
+
+Temel ilke korunmaktadır:
+
+> Anıtkabir’de bulunan hiçbir sorun yalnızca Anıtkabir’e özel biçimde çözülmeyecektir. Her çözüm ana motora genellenecek, regresyon testine dönüştürülecek ve önceki gerçek sahnelerde yeniden doğrulanacaktır.

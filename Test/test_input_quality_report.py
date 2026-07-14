@@ -1062,3 +1062,53 @@ def test_input_quality_report_groups_semantic_issues_by_severity():
     assert severity_issues["FAIL"] == {
         "relation_missing_outer_geometry": 1,
     }
+
+
+def test_building_parts_are_counted_separately_from_main_buildings():
+    buildings = [
+        {
+            "id": 9001,
+            "geometry": [
+                (39.0, 32.0),
+                (39.0, 32.001),
+                (39.001, 32.001),
+                (39.001, 32.0),
+            ],
+            "tags": {
+                "building": "yes",
+                "height": "10",
+            },
+        },
+        {
+            "id": 9002,
+            "geometry": [
+                (39.0, 32.0),
+                (39.0, 32.0001),
+                (39.0001, 32.0001),
+                (39.0001, 32.0),
+            ],
+            "tags": {
+                "building:part": "yes",
+                "height": "22",
+            },
+        },
+    ]
+
+    report = AtlasInputQualityReport.build(
+        buildings=buildings,
+        castles=[],
+        castle_geometry={},
+        terrain_grid={},
+        castle_focus_result={},
+    )
+
+    semantics = report["semantics"]
+
+    assert semantics["building_count"] == 1
+    assert semantics["building_part_count"] == 1
+
+    assert semantics["height_count"] == 1
+    assert semantics["height_coverage_percent"] == 100.0
+
+    assert semantics["roof_count"] == 0
+    assert semantics["roof_coverage_percent"] == 0.0

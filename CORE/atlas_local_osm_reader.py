@@ -27,6 +27,8 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         self.trees = []
         self.roads = []
         self.pedestrian_paths = []
+        self.elevated_areas = []
+        self.artworks = []
         self.parks = []
         self.waters = []
         self.coastlines = []
@@ -75,6 +77,21 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                     "tags": tags,
                 }
             )
+
+        if self._is_artwork(tags):
+            self.artworks.append(
+                {
+                    "id": n.id,
+                    "lat": lat,
+                    "lon": lon,
+                    "geometry_type": "node",
+                    "tags": tags,
+                    "artwork_type": tags.get("artwork_type"),
+                    "statue_type": tags.get("statue"),
+                    "name": tags.get("name"),
+                }
+            )
+
         if self._is_defensive_tower(tags):
             self.defensive_towers.append(
                 {
@@ -85,6 +102,16 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                     "tags": tags,
                 }
             )
+
+    @staticmethod
+    def _is_artwork(tags):
+        if tags.get("tourism") != "artwork":
+            return False
+
+        return tags.get("artwork_type") in {
+            "statue",
+            "sculpture",
+        }
 
     def way(self, w):
         tags = dict(w.tags)
@@ -105,7 +132,10 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             self._read_defensive_tower(w, tags)
             return
 
-        if "building" in tags:
+        if (
+            "building" in tags
+            or "building:part" in tags
+        ):
             self._read_building(w, tags)
             return
 
@@ -115,6 +145,10 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
 
         if self._is_water(tags):
             self._read_water(w, tags)
+            return
+
+        if self._is_elevated_area(tags):
+            self._read_elevated_area(w, tags)
             return
 
         if "highway" in tags:
@@ -186,6 +220,52 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                 "tags": tags,
             }
         )
+
+    def _read_elevated_area(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 4:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        if len(geometry) < 3:
+            return
+
+        try:
+            height_m = float(tags.get("height"))
+        except (TypeError, ValueError):
+            return
+
+        if height_m <= 0.0:
+            return
+
+        self.elevated_areas.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tags": tags,
+                "height_m": height_m,
+                "area_type": "elevated_pedestrian_area",
+            }
+        )
+
+    @staticmethod
+    def _is_elevated_area(tags):
+        if tags.get("highway") != "pedestrian":
+            return False
+
+        if tags.get("area") != "yes":
+            return False
+
+        try:
+            return float(tags.get("height")) > 0.0
+        except (TypeError, ValueError):
+            return False
 
     def _read_highway(self, w, tags):
         geometry = self._extract_way_geometry(w)
@@ -723,6 +803,8 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             "trees": reader.trees,
             "roads": reader.roads,
             "pedestrian_paths": reader.pedestrian_paths,
+            "elevated_areas": reader.elevated_areas,
+            "artworks": reader.artworks,
             "parks": reader.parks,
             "waters": reader.waters,
             "coastlines": reader.coastlines,

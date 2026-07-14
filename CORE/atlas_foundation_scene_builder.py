@@ -19,6 +19,9 @@ from CORE.atlas_castle_building_profiler import (
 from CORE.atlas_castle_footprint_regularizer import (
     AtlasCastleFootprintRegularizer,
 )
+from CORE.atlas_building_part_hierarchy_profiler import (
+    AtlasBuildingPartHierarchyProfiler,
+)
 
 
 class AtlasFoundationSceneBuilder:
@@ -61,6 +64,54 @@ class AtlasFoundationSceneBuilder:
         if castles is None:
             castles = []
 
+        building_part_hierarchy = (
+            AtlasBuildingPartHierarchyProfiler.analyze(
+                raw_buildings
+            )
+        )
+
+        mesh_buildings = building_part_hierarchy[
+            "mesh_buildings"
+        ]
+
+        if debug:
+            hierarchy_summary = building_part_hierarchy[
+                "summary"
+            ]
+
+            print()
+            print("=" * 70)
+            print("ATLAS BUILDING PART HIERARCHY REPORT")
+            print("=" * 70)
+            print(
+                "Parents with parts       : "
+                f"{hierarchy_summary['parent_with_parts_count']}"
+            )
+            print(
+                "Assigned building parts  : "
+                f"{hierarchy_summary['assigned_building_part_count']}"
+            )
+            print(
+                "Unassigned building parts: "
+                f"{hierarchy_summary['unassigned_building_part_count']}"
+            )
+            print(
+                "Parent part counts       : "
+                f"{hierarchy_summary['parent_part_counts']}"
+            )
+            print(
+                "Suppressed parents       : "
+                f"{hierarchy_summary['suppressed_parent_count']}"
+            )
+            print(
+                "Suppressed parent IDs    : "
+                f"{building_part_hierarchy['suppressed_parent_ids']}"
+            )
+            print(
+                "Mesh building records    : "
+                f"{hierarchy_summary['mesh_building_count']}"
+            )
+
         scene = AtlasScene(
             bbox=bbox,
             target_size_mm=target_size_mm,
@@ -73,6 +124,9 @@ class AtlasFoundationSceneBuilder:
         )
 
         accepted_buildings = 0
+        accepted_main_buildings = 0
+        accepted_building_parts = 0
+        rejected_building_parts = 0
         skipped_buildings = 0
         castle_buildings = 0
 
@@ -95,9 +149,76 @@ class AtlasFoundationSceneBuilder:
         multi_gable_roof_count = 0
         multi_gable_piece_count = 0
 
-        for raw_building in raw_buildings:
+        suppressed_parent_ids = set(
+            building_part_hierarchy[
+                "suppressed_parent_ids"
+            ]
+        )
+
+        parent_foundation_z_cache = {}
+
+        for parent_id in suppressed_parent_ids:
+            parent_data = building_part_hierarchy[
+                "parents"
+            ].get(parent_id)
+
+            if not parent_data:
+                continue
+
+            raw_parent = parent_data["parent"]
+
+            prepared_parent = (
+                AtlasCastleFootprintRegularizer.prepare(
+                    raw_building=raw_parent,
+                    castles=castles,
+                )
+            )
+
+            atlas_parent = (
+                AtlasSceneBuilder._to_atlas_building(
+                    prepared_parent
+                )
+            )
+
+            atlas_parent = (
+                AtlasCastleBuildingProfiler.apply_to_building(
+                    atlas_building=atlas_parent,
+                    raw_building=prepared_parent,
+                    castles=castles,
+                )
+            )
+
+            parent_diagnostics = {}
+
+            parent_reference_mesh = (
+                AtlasFoundationFirstPipeline.build_building_mesh(
+                    building=atlas_parent,
+                    coordinate_engine=coordinate_engine,
+                    terrain_mesh=terrain_mesh,
+                    sample_grid=5,
+                    embed_depth_mm=0.30,
+                    diagnostics=parent_diagnostics,
+                )
+            )
+
+            if parent_reference_mesh is None:
+                continue
+
+            parent_foundation_z_cache[parent_id] = (
+                parent_reference_mesh["foundation_z"]
+            )
+
+        for raw_building in mesh_buildings:
             if max_buildings is not None and accepted_buildings >= max_buildings:
                 break
+
+            raw_tags = raw_building.get(
+                "tags",
+                {},
+            )
+            is_building_part = (
+                raw_tags.get("building:part") is not None
+            )
 
             if bbox is not None and not (
                 AtlasFoundationSceneBuilder._geometry_intersects_bbox(
@@ -141,17 +262,37 @@ class AtlasFoundationSceneBuilder:
 
             building_diagnostics = {}
 
+            foundation_z_override = None
+
+            if is_building_part:
+                parent_id = building_part_hierarchy[
+                    "part_to_parent"
+                ].get(
+                    raw_building.get("id")
+                )
+
+                foundation_z_override = (
+                    parent_foundation_z_cache.get(
+                        parent_id
+                    )
+                )
+
             mesh = AtlasFoundationFirstPipeline.build_building_mesh(
                 building=atlas_building,
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_mesh,
                 sample_grid=5,
                 embed_depth_mm=0.30,
+                foundation_z_override=foundation_z_override,
                 diagnostics=building_diagnostics,
             )
 
             if not mesh:
                 skipped_buildings += 1
+
+                if is_building_part:
+                    rejected_building_parts += 1
+
                 record_building_rejection(
                     building_diagnostics.get(
                         "reason",
@@ -273,8 +414,16 @@ class AtlasFoundationSceneBuilder:
 
             accepted_buildings += 1
 
+            if is_building_part:
+                accepted_building_parts += 1
+            else:
+                accepted_main_buildings += 1
+
         scene.metadata["building_report"] = {
             "accepted": accepted_buildings,
+            "accepted_main_buildings": accepted_main_buildings,
+            "accepted_building_parts": accepted_building_parts,
+            "rejected_building_parts": rejected_building_parts,
             "skipped": skipped_buildings,
             "castle_buildings": castle_buildings,
             "rejection_counts": dict(
@@ -289,6 +438,21 @@ class AtlasFoundationSceneBuilder:
             print("=" * 70)
 
             print(f"Accepted buildings : " f"{accepted_buildings}")
+
+            print(
+                f"  main buildings   : "
+                f"{accepted_main_buildings}"
+            )
+
+            print(
+                f"  building parts   : "
+                f"{accepted_building_parts}"
+            )
+
+            print(
+                f"Rejected parts      : "
+                f"{rejected_building_parts}"
+            )
 
             print(f"Skipped buildings  : " f"{skipped_buildings}")
 

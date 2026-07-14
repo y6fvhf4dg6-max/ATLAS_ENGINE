@@ -231,3 +231,83 @@ def test_pipeline_preserves_temporary_mesh_rejection_reason(monkeypatch):
         "accepted": False,
         "reason": "building_area_below_minimum",
     }
+
+
+def test_pipeline_uses_explicit_foundation_z_override(monkeypatch):
+    temporary_mesh = {
+        "bottom": [
+            (0.0, 0.0, 0.0),
+            (2.0, 0.0, 0.0),
+            (2.0, 2.0, 0.0),
+        ],
+        "top": [],
+        "triangles": [],
+    }
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline."
+        "AtlasMeshBuilder.build_mesh",
+        lambda *args, **kwargs: temporary_mesh,
+    )
+
+    def fail_if_surface_is_sampled(*args, **kwargs):
+        raise AssertionError(
+            "Foundation surface must not be sampled "
+            "when an override is supplied"
+        )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline."
+        "AtlasFoundationSurfaceBuilder.build_surface",
+        fail_if_surface_is_sampled,
+    )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline."
+        "AtlasFoundationMeshBuilder.build",
+        lambda footprint_points, foundation_z: {
+            "foundation_z": foundation_z,
+        },
+    )
+
+    def fake_extrude(
+        building,
+        coordinate_engine,
+        foundation_z,
+        diagnostics=None,
+    ):
+        return {
+            "bottom": [
+                (0.0, 0.0, foundation_z),
+                (2.0, 0.0, foundation_z),
+                (2.0, 2.0, foundation_z),
+            ],
+            "top": [],
+            "triangles": [],
+        }
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_pipeline."
+        "AtlasFoundationMeshExtruder.extrude",
+        fake_extrude,
+    )
+
+    mesh = AtlasFoundationFirstPipeline.build_building_mesh(
+        building=object(),
+        coordinate_engine=object(),
+        terrain_mesh=object(),
+        foundation_z_override=7.25,
+    )
+
+    assert mesh is not None
+    assert mesh["foundation_z"] == 7.25
+    assert mesh["foundation_surface"]["sample_mode"] == "override"
+    assert mesh["foundation_surface"]["sample_count"] == 0
+    assert mesh["foundation_mesh"]["foundation_z"] == 7.25
+
+    assert {
+        round(point[2], 6)
+        for point in mesh["bottom"]
+    } == {
+        7.25,
+    }

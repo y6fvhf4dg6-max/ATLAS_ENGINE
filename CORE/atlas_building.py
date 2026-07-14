@@ -18,6 +18,13 @@ class AtlasBuilding:
         self.tags = tags
 
         self.building_type = self.tags.get("building")
+        self.building_part_type = self.tags.get(
+            "building:part"
+        )
+        self.is_building_part = (
+            self.building_part_type is not None
+        )
+
         self.height = self.parse_height()
         self.levels = self.parse_levels()
         self.min_height = self.parse_min_height()
@@ -122,6 +129,8 @@ class AtlasBuilding:
             "centroid": self.centroid,
             "bbox": self.bbox,
             "building": self.building_type,
+            "building_part": self.building_part_type,
+            "is_building_part": self.is_building_part,
             "height": self.height,
             "levels": self.levels,
             "min_height": self.min_height,
