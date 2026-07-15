@@ -19,6 +19,9 @@ class AtlasReliefQualityReport:
     @staticmethod
     def build(
         relief_mesh: dict[str, Any],
+        *,
+        warning_slope_degrees: float = 55.0,
+        critical_slope_degrees: float = 75.0,
     ) -> dict[str, Any]:
         if not isinstance(relief_mesh, dict):
             raise ValueError(
@@ -98,6 +101,23 @@ class AtlasReliefQualityReport:
             )
         )
 
+        print_risk = (
+            AtlasReliefQualityReport
+            ._classify_print_risk(
+                is_closed=is_closed,
+                is_manifold=is_manifold,
+                surface_analysis=(
+                    surface_analysis
+                ),
+                warning_slope_degrees=(
+                    warning_slope_degrees
+                ),
+                critical_slope_degrees=(
+                    critical_slope_degrees
+                ),
+            )
+        )
+
         return {
             "geometry_type": (
                 relief_mesh.get(
@@ -135,6 +155,165 @@ class AtlasReliefQualityReport:
                 is_closed and is_manifold
             ),
             **surface_analysis,
+            **print_risk,
+        }
+
+    @staticmethod
+    def _classify_print_risk(
+        *,
+        is_closed: bool,
+        is_manifold: bool,
+        surface_analysis: dict[str, Any],
+        warning_slope_degrees: float,
+        critical_slope_degrees: float,
+    ) -> dict[str, Any]:
+        thresholds = {
+            "warning_slope_degrees": (
+                warning_slope_degrees
+            ),
+            "critical_slope_degrees": (
+                critical_slope_degrees
+            ),
+        }
+
+        for name, value in thresholds.items():
+            if not math.isfinite(float(value)):
+                raise ValueError(
+                    f"{name} must be finite."
+                )
+
+        warning_slope_degrees = float(
+            warning_slope_degrees
+        )
+        critical_slope_degrees = float(
+            critical_slope_degrees
+        )
+
+        if not (
+            0.0
+            <= warning_slope_degrees
+            < 90.0
+        ):
+            raise ValueError(
+                "warning_slope_degrees must be "
+                "in the 0.0..<90.0 range."
+            )
+
+        if not (
+            0.0
+            < critical_slope_degrees
+            < 90.0
+        ):
+            raise ValueError(
+                "critical_slope_degrees must be "
+                "in the 0.0..<90.0 range."
+            )
+
+        if (
+            warning_slope_degrees
+            >= critical_slope_degrees
+        ):
+            raise ValueError(
+                "warning_slope_degrees must be "
+                "lower than "
+                "critical_slope_degrees."
+            )
+
+        issues = []
+
+        if not is_closed:
+            issues.append(
+                {
+                    "severity": "FAIL",
+                    "code": "open_relief_mesh",
+                }
+            )
+
+        if not is_manifold:
+            issues.append(
+                {
+                    "severity": "FAIL",
+                    "code": (
+                        "non_manifold_relief_mesh"
+                    ),
+                }
+            )
+
+        if not surface_analysis[
+            "surface_analysis_available"
+        ]:
+            issues.append(
+                {
+                    "severity": "WARN",
+                    "code": (
+                        "surface_analysis_unavailable"
+                    ),
+                }
+            )
+        else:
+            maximum_slope = float(
+                surface_analysis[
+                    "maximum_slope_degrees"
+                ]
+            )
+
+            if (
+                maximum_slope
+                >= critical_slope_degrees
+            ):
+                issues.append(
+                    {
+                        "severity": "FAIL",
+                        "code": (
+                            "critical_surface_slope"
+                        ),
+                        "value": maximum_slope,
+                        "limit": (
+                            critical_slope_degrees
+                        ),
+                    }
+                )
+            elif (
+                maximum_slope
+                >= warning_slope_degrees
+            ):
+                issues.append(
+                    {
+                        "severity": "WARN",
+                        "code": (
+                            "steep_surface_slope"
+                        ),
+                        "value": maximum_slope,
+                        "limit": (
+                            warning_slope_degrees
+                        ),
+                    }
+                )
+
+        severities = {
+            issue["severity"]
+            for issue in issues
+        }
+
+        if "FAIL" in severities:
+            status = "FAIL"
+        elif "WARN" in severities:
+            status = "WARN"
+        else:
+            status = "PASS"
+
+        return {
+            "print_risk_status": status,
+            "print_risk_issue_count": len(
+                issues
+            ),
+            "print_risk_issues": issues,
+            "warning_slope_degrees": (
+                warning_slope_degrees
+            ),
+            "critical_slope_degrees": (
+                critical_slope_degrees
+            ),
         }
 
     @staticmethod

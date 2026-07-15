@@ -255,3 +255,131 @@ def test_report_rejects_irregular_top_grid():
         AtlasReliefQualityReport.build(
             relief
         )
+
+
+def test_flat_relief_print_risk_passes():
+    relief = AtlasReliefMeshBuilder.build(
+        [
+            [0.5, 0.5],
+            [0.5, 0.5],
+        ],
+        width_mm=10.0,
+        depth_mm=10.0,
+    )
+
+    report = AtlasReliefQualityReport.build(
+        relief
+    )
+
+    assert report[
+        "print_risk_status"
+    ] == "PASS"
+
+    assert report[
+        "print_risk_issue_count"
+    ] == 0
+
+
+def test_steep_relief_print_risk_warns():
+    relief = AtlasReliefMeshBuilder.build(
+        [
+            [0.0, 1.0],
+            [0.0, 1.0],
+        ],
+        width_mm=1.0,
+        depth_mm=10.0,
+        relief_height_mm=2.0,
+    )
+
+    report = AtlasReliefQualityReport.build(
+        relief,
+        warning_slope_degrees=50.0,
+        critical_slope_degrees=80.0,
+    )
+
+    assert report[
+        "print_risk_status"
+    ] == "WARN"
+
+    assert report[
+        "print_risk_issues"
+    ][0]["code"] == "steep_surface_slope"
+
+
+def test_critical_relief_slope_fails():
+    relief = AtlasReliefMeshBuilder.build(
+        [
+            [0.0, 1.0],
+            [0.0, 1.0],
+        ],
+        width_mm=0.2,
+        depth_mm=10.0,
+        relief_height_mm=2.0,
+    )
+
+    report = AtlasReliefQualityReport.build(
+        relief,
+        warning_slope_degrees=50.0,
+        critical_slope_degrees=80.0,
+    )
+
+    assert report[
+        "print_risk_status"
+    ] == "FAIL"
+
+    assert report[
+        "print_risk_issues"
+    ][0]["code"] == (
+        "critical_surface_slope"
+    )
+
+
+def test_missing_surface_analysis_warns():
+    relief = _relief()
+
+    triangle_only_mesh = {
+        "type": relief["type"],
+        "geometry_type": (
+            relief["geometry_type"]
+        ),
+        "triangles": relief["triangles"],
+    }
+
+    report = AtlasReliefQualityReport.build(
+        triangle_only_mesh
+    )
+
+    assert report[
+        "print_risk_status"
+    ] == "WARN"
+
+    assert report[
+        "print_risk_issues"
+    ][0]["code"] == (
+        "surface_analysis_unavailable"
+    )
+
+
+@pytest.mark.parametrize(
+    "warning,critical",
+    [
+        (-1.0, 75.0),
+        (90.0, 95.0),
+        (55.0, 0.0),
+        (55.0, 90.0),
+        (75.0, 55.0),
+        (55.0, 55.0),
+        (float("nan"), 75.0),
+        (55.0, float("inf")),
+    ],
+)
+def test_print_risk_rejects_invalid_thresholds(
+    warning,
+    critical,
+):
+    with pytest.raises(ValueError):
+        AtlasReliefQualityReport.build(
+            _relief(),
+            warning_slope_degrees=warning,
+            critical_slope_degrees=critical,
+        )
