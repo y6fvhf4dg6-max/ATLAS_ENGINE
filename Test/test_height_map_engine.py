@@ -115,3 +115,195 @@ def test_output_is_deterministic():
     )
 
     assert np.array_equal(first, second)
+
+
+def test_gaussian_smoothing_preserves_shape():
+    values = np.arange(
+        20,
+        dtype=np.float64,
+    ).reshape(4, 5)
+
+    result = (
+        AtlasHeightMapEngine
+        .smooth_gaussian(
+            values,
+            sigma=1.0,
+        )
+    )
+
+    assert result.shape == values.shape
+    assert result.dtype == np.float64
+
+
+def test_gaussian_smoothing_preserves_constant_map():
+    values = np.full(
+        (5, 7),
+        0.42,
+        dtype=np.float64,
+    )
+
+    result = (
+        AtlasHeightMapEngine
+        .smooth_gaussian(
+            values,
+            sigma=1.25,
+        )
+    )
+
+    assert np.allclose(
+        result,
+        values,
+    )
+
+
+def test_gaussian_smoothing_reduces_impulse_peak():
+    values = np.zeros(
+        (7, 7),
+        dtype=np.float64,
+    )
+
+    values[3, 3] = 1.0
+
+    result = (
+        AtlasHeightMapEngine
+        .smooth_gaussian(
+            values,
+            sigma=1.0,
+        )
+    )
+
+    assert 0.0 < result[3, 3] < 1.0
+    assert result[3, 2] > 0.0
+    assert result[2, 3] > 0.0
+
+
+def test_gaussian_smoothing_is_symmetric():
+    values = np.zeros(
+        (7, 7),
+        dtype=np.float64,
+    )
+
+    values[3, 3] = 1.0
+
+    result = (
+        AtlasHeightMapEngine
+        .smooth_gaussian(
+            values,
+            sigma=1.0,
+        )
+    )
+
+    assert result[3, 2] == pytest.approx(
+        result[3, 4]
+    )
+
+    assert result[2, 3] == pytest.approx(
+        result[4, 3]
+    )
+
+    assert result[2, 2] == pytest.approx(
+        result[4, 4]
+    )
+
+
+def test_gaussian_smoothing_preserves_total_impulse_mass():
+    values = np.zeros(
+        (15, 15),
+        dtype=np.float64,
+    )
+
+    values[7, 7] = 1.0
+
+    result = (
+        AtlasHeightMapEngine
+        .smooth_gaussian(
+            values,
+            sigma=1.0,
+            radius=3,
+        )
+    )
+
+    assert result.sum() == pytest.approx(
+        1.0,
+        abs=1e-12,
+    )
+
+
+def test_gaussian_smoothing_is_deterministic():
+    values = np.array(
+        [
+            [0.0, 1.0, 0.0],
+            [0.5, 0.2, 0.8],
+            [1.0, 0.0, 0.4],
+        ],
+        dtype=np.float64,
+    )
+
+    first = (
+        AtlasHeightMapEngine
+        .smooth_gaussian(
+            values,
+            sigma=0.8,
+            radius=2,
+        )
+    )
+
+    second = (
+        AtlasHeightMapEngine
+        .smooth_gaussian(
+            values,
+            sigma=0.8,
+            radius=2,
+        )
+    )
+
+    assert np.array_equal(
+        first,
+        second,
+    )
+
+
+@pytest.mark.parametrize(
+    "sigma",
+    [
+        0.0,
+        -1.0,
+        np.nan,
+        np.inf,
+    ],
+)
+def test_gaussian_smoothing_rejects_invalid_sigma(
+    sigma,
+):
+    with pytest.raises(ValueError):
+        (
+            AtlasHeightMapEngine
+            .smooth_gaussian(
+                [[0.0, 1.0], [1.0, 0.0]],
+                sigma=sigma,
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    "radius",
+    [
+        0,
+        -1,
+        1.5,
+        True,
+        "invalid",
+    ],
+)
+def test_gaussian_smoothing_rejects_invalid_radius(
+    radius,
+):
+    with pytest.raises(ValueError):
+        (
+            AtlasHeightMapEngine
+            .smooth_gaussian(
+                [[0.0, 1.0], [1.0, 0.0]],
+                sigma=1.0,
+                radius=radius,
+            )
+        )
