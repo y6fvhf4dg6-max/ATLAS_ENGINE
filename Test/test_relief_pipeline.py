@@ -204,3 +204,110 @@ def test_pipeline_rejects_radius_without_sigma():
             depth_mm=10.0,
             smoothing_radius=2,
         )
+
+
+def test_pipeline_supports_contrast_remapping():
+    values = np.array(
+        [
+            [0.0, 0.25, 0.50],
+            [0.75, 0.90, 1.0],
+        ],
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build(
+        values,
+        width_mm=20.0,
+        depth_mm=10.0,
+        black_point=0.25,
+        white_point=0.75,
+        gamma=1.0,
+    )
+
+    contrast = result[
+        "contrast_height_map"
+    ]
+
+    assert contrast[0, 0] == pytest.approx(0.0)
+    assert contrast[0, 1] == pytest.approx(0.0)
+    assert contrast[0, 2] == pytest.approx(0.5)
+    assert contrast[1, 0] == pytest.approx(1.0)
+    assert contrast[1, 2] == pytest.approx(1.0)
+
+
+def test_pipeline_gamma_changes_processed_relief():
+    values = [
+        [0.0, 0.5, 1.0],
+        [0.0, 0.5, 1.0],
+    ]
+
+    normal = AtlasReliefPipeline.build(
+        values,
+        width_mm=10.0,
+        depth_mm=5.0,
+        gamma=1.0,
+    )
+
+    shaped = AtlasReliefPipeline.build(
+        values,
+        width_mm=10.0,
+        depth_mm=5.0,
+        gamma=2.0,
+    )
+
+    assert shaped[
+        "contrast_height_map"
+    ][0, 1] == pytest.approx(0.25)
+
+    assert not np.array_equal(
+        normal["processed_height_map"],
+        shaped["processed_height_map"],
+    )
+
+
+def test_pipeline_records_contrast_settings():
+    result = AtlasReliefPipeline.build(
+        _values(),
+        width_mm=10.0,
+        depth_mm=10.0,
+        black_point=0.10,
+        white_point=0.90,
+        gamma=0.75,
+    )
+
+    settings = result["settings"]
+
+    assert settings["black_point"] == pytest.approx(
+        0.10
+    )
+    assert settings["white_point"] == pytest.approx(
+        0.90
+    )
+    assert settings["gamma"] == pytest.approx(
+        0.75
+    )
+
+
+@pytest.mark.parametrize(
+    "black_point,white_point,gamma",
+    [
+        (-0.1, 1.0, 1.0),
+        (0.0, 1.1, 1.0),
+        (0.8, 0.2, 1.0),
+        (0.0, 1.0, 0.0),
+    ],
+)
+def test_pipeline_rejects_invalid_contrast_settings(
+    black_point,
+    white_point,
+    gamma,
+):
+    with pytest.raises(ValueError):
+        AtlasReliefPipeline.build(
+            _values(),
+            width_mm=10.0,
+            depth_mm=10.0,
+            black_point=black_point,
+            white_point=white_point,
+            gamma=gamma,
+        )

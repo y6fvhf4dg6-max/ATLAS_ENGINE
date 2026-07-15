@@ -36,6 +36,9 @@ class AtlasReliefPipeline:
         base_thickness_mm: float = 0.80,
         relief_height_mm: float = 2.00,
         invert: bool = False,
+        black_point: float = 0.0,
+        white_point: float = 1.0,
+        gamma: float = 1.0,
         target_rows: int | None = None,
         target_columns: int | None = None,
         smoothing_sigma: float | None = None,
@@ -49,11 +52,21 @@ class AtlasReliefPipeline:
             invert=invert,
         )
 
+        contrast_remapped = (
+            AtlasHeightMapEngine
+            .remap_contrast(
+                normalized,
+                black_point=black_point,
+                white_point=white_point,
+                gamma=gamma,
+            )
+        )
+
         if (
             target_rows is None
             and target_columns is None
         ):
-            resampled = normalized.copy()
+            resampled = contrast_remapped.copy()
         elif (
             target_rows is not None
             and target_columns is not None
@@ -61,7 +74,7 @@ class AtlasReliefPipeline:
             resampled = (
                 AtlasHeightMapEngine
                 .resample_bilinear(
-                    normalized,
+                    contrast_remapped,
                     target_rows=target_rows,
                     target_columns=target_columns,
                 )
@@ -110,12 +123,20 @@ class AtlasReliefPipeline:
         return {
             "type": "relief_pipeline_result",
             "normalized_height_map": normalized,
+            "contrast_height_map": contrast_remapped,
             "resampled_height_map": resampled,
             "processed_height_map": processed,
             "mesh": mesh,
             "quality_report": quality_report,
             "settings": {
                 "invert": bool(invert),
+                "black_point": float(
+                    black_point
+                ),
+                "white_point": float(
+                    white_point
+                ),
+                "gamma": float(gamma),
                 "target_rows": (
                     processed.shape[0]
                 ),
