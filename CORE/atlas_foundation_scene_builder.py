@@ -37,6 +37,12 @@ from CORE.atlas_ancient_theatre_profiler import (
 from CORE.atlas_ancient_theatre_stage_builder import (
     AtlasAncientTheatreStageBuilder,
 )
+from CORE.atlas_ancient_theatre_cavea_builder import (
+    AtlasAncientTheatreCaveaBuilder,
+)
+from CORE.atlas_ancient_theatre_upper_gallery_builder import (
+    AtlasAncientTheatreUpperGalleryBuilder,
+)
 
 
 class AtlasFoundationSceneBuilder:
@@ -308,7 +314,69 @@ class AtlasFoundationSceneBuilder:
 
                     continue
 
+                cavea_diagnostics = {}
+
+                cavea_mesh = (
+                    AtlasAncientTheatreCaveaBuilder
+                    .build(
+                        raw_building=prepared_building,
+                        coordinate_engine=(
+                            coordinate_engine
+                        ),
+                        terrain_mesh=terrain_mesh,
+                        diagnostics=cavea_diagnostics,
+                    )
+                )
+
+                if not cavea_mesh:
+                    skipped_buildings += 1
+
+                    record_building_rejection(
+                        cavea_diagnostics.get(
+                            "reason",
+                            "ancient_theatre_cavea_failed",
+                        )
+                    )
+
+                    continue
+
+                upper_gallery_mesh = (
+                    AtlasAncientTheatreUpperGalleryBuilder
+                    .build(
+                        cavea_mesh=cavea_mesh,
+                    )
+                )
+
+                stage_mesh["source_id"] = (
+                    raw_building.get("id")
+                )
+                stage_mesh["architectural_role"] = (
+                    "ancient_theatre_stage"
+                )
+
+                cavea_mesh["source_id"] = (
+                    raw_building.get("id")
+                )
+                cavea_mesh["architectural_role"] = (
+                    "ancient_theatre_cavea"
+                )
+
                 scene.add_building_mesh(stage_mesh)
+                scene.add_building_mesh(cavea_mesh)
+
+                if upper_gallery_mesh:
+                    upper_gallery_mesh["source_id"] = (
+                        raw_building.get("id")
+                    )
+                    upper_gallery_mesh[
+                        "architectural_role"
+                    ] = (
+                        "ancient_theatre_upper_gallery"
+                    )
+
+                    scene.add_building_mesh(
+                        upper_gallery_mesh
+                    )
 
                 accepted_buildings += 1
                 accepted_main_buildings += 1
