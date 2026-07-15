@@ -307,3 +307,183 @@ def test_gaussian_smoothing_rejects_invalid_radius(
                 radius=radius,
             )
         )
+
+
+def test_bilinear_resampling_preserves_corners():
+    values = np.array(
+        [
+            [0.0, 1.0],
+            [2.0, 3.0],
+        ],
+        dtype=np.float64,
+    )
+
+    result = (
+        AtlasHeightMapEngine
+        .resample_bilinear(
+            values,
+            target_rows=5,
+            target_columns=7,
+        )
+    )
+
+    assert result[0, 0] == pytest.approx(0.0)
+    assert result[0, -1] == pytest.approx(1.0)
+    assert result[-1, 0] == pytest.approx(2.0)
+    assert result[-1, -1] == pytest.approx(
+        3.0
+    )
+
+
+def test_bilinear_resampling_interpolates_center():
+    values = np.array(
+        [
+            [0.0, 2.0],
+            [2.0, 4.0],
+        ],
+        dtype=np.float64,
+    )
+
+    result = (
+        AtlasHeightMapEngine
+        .resample_bilinear(
+            values,
+            target_rows=3,
+            target_columns=3,
+        )
+    )
+
+    assert result[1, 1] == pytest.approx(2.0)
+
+
+def test_bilinear_resampling_preserves_constant_map():
+    values = np.full(
+        (4, 6),
+        0.37,
+        dtype=np.float64,
+    )
+
+    result = (
+        AtlasHeightMapEngine
+        .resample_bilinear(
+            values,
+            target_rows=9,
+            target_columns=11,
+        )
+    )
+
+    assert np.allclose(
+        result,
+        0.37,
+    )
+
+
+def test_bilinear_resampling_supports_downsampling():
+    values = np.arange(
+        25,
+        dtype=np.float64,
+    ).reshape(5, 5)
+
+    result = (
+        AtlasHeightMapEngine
+        .resample_bilinear(
+            values,
+            target_rows=3,
+            target_columns=3,
+        )
+    )
+
+    assert result.shape == (3, 3)
+    assert result[1, 1] == pytest.approx(
+        values[2, 2]
+    )
+
+
+def test_bilinear_resampling_same_size_returns_copy():
+    values = np.array(
+        [
+            [0.0, 1.0],
+            [1.0, 0.0],
+        ],
+        dtype=np.float64,
+    )
+
+    result = (
+        AtlasHeightMapEngine
+        .resample_bilinear(
+            values,
+            target_rows=2,
+            target_columns=2,
+        )
+    )
+
+    assert np.array_equal(
+        result,
+        values,
+    )
+    assert result is not values
+
+
+def test_bilinear_resampling_is_deterministic():
+    values = np.array(
+        [
+            [0.0, 0.4, 1.0],
+            [0.3, 0.8, 0.2],
+        ],
+        dtype=np.float64,
+    )
+
+    first = (
+        AtlasHeightMapEngine
+        .resample_bilinear(
+            values,
+            target_rows=7,
+            target_columns=8,
+        )
+    )
+
+    second = (
+        AtlasHeightMapEngine
+        .resample_bilinear(
+            values,
+            target_rows=7,
+            target_columns=8,
+        )
+    )
+
+    assert np.array_equal(first, second)
+
+
+@pytest.mark.parametrize(
+    "target_rows,target_columns",
+    [
+        (1, 2),
+        (2, 1),
+        (0, 2),
+        (2, 0),
+        (-1, 2),
+        (2, -1),
+        (2.5, 3),
+        (3, 2.5),
+        (True, 3),
+        (3, False),
+        ("invalid", 3),
+        (3, "invalid"),
+    ],
+)
+def test_bilinear_resampling_rejects_invalid_size(
+    target_rows,
+    target_columns,
+):
+    with pytest.raises(ValueError):
+        (
+            AtlasHeightMapEngine
+            .resample_bilinear(
+                [
+                    [0.0, 1.0],
+                    [1.0, 0.0],
+                ],
+                target_rows=target_rows,
+                target_columns=target_columns,
+            )
+        )

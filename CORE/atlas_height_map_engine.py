@@ -54,6 +54,113 @@ class AtlasHeightMapEngine:
         )
 
     @staticmethod
+    def resample_bilinear(
+        values: Any,
+        *,
+        target_rows: int,
+        target_columns: int,
+    ) -> np.ndarray:
+        """
+        Resamples a two-dimensional height map using
+        deterministic bilinear interpolation.
+        """
+
+        height_map = AtlasHeightMapEngine._as_valid_array(
+            values
+        )
+
+        target_rows = (
+            AtlasHeightMapEngine
+            ._validate_target_size(
+                target_rows,
+                name="target_rows",
+            )
+        )
+
+        target_columns = (
+            AtlasHeightMapEngine
+            ._validate_target_size(
+                target_columns,
+                name="target_columns",
+            )
+        )
+
+        source_rows, source_columns = (
+            height_map.shape
+        )
+
+        if (
+            source_rows == target_rows
+            and source_columns == target_columns
+        ):
+            return height_map.copy()
+
+        source_y = np.linspace(
+            0.0,
+            float(source_rows - 1),
+            target_rows,
+            dtype=np.float64,
+        )
+
+        source_x = np.linspace(
+            0.0,
+            float(source_columns - 1),
+            target_columns,
+            dtype=np.float64,
+        )
+
+        result = np.empty(
+            (
+                target_rows,
+                target_columns,
+            ),
+            dtype=np.float64,
+        )
+
+        for target_row, y in enumerate(source_y):
+            y0 = int(np.floor(y))
+            y1 = min(
+                y0 + 1,
+                source_rows - 1,
+            )
+            fy = float(y - y0)
+
+            for target_column, x in enumerate(
+                source_x
+            ):
+                x0 = int(np.floor(x))
+                x1 = min(
+                    x0 + 1,
+                    source_columns - 1,
+                )
+                fx = float(x - x0)
+
+                lower_left = height_map[y0, x0]
+                lower_right = height_map[y0, x1]
+                upper_left = height_map[y1, x0]
+                upper_right = height_map[y1, x1]
+
+                lower = (
+                    lower_left * (1.0 - fx)
+                    + lower_right * fx
+                )
+
+                upper = (
+                    upper_left * (1.0 - fx)
+                    + upper_right * fx
+                )
+
+                result[
+                    target_row,
+                    target_column,
+                ] = (
+                    lower * (1.0 - fy)
+                    + upper * fy
+                )
+
+        return result
+
+    @staticmethod
     def smooth_gaussian(
         values: Any,
         *,
@@ -157,6 +264,36 @@ class AtlasHeightMapEngine:
             np.float64,
             copy=False,
         )
+
+    @staticmethod
+    def _validate_target_size(
+        value: Any,
+        *,
+        name: str,
+    ) -> int:
+        if isinstance(value, bool):
+            raise ValueError(
+                f"{name} must be an integer."
+            )
+
+        try:
+            integer_value = int(value)
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"{name} must be an integer."
+            ) from error
+
+        if integer_value != value:
+            raise ValueError(
+                f"{name} must be an integer."
+            )
+
+        if integer_value < 2:
+            raise ValueError(
+                f"{name} must be at least two."
+            )
+
+        return integer_value
 
     @staticmethod
     def _as_valid_array(
