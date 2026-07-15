@@ -145,6 +145,11 @@ class AtlasAncientTheatreCaveaBuilder:
             "bottom": boundary_bottom,
             "top": boundary_top,
             "walls": wall_quads,
+            "outer_wall_quads": (
+                closed_bowl[
+                    "outer_wall_quads"
+                ]
+            ),
             "triangles": closed_bowl[
                 "triangles"
             ],
@@ -970,6 +975,7 @@ class AtlasAncientTheatreCaveaBuilder:
 
         wall_triangles = []
         wall_quads = []
+        outer_wall_quads = []
 
         def append_wall_quad(
             bottom_1,
@@ -1029,19 +1035,27 @@ class AtlasAncientTheatreCaveaBuilder:
         for arc_index in range(
             point_count - 1
         ):
+            outer_quad = (
+                outer_bottom[
+                    arc_index
+                ],
+                outer_bottom[
+                    arc_index + 1
+                ],
+                outer_top[
+                    arc_index + 1
+                ],
+                outer_top[
+                    arc_index
+                ],
+            )
+
+            outer_wall_quads.append(
+                outer_quad
+            )
+
             append_wall_quad(
-                outer_bottom[
-                    arc_index
-                ],
-                outer_bottom[
-                    arc_index + 1
-                ],
-                outer_top[
-                    arc_index + 1
-                ],
-                outer_top[
-                    arc_index
-                ],
+                *outer_quad
             )
 
         radial_count = len(top_rings)
@@ -1212,6 +1226,9 @@ class AtlasAncientTheatreCaveaBuilder:
             ),
             "wall_triangles": wall_triangles,
             "wall_quads": wall_quads,
+            "outer_wall_quads": (
+                outer_wall_quads
+            ),
             "triangles": triangles,
         }
 

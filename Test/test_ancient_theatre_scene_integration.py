@@ -102,6 +102,7 @@ def test_scene_builds_all_ancient_theatre_components():
     assert roles == {
         "ancient_theatre_stage",
         "ancient_theatre_cavea",
+        "ancient_theatre_stage_facade",
         "ancient_theatre_upper_gallery",
     }
 
@@ -128,7 +129,7 @@ def test_scene_theatre_components_have_triangles():
         "buildings"
     ]
 
-    assert len(building_meshes) == 3
+    assert len(building_meshes) == 4
 
     assert all(
         mesh.get("triangles")

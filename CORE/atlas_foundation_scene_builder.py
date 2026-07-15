@@ -37,6 +37,9 @@ from CORE.atlas_ancient_theatre_profiler import (
 from CORE.atlas_ancient_theatre_stage_builder import (
     AtlasAncientTheatreStageBuilder,
 )
+from CORE.atlas_ancient_theatre_stage_facade_builder import (
+    AtlasAncientTheatreStageFacadeBuilder,
+)
 from CORE.atlas_ancient_theatre_cavea_builder import (
     AtlasAncientTheatreCaveaBuilder,
 )
@@ -347,6 +350,13 @@ class AtlasFoundationSceneBuilder:
                     )
                 )
 
+                stage_facade_mesh = (
+                    AtlasAncientTheatreStageFacadeBuilder
+                    .build(
+                        stage_mesh=stage_mesh,
+                    )
+                )
+
                 stage_mesh["source_id"] = (
                     raw_building.get("id")
                 )
@@ -363,6 +373,20 @@ class AtlasFoundationSceneBuilder:
 
                 scene.add_building_mesh(stage_mesh)
                 scene.add_building_mesh(cavea_mesh)
+
+                if stage_facade_mesh:
+                    stage_facade_mesh["source_id"] = (
+                        raw_building.get("id")
+                    )
+                    stage_facade_mesh[
+                        "architectural_role"
+                    ] = (
+                        "ancient_theatre_stage_facade"
+                    )
+
+                    scene.add_building_mesh(
+                        stage_facade_mesh
+                    )
 
                 if upper_gallery_mesh:
                     upper_gallery_mesh["source_id"] = (

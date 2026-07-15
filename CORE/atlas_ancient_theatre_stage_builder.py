@@ -147,6 +147,23 @@ class AtlasAncientTheatreStageBuilder:
             {},
         ).get("name")
 
+        walls = mesh.get(
+            "walls",
+            [],
+        )
+
+        if walls:
+            mesh["stage_front_wall_quad"] = (
+                walls[2]
+            )
+            mesh["stage_side_wall_quads"] = [
+                walls[1],
+                walls[3],
+            ]
+            mesh["stage_back_wall_quad"] = (
+                walls[0]
+            )
+
         return mesh
 
     @staticmethod
