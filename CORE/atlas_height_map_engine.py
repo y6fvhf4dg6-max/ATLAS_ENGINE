@@ -54,6 +54,103 @@ class AtlasHeightMapEngine:
         )
 
     @staticmethod
+    def remap_contrast(
+        values: Any,
+        *,
+        black_point: float = 0.0,
+        white_point: float = 1.0,
+        gamma: float = 1.0,
+    ) -> np.ndarray:
+        """
+        Remaps normalized height-map contrast.
+
+        Processing order:
+        - black/white level clipping
+        - normalization to 0.0..1.0
+        - gamma shaping
+
+        Gamma below 1.0 raises mid-level details.
+        Gamma above 1.0 suppresses mid-level details.
+        """
+
+        height_map = AtlasHeightMapEngine._as_valid_array(
+            values
+        )
+
+        tolerance = 1e-12
+
+        if (
+            float(height_map.min()) < -tolerance
+            or float(height_map.max()) > 1.0 + tolerance
+        ):
+            raise ValueError(
+                "Contrast input must be normalized "
+                "to the 0.0..1.0 range."
+            )
+
+        parameters = {
+            "black_point": black_point,
+            "white_point": white_point,
+            "gamma": gamma,
+        }
+
+        for name, value in parameters.items():
+            if not np.isfinite(value):
+                raise ValueError(
+                    f"{name} must be finite."
+                )
+
+        if not 0.0 <= black_point < 1.0:
+            raise ValueError(
+                "black_point must be in the "
+                "0.0..1.0 range."
+            )
+
+        if not 0.0 < white_point <= 1.0:
+            raise ValueError(
+                "white_point must be in the "
+                "0.0..1.0 range."
+            )
+
+        if black_point >= white_point:
+            raise ValueError(
+                "black_point must be lower than "
+                "white_point."
+            )
+
+        if gamma <= 0.0:
+            raise ValueError(
+                "gamma must be greater than zero."
+            )
+
+        clipped = np.clip(
+            height_map,
+            black_point,
+            white_point,
+        )
+
+        remapped = (
+            clipped - black_point
+        ) / (
+            white_point - black_point
+        )
+
+        shaped = np.power(
+            remapped,
+            gamma,
+            dtype=np.float64,
+        )
+
+        return np.clip(
+            shaped,
+            0.0,
+            1.0,
+        ).astype(
+            np.float64,
+            copy=False,
+        )
+
+    @staticmethod
     def resample_bilinear(
         values: Any,
         *,

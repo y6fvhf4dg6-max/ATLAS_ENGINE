@@ -487,3 +487,150 @@ def test_bilinear_resampling_rejects_invalid_size(
                 target_columns=target_columns,
             )
         )
+
+
+def test_contrast_remap_preserves_unit_endpoints():
+    result = AtlasHeightMapEngine.remap_contrast(
+        [[0.0, 0.5, 1.0]]
+    )
+
+    assert result[0, 0] == pytest.approx(0.0)
+    assert result[0, -1] == pytest.approx(1.0)
+
+
+def test_contrast_remap_applies_black_and_white_points():
+    result = AtlasHeightMapEngine.remap_contrast(
+        [[0.0, 0.25, 0.50, 0.75, 1.0]],
+        black_point=0.25,
+        white_point=0.75,
+    )
+
+    assert result[0, 0] == pytest.approx(0.0)
+    assert result[0, 1] == pytest.approx(0.0)
+    assert result[0, 2] == pytest.approx(0.5)
+    assert result[0, 3] == pytest.approx(1.0)
+    assert result[0, 4] == pytest.approx(1.0)
+
+
+def test_contrast_remap_gamma_below_one_raises_midtones():
+    result = AtlasHeightMapEngine.remap_contrast(
+        [[0.25]],
+        gamma=0.5,
+    )
+
+    assert result[0, 0] == pytest.approx(0.5)
+
+
+def test_contrast_remap_gamma_above_one_suppresses_midtones():
+    result = AtlasHeightMapEngine.remap_contrast(
+        [[0.5]],
+        gamma=2.0,
+    )
+
+    assert result[0, 0] == pytest.approx(0.25)
+
+
+def test_contrast_remap_preserves_shape_and_dtype():
+    values = np.linspace(
+        0.0,
+        1.0,
+        20,
+        dtype=np.float64,
+    ).reshape(4, 5)
+
+    result = AtlasHeightMapEngine.remap_contrast(
+        values,
+        gamma=0.8,
+    )
+
+    assert result.shape == values.shape
+    assert result.dtype == np.float64
+
+
+def test_contrast_remap_constant_map_is_stable():
+    values = np.full(
+        (4, 4),
+        0.4,
+        dtype=np.float64,
+    )
+
+    result = AtlasHeightMapEngine.remap_contrast(
+        values,
+        gamma=1.0,
+    )
+
+    assert np.allclose(
+        result,
+        values,
+    )
+
+
+def test_contrast_remap_is_deterministic():
+    values = np.array(
+        [
+            [0.0, 0.2, 0.5],
+            [0.7, 0.9, 1.0],
+        ],
+        dtype=np.float64,
+    )
+
+    first = AtlasHeightMapEngine.remap_contrast(
+        values,
+        black_point=0.1,
+        white_point=0.9,
+        gamma=0.75,
+    )
+
+    second = AtlasHeightMapEngine.remap_contrast(
+        values,
+        black_point=0.1,
+        white_point=0.9,
+        gamma=0.75,
+    )
+
+    assert np.array_equal(first, second)
+
+
+@pytest.mark.parametrize(
+    "black_point,white_point,gamma",
+    [
+        (-0.1, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (0.0, 0.0, 1.0),
+        (0.8, 0.2, 1.0),
+        (0.0, 1.1, 1.0),
+        (0.0, 1.0, 0.0),
+        (0.0, 1.0, -1.0),
+        (np.nan, 1.0, 1.0),
+        (0.0, np.inf, 1.0),
+        (0.0, 1.0, np.nan),
+    ],
+)
+def test_contrast_remap_rejects_invalid_parameters(
+    black_point,
+    white_point,
+    gamma,
+):
+    with pytest.raises(ValueError):
+        AtlasHeightMapEngine.remap_contrast(
+            [[0.0, 1.0]],
+            black_point=black_point,
+            white_point=white_point,
+            gamma=gamma,
+        )
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        [[-0.01, 0.5]],
+        [[0.5, 1.01]],
+    ],
+)
+def test_contrast_remap_rejects_non_normalized_input(
+    values,
+):
+    with pytest.raises(ValueError):
+        AtlasHeightMapEngine.remap_contrast(
+            values
+        )
