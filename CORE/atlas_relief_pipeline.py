@@ -17,6 +17,9 @@ from CORE.atlas_relief_image_input import (
 from CORE.atlas_relief_layer_separator import (
     AtlasReliefLayerSeparator,
 )
+from CORE.atlas_relief_mask_input import (
+    AtlasReliefMaskInput,
+)
 from CORE.atlas_relief_multiscale_decomposer import (
     AtlasReliefMultiscaleDecomposer,
 )
@@ -64,6 +67,8 @@ class AtlasReliefPipeline:
         depth_upper_percentile: float = 99.0,
         depth_gamma: float = 1.0,
         subject_mask: Any | None = None,
+        mask_path: Any | None = None,
+        mask_use_alpha: bool = False,
         background_depth_range: Any = (0.0, 0.40),
         foreground_depth_range: Any = (0.60, 1.0),
         alpha_background_luminance: float = 1.0,
@@ -118,16 +123,39 @@ class AtlasReliefPipeline:
             )
         )
 
+        if (
+            subject_mask is not None
+            and mask_path is not None
+        ):
+            raise ValueError(
+                "subject_mask and mask_path cannot "
+                "be used together."
+            )
+
+        mask_input = None
+        effective_subject_mask = subject_mask
+        mask_source = None
+
+        if mask_path is not None:
+            mask_input = AtlasReliefMaskInput.load(
+                mask_path,
+                use_alpha=mask_use_alpha,
+            )
+            effective_subject_mask = mask_input["mask"]
+            mask_source = "file"
+        elif subject_mask is not None:
+            mask_source = "array"
+
         layer_separation = None
         relief_depth = depth_compression[
             "compressed_depth"
         ]
 
-        if subject_mask is not None:
+        if effective_subject_mask is not None:
             layer_separation = (
                 AtlasReliefLayerSeparator.separate(
                     relief_depth,
-                    subject_mask,
+                    effective_subject_mask,
                     background_range=(
                         background_depth_range
                     ),
@@ -154,6 +182,7 @@ class AtlasReliefPipeline:
             "multiscale": multiscale,
             "depth_composition": depth_composition,
             "depth_compression": depth_compression,
+            "mask_input": mask_input,
             "layer_separation": layer_separation,
             "relief_result": relief_result,
             "image_settings": {
@@ -193,7 +222,13 @@ class AtlasReliefPipeline:
                     "gamma"
                 ],
                 "has_subject_mask": (
-                    subject_mask is not None
+                    effective_subject_mask is not None
+                ),
+                "mask_source": mask_source,
+                "mask_use_alpha": (
+                    mask_input["use_alpha"]
+                    if mask_input is not None
+                    else False
                 ),
                 "background_depth_range": (
                     None

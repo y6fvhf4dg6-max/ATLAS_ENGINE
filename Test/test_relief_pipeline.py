@@ -1340,3 +1340,205 @@ def test_pipeline_build_from_image_rejects_mask_shape_mismatch(
             detail_sigma=0.5,
             subject_mask=subject_mask,
         )
+
+
+def test_pipeline_build_from_image_loads_mask_path(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source.png"
+    mask_path = tmp_path / "subject-mask.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(image_path)
+
+    mask_image = Image.new(
+        "L",
+        (3, 3),
+    )
+    mask_image.putdata(
+        [
+            0,
+            0,
+            0,
+            0,
+            255,
+            255,
+            0,
+            255,
+            255,
+        ]
+    )
+    mask_image.save(mask_path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        mask_path=mask_path,
+    )
+
+    assert result["mask_input"]["type"] == (
+        "relief_mask_input"
+    )
+    assert result["layer_separation"][
+        "subject_mask"
+    ].shape == (3, 3)
+    assert result["image_settings"][
+        "mask_source"
+    ] == "file"
+
+
+def test_pipeline_build_from_image_supports_alpha_mask_path(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-alpha.png"
+    mask_path = tmp_path / "alpha-mask.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(image_path)
+
+    mask_image = Image.new(
+        "RGBA",
+        (3, 3),
+    )
+    mask_image.putdata(
+        [
+            (255, 255, 255, 0),
+            (255, 255, 255, 0),
+            (255, 255, 255, 0),
+            (255, 255, 255, 0),
+            (255, 255, 255, 255),
+            (255, 255, 255, 255),
+            (255, 255, 255, 0),
+            (255, 255, 255, 255),
+            (255, 255, 255, 255),
+        ]
+    )
+    mask_image.save(mask_path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        mask_path=mask_path,
+        mask_use_alpha=True,
+    )
+
+    assert result["mask_input"]["use_alpha"] is True
+    assert result["layer_separation"][
+        "subject_mask"
+    ][0, 0] == pytest.approx(0.0)
+    assert result["layer_separation"][
+        "subject_mask"
+    ][2, 2] == pytest.approx(1.0)
+
+
+def test_pipeline_build_from_image_rejects_mask_and_mask_path(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-conflict.png"
+    mask_path = tmp_path / "mask-conflict.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(image_path)
+
+    Image.new(
+        "L",
+        (3, 3),
+        255,
+    ).save(mask_path)
+
+    subject_mask = np.ones(
+        (3, 3),
+        dtype=np.float64,
+    )
+
+    with pytest.raises(ValueError):
+        AtlasReliefPipeline.build_from_image(
+            image_path,
+            width_mm=30.0,
+            depth_mm=30.0,
+            form_sigma=1.2,
+            detail_sigma=0.5,
+            subject_mask=subject_mask,
+            mask_path=mask_path,
+        )
+
+
+def test_pipeline_build_from_image_records_array_mask_source(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-array-mask.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.ones(
+        (3, 3),
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+    )
+
+    assert result["mask_input"] is None
+    assert result["image_settings"][
+        "mask_source"
+    ] == "array"
+
+
+def test_pipeline_build_from_image_records_no_mask_source(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-no-mask.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(image_path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+    )
+
+    assert result["mask_input"] is None
+    assert result["image_settings"][
+        "mask_source"
+    ] is None
