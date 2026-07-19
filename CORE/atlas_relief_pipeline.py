@@ -158,14 +158,23 @@ class AtlasReliefPipeline:
             mask_source = "array"
 
         mask_processing = None
+        mask_morphology = None
+        mask_feathering = None
 
         if effective_subject_mask is not None:
+            preprocessing_feather_sigma = (
+                0.0
+                if mask_morphology_operation
+                is not None
+                else mask_feather_sigma
+            )
+
             mask_processing = (
                 AtlasReliefMaskProcessor.process(
                     effective_subject_mask,
                     threshold=mask_threshold,
                     feather_sigma=(
-                        mask_feather_sigma
+                        preprocessing_feather_sigma
                     ),
                 )
             )
@@ -174,8 +183,6 @@ class AtlasReliefPipeline:
                     "processed_mask"
                 ]
             )
-
-        mask_morphology = None
 
         if mask_morphology_operation is not None:
             if effective_subject_mask is None:
@@ -203,6 +210,21 @@ class AtlasReliefPipeline:
                     "processed_mask"
                 ]
             )
+
+            if mask_feather_sigma > 0.0:
+                mask_feathering = (
+                    AtlasReliefMaskProcessor.process(
+                        effective_subject_mask,
+                        feather_sigma=(
+                            mask_feather_sigma
+                        ),
+                    )
+                )
+                effective_subject_mask = (
+                    mask_feathering[
+                        "processed_mask"
+                    ]
+                )
 
         layer_separation = None
         relief_depth = depth_compression[
@@ -243,6 +265,7 @@ class AtlasReliefPipeline:
             "mask_input": mask_input,
             "mask_processing": mask_processing,
             "mask_morphology": mask_morphology,
+            "mask_feathering": mask_feathering,
             "layer_separation": layer_separation,
             "relief_result": relief_result,
             "image_settings": {
@@ -300,9 +323,9 @@ class AtlasReliefPipeline:
                 "mask_feather_sigma": (
                     0.0
                     if mask_processing is None
-                    else mask_processing[
-                        "feather_sigma"
-                    ]
+                    else float(
+                        mask_feather_sigma
+                    )
                 ),
                 "mask_morphology_operation": (
                     None

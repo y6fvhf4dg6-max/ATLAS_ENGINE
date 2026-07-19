@@ -1965,3 +1965,50 @@ def test_pipeline_build_from_image_rejects_morphology_without_mask(
             mask_morphology_operation="dilate",
             mask_morphology_radius=1,
         )
+
+
+def test_pipeline_build_from_image_feathers_after_morphology(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = (
+        tmp_path
+        / "source-morphology-feather-order.png"
+    )
+
+    Image.new(
+        "L",
+        (7, 7),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.zeros(
+        (7, 7),
+        dtype=np.float64,
+    )
+    subject_mask[3, 3] = 1.0
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=70.0,
+        depth_mm=70.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+        mask_morphology_operation="dilate",
+        mask_morphology_radius=1,
+        mask_feather_sigma=1.0,
+    )
+
+    final_mask = result["layer_separation"][
+        "subject_mask"
+    ]
+
+    assert np.any(
+        (final_mask > 0.0)
+        & (final_mask < 1.0)
+    )
+    assert final_mask[3, 3] > final_mask[0, 0]
+    assert final_mask.min() >= 0.0
+    assert final_mask.max() <= 1.0
