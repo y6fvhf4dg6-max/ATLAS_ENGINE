@@ -132,6 +132,54 @@ class AtlasMeshValidator:
         if len(triangles) < 4:
             return {"structure_valid": False, "reason": "triangles_too_small"}
 
+        for triangle in triangles:
+            if triangle is None:
+                return {
+                    "structure_valid": False,
+                    "reason": "bad_triangle_size",
+                }
+
+            try:
+                triangle_size = len(triangle)
+            except TypeError:
+                return {
+                    "structure_valid": False,
+                    "reason": "bad_triangle_size",
+                }
+
+            if triangle_size != 3:
+                return {
+                    "structure_valid": False,
+                    "reason": "bad_triangle_size",
+                }
+
+            for point in triangle:
+                if point is None:
+                    return {
+                        "structure_valid": False,
+                        "reason": "bad_point_size",
+                    }
+
+                try:
+                    point_size = len(point)
+                except TypeError:
+                    return {
+                        "structure_valid": False,
+                        "reason": "bad_point_size",
+                    }
+
+                if point_size != 3:
+                    return {
+                        "structure_valid": False,
+                        "reason": "bad_point_size",
+                    }
+
+                if any(value is None for value in point):
+                    return {
+                        "structure_valid": False,
+                        "reason": "point_has_none",
+                    }
+
         for point in bottom + top:
             if len(point) != 3:
                 return {"structure_valid": False, "reason": "bad_point_size"}
