@@ -8,6 +8,9 @@ from CORE.atlas_height_map_engine import (
 from CORE.atlas_relief_depth_composer import (
     AtlasReliefDepthComposer,
 )
+from CORE.atlas_relief_depth_compressor import (
+    AtlasReliefDepthCompressor,
+)
 from CORE.atlas_relief_image_input import (
     AtlasReliefImageInput,
 )
@@ -54,6 +57,9 @@ class AtlasReliefPipeline:
         detail_weight: float = 0.35,
         micro_detail_weight: float = 0.10,
         micro_detail_limit: float = 0.05,
+        depth_lower_percentile: float = 1.0,
+        depth_upper_percentile: float = 99.0,
+        depth_gamma: float = 1.0,
         alpha_background_luminance: float = 1.0,
         **pipeline_arguments: Any,
     ) -> dict:
@@ -91,8 +97,23 @@ class AtlasReliefPipeline:
             )
         )
 
+        depth_compression = (
+            AtlasReliefDepthCompressor.compress(
+                depth_composition[
+                    "depth_candidate"
+                ],
+                lower_percentile=(
+                    depth_lower_percentile
+                ),
+                upper_percentile=(
+                    depth_upper_percentile
+                ),
+                gamma=depth_gamma,
+            )
+        )
+
         relief_result = AtlasReliefPipeline.build(
-            depth_composition["depth_candidate"],
+            depth_compression["compressed_depth"],
             width_mm=width_mm,
             depth_mm=depth_mm,
             **pipeline_arguments,
@@ -103,6 +124,7 @@ class AtlasReliefPipeline:
             "image_input": image_input,
             "multiscale": multiscale,
             "depth_composition": depth_composition,
+            "depth_compression": depth_compression,
             "relief_result": relief_result,
             "image_settings": {
                 "form_sigma": multiscale[
@@ -127,6 +149,19 @@ class AtlasReliefPipeline:
                         "micro_detail_limit"
                     ]
                 ),
+                "depth_lower_percentile": (
+                    depth_compression[
+                        "lower_percentile"
+                    ]
+                ),
+                "depth_upper_percentile": (
+                    depth_compression[
+                        "upper_percentile"
+                    ]
+                ),
+                "depth_gamma": depth_compression[
+                    "gamma"
+                ],
                 "alpha_background_luminance": (
                     image_input[
                         "alpha_background_luminance"

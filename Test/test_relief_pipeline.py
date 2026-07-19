@@ -895,3 +895,203 @@ def test_pipeline_build_from_image_is_deterministic(
         first["relief_result"]["mesh"]["triangles"]
         == second["relief_result"]["mesh"]["triangles"]
     )
+
+
+def test_pipeline_build_from_image_applies_depth_compression(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "compressed-image.png"
+
+    image = Image.new(
+        "L",
+        (5, 2),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            255,
+            0,
+            32,
+            64,
+            96,
+            255,
+        ]
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=50.0,
+        depth_mm=10.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        depth_lower_percentile=0.0,
+        depth_upper_percentile=80.0,
+        depth_gamma=1.0,
+    )
+
+    compression = result["depth_compression"]
+
+    assert compression["type"] == (
+        "relief_depth_compression"
+    )
+    assert compression["compressed_depth"].min() == (
+        pytest.approx(0.0)
+    )
+    assert compression["compressed_depth"].max() == (
+        pytest.approx(1.0)
+    )
+
+
+def test_pipeline_build_from_image_uses_compressed_depth(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "compressed-source.png"
+
+    image = Image.new(
+        "L",
+        (4, 3),
+    )
+    image.putdata(
+        [
+            0,
+            20,
+            40,
+            255,
+            10,
+            30,
+            50,
+            70,
+            15,
+            35,
+            55,
+            75,
+        ]
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=40.0,
+        depth_mm=30.0,
+        form_sigma=1.5,
+        detail_sigma=0.6,
+        depth_lower_percentile=5.0,
+        depth_upper_percentile=90.0,
+        depth_gamma=0.9,
+    )
+
+    compressed = result[
+        "depth_compression"
+    ]["compressed_depth"]
+
+    assert np.allclose(
+        result["relief_result"][
+            "normalized_height_map"
+        ],
+        compressed,
+    )
+
+
+def test_pipeline_build_from_image_records_compression_settings(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "compression-settings.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        depth_lower_percentile=2.5,
+        depth_upper_percentile=97.5,
+        depth_gamma=0.85,
+    )
+
+    settings = result["image_settings"]
+
+    assert settings[
+        "depth_lower_percentile"
+    ] == pytest.approx(2.5)
+    assert settings[
+        "depth_upper_percentile"
+    ] == pytest.approx(97.5)
+    assert settings["depth_gamma"] == pytest.approx(
+        0.85
+    )
+
+
+def test_pipeline_build_from_image_default_compression_policy(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "default-compression.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+    )
+
+    compression = result["depth_compression"]
+
+    assert compression["lower_percentile"] == (
+        pytest.approx(1.0)
+    )
+    assert compression["upper_percentile"] == (
+        pytest.approx(99.0)
+    )
+    assert compression["gamma"] == pytest.approx(
+        1.0
+    )
