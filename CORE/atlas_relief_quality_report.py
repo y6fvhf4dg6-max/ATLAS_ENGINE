@@ -139,6 +139,9 @@ class AtlasReliefQualityReport:
                 surface_analysis=(
                     surface_analysis
                 ),
+                slope_area_distribution=(
+                    slope_area_distribution
+                ),
                 warning_slope_degrees=(
                     warning_slope_degrees
                 ),
@@ -357,6 +360,7 @@ class AtlasReliefQualityReport:
         is_closed: bool,
         is_manifold: bool,
         surface_analysis: dict[str, Any],
+        slope_area_distribution: dict[str, Any],
         warning_slope_degrees: float,
         critical_slope_degrees: float,
     ) -> dict[str, Any]:
@@ -482,6 +486,100 @@ class AtlasReliefQualityReport:
                         ),
                     }
                 )
+
+            has_slope_issue = any(
+                "slope" in issue["code"]
+                for issue in issues
+            )
+
+            if not has_slope_issue:
+                critical_area_percent = (
+                    slope_area_distribution[
+                        "critical_slope_surface_area_percent"
+                    ]
+                )
+                warning_area_percent = (
+                    slope_area_distribution[
+                        "warning_slope_surface_area_percent"
+                    ]
+                )
+
+                triangle_metrics = (
+                    surface_analysis.get(
+                        "_slope_triangle_metrics",
+                        (),
+                    )
+                )
+
+                critical_triangle_slopes = [
+                    slope
+                    for slope, _area in triangle_metrics
+                    if slope >= critical_slope_degrees
+                ]
+                warning_triangle_slopes = [
+                    slope
+                    for slope, _area in triangle_metrics
+                    if (
+                        warning_slope_degrees
+                        <= slope
+                        < critical_slope_degrees
+                    )
+                ]
+
+                if (
+                    critical_area_percent
+                    is not None
+                    and critical_area_percent > 0.0
+                ):
+                    issues.append(
+                        {
+                            "severity": "FAIL",
+                            "code": (
+                                "critical_surface_slope_area"
+                            ),
+                            "value": max(
+                                critical_triangle_slopes
+                            ),
+                            "area_percent": (
+                                critical_area_percent
+                            ),
+                            "area_mm2": (
+                                slope_area_distribution[
+                                    "critical_slope_surface_area_mm2"
+                                ]
+                            ),
+                            "limit": (
+                                critical_slope_degrees
+                            ),
+                        }
+                    )
+                elif (
+                    warning_area_percent
+                    is not None
+                    and warning_area_percent > 0.0
+                ):
+                    issues.append(
+                        {
+                            "severity": "WARN",
+                            "code": (
+                                "steep_surface_slope_area"
+                            ),
+                            "value": max(
+                                warning_triangle_slopes
+                            ),
+                            "area_percent": (
+                                warning_area_percent
+                            ),
+                            "area_mm2": (
+                                slope_area_distribution[
+                                    "warning_slope_surface_area_mm2"
+                                ]
+                            ),
+                            "limit": (
+                                warning_slope_degrees
+                            ),
+                        }
+                    )
 
         severities = {
             issue["severity"]
