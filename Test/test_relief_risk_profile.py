@@ -95,3 +95,41 @@ def test_profile_is_immutable():
 def test_profile_rejects_invalid_values(arguments):
     with pytest.raises(ValueError):
         AtlasReliefRiskProfile(**arguments)
+
+
+def test_profile_accepts_optional_name():
+    profile = AtlasReliefRiskProfile(
+        name="prototype-safe",
+    )
+
+    assert profile.name == "prototype-safe"
+
+
+def test_profile_strips_name_whitespace():
+    profile = AtlasReliefRiskProfile(
+        name="  prototype-safe  ",
+    )
+
+    assert profile.name == "prototype-safe"
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "",
+        "   ",
+    ],
+)
+def test_profile_rejects_blank_name(name):
+    with pytest.raises(ValueError):
+        AtlasReliefRiskProfile(
+            name=name,
+        )
+
+
+def test_profile_pipeline_kwargs_exclude_name():
+    profile = AtlasReliefRiskProfile(
+        name="prototype-safe",
+    )
+
+    assert "name" not in profile.to_pipeline_kwargs()

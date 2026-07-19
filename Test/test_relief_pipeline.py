@@ -439,3 +439,41 @@ def test_pipeline_risk_profile_overrides_scalar_risk_arguments():
         result["settings"]["critical_slope_area_percent"]
         == 3.0
     )
+
+
+def test_pipeline_records_risk_profile_name():
+    from CORE.atlas_relief_risk_profile import (
+        AtlasReliefRiskProfile,
+    )
+
+    profile = AtlasReliefRiskProfile(
+        name="prototype-safe",
+    )
+
+    result = AtlasReliefPipeline.build(
+        [
+            [0.0, 0.5],
+            [0.5, 1.0],
+        ],
+        width_mm=40.0,
+        depth_mm=40.0,
+        risk_profile=profile,
+    )
+
+    assert (
+        result["settings"]["risk_profile_name"]
+        == "prototype-safe"
+    )
+
+
+def test_pipeline_records_no_profile_name_by_default():
+    result = AtlasReliefPipeline.build(
+        [
+            [0.0, 0.5],
+            [0.5, 1.0],
+        ],
+        width_mm=40.0,
+        depth_mm=40.0,
+    )
+
+    assert result["settings"]["risk_profile_name"] is None

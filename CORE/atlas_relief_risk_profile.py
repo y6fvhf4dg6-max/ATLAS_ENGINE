@@ -18,8 +18,28 @@ class AtlasReliefRiskProfile:
     critical_slope_degrees: float = 75.0
     warning_slope_area_percent: float = 0.0
     critical_slope_area_percent: float = 0.0
+    name: str | None = None
 
     def __post_init__(self) -> None:
+        if self.name is not None:
+            if not isinstance(self.name, str):
+                raise ValueError(
+                    "name must be a string or None."
+                )
+
+            normalized_name = self.name.strip()
+
+            if not normalized_name:
+                raise ValueError(
+                    "name must not be blank."
+                )
+
+            object.__setattr__(
+                self,
+                "name",
+                normalized_name,
+            )
+
         values = {
             "warning_slope_degrees": (
                 self.warning_slope_degrees

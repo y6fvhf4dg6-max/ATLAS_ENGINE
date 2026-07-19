@@ -208,6 +208,11 @@ class AtlasReliefPipeline:
                 "critical_slope_area_percent": float(
                     critical_slope_area_percent
                 ),
+                "risk_profile_name": (
+                    None
+                    if risk_profile is None
+                    else risk_profile.name
+                ),
                 "origin": (
                     float(origin_x),
                     float(origin_y),
