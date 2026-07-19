@@ -43,24 +43,60 @@ class AtlasReliefQualityReport:
                 "relief_mesh must contain triangles."
             )
 
+        if any(
+            not isinstance(
+                triangle,
+                (list, tuple),
+            )
+            or len(triangle) != 3
+            for triangle in triangles
+        ):
+            raise ValueError(
+                "Relief geometry contains malformed "
+                "triangles."
+            )
+
         points = [
             point
             for triangle in triangles
             for point in triangle
         ]
 
-        if any(
-            len(point) != 3
-            or not all(
-                math.isfinite(float(value))
-                for value in point
-            )
-            for point in points
-        ):
-            raise ValueError(
-                "Relief geometry contains invalid "
-                "vertex coordinates."
-            )
+        for point in points:
+            if (
+                not isinstance(
+                    point,
+                    (list, tuple),
+                )
+                or len(point) != 3
+            ):
+                raise ValueError(
+                    "Relief geometry contains invalid "
+                    "vertex coordinates."
+                )
+
+            try:
+                coordinates = [
+                    float(value)
+                    for value in point
+                ]
+            except (
+                TypeError,
+                ValueError,
+            ) as exc:
+                raise ValueError(
+                    "Relief geometry contains invalid "
+                    "vertex coordinates."
+                ) from exc
+
+            if not all(
+                math.isfinite(value)
+                for value in coordinates
+            ):
+                raise ValueError(
+                    "Relief geometry contains invalid "
+                    "vertex coordinates."
+                )
 
         topology = (
             AtlasMeshValidator._topology_report(
