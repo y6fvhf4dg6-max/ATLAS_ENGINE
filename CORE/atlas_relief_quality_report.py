@@ -116,6 +116,21 @@ class AtlasReliefQualityReport:
             )
         )
 
+        slope_area_distribution = (
+            AtlasReliefQualityReport
+            ._classify_slope_area_distribution(
+                surface_analysis=(
+                    surface_analysis
+                ),
+                warning_slope_degrees=(
+                    warning_slope_degrees
+                ),
+                critical_slope_degrees=(
+                    critical_slope_degrees
+                ),
+            )
+        )
+
         print_risk = (
             AtlasReliefQualityReport
             ._classify_print_risk(
@@ -177,7 +192,88 @@ class AtlasReliefQualityReport:
             ),
             **public_surface_analysis,
             **slope_distribution,
+            **slope_area_distribution,
             **print_risk,
+        }
+
+    @staticmethod
+    def _classify_slope_area_distribution(
+        *,
+        surface_analysis: dict[str, Any],
+        warning_slope_degrees: float,
+        critical_slope_degrees: float,
+    ) -> dict[str, Any]:
+        triangle_metrics = surface_analysis.get(
+            "_slope_triangle_metrics",
+            (),
+        )
+
+        if not triangle_metrics:
+            return {
+                "classified_slope_triangle_count": 0,
+                "classified_slope_surface_area_mm2": 0.0,
+                "safe_slope_surface_area_mm2": 0.0,
+                "warning_slope_surface_area_mm2": 0.0,
+                "critical_slope_surface_area_mm2": 0.0,
+                "safe_slope_surface_area_percent": None,
+                "warning_slope_surface_area_percent": None,
+                "critical_slope_surface_area_percent": None,
+            }
+
+        warning_slope_degrees = float(
+            warning_slope_degrees
+        )
+        critical_slope_degrees = float(
+            critical_slope_degrees
+        )
+
+        safe_area = 0.0
+        warning_area = 0.0
+        critical_area = 0.0
+
+        for slope, area in triangle_metrics:
+            if slope < warning_slope_degrees:
+                safe_area += area
+            elif slope < critical_slope_degrees:
+                warning_area += area
+            else:
+                critical_area += area
+
+        total_area = (
+            safe_area
+            + warning_area
+            + critical_area
+        )
+
+        return {
+            "classified_slope_triangle_count": len(
+                triangle_metrics
+            ),
+            "classified_slope_surface_area_mm2": (
+                total_area
+            ),
+            "safe_slope_surface_area_mm2": safe_area,
+            "warning_slope_surface_area_mm2": (
+                warning_area
+            ),
+            "critical_slope_surface_area_mm2": (
+                critical_area
+            ),
+            "safe_slope_surface_area_percent": (
+                safe_area
+                / total_area
+                * 100.0
+            ),
+            "warning_slope_surface_area_percent": (
+                warning_area
+                / total_area
+                * 100.0
+            ),
+            "critical_slope_surface_area_percent": (
+                critical_area
+                / total_area
+                * 100.0
+            ),
         }
 
     @staticmethod
@@ -429,6 +525,7 @@ class AtlasReliefQualityReport:
                 "maximum_slope_degrees": None,
                 "average_slope_degrees": None,
                 "_slope_values": (),
+                "_slope_triangle_metrics": (),
             }
 
         row_count = len(top_grid)
@@ -461,6 +558,7 @@ class AtlasReliefQualityReport:
         diagonal_spacing_values = []
         slope_values = []
         rise_values = []
+        slope_triangle_metrics = []
 
         for row in range(row_count):
             for column in range(
@@ -503,6 +601,12 @@ class AtlasReliefQualityReport:
                 column_count - 1
             ):
                 lower_left = top_grid[row][column]
+                lower_right = top_grid[row][
+                    column + 1
+                ]
+                upper_left = top_grid[
+                    row + 1
+                ][column]
                 upper_right = top_grid[
                     row + 1
                 ][column + 1]
@@ -515,6 +619,27 @@ class AtlasReliefQualityReport:
                     planar_values=(
                         diagonal_spacing_values
                     ),
+                )
+
+                slope_triangle_metrics.append(
+                    AtlasReliefQualityReport
+                    ._triangle_slope_and_area(
+                        (
+                            lower_left,
+                            lower_right,
+                            upper_right,
+                        )
+                    )
+                )
+                slope_triangle_metrics.append(
+                    AtlasReliefQualityReport
+                    ._triangle_slope_and_area(
+                        (
+                            lower_left,
+                            upper_right,
+                            upper_left,
+                        )
+                    )
                 )
 
         return {
@@ -543,7 +668,70 @@ class AtlasReliefQualityReport:
             "_slope_values": tuple(
                 slope_values
             ),
+            "_slope_triangle_metrics": tuple(
+                slope_triangle_metrics
+            ),
         }
+
+    @staticmethod
+    def _triangle_slope_and_area(
+        triangle: tuple[Any, Any, Any],
+    ) -> tuple[float, float]:
+        point_a, point_b, point_c = triangle
+
+        ax, ay, az = (
+            float(value)
+            for value in point_a
+        )
+        bx, by, bz = (
+            float(value)
+            for value in point_b
+        )
+        cx, cy, cz = (
+            float(value)
+            for value in point_c
+        )
+
+        ux = bx - ax
+        uy = by - ay
+        uz = bz - az
+
+        vx = cx - ax
+        vy = cy - ay
+        vz = cz - az
+
+        normal_x = uy * vz - uz * vy
+        normal_y = uz * vx - ux * vz
+        normal_z = ux * vy - uy * vx
+
+        normal_length = math.sqrt(
+            normal_x * normal_x
+            + normal_y * normal_y
+            + normal_z * normal_z
+        )
+
+        if normal_length <= 0.0:
+            raise ValueError(
+                "Relief top surface contains a "
+                "zero-area triangle."
+            )
+
+        horizontal_normal = math.sqrt(
+            normal_x * normal_x
+            + normal_y * normal_y
+        )
+
+        slope_degrees = math.degrees(
+            math.atan2(
+                horizontal_normal,
+                abs(normal_z),
+            )
+        )
+
+        return (
+            slope_degrees,
+            normal_length / 2.0,
+        )
 
     @staticmethod
     def _add_slope(
