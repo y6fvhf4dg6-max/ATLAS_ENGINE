@@ -311,3 +311,59 @@ def test_pipeline_rejects_invalid_contrast_settings(
             white_point=white_point,
             gamma=gamma,
         )
+
+
+def test_pipeline_forwards_slope_risk_thresholds():
+    result = AtlasReliefPipeline.build(
+        [
+            [0.5, 1.0],
+            [0.0, 0.5],
+        ],
+        width_mm=1.0,
+        depth_mm=1.0,
+        relief_height_mm=2.0,
+        warning_slope_degrees=50.0,
+        critical_slope_degrees=60.0,
+        warning_slope_area_percent=100.0,
+        critical_slope_area_percent=100.0,
+    )
+
+    report = result["quality_report"]
+
+    assert report["warning_slope_area_percent"] == 100.0
+    assert report["critical_slope_area_percent"] == 100.0
+    assert report["print_risk_status"] == "WARN"
+
+
+def test_pipeline_records_slope_risk_settings():
+    result = AtlasReliefPipeline.build(
+        _values(),
+        width_mm=30.0,
+        depth_mm=20.0,
+        warning_slope_degrees=48.0,
+        critical_slope_degrees=72.0,
+        warning_slope_area_percent=3.0,
+        critical_slope_area_percent=1.0,
+    )
+
+    settings = result["settings"]
+
+    assert settings["warning_slope_degrees"] == 48.0
+    assert settings["critical_slope_degrees"] == 72.0
+    assert settings["warning_slope_area_percent"] == 3.0
+    assert settings["critical_slope_area_percent"] == 1.0
+
+
+def test_pipeline_preserves_default_slope_risk_settings():
+    result = AtlasReliefPipeline.build(
+        _values(),
+        width_mm=30.0,
+        depth_mm=20.0,
+    )
+
+    settings = result["settings"]
+
+    assert settings["warning_slope_degrees"] == 55.0
+    assert settings["critical_slope_degrees"] == 75.0
+    assert settings["warning_slope_area_percent"] == 0.0
+    assert settings["critical_slope_area_percent"] == 0.0

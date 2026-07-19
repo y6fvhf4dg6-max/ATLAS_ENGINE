@@ -46,6 +46,10 @@ class AtlasReliefPipeline:
         origin_x: float = 0.0,
         origin_y: float = 0.0,
         origin_z: float = 0.0,
+        warning_slope_degrees: float = 55.0,
+        critical_slope_degrees: float = 75.0,
+        warning_slope_area_percent: float = 0.0,
+        critical_slope_area_percent: float = 0.0,
     ) -> dict:
         normalized = AtlasHeightMapEngine.normalize(
             values,
@@ -117,7 +121,21 @@ class AtlasReliefPipeline:
         )
 
         quality_report = (
-            AtlasReliefQualityReport.build(mesh)
+            AtlasReliefQualityReport.build(
+                mesh,
+                warning_slope_degrees=(
+                    warning_slope_degrees
+                ),
+                critical_slope_degrees=(
+                    critical_slope_degrees
+                ),
+                warning_slope_area_percent=(
+                    warning_slope_area_percent
+                ),
+                critical_slope_area_percent=(
+                    critical_slope_area_percent
+                ),
+            )
         )
 
         return {
@@ -156,6 +174,18 @@ class AtlasReliefPipeline:
                 ),
                 "relief_height_mm": float(
                     relief_height_mm
+                ),
+                "warning_slope_degrees": float(
+                    warning_slope_degrees
+                ),
+                "critical_slope_degrees": float(
+                    critical_slope_degrees
+                ),
+                "warning_slope_area_percent": float(
+                    warning_slope_area_percent
+                ),
+                "critical_slope_area_percent": float(
+                    critical_slope_area_percent
                 ),
                 "origin": (
                     float(origin_x),
