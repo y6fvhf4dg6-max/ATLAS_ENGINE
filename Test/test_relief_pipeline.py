@@ -1768,3 +1768,200 @@ def test_pipeline_build_from_image_has_no_mask_processing_without_mask(
     assert result["image_settings"][
         "mask_feather_sigma"
     ] == pytest.approx(0.0)
+
+
+def test_pipeline_build_from_image_applies_mask_morphology(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-morphology.png"
+
+    Image.new(
+        "L",
+        (5, 5),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.zeros(
+        (5, 5),
+        dtype=np.float64,
+    )
+    subject_mask[2, 2] = 1.0
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=50.0,
+        depth_mm=50.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+        mask_morphology_operation="dilate",
+        mask_morphology_radius=1,
+    )
+
+    expected = np.zeros(
+        (5, 5),
+        dtype=np.float64,
+    )
+    expected[1:4, 1:4] = 1.0
+
+    assert result["mask_morphology"]["type"] == (
+        "relief_mask_morphology_result"
+    )
+    np.testing.assert_array_equal(
+        result["mask_morphology"][
+            "processed_mask"
+        ],
+        expected,
+    )
+    np.testing.assert_array_equal(
+        result["layer_separation"][
+            "subject_mask"
+        ],
+        expected,
+    )
+
+
+def test_pipeline_build_from_image_applies_morphology_after_preprocessing(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-morphology-order.png"
+
+    Image.new(
+        "L",
+        (5, 5),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.zeros(
+        (5, 5),
+        dtype=np.float64,
+    )
+    subject_mask[2, 2] = 0.75
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=50.0,
+        depth_mm=50.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+        mask_threshold=0.5,
+        mask_morphology_operation="dilate",
+        mask_morphology_radius=1,
+    )
+
+    assert result["mask_processing"][
+        "processed_mask"
+    ][2, 2] == pytest.approx(1.0)
+
+    assert result["mask_morphology"][
+        "processed_mask"
+    ][1, 1] == pytest.approx(1.0)
+
+
+def test_pipeline_build_from_image_records_mask_morphology_settings(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-morphology-settings.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.ones(
+        (3, 3),
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+        mask_morphology_operation="close",
+        mask_morphology_radius=1,
+        mask_morphology_threshold=0.6,
+    )
+
+    settings = result["image_settings"]
+
+    assert settings[
+        "mask_morphology_operation"
+    ] == "close"
+    assert settings[
+        "mask_morphology_radius"
+    ] == 1
+    assert settings[
+        "mask_morphology_threshold"
+    ] == pytest.approx(0.6)
+
+
+def test_pipeline_build_from_image_skips_mask_morphology_by_default(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-no-morphology.png"
+
+    Image.new(
+        "L",
+        (2, 2),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.ones(
+        (2, 2),
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=20.0,
+        depth_mm=20.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+    )
+
+    assert result["mask_morphology"] is None
+    assert result["image_settings"][
+        "mask_morphology_operation"
+    ] is None
+    assert result["image_settings"][
+        "mask_morphology_radius"
+    ] == 0
+
+
+def test_pipeline_build_from_image_rejects_morphology_without_mask(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-morphology-no-mask.png"
+
+    Image.new(
+        "L",
+        (2, 2),
+        128,
+    ).save(image_path)
+
+    with pytest.raises(ValueError):
+        AtlasReliefPipeline.build_from_image(
+            image_path,
+            width_mm=20.0,
+            depth_mm=20.0,
+            form_sigma=1.2,
+            detail_sigma=0.5,
+            mask_morphology_operation="dilate",
+            mask_morphology_radius=1,
+        )

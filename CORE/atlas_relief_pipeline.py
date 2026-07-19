@@ -20,6 +20,9 @@ from CORE.atlas_relief_layer_separator import (
 from CORE.atlas_relief_mask_input import (
     AtlasReliefMaskInput,
 )
+from CORE.atlas_relief_mask_morphology import (
+    AtlasReliefMaskMorphology,
+)
 from CORE.atlas_relief_mask_processor import (
     AtlasReliefMaskProcessor,
 )
@@ -74,6 +77,9 @@ class AtlasReliefPipeline:
         mask_use_alpha: bool = False,
         mask_threshold: float | None = None,
         mask_feather_sigma: float = 0.0,
+        mask_morphology_operation: str | None = None,
+        mask_morphology_radius: int = 0,
+        mask_morphology_threshold: float = 0.5,
         background_depth_range: Any = (0.0, 0.40),
         foreground_depth_range: Any = (0.60, 1.0),
         alpha_background_luminance: float = 1.0,
@@ -169,6 +175,35 @@ class AtlasReliefPipeline:
                 ]
             )
 
+        mask_morphology = None
+
+        if mask_morphology_operation is not None:
+            if effective_subject_mask is None:
+                raise ValueError(
+                    "mask morphology requires a "
+                    "subject mask."
+                )
+
+            mask_morphology = (
+                AtlasReliefMaskMorphology.apply(
+                    effective_subject_mask,
+                    operation=(
+                        mask_morphology_operation
+                    ),
+                    radius=(
+                        mask_morphology_radius
+                    ),
+                    threshold=(
+                        mask_morphology_threshold
+                    ),
+                )
+            )
+            effective_subject_mask = (
+                mask_morphology[
+                    "processed_mask"
+                ]
+            )
+
         layer_separation = None
         relief_depth = depth_compression[
             "compressed_depth"
@@ -207,6 +242,7 @@ class AtlasReliefPipeline:
             "depth_compression": depth_compression,
             "mask_input": mask_input,
             "mask_processing": mask_processing,
+            "mask_morphology": mask_morphology,
             "layer_separation": layer_separation,
             "relief_result": relief_result,
             "image_settings": {
@@ -266,6 +302,27 @@ class AtlasReliefPipeline:
                     if mask_processing is None
                     else mask_processing[
                         "feather_sigma"
+                    ]
+                ),
+                "mask_morphology_operation": (
+                    None
+                    if mask_morphology is None
+                    else mask_morphology[
+                        "operation"
+                    ]
+                ),
+                "mask_morphology_radius": (
+                    0
+                    if mask_morphology is None
+                    else mask_morphology[
+                        "radius"
+                    ]
+                ),
+                "mask_morphology_threshold": (
+                    None
+                    if mask_morphology is None
+                    else mask_morphology[
+                        "threshold"
                     ]
                 ),
                 "background_depth_range": (
