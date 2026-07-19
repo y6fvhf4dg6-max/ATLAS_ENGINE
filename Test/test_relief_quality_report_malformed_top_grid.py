@@ -108,7 +108,7 @@ def test_valid_top_grid_still_produces_surface_metrics():
     assert report[
         "surface_analysis_available"
     ] is True
-    assert report["surface_edge_count"] == 4
+    assert report["surface_edge_count"] == 5
     assert report[
         "maximum_slope_degrees"
     ] >= 0.0

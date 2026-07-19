@@ -157,7 +157,7 @@ def test_report_contains_surface_sampling_metrics():
         "sample_spacing_y_mm"
     ] == pytest.approx(5.0)
 
-    assert report["surface_edge_count"] == 12
+    assert report["surface_edge_count"] == 16
 
 
 def test_report_contains_slope_metrics():

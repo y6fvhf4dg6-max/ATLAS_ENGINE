@@ -360,6 +360,7 @@ class AtlasReliefQualityReport:
 
         spacing_x_values = []
         spacing_y_values = []
+        diagonal_spacing_values = []
         slope_values = []
         rise_values = []
 
@@ -396,6 +397,25 @@ class AtlasReliefQualityReport:
                     rise_values=rise_values,
                     planar_values=(
                         spacing_y_values
+                    ),
+                )
+
+        for row in range(row_count - 1):
+            for column in range(
+                column_count - 1
+            ):
+                lower_left = top_grid[row][column]
+                upper_right = top_grid[
+                    row + 1
+                ][column + 1]
+
+                AtlasReliefQualityReport._add_slope(
+                    lower_left,
+                    upper_right,
+                    slope_values=slope_values,
+                    rise_values=rise_values,
+                    planar_values=(
+                        diagonal_spacing_values
                     ),
                 )
 
