@@ -14,6 +14,9 @@ from CORE.atlas_relief_quality_report import (
 from CORE.atlas_relief_risk_profile import (
     AtlasReliefRiskProfile,
 )
+from CORE.atlas_relief_sampling_plan import (
+    AtlasReliefSamplingPlan,
+)
 
 
 class AtlasReliefPipeline:
@@ -54,7 +57,39 @@ class AtlasReliefPipeline:
         warning_slope_area_percent: float = 0.0,
         critical_slope_area_percent: float = 0.0,
         risk_profile: AtlasReliefRiskProfile | None = None,
+        sampling_plan: AtlasReliefSamplingPlan | None = None,
     ) -> dict:
+        if sampling_plan is not None:
+            if (
+                target_rows is not None
+                or target_columns is not None
+            ):
+                raise ValueError(
+                    "sampling_plan cannot be combined with "
+                    "target_rows or target_columns."
+                )
+
+            if (
+                sampling_plan.width_mm
+                != float(width_mm)
+                or sampling_plan.depth_mm
+                != float(depth_mm)
+            ):
+                raise ValueError(
+                    "sampling_plan dimensions must match "
+                    "pipeline dimensions."
+                )
+
+            sampling_arguments = (
+                sampling_plan.to_pipeline_kwargs()
+            )
+            target_rows = sampling_arguments[
+                "target_rows"
+            ]
+            target_columns = sampling_arguments[
+                "target_columns"
+            ]
+
         if risk_profile is not None:
             risk_arguments = (
                 risk_profile.to_pipeline_kwargs()
@@ -181,6 +216,43 @@ class AtlasReliefPipeline:
                 ),
                 "target_columns": (
                     processed.shape[1]
+                ),
+                "target_sample_spacing_mm": (
+                    None
+                    if sampling_plan is None
+                    else (
+                        sampling_plan
+                        .target_sample_spacing_mm
+                    )
+                ),
+                "effective_spacing_x_mm": (
+                    None
+                    if sampling_plan is None
+                    else (
+                        sampling_plan
+                        .effective_spacing_x_mm
+                    )
+                ),
+                "effective_spacing_y_mm": (
+                    None
+                    if sampling_plan is None
+                    else (
+                        sampling_plan
+                        .effective_spacing_y_mm
+                    )
+                ),
+                "sample_count": (
+                    None
+                    if sampling_plan is None
+                    else sampling_plan.sample_count
+                ),
+                "expected_triangle_count": (
+                    None
+                    if sampling_plan is None
+                    else (
+                        sampling_plan
+                        .total_triangle_count
+                    )
                 ),
                 "smoothing_sigma": (
                     smoothing_sigma

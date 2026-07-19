@@ -477,3 +477,168 @@ def test_pipeline_records_no_profile_name_by_default():
     )
 
     assert result["settings"]["risk_profile_name"] is None
+
+
+def test_pipeline_accepts_physical_sampling_plan():
+    from CORE.atlas_relief_sampling_plan import (
+        AtlasReliefSamplingPlan,
+    )
+
+    plan = AtlasReliefSamplingPlan(
+        width_mm=40.0,
+        depth_mm=30.0,
+        target_sample_spacing_mm=10.0,
+    )
+
+    result = AtlasReliefPipeline.build(
+        [
+            [0.0, 0.5],
+            [0.5, 1.0],
+        ],
+        width_mm=40.0,
+        depth_mm=30.0,
+        sampling_plan=plan,
+    )
+
+    assert result["processed_height_map"].shape == (
+        4,
+        5,
+    )
+    assert result["mesh"]["row_count"] == 4
+    assert result["mesh"]["column_count"] == 5
+
+
+def test_pipeline_records_sampling_plan_metadata():
+    from CORE.atlas_relief_sampling_plan import (
+        AtlasReliefSamplingPlan,
+    )
+
+    plan = AtlasReliefSamplingPlan(
+        width_mm=41.0,
+        depth_mm=31.0,
+        target_sample_spacing_mm=10.0,
+    )
+
+    result = AtlasReliefPipeline.build(
+        [
+            [0.0, 0.5],
+            [0.5, 1.0],
+        ],
+        width_mm=41.0,
+        depth_mm=31.0,
+        sampling_plan=plan,
+    )
+
+    settings = result["settings"]
+
+    assert settings[
+        "target_sample_spacing_mm"
+    ] == 10.0
+    assert settings[
+        "effective_spacing_x_mm"
+    ] == pytest.approx(8.2)
+    assert settings[
+        "effective_spacing_y_mm"
+    ] == pytest.approx(7.75)
+    assert settings["sample_count"] == 30
+    assert (
+        settings["expected_triangle_count"]
+        == plan.total_triangle_count
+    )
+
+
+def test_pipeline_sampling_metadata_is_none_by_default():
+    result = AtlasReliefPipeline.build(
+        [
+            [0.0, 0.5],
+            [0.5, 1.0],
+        ],
+        width_mm=40.0,
+        depth_mm=30.0,
+    )
+
+    settings = result["settings"]
+
+    assert settings[
+        "target_sample_spacing_mm"
+    ] is None
+    assert settings[
+        "effective_spacing_x_mm"
+    ] is None
+    assert settings[
+        "effective_spacing_y_mm"
+    ] is None
+    assert settings["sample_count"] is None
+    assert settings[
+        "expected_triangle_count"
+    ] is None
+
+
+def test_pipeline_rejects_sampling_plan_with_explicit_target_size():
+    from CORE.atlas_relief_sampling_plan import (
+        AtlasReliefSamplingPlan,
+    )
+
+    plan = AtlasReliefSamplingPlan(
+        width_mm=40.0,
+        depth_mm=30.0,
+        target_sample_spacing_mm=10.0,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "sampling_plan cannot be combined with "
+            "target_rows or target_columns"
+        ),
+    ):
+        AtlasReliefPipeline.build(
+            [
+                [0.0, 0.5],
+                [0.5, 1.0],
+            ],
+            width_mm=40.0,
+            depth_mm=30.0,
+            target_rows=4,
+            target_columns=5,
+            sampling_plan=plan,
+        )
+
+
+@pytest.mark.parametrize(
+    "width_mm,depth_mm",
+    [
+        (41.0, 30.0),
+        (40.0, 31.0),
+    ],
+)
+def test_pipeline_rejects_sampling_plan_dimension_mismatch(
+    width_mm,
+    depth_mm,
+):
+    from CORE.atlas_relief_sampling_plan import (
+        AtlasReliefSamplingPlan,
+    )
+
+    plan = AtlasReliefSamplingPlan(
+        width_mm=40.0,
+        depth_mm=30.0,
+        target_sample_spacing_mm=10.0,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "sampling_plan dimensions must match "
+            "pipeline dimensions"
+        ),
+    ):
+        AtlasReliefPipeline.build(
+            [
+                [0.0, 0.5],
+                [0.5, 1.0],
+            ],
+            width_mm=width_mm,
+            depth_mm=depth_mm,
+            sampling_plan=plan,
+        )
