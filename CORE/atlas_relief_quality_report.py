@@ -101,6 +101,21 @@ class AtlasReliefQualityReport:
             )
         )
 
+        slope_distribution = (
+            AtlasReliefQualityReport
+            ._classify_slope_distribution(
+                surface_analysis=(
+                    surface_analysis
+                ),
+                warning_slope_degrees=(
+                    warning_slope_degrees
+                ),
+                critical_slope_degrees=(
+                    critical_slope_degrees
+                ),
+            )
+        )
+
         print_risk = (
             AtlasReliefQualityReport
             ._classify_print_risk(
@@ -117,6 +132,12 @@ class AtlasReliefQualityReport:
                 ),
             )
         )
+
+        public_surface_analysis = {
+            key: value
+            for key, value in surface_analysis.items()
+            if not key.startswith("_")
+        }
 
         return {
             "geometry_type": (
@@ -154,8 +175,84 @@ class AtlasReliefQualityReport:
             "is_printable_topology": (
                 is_closed and is_manifold
             ),
-            **surface_analysis,
+            **public_surface_analysis,
+            **slope_distribution,
             **print_risk,
+        }
+
+    @staticmethod
+    def _classify_slope_distribution(
+        *,
+        surface_analysis: dict[str, Any],
+        warning_slope_degrees: float,
+        critical_slope_degrees: float,
+    ) -> dict[str, Any]:
+        slope_values = surface_analysis.get(
+            "_slope_values",
+            (),
+        )
+
+        if not slope_values:
+            return {
+                "classified_slope_sample_count": 0,
+                "safe_slope_sample_count": 0,
+                "warning_slope_sample_count": 0,
+                "critical_slope_sample_count": 0,
+                "safe_slope_sample_percent": None,
+                "warning_slope_sample_percent": None,
+                "critical_slope_sample_percent": None,
+            }
+
+        warning_slope_degrees = float(
+            warning_slope_degrees
+        )
+        critical_slope_degrees = float(
+            critical_slope_degrees
+        )
+
+        safe_count = sum(
+            slope < warning_slope_degrees
+            for slope in slope_values
+        )
+        warning_count = sum(
+            warning_slope_degrees
+            <= slope
+            < critical_slope_degrees
+            for slope in slope_values
+        )
+        critical_count = sum(
+            slope >= critical_slope_degrees
+            for slope in slope_values
+        )
+
+        total_count = len(slope_values)
+
+        return {
+            "classified_slope_sample_count": (
+                total_count
+            ),
+            "safe_slope_sample_count": safe_count,
+            "warning_slope_sample_count": (
+                warning_count
+            ),
+            "critical_slope_sample_count": (
+                critical_count
+            ),
+            "safe_slope_sample_percent": (
+                safe_count
+                / total_count
+                * 100.0
+            ),
+            "warning_slope_sample_percent": (
+                warning_count
+                / total_count
+                * 100.0
+            ),
+            "critical_slope_sample_percent": (
+                critical_count
+                / total_count
+                * 100.0
+            ),
         }
 
     @staticmethod
@@ -331,6 +428,7 @@ class AtlasReliefQualityReport:
                 "maximum_adjacent_rise_mm": None,
                 "maximum_slope_degrees": None,
                 "average_slope_degrees": None,
+                "_slope_values": (),
             }
 
         row_count = len(top_grid)
@@ -441,6 +539,9 @@ class AtlasReliefQualityReport:
             "average_slope_degrees": (
                 sum(slope_values)
                 / len(slope_values)
+            ),
+            "_slope_values": tuple(
+                slope_values
             ),
         }
 
