@@ -22,6 +22,8 @@ class AtlasReliefQualityReport:
         *,
         warning_slope_degrees: float = 55.0,
         critical_slope_degrees: float = 75.0,
+        warning_slope_area_percent: float = 0.0,
+        critical_slope_area_percent: float = 0.0,
     ) -> dict[str, Any]:
         if not isinstance(relief_mesh, dict):
             raise ValueError(
@@ -148,6 +150,12 @@ class AtlasReliefQualityReport:
                 critical_slope_degrees=(
                     critical_slope_degrees
                 ),
+                warning_slope_area_percent=(
+                    warning_slope_area_percent
+                ),
+                critical_slope_area_percent=(
+                    critical_slope_area_percent
+                ),
             )
         )
 
@@ -196,6 +204,16 @@ class AtlasReliefQualityReport:
             **public_surface_analysis,
             **slope_distribution,
             **slope_area_distribution,
+            "warning_slope_area_percent": (
+                float(
+                    warning_slope_area_percent
+                )
+            ),
+            "critical_slope_area_percent": (
+                float(
+                    critical_slope_area_percent
+                )
+            ),
             **print_risk,
         }
 
@@ -363,6 +381,8 @@ class AtlasReliefQualityReport:
         slope_area_distribution: dict[str, Any],
         warning_slope_degrees: float,
         critical_slope_degrees: float,
+        warning_slope_area_percent: float,
+        critical_slope_area_percent: float,
     ) -> dict[str, Any]:
         thresholds = {
             "warning_slope_degrees": (
@@ -370,6 +390,12 @@ class AtlasReliefQualityReport:
             ),
             "critical_slope_degrees": (
                 critical_slope_degrees
+            ),
+            "warning_slope_area_percent": (
+                warning_slope_area_percent
+            ),
+            "critical_slope_area_percent": (
+                critical_slope_area_percent
             ),
         }
 
@@ -384,6 +410,12 @@ class AtlasReliefQualityReport:
         )
         critical_slope_degrees = float(
             critical_slope_degrees
+        )
+        warning_slope_area_percent = float(
+            warning_slope_area_percent
+        )
+        critical_slope_area_percent = float(
+            critical_slope_area_percent
         )
 
         if not (
@@ -414,6 +446,26 @@ class AtlasReliefQualityReport:
                 "warning_slope_degrees must be "
                 "lower than "
                 "critical_slope_degrees."
+            )
+
+        if not (
+            0.0
+            <= warning_slope_area_percent
+            <= 100.0
+        ):
+            raise ValueError(
+                "warning_slope_area_percent must "
+                "be in the 0.0..100.0 range."
+            )
+
+        if not (
+            0.0
+            <= critical_slope_area_percent
+            <= 100.0
+        ):
+            raise ValueError(
+                "critical_slope_area_percent must "
+                "be in the 0.0..100.0 range."
             )
 
         issues = []
@@ -530,6 +582,8 @@ class AtlasReliefQualityReport:
                     critical_area_percent
                     is not None
                     and critical_area_percent > 0.0
+                    and critical_area_percent
+                    >= critical_slope_area_percent
                 ):
                     issues.append(
                         {
@@ -557,6 +611,8 @@ class AtlasReliefQualityReport:
                     warning_area_percent
                     is not None
                     and warning_area_percent > 0.0
+                    and warning_area_percent
+                    >= warning_slope_area_percent
                 ):
                     issues.append(
                         {
