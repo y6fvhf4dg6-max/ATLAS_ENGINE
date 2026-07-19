@@ -1542,3 +1542,229 @@ def test_pipeline_build_from_image_records_no_mask_source(
     assert result["image_settings"][
         "mask_source"
     ] is None
+
+
+def test_pipeline_build_from_image_processes_mask_path(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-mask-process.png"
+    mask_path = tmp_path / "mask-process.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(image_path)
+
+    mask_image = Image.new(
+        "L",
+        (3, 3),
+    )
+    mask_image.putdata(
+        [
+            0,
+            100,
+            0,
+            100,
+            200,
+            100,
+            0,
+            100,
+            0,
+        ]
+    )
+    mask_image.save(mask_path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        mask_path=mask_path,
+        mask_threshold=0.5,
+    )
+
+    assert result["mask_processing"]["type"] == (
+        "relief_mask_processing_result"
+    )
+    np.testing.assert_allclose(
+        result["mask_processing"][
+            "processed_mask"
+        ],
+        np.array(
+            [
+                [0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0],
+            ],
+            dtype=np.float64,
+        ),
+    )
+    np.testing.assert_allclose(
+        result["layer_separation"][
+            "subject_mask"
+        ],
+        result["mask_processing"][
+            "processed_mask"
+        ],
+    )
+
+
+def test_pipeline_build_from_image_feathers_mask_path(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-mask-feather.png"
+    mask_path = tmp_path / "mask-feather.png"
+
+    Image.new(
+        "L",
+        (5, 5),
+        128,
+    ).save(image_path)
+
+    mask_image = Image.new(
+        "L",
+        (5, 5),
+        0,
+    )
+    mask_image.putpixel(
+        (2, 2),
+        255,
+    )
+    mask_image.save(mask_path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=50.0,
+        depth_mm=50.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        mask_path=mask_path,
+        mask_feather_sigma=1.0,
+    )
+
+    processed = result["mask_processing"][
+        "processed_mask"
+    ]
+
+    assert processed[2, 2] < 1.0
+    assert processed[2, 1] > 0.0
+    assert result["image_settings"][
+        "mask_feather_sigma"
+    ] == pytest.approx(1.0)
+
+
+def test_pipeline_build_from_image_processes_array_mask(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-array-process.png"
+
+    Image.new(
+        "L",
+        (2, 2),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.array(
+        [
+            [-1.0, 0.25],
+            [0.75, 2.0],
+        ],
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=20.0,
+        depth_mm=20.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+    )
+
+    np.testing.assert_allclose(
+        result["mask_processing"][
+            "processed_mask"
+        ],
+        np.array(
+            [
+                [0.0, 0.25],
+                [0.75, 1.0],
+            ],
+            dtype=np.float64,
+        ),
+    )
+
+
+def test_pipeline_build_from_image_records_mask_processing_settings(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-mask-settings.png"
+
+    Image.new(
+        "L",
+        (2, 2),
+        128,
+    ).save(image_path)
+
+    subject_mask = np.ones(
+        (2, 2),
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=20.0,
+        depth_mm=20.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+        mask_threshold=0.4,
+        mask_feather_sigma=0.8,
+    )
+
+    assert result["image_settings"][
+        "mask_threshold"
+    ] == pytest.approx(0.4)
+    assert result["image_settings"][
+        "mask_feather_sigma"
+    ] == pytest.approx(0.8)
+
+
+def test_pipeline_build_from_image_has_no_mask_processing_without_mask(
+    tmp_path,
+):
+    from PIL import Image
+
+    image_path = tmp_path / "source-no-mask-processing.png"
+
+    Image.new(
+        "L",
+        (2, 2),
+        128,
+    ).save(image_path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        image_path,
+        width_mm=20.0,
+        depth_mm=20.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+    )
+
+    assert result["mask_processing"] is None
+    assert result["image_settings"][
+        "mask_threshold"
+    ] is None
+    assert result["image_settings"][
+        "mask_feather_sigma"
+    ] == pytest.approx(0.0)

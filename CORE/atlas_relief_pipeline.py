@@ -20,6 +20,9 @@ from CORE.atlas_relief_layer_separator import (
 from CORE.atlas_relief_mask_input import (
     AtlasReliefMaskInput,
 )
+from CORE.atlas_relief_mask_processor import (
+    AtlasReliefMaskProcessor,
+)
 from CORE.atlas_relief_multiscale_decomposer import (
     AtlasReliefMultiscaleDecomposer,
 )
@@ -69,6 +72,8 @@ class AtlasReliefPipeline:
         subject_mask: Any | None = None,
         mask_path: Any | None = None,
         mask_use_alpha: bool = False,
+        mask_threshold: float | None = None,
+        mask_feather_sigma: float = 0.0,
         background_depth_range: Any = (0.0, 0.40),
         foreground_depth_range: Any = (0.60, 1.0),
         alpha_background_luminance: float = 1.0,
@@ -146,6 +151,24 @@ class AtlasReliefPipeline:
         elif subject_mask is not None:
             mask_source = "array"
 
+        mask_processing = None
+
+        if effective_subject_mask is not None:
+            mask_processing = (
+                AtlasReliefMaskProcessor.process(
+                    effective_subject_mask,
+                    threshold=mask_threshold,
+                    feather_sigma=(
+                        mask_feather_sigma
+                    ),
+                )
+            )
+            effective_subject_mask = (
+                mask_processing[
+                    "processed_mask"
+                ]
+            )
+
         layer_separation = None
         relief_depth = depth_compression[
             "compressed_depth"
@@ -183,6 +206,7 @@ class AtlasReliefPipeline:
             "depth_composition": depth_composition,
             "depth_compression": depth_compression,
             "mask_input": mask_input,
+            "mask_processing": mask_processing,
             "layer_separation": layer_separation,
             "relief_result": relief_result,
             "image_settings": {
@@ -229,6 +253,20 @@ class AtlasReliefPipeline:
                     mask_input["use_alpha"]
                     if mask_input is not None
                     else False
+                ),
+                "mask_threshold": (
+                    None
+                    if mask_processing is None
+                    else mask_processing[
+                        "threshold"
+                    ]
+                ),
+                "mask_feather_sigma": (
+                    0.0
+                    if mask_processing is None
+                    else mask_processing[
+                        "feather_sigma"
+                    ]
                 ),
                 "background_depth_range": (
                     None
