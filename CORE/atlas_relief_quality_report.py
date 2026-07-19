@@ -433,20 +433,32 @@ class AtlasReliefQualityReport:
         rise_values: list[float],
         planar_values: list[float],
     ) -> None:
-        if (
-            len(point_a) != 3
-            or len(point_b) != 3
-        ):
-            raise ValueError(
-                "Relief top_grid contains an "
-                "invalid point."
-            )
+        for point in (point_a, point_b):
+            try:
+                point_size = len(point)
+            except TypeError:
+                raise ValueError(
+                    "Relief top_grid contains an "
+                    "invalid point."
+                ) from None
 
-        coordinates = [
-            float(value)
-            for point in (point_a, point_b)
-            for value in point
-        ]
+            if point_size != 3:
+                raise ValueError(
+                    "Relief top_grid contains an "
+                    "invalid point."
+                )
+
+        try:
+            coordinates = [
+                float(value)
+                for point in (point_a, point_b)
+                for value in point
+            ]
+        except (TypeError, ValueError):
+            raise ValueError(
+                "Relief top_grid contains "
+                "invalid coordinates."
+            ) from None
 
         if not all(
             math.isfinite(value)
