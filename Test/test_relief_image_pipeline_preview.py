@@ -9,6 +9,9 @@ from CORE.atlas_relief_pipeline import (
 from EXPORT.atlas_stl_writer import (
     AtlasSTLWriter,
 )
+from Test.fixtures.relief.relief_synthetic_portrait_fixture import (
+    write_synthetic_portrait_fixture,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -43,79 +46,6 @@ HEIGHT_MAP_OUTPUT_PATH = (
 )
 
 
-def _create_portrait_fixture() -> None:
-    PREVIEW_DIRECTORY.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    height = 48
-    width = 40
-
-    y, x = np.mgrid[
-        0:height,
-        0:width,
-    ].astype(np.float64)
-
-    face = np.exp(
-        -(
-            ((x - 20.0) / 10.0) ** 2
-            + ((y - 22.0) / 15.0) ** 2
-        )
-    )
-
-    nose = np.exp(
-        -(
-            ((x - 20.0) / 2.8) ** 2
-            + ((y - 23.0) / 5.0) ** 2
-        )
-    )
-
-    eyes = (
-        np.exp(
-            -(
-                ((x - 15.5) / 2.0) ** 2
-                + ((y - 18.0) / 1.2) ** 2
-            )
-        )
-        + np.exp(
-            -(
-                ((x - 24.5) / 2.0) ** 2
-                + ((y - 18.0) / 1.2) ** 2
-            )
-        )
-    )
-
-    luminance = np.clip(
-        0.18
-        + 0.62 * face
-        + 0.18 * nose
-        - 0.12 * eyes,
-        0.0,
-        1.0,
-    )
-
-    mask = np.clip(
-        (face - 0.12) / 0.55,
-        0.0,
-        1.0,
-    )
-
-    Image.fromarray(
-        np.rint(
-            luminance * 255.0
-        ).astype(np.uint8),
-        mode="L",
-    ).save(IMAGE_OUTPUT_PATH)
-
-    Image.fromarray(
-        np.rint(
-            mask * 255.0
-        ).astype(np.uint8),
-        mode="L",
-    ).save(MASK_OUTPUT_PATH)
-
-
 def _save_height_map_preview(
     height_map: np.ndarray,
 ) -> None:
@@ -139,7 +69,15 @@ def _save_height_map_preview(
 
 
 def main() -> None:
-    _create_portrait_fixture()
+    write_synthetic_portrait_fixture(
+        PREVIEW_DIRECTORY,
+        image_filename=(
+            IMAGE_OUTPUT_PATH.name
+        ),
+        mask_filename=(
+            MASK_OUTPUT_PATH.name
+        ),
+    )
 
     STL_OUTPUT_PATH.parent.mkdir(
         parents=True,

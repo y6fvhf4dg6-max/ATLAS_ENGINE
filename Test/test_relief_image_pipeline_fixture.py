@@ -2,103 +2,29 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from PIL import Image
-
 from CORE.atlas_relief_pipeline import (
     AtlasReliefPipeline,
 )
-
-
-def _create_portrait_fixture(
-    fixture_dir: Path,
-) -> tuple[Path, Path]:
-    fixture_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    image_path = (
-        fixture_dir / "synthetic_portrait.png"
-    )
-    mask_path = (
-        fixture_dir / "synthetic_portrait_mask.png"
-    )
-
-    height = 48
-    width = 40
-
-    y, x = np.mgrid[
-        0:height,
-        0:width,
-    ].astype(np.float64)
-
-    face = np.exp(
-        -(
-            ((x - 20.0) / 10.0) ** 2
-            + ((y - 22.0) / 15.0) ** 2
-        )
-    )
-
-    nose = np.exp(
-        -(
-            ((x - 20.0) / 2.8) ** 2
-            + ((y - 23.0) / 5.0) ** 2
-        )
-    )
-
-    eyes = (
-        np.exp(
-            -(
-                ((x - 15.5) / 2.0) ** 2
-                + ((y - 18.0) / 1.2) ** 2
-            )
-        )
-        + np.exp(
-            -(
-                ((x - 24.5) / 2.0) ** 2
-                + ((y - 18.0) / 1.2) ** 2
-            )
-        )
-    )
-
-    luminance = np.clip(
-        0.18
-        + 0.62 * face
-        + 0.18 * nose
-        - 0.12 * eyes,
-        0.0,
-        1.0,
-    )
-
-    mask = np.clip(
-        (face - 0.12) / 0.55,
-        0.0,
-        1.0,
-    )
-
-    Image.fromarray(
-        np.rint(
-            luminance * 255.0
-        ).astype(np.uint8),
-        mode="L",
-    ).save(image_path)
-
-    Image.fromarray(
-        np.rint(
-            mask * 255.0
-        ).astype(np.uint8),
-        mode="L",
-    ).save(mask_path)
-
-    return image_path, mask_path
+from Test.fixtures.relief.relief_synthetic_portrait_fixture import (
+    write_synthetic_portrait_fixture,
+)
 
 
 def _build_fixture_result(
     tmp_path: Path,
 ) -> dict:
-    image_path, mask_path = (
-        _create_portrait_fixture(tmp_path)
+    fixture_paths = (
+        write_synthetic_portrait_fixture(
+            tmp_path,
+        )
     )
+
+    image_path = fixture_paths[
+        "image_path"
+    ]
+    mask_path = fixture_paths[
+        "mask_path"
+    ]
 
     return AtlasReliefPipeline.build_from_image(
         image_path,
