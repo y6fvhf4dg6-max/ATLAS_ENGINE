@@ -94,3 +94,15 @@ Data/TERRAIN/SRTM/*.hgt
 
 Data/OSM/*.osm.pbf
 Data/OSM/*.pbf
+
+# ---------------------------------------------------
+# Portrait ML Environment
+# ---------------------------------------------------
+
+.venv_portrait/
+
+# ---------------------------------------------------
+# Private / Experimental Relief Inputs
+# ---------------------------------------------------
+
+Data/RELIEF/real_portrait_01/
