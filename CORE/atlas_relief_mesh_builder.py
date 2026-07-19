@@ -41,6 +41,9 @@ class AtlasReliefMeshBuilder:
             depth_mm=depth_mm,
             base_thickness_mm=base_thickness_mm,
             relief_height_mm=relief_height_mm,
+            origin_x=origin_x,
+            origin_y=origin_y,
+            origin_z=origin_z,
         )
 
         row_count, column_count = values.shape
@@ -157,6 +160,9 @@ class AtlasReliefMeshBuilder:
         depth_mm: float,
         base_thickness_mm: float,
         relief_height_mm: float,
+        origin_x: float,
+        origin_y: float,
+        origin_z: float,
     ) -> None:
         if values.ndim != 2:
             raise ValueError(
@@ -197,6 +203,9 @@ class AtlasReliefMeshBuilder:
                 base_thickness_mm
             ),
             "relief_height_mm": relief_height_mm,
+            "origin_x": origin_x,
+            "origin_y": origin_y,
+            "origin_z": origin_z,
         }
 
         for name, value in parameters.items():
