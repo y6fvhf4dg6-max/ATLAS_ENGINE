@@ -11,6 +11,9 @@ from CORE.atlas_relief_mesh_builder import (
 from CORE.atlas_relief_quality_report import (
     AtlasReliefQualityReport,
 )
+from CORE.atlas_relief_risk_profile import (
+    AtlasReliefRiskProfile,
+)
 
 
 class AtlasReliefPipeline:
@@ -50,7 +53,25 @@ class AtlasReliefPipeline:
         critical_slope_degrees: float = 75.0,
         warning_slope_area_percent: float = 0.0,
         critical_slope_area_percent: float = 0.0,
+        risk_profile: AtlasReliefRiskProfile | None = None,
     ) -> dict:
+        if risk_profile is not None:
+            risk_arguments = (
+                risk_profile.to_pipeline_kwargs()
+            )
+            warning_slope_degrees = risk_arguments[
+                "warning_slope_degrees"
+            ]
+            critical_slope_degrees = risk_arguments[
+                "critical_slope_degrees"
+            ]
+            warning_slope_area_percent = risk_arguments[
+                "warning_slope_area_percent"
+            ]
+            critical_slope_area_percent = risk_arguments[
+                "critical_slope_area_percent"
+            ]
+
         normalized = AtlasHeightMapEngine.normalize(
             values,
             invert=invert,

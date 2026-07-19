@@ -367,3 +367,75 @@ def test_pipeline_preserves_default_slope_risk_settings():
     assert settings["critical_slope_degrees"] == 75.0
     assert settings["warning_slope_area_percent"] == 0.0
     assert settings["critical_slope_area_percent"] == 0.0
+
+
+def test_pipeline_accepts_relief_risk_profile():
+    from CORE.atlas_relief_risk_profile import (
+        AtlasReliefRiskProfile,
+    )
+
+    profile = AtlasReliefRiskProfile(
+        warning_slope_degrees=47.0,
+        critical_slope_degrees=71.0,
+        warning_slope_area_percent=4.0,
+        critical_slope_area_percent=2.0,
+    )
+
+    result = AtlasReliefPipeline.build(
+        [
+            [0.0, 0.5],
+            [0.5, 1.0],
+        ],
+        width_mm=40.0,
+        depth_mm=40.0,
+        risk_profile=profile,
+    )
+
+    assert result["settings"]["warning_slope_degrees"] == 47.0
+    assert result["settings"]["critical_slope_degrees"] == 71.0
+    assert (
+        result["settings"]["warning_slope_area_percent"]
+        == 4.0
+    )
+    assert (
+        result["settings"]["critical_slope_area_percent"]
+        == 2.0
+    )
+
+
+def test_pipeline_risk_profile_overrides_scalar_risk_arguments():
+    from CORE.atlas_relief_risk_profile import (
+        AtlasReliefRiskProfile,
+    )
+
+    profile = AtlasReliefRiskProfile(
+        warning_slope_degrees=46.0,
+        critical_slope_degrees=70.0,
+        warning_slope_area_percent=5.0,
+        critical_slope_area_percent=3.0,
+    )
+
+    result = AtlasReliefPipeline.build(
+        [
+            [0.0, 0.5],
+            [0.5, 1.0],
+        ],
+        width_mm=40.0,
+        depth_mm=40.0,
+        warning_slope_degrees=55.0,
+        critical_slope_degrees=75.0,
+        warning_slope_area_percent=0.0,
+        critical_slope_area_percent=0.0,
+        risk_profile=profile,
+    )
+
+    assert result["settings"]["warning_slope_degrees"] == 46.0
+    assert result["settings"]["critical_slope_degrees"] == 70.0
+    assert (
+        result["settings"]["warning_slope_area_percent"]
+        == 5.0
+    )
+    assert (
+        result["settings"]["critical_slope_area_percent"]
+        == 3.0
+    )
