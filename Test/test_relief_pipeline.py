@@ -642,3 +642,256 @@ def test_pipeline_rejects_sampling_plan_dimension_mismatch(
             depth_mm=depth_mm,
             sampling_plan=plan,
         )
+
+
+def test_pipeline_build_from_image_runs_real_image_chain(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "relief-input.png"
+
+    image = Image.new(
+        "RGB",
+        (4, 3),
+    )
+    image.putdata(
+        [
+            (0, 0, 0),
+            (64, 64, 64),
+            (128, 128, 128),
+            (255, 255, 255),
+            (32, 32, 32),
+            (96, 96, 96),
+            (160, 160, 160),
+            (224, 224, 224),
+            (16, 16, 16),
+            (80, 80, 80),
+            (144, 144, 144),
+            (208, 208, 208),
+        ]
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=40.0,
+        depth_mm=30.0,
+        form_sigma=1.5,
+        detail_sigma=0.6,
+    )
+
+    assert result["type"] == (
+        "relief_image_pipeline_result"
+    )
+    assert result["image_input"]["type"] == (
+        "relief_image_input"
+    )
+    assert result["multiscale"]["type"] == (
+        "relief_multiscale_decomposition"
+    )
+    assert result["depth_composition"]["type"] == (
+        "relief_depth_candidate"
+    )
+    assert result["relief_result"]["type"] == (
+        "relief_pipeline_result"
+    )
+    assert result["relief_result"][
+        "quality_report"
+    ]["is_printable_topology"] is True
+
+
+def test_pipeline_build_from_image_preserves_source_shape(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "shape.png"
+
+    image = Image.new(
+        "L",
+        (5, 3),
+    )
+    image.putdata(
+        list(range(15))
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=50.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+    )
+
+    assert result["image_input"]["luminance"].shape == (
+        3,
+        5,
+    )
+    assert result["multiscale"]["form"].shape == (
+        3,
+        5,
+    )
+    assert result["depth_composition"][
+        "depth_candidate"
+    ].shape == (3, 5)
+
+
+def test_pipeline_build_from_image_forwards_sampling(
+    tmp_path,
+):
+    from PIL import Image
+
+    from CORE.atlas_relief_sampling_plan import (
+        AtlasReliefSamplingPlan,
+    )
+
+    path = tmp_path / "sampling.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    plan = AtlasReliefSamplingPlan(
+        width_mm=40.0,
+        depth_mm=30.0,
+        target_sample_spacing_mm=10.0,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=40.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        sampling_plan=plan,
+    )
+
+    relief_result = result["relief_result"]
+
+    assert relief_result[
+        "processed_height_map"
+    ].shape == (4, 5)
+    assert relief_result["settings"][
+        "sample_count"
+    ] == 20
+
+
+def test_pipeline_build_from_image_records_settings(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "settings.png"
+
+    image = Image.new(
+        "RGBA",
+        (3, 3),
+        (255, 255, 255, 128),
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=2.0,
+        detail_sigma=0.7,
+        form_weight=1.1,
+        detail_weight=0.4,
+        micro_detail_weight=0.08,
+        micro_detail_limit=0.03,
+        alpha_background_luminance=0.2,
+    )
+
+    settings = result["image_settings"]
+
+    assert settings["form_sigma"] == pytest.approx(
+        2.0
+    )
+    assert settings["detail_sigma"] == pytest.approx(
+        0.7
+    )
+    assert settings["form_weight"] == pytest.approx(
+        1.1
+    )
+    assert settings["detail_weight"] == pytest.approx(
+        0.4
+    )
+    assert settings[
+        "micro_detail_weight"
+    ] == pytest.approx(0.08)
+    assert settings[
+        "micro_detail_limit"
+    ] == pytest.approx(0.03)
+    assert settings[
+        "alpha_background_luminance"
+    ] == pytest.approx(0.2)
+
+
+def test_pipeline_build_from_image_is_deterministic(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "deterministic-image.png"
+
+    image = Image.new(
+        "RGB",
+        (4, 4),
+    )
+    image.putdata(
+        [
+            (
+                index * 11,
+                index * 7,
+                index * 3,
+            )
+            for index in range(16)
+        ]
+    )
+    image.save(path)
+
+    arguments = {
+        "image_path": path,
+        "width_mm": 40.0,
+        "depth_mm": 40.0,
+        "form_sigma": 1.5,
+        "detail_sigma": 0.6,
+    }
+
+    first = AtlasReliefPipeline.build_from_image(
+        **arguments
+    )
+    second = AtlasReliefPipeline.build_from_image(
+        **arguments
+    )
+
+    assert np.array_equal(
+        first["depth_composition"][
+            "depth_candidate"
+        ],
+        second["depth_composition"][
+            "depth_candidate"
+        ],
+    )
+    assert (
+        first["relief_result"]["mesh"]["triangles"]
+        == second["relief_result"]["mesh"]["triangles"]
+    )
