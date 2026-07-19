@@ -1095,3 +1095,248 @@ def test_pipeline_build_from_image_default_compression_policy(
     assert compression["gamma"] == pytest.approx(
         1.0
     )
+
+
+def test_pipeline_build_from_image_applies_subject_mask_layers(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "masked-relief.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    subject_mask = np.array(
+        [
+            [0.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0],
+        ],
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+        background_depth_range=(0.0, 0.30),
+        foreground_depth_range=(0.60, 1.0),
+    )
+
+    separation = result["layer_separation"]
+
+    assert separation["type"] == (
+        "relief_layer_separation"
+    )
+    assert separation["subject_mask"].shape == (
+        3,
+        3,
+    )
+
+    separated = separation["separated_depth"]
+
+    assert separated[0, 0] <= 0.30
+    assert separated[2, 2] >= 0.60
+
+
+def test_pipeline_build_from_image_uses_separated_depth(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "layered-source.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    subject_mask = np.array(
+        [
+            [0.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0],
+        ],
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+    )
+
+    assert np.allclose(
+        result["relief_result"][
+            "normalized_height_map"
+        ],
+        result["layer_separation"][
+            "separated_depth"
+        ],
+    )
+
+
+def test_pipeline_build_from_image_without_mask_skips_layers(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "unmasked-source.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+    )
+
+    assert result["layer_separation"] is None
+
+    assert np.allclose(
+        result["relief_result"][
+            "normalized_height_map"
+        ],
+        result["depth_compression"][
+            "compressed_depth"
+        ],
+    )
+
+
+def test_pipeline_build_from_image_records_layer_settings(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "layer-settings.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    subject_mask = np.zeros(
+        (3, 3),
+        dtype=np.float64,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=1.2,
+        detail_sigma=0.5,
+        subject_mask=subject_mask,
+        background_depth_range=(0.05, 0.35),
+        foreground_depth_range=(0.65, 0.95),
+    )
+
+    settings = result["image_settings"]
+
+    assert settings["has_subject_mask"] is True
+    assert settings[
+        "background_depth_range"
+    ] == (0.05, 0.35)
+    assert settings[
+        "foreground_depth_range"
+    ] == (0.65, 0.95)
+
+
+def test_pipeline_build_from_image_rejects_mask_shape_mismatch(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "mask-mismatch.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+        128,
+    )
+    image.save(path)
+
+    subject_mask = np.zeros(
+        (2, 2),
+        dtype=np.float64,
+    )
+
+    with pytest.raises(ValueError):
+        AtlasReliefPipeline.build_from_image(
+            path,
+            width_mm=30.0,
+            depth_mm=30.0,
+            form_sigma=1.2,
+            detail_sigma=0.5,
+            subject_mask=subject_mask,
+        )

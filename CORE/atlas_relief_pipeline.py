@@ -14,6 +14,9 @@ from CORE.atlas_relief_depth_compressor import (
 from CORE.atlas_relief_image_input import (
     AtlasReliefImageInput,
 )
+from CORE.atlas_relief_layer_separator import (
+    AtlasReliefLayerSeparator,
+)
 from CORE.atlas_relief_multiscale_decomposer import (
     AtlasReliefMultiscaleDecomposer,
 )
@@ -60,6 +63,9 @@ class AtlasReliefPipeline:
         depth_lower_percentile: float = 1.0,
         depth_upper_percentile: float = 99.0,
         depth_gamma: float = 1.0,
+        subject_mask: Any | None = None,
+        background_depth_range: Any = (0.0, 0.40),
+        foreground_depth_range: Any = (0.60, 1.0),
         alpha_background_luminance: float = 1.0,
         **pipeline_arguments: Any,
     ) -> dict:
@@ -112,8 +118,31 @@ class AtlasReliefPipeline:
             )
         )
 
+        layer_separation = None
+        relief_depth = depth_compression[
+            "compressed_depth"
+        ]
+
+        if subject_mask is not None:
+            layer_separation = (
+                AtlasReliefLayerSeparator.separate(
+                    relief_depth,
+                    subject_mask,
+                    background_range=(
+                        background_depth_range
+                    ),
+                    foreground_range=(
+                        foreground_depth_range
+                    ),
+                )
+            )
+
+            relief_depth = layer_separation[
+                "separated_depth"
+            ]
+
         relief_result = AtlasReliefPipeline.build(
-            depth_compression["compressed_depth"],
+            relief_depth,
             width_mm=width_mm,
             depth_mm=depth_mm,
             **pipeline_arguments,
@@ -125,6 +154,7 @@ class AtlasReliefPipeline:
             "multiscale": multiscale,
             "depth_composition": depth_composition,
             "depth_compression": depth_compression,
+            "layer_separation": layer_separation,
             "relief_result": relief_result,
             "image_settings": {
                 "form_sigma": multiscale[
@@ -162,6 +192,23 @@ class AtlasReliefPipeline:
                 "depth_gamma": depth_compression[
                     "gamma"
                 ],
+                "has_subject_mask": (
+                    subject_mask is not None
+                ),
+                "background_depth_range": (
+                    None
+                    if layer_separation is None
+                    else layer_separation[
+                        "background_range"
+                    ]
+                ),
+                "foreground_depth_range": (
+                    None
+                    if layer_separation is None
+                    else layer_separation[
+                        "foreground_range"
+                    ]
+                ),
                 "alpha_background_luminance": (
                     image_input[
                         "alpha_background_luminance"
