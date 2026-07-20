@@ -27,6 +27,8 @@ class AtlasParametricFaceSurfaceComparisonResult:
     or mesh generation.
     """
 
+    COORDINATE_CHANGE_TOLERANCE = 1e-12
+
     neutral_surface: AtlasParametricFaceSurface
     adapted_surface: AtlasParametricFaceSurface
     parameters: AtlasParametricFaceParameters
@@ -139,7 +141,8 @@ class AtlasParametricFaceSurfaceComparisonResult:
     @property
     def has_coordinate_change(self) -> bool:
         return any(
-            value > 0.0
+            value
+            > self.COORDINATE_CHANGE_TOLERANCE
             for value in (
                 self.maximum_absolute_x_delta,
                 self.maximum_absolute_y_delta,
