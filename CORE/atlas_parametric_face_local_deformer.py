@@ -15,16 +15,21 @@ class AtlasParametricFaceLocalDeformer:
     Applies local anatomical coordinate deformation.
 
     Current scope:
+    - eye spacing
+    - eye height
     - nose width
     - nose length
 
-    Deformation uses smooth Gaussian influence masks so
+    Deformation uses smooth regional influence masks so
     distant facial regions remain unchanged.
 
     It performs no global scaling, rotation, translation,
     projection, rendering, triangulation, or mesh
     generation.
     """
+
+    EYE_CENTER_Y = 0.22
+    NOSE_CENTER_Y = 0.05
 
     @classmethod
     def deform(
@@ -63,8 +68,12 @@ class AtlasParametricFaceLocalDeformer:
             x_coordinates=source_x,
             y_coordinates=source_y,
         )
+        eye_mask = cls._eye_mask(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+        )
 
-        width_factor = (
+        nose_width_factor = (
             1.0
             + (
                 parameters.nose_width
@@ -73,9 +82,7 @@ class AtlasParametricFaceLocalDeformer:
             * nose_width_mask
         )
 
-        nose_center_y = 0.05
-
-        length_factor = (
+        nose_length_factor = (
             1.0
             + (
                 parameters.nose_length
@@ -84,18 +91,55 @@ class AtlasParametricFaceLocalDeformer:
             * nose_length_mask
         )
 
-        deformed_x = (
+        eye_spacing_factor = (
+            1.0
+            + (
+                parameters.eye_spacing
+                - 1.0
+            )
+            * eye_mask
+        )
+
+        eye_height_factor = (
+            1.0
+            + (
+                parameters.eye_height
+                - 1.0
+            )
+            * eye_mask
+        )
+
+        nose_deformed_x = (
             source_x
-            * width_factor
+            * nose_width_factor
+        )
+
+        nose_deformed_y = (
+            cls.NOSE_CENTER_Y
+            + (
+                source_y
+                - cls.NOSE_CENTER_Y
+            )
+            * nose_length_factor
+        )
+
+        deformed_x = (
+            nose_deformed_x
+            * eye_spacing_factor
+        )
+
+        eye_y_offset = (
+            source_y
+            - cls.EYE_CENTER_Y
         )
 
         deformed_y = (
-            nose_center_y
-            + (
-                source_y
-                - nose_center_y
+            nose_deformed_y
+            + eye_y_offset
+            * (
+                eye_height_factor
+                - 1.0
             )
-            * length_factor
         )
 
         return AtlasParametricFaceSurface(
@@ -111,6 +155,58 @@ class AtlasParametricFaceLocalDeformer:
                 source_z,
                 dtype=np.float64,
             ),
+        )
+
+    @staticmethod
+    def _eye_mask(
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+    ) -> np.ndarray:
+        horizontal_distance = (
+            np.abs(
+                x_coordinates,
+            )
+            - 0.36
+        )
+
+        mask = np.exp(
+            -(
+                (
+                    horizontal_distance
+                    / 0.22
+                )
+                ** 2
+                + (
+                    (
+                        y_coordinates
+                        - 0.22
+                    )
+                    / 0.20
+                )
+                ** 2
+            )
+        )
+
+        protected_region = (
+            (y_coordinates <= -0.20)
+            | (
+                np.abs(
+                    x_coordinates,
+                )
+                >= 0.75
+            )
+        )
+
+        mask = np.where(
+            protected_region,
+            0.0,
+            mask,
+        )
+
+        return mask.astype(
+            np.float64,
+            copy=False,
         )
 
     @staticmethod

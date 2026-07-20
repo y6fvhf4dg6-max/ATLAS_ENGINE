@@ -323,3 +323,193 @@ def test_local_deformer_rejects_wrong_parameters_type():
             _surface(),
             parameters=object(),
         )
+
+
+def test_increased_eye_spacing_moves_eye_regions_outward():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            eye_spacing=1.30,
+        ),
+    )
+
+    eye_region = (
+        (np.abs(source.x_coordinates) >= 0.20)
+        & (np.abs(source.x_coordinates) <= 0.55)
+        & (source.y_coordinates >= 0.05)
+        & (source.y_coordinates <= 0.40)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[eye_region]
+        )
+    ) > np.mean(
+        np.abs(
+            source.x_coordinates[eye_region]
+        )
+    )
+
+
+def test_reduced_eye_spacing_moves_eye_regions_inward():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            eye_spacing=0.75,
+        ),
+    )
+
+    eye_region = (
+        (np.abs(source.x_coordinates) >= 0.20)
+        & (np.abs(source.x_coordinates) <= 0.55)
+        & (source.y_coordinates >= 0.05)
+        & (source.y_coordinates <= 0.40)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[eye_region]
+        )
+    ) < np.mean(
+        np.abs(
+            source.x_coordinates[eye_region]
+        )
+    )
+
+
+def test_increased_eye_height_expands_eye_regions_vertically():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            eye_height=1.35,
+        ),
+    )
+
+    eye_region = (
+        (np.abs(source.x_coordinates) >= 0.20)
+        & (np.abs(source.x_coordinates) <= 0.55)
+        & (source.y_coordinates >= 0.05)
+        & (source.y_coordinates <= 0.40)
+    )
+
+    eye_center_y = 0.22
+
+    assert np.mean(
+        np.abs(
+            result.y_coordinates[eye_region]
+            - eye_center_y
+        )
+    ) > np.mean(
+        np.abs(
+            source.y_coordinates[eye_region]
+            - eye_center_y
+        )
+    )
+
+
+def test_reduced_eye_height_compresses_eye_regions_vertically():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            eye_height=0.70,
+        ),
+    )
+
+    eye_region = (
+        (np.abs(source.x_coordinates) >= 0.20)
+        & (np.abs(source.x_coordinates) <= 0.55)
+        & (source.y_coordinates >= 0.05)
+        & (source.y_coordinates <= 0.40)
+    )
+
+    eye_center_y = 0.22
+
+    assert np.mean(
+        np.abs(
+            result.y_coordinates[eye_region]
+            - eye_center_y
+        )
+    ) < np.mean(
+        np.abs(
+            source.y_coordinates[eye_region]
+            - eye_center_y
+        )
+    )
+
+
+def test_eye_deformation_preserves_horizontal_symmetry():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            eye_spacing=1.20,
+            eye_height=1.15,
+        ),
+    )
+
+    assert result.x_coordinates == pytest.approx(
+        -np.fliplr(
+            result.x_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.y_coordinates == pytest.approx(
+        np.fliplr(
+            result.y_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.z_coordinates == pytest.approx(
+        np.fliplr(
+            result.z_coordinates,
+        ),
+        abs=1e-12,
+    )
+
+
+def test_eye_deformation_preserves_lower_face_and_far_edges():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            eye_spacing=1.30,
+            eye_height=1.25,
+        ),
+    )
+
+    protected_region = (
+        (source.y_coordinates <= -0.20)
+        | (np.abs(source.x_coordinates) >= 0.75)
+    )
+
+    assert result.x_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.x_coordinates[
+            protected_region
+        ],
+    )
+    assert result.y_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.y_coordinates[
+            protected_region
+        ],
+    )
+    assert result.z_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.z_coordinates[
+            protected_region
+        ],
+    )
