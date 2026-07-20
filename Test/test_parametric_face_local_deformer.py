@@ -899,3 +899,135 @@ def test_jaw_and_chin_deformation_preserves_z_coordinates():
     assert result.z_coordinates == pytest.approx(
         source.z_coordinates,
     )
+
+
+def test_increased_forehead_height_moves_forehead_upward():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            forehead_height=1.30,
+        ),
+    )
+
+    forehead_region = (
+        (np.abs(source.x_coordinates) <= 0.55)
+        & (source.y_coordinates >= 0.48)
+        & (source.y_coordinates <= 0.92)
+    )
+
+    assert np.mean(
+        result.y_coordinates[forehead_region]
+    ) > np.mean(
+        source.y_coordinates[forehead_region]
+    )
+
+
+def test_reduced_forehead_height_moves_forehead_downward():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            forehead_height=0.72,
+        ),
+    )
+
+    forehead_region = (
+        (np.abs(source.x_coordinates) <= 0.55)
+        & (source.y_coordinates >= 0.48)
+        & (source.y_coordinates <= 0.92)
+    )
+
+    assert np.mean(
+        result.y_coordinates[forehead_region]
+    ) < np.mean(
+        source.y_coordinates[forehead_region]
+    )
+
+
+def test_forehead_deformation_preserves_horizontal_symmetry():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            forehead_height=1.25,
+        ),
+    )
+
+    assert result.x_coordinates == pytest.approx(
+        -np.fliplr(
+            result.x_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.y_coordinates == pytest.approx(
+        np.fliplr(
+            result.y_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.z_coordinates == pytest.approx(
+        np.fliplr(
+            result.z_coordinates,
+        ),
+        abs=1e-12,
+    )
+
+
+def test_forehead_deformation_preserves_lower_face_and_far_edges():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            forehead_height=1.30,
+        ),
+    )
+
+    protected_region = (
+        (source.y_coordinates <= 0.20)
+        | (np.abs(source.x_coordinates) >= 0.78)
+    )
+
+    assert result.x_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.x_coordinates[
+            protected_region
+        ],
+    )
+    assert result.y_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.y_coordinates[
+            protected_region
+        ],
+    )
+    assert result.z_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.z_coordinates[
+            protected_region
+        ],
+    )
+
+
+def test_forehead_height_does_not_change_x_or_z_coordinates():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            forehead_height=1.25,
+        ),
+    )
+
+    assert result.x_coordinates == pytest.approx(
+        source.x_coordinates,
+    )
+    assert result.z_coordinates == pytest.approx(
+        source.z_coordinates,
+    )
