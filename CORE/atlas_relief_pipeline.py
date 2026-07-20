@@ -32,6 +32,9 @@ from CORE.atlas_relief_multiscale_decomposer import (
 from CORE.atlas_relief_mesh_builder import (
     AtlasReliefMeshBuilder,
 )
+from CORE.atlas_relief_product_profile import (
+    AtlasReliefProductProfile,
+)
 from CORE.atlas_relief_quality_report import (
     AtlasReliefQualityReport,
 )
@@ -63,8 +66,8 @@ class AtlasReliefPipeline:
         *,
         width_mm: float,
         depth_mm: float,
-        form_sigma: float,
-        detail_sigma: float,
+        form_sigma: float | None = None,
+        detail_sigma: float | None = None,
         form_weight: float = 1.0,
         detail_weight: float = 0.35,
         micro_detail_weight: float = 0.10,
@@ -83,8 +86,102 @@ class AtlasReliefPipeline:
         background_depth_range: Any = (0.0, 0.40),
         foreground_depth_range: Any = (0.60, 1.0),
         alpha_background_luminance: float = 1.0,
+        product_profile: (
+            AtlasReliefProductProfile | None
+        ) = None,
         **pipeline_arguments: Any,
     ) -> dict:
+        product_profile_name = None
+
+        if product_profile is not None:
+            if not isinstance(
+                product_profile,
+                AtlasReliefProductProfile,
+            ):
+                raise ValueError(
+                    "product_profile must be an "
+                    "AtlasReliefProductProfile or None."
+                )
+
+            profile_arguments = (
+                product_profile.to_pipeline_kwargs()
+            )
+            product_profile_name = (
+                product_profile.name
+            )
+
+            form_sigma = profile_arguments[
+                "form_sigma"
+            ]
+            detail_sigma = profile_arguments[
+                "detail_sigma"
+            ]
+            form_weight = profile_arguments[
+                "form_weight"
+            ]
+            detail_weight = profile_arguments[
+                "detail_weight"
+            ]
+            micro_detail_weight = (
+                profile_arguments[
+                    "micro_detail_weight"
+                ]
+            )
+            micro_detail_limit = (
+                profile_arguments[
+                    "micro_detail_limit"
+                ]
+            )
+            depth_lower_percentile = (
+                profile_arguments[
+                    "depth_lower_percentile"
+                ]
+            )
+            depth_upper_percentile = (
+                profile_arguments[
+                    "depth_upper_percentile"
+                ]
+            )
+            depth_gamma = profile_arguments[
+                "depth_gamma"
+            ]
+            background_depth_range = (
+                profile_arguments[
+                    "background_depth_range"
+                ]
+            )
+            foreground_depth_range = (
+                profile_arguments[
+                    "foreground_depth_range"
+                ]
+            )
+
+            pipeline_arguments[
+                "relief_height_mm"
+            ] = profile_arguments[
+                "relief_height_mm"
+            ]
+            pipeline_arguments[
+                "smoothing_sigma"
+            ] = profile_arguments[
+                "smoothing_sigma"
+            ]
+            pipeline_arguments[
+                "smoothing_radius"
+            ] = profile_arguments[
+                "smoothing_radius"
+            ]
+
+        if (
+            form_sigma is None
+            or detail_sigma is None
+        ):
+            raise ValueError(
+                "form_sigma and detail_sigma are "
+                "required when product_profile is "
+                "not provided."
+            )
+
         image_input = AtlasReliefImageInput.load(
             image_path,
             alpha_background_luminance=(
@@ -269,6 +366,9 @@ class AtlasReliefPipeline:
             "layer_separation": layer_separation,
             "relief_result": relief_result,
             "image_settings": {
+                "product_profile_name": (
+                    product_profile_name
+                ),
                 "form_sigma": multiscale[
                     "form_sigma"
                 ],

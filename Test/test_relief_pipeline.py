@@ -2012,3 +2012,283 @@ def test_pipeline_build_from_image_feathers_after_morphology(
     assert final_mask[3, 3] > final_mask[0, 0]
     assert final_mask.min() >= 0.0
     assert final_mask.max() <= 1.0
+
+
+def test_pipeline_build_from_image_accepts_product_profile(
+    tmp_path,
+):
+    from PIL import Image
+
+    from CORE.atlas_relief_product_profile import (
+        AtlasReliefProductProfile,
+    )
+
+    path = tmp_path / "product-profile.png"
+
+    image = Image.new(
+        "L",
+        (4, 4),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            32,
+            64,
+            96,
+            128,
+            64,
+            96,
+            128,
+            192,
+            96,
+            128,
+            192,
+            255,
+        ]
+    )
+    image.save(path)
+
+    profile = AtlasReliefProductProfile(
+        name="memorial-soft",
+        form_sigma=2.5,
+        detail_sigma=0.8,
+        form_weight=1.10,
+        detail_weight=0.25,
+        micro_detail_weight=0.04,
+        micro_detail_limit=0.02,
+        depth_lower_percentile=2.0,
+        depth_upper_percentile=98.0,
+        depth_gamma=1.15,
+        background_depth_range=(0.0, 0.35),
+        foreground_depth_range=(0.65, 1.0),
+        relief_height_mm=1.80,
+        smoothing_sigma=0.50,
+        smoothing_radius=2,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=40.0,
+        depth_mm=40.0,
+        product_profile=profile,
+    )
+
+    image_settings = result["image_settings"]
+    relief_settings = result[
+        "relief_result"
+    ]["settings"]
+
+    assert image_settings[
+        "product_profile_name"
+    ] == "memorial-soft"
+    assert image_settings["form_sigma"] == 2.5
+    assert image_settings["detail_sigma"] == 0.8
+    assert image_settings["form_weight"] == 1.10
+    assert image_settings["detail_weight"] == 0.25
+    assert image_settings[
+        "micro_detail_weight"
+    ] == 0.04
+    assert image_settings[
+        "micro_detail_limit"
+    ] == 0.02
+    assert image_settings[
+        "depth_lower_percentile"
+    ] == 2.0
+    assert image_settings[
+        "depth_upper_percentile"
+    ] == 98.0
+    assert image_settings["depth_gamma"] == 1.15
+
+    assert relief_settings[
+        "relief_height_mm"
+    ] == 1.80
+    assert relief_settings[
+        "smoothing_sigma"
+    ] == 0.50
+    assert relief_settings[
+        "smoothing_radius"
+    ] == 2
+
+
+def test_pipeline_product_profile_overrides_scalar_settings(
+    tmp_path,
+):
+    from PIL import Image
+
+    from CORE.atlas_relief_product_profile import (
+        AtlasReliefProductProfile,
+    )
+
+    path = tmp_path / "profile-override.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(path)
+
+    profile = AtlasReliefProductProfile(
+        name="caricature",
+        form_sigma=3.0,
+        detail_sigma=0.9,
+        form_weight=1.20,
+        detail_weight=0.45,
+        relief_height_mm=2.40,
+        smoothing_sigma=0.30,
+        smoothing_radius=1,
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=9.0,
+        detail_sigma=4.0,
+        form_weight=0.20,
+        detail_weight=0.10,
+        relief_height_mm=1.00,
+        smoothing_sigma=1.50,
+        smoothing_radius=4,
+        product_profile=profile,
+    )
+
+    image_settings = result["image_settings"]
+    relief_settings = result[
+        "relief_result"
+    ]["settings"]
+
+    assert image_settings["form_sigma"] == 3.0
+    assert image_settings["detail_sigma"] == 0.9
+    assert image_settings["form_weight"] == 1.20
+    assert image_settings["detail_weight"] == 0.45
+    assert relief_settings[
+        "relief_height_mm"
+    ] == 2.40
+    assert relief_settings[
+        "smoothing_sigma"
+    ] == 0.30
+    assert relief_settings[
+        "smoothing_radius"
+    ] == 1
+
+
+def test_pipeline_records_no_product_profile_by_default(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "no-product-profile.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(path)
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=2.0,
+        detail_sigma=0.7,
+    )
+
+    assert result["image_settings"][
+        "product_profile_name"
+    ] is None
+
+
+def test_pipeline_rejects_invalid_product_profile(
+    tmp_path,
+):
+    from PIL import Image
+
+    path = tmp_path / "invalid-product-profile.png"
+
+    Image.new(
+        "L",
+        (3, 3),
+        128,
+    ).save(path)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "product_profile must be an "
+            "AtlasReliefProductProfile or None"
+        ),
+    ):
+        AtlasReliefPipeline.build_from_image(
+            path,
+            width_mm=30.0,
+            depth_mm=30.0,
+            product_profile="caricature",
+        )
+
+
+def test_pipeline_product_profile_applies_layer_ranges(
+    tmp_path,
+):
+    import numpy as np
+    from PIL import Image
+
+    from CORE.atlas_relief_product_profile import (
+        AtlasReliefProductProfile,
+    )
+
+    path = tmp_path / "profile-layer-ranges.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    subject_mask = np.zeros(
+        (3, 3),
+        dtype=np.float64,
+    )
+    subject_mask[1, 1] = 1.0
+
+    profile = AtlasReliefProductProfile(
+        name="memorial-soft",
+        form_sigma=2.0,
+        detail_sigma=0.7,
+        background_depth_range=(0.05, 0.25),
+        foreground_depth_range=(0.75, 0.95),
+    )
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        subject_mask=subject_mask,
+        product_profile=profile,
+    )
+
+    separation = result["layer_separation"]
+
+    assert separation["background_range"] == (
+        0.05,
+        0.25,
+    )
+    assert separation["foreground_range"] == (
+        0.75,
+        0.95,
+    )
