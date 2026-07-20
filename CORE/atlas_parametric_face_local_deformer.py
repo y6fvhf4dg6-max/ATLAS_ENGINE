@@ -20,6 +20,9 @@ class AtlasParametricFaceLocalDeformer:
     - nose width
     - nose length
     - mouth width
+    - jaw width
+    - chin width
+    - chin length
 
     Deformation uses smooth regional influence masks so
     distant facial regions remain unchanged.
@@ -32,6 +35,7 @@ class AtlasParametricFaceLocalDeformer:
     EYE_CENTER_Y = 0.22
     NOSE_CENTER_Y = 0.05
     MOUTH_CENTER_Y = -0.38
+    CHIN_LENGTH_ANCHOR_Y = -0.50
 
     @classmethod
     def deform(
@@ -75,6 +79,18 @@ class AtlasParametricFaceLocalDeformer:
             y_coordinates=source_y,
         )
         mouth_mask = cls._mouth_mask(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+        )
+        jaw_width_mask = cls._jaw_width_mask(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+        )
+        chin_width_mask = cls._chin_width_mask(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+        )
+        chin_length_mask = cls._chin_length_mask(
             x_coordinates=source_x,
             y_coordinates=source_y,
         )
@@ -124,6 +140,33 @@ class AtlasParametricFaceLocalDeformer:
             * mouth_mask
         )
 
+        jaw_width_factor = (
+            1.0
+            + (
+                parameters.jaw_width
+                - 1.0
+            )
+            * jaw_width_mask
+        )
+
+        chin_width_factor = (
+            1.0
+            + (
+                parameters.chin_width
+                - 1.0
+            )
+            * chin_width_mask
+        )
+
+        chin_length_factor = (
+            1.0
+            + (
+                parameters.chin_length
+                - 1.0
+            )
+            * chin_length_mask
+        )
+
         nose_deformed_x = (
             source_x
             * nose_width_factor
@@ -142,6 +185,8 @@ class AtlasParametricFaceLocalDeformer:
             nose_deformed_x
             * eye_spacing_factor
             * mouth_width_factor
+            * jaw_width_factor
+            * chin_width_factor
         )
 
         eye_y_offset = (
@@ -149,11 +194,25 @@ class AtlasParametricFaceLocalDeformer:
             - cls.EYE_CENTER_Y
         )
 
-        deformed_y = (
+        eye_deformed_y = (
             nose_deformed_y
             + eye_y_offset
             * (
                 eye_height_factor
+                - 1.0
+            )
+        )
+
+        chin_y_offset = (
+            source_y
+            - cls.CHIN_LENGTH_ANCHOR_Y
+        )
+
+        deformed_y = (
+            eye_deformed_y
+            + chin_y_offset
+            * (
+                chin_length_factor
                 - 1.0
             )
         )
@@ -257,6 +316,148 @@ class AtlasParametricFaceLocalDeformer:
                     x_coordinates,
                 )
                 >= 0.75
+            )
+        )
+
+        mask = np.where(
+            protected_region,
+            0.0,
+            mask,
+        )
+
+        return mask.astype(
+            np.float64,
+            copy=False,
+        )
+
+    @staticmethod
+    def _jaw_width_mask(
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+    ) -> np.ndarray:
+        horizontal_distance = (
+            np.abs(
+                x_coordinates,
+            )
+            - 0.50
+        )
+
+        mask = np.exp(
+            -(
+                (
+                    horizontal_distance
+                    / 0.24
+                )
+                ** 2
+                + (
+                    (
+                        y_coordinates
+                        + 0.52
+                    )
+                    / 0.25
+                )
+                ** 2
+            )
+        )
+
+        protected_region = (
+            (y_coordinates >= -0.10)
+            | (
+                np.abs(
+                    x_coordinates,
+                )
+                >= 0.78
+            )
+        )
+
+        mask = np.where(
+            protected_region,
+            0.0,
+            mask,
+        )
+
+        return mask.astype(
+            np.float64,
+            copy=False,
+        )
+
+    @staticmethod
+    def _chin_width_mask(
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+    ) -> np.ndarray:
+        mask = np.exp(
+            -(
+                (
+                    x_coordinates
+                    / 0.32
+                )
+                ** 2
+                + (
+                    (
+                        y_coordinates
+                        + 0.72
+                    )
+                    / 0.22
+                )
+                ** 2
+            )
+        )
+
+        protected_region = (
+            (y_coordinates >= -0.10)
+            | (
+                np.abs(
+                    x_coordinates,
+                )
+                >= 0.78
+            )
+        )
+
+        mask = np.where(
+            protected_region,
+            0.0,
+            mask,
+        )
+
+        return mask.astype(
+            np.float64,
+            copy=False,
+        )
+
+    @staticmethod
+    def _chin_length_mask(
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+    ) -> np.ndarray:
+        mask = np.exp(
+            -(
+                (
+                    x_coordinates
+                    / 0.30
+                )
+                ** 2
+                + (
+                    (
+                        y_coordinates
+                        + 0.74
+                    )
+                    / 0.24
+                )
+                ** 2
+            )
+        )
+
+        protected_region = (
+            (y_coordinates >= -0.10)
+            | (
+                np.abs(
+                    x_coordinates,
+                )
+                >= 0.78
             )
         )
 

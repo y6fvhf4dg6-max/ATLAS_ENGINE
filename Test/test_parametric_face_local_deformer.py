@@ -654,3 +654,248 @@ def test_mouth_width_does_not_change_y_or_z_coordinates():
     assert result.z_coordinates == pytest.approx(
         source.z_coordinates,
     )
+
+
+def test_increased_jaw_width_expands_jaw_region():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.30,
+        ),
+    )
+
+    jaw_region = (
+        (np.abs(source.x_coordinates) >= 0.30)
+        & (np.abs(source.x_coordinates) <= 0.70)
+        & (source.y_coordinates >= -0.78)
+        & (source.y_coordinates <= -0.30)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[jaw_region]
+        )
+    ) > np.mean(
+        np.abs(
+            source.x_coordinates[jaw_region]
+        )
+    )
+
+
+def test_reduced_jaw_width_compresses_jaw_region():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=0.72,
+        ),
+    )
+
+    jaw_region = (
+        (np.abs(source.x_coordinates) >= 0.30)
+        & (np.abs(source.x_coordinates) <= 0.70)
+        & (source.y_coordinates >= -0.78)
+        & (source.y_coordinates <= -0.30)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[jaw_region]
+        )
+    ) < np.mean(
+        np.abs(
+            source.x_coordinates[jaw_region]
+        )
+    )
+
+
+def test_increased_chin_width_expands_chin_region():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            chin_width=1.35,
+        ),
+    )
+
+    chin_region = (
+        (np.abs(source.x_coordinates) <= 0.35)
+        & (source.y_coordinates >= -0.92)
+        & (source.y_coordinates <= -0.55)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[chin_region]
+        )
+    ) > np.mean(
+        np.abs(
+            source.x_coordinates[chin_region]
+        )
+    )
+
+
+def test_reduced_chin_width_compresses_chin_region():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            chin_width=0.70,
+        ),
+    )
+
+    chin_region = (
+        (np.abs(source.x_coordinates) <= 0.35)
+        & (source.y_coordinates >= -0.92)
+        & (source.y_coordinates <= -0.55)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[chin_region]
+        )
+    ) < np.mean(
+        np.abs(
+            source.x_coordinates[chin_region]
+        )
+    )
+
+
+def test_increased_chin_length_moves_chin_downward():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            chin_length=1.30,
+        ),
+    )
+
+    chin_region = (
+        (np.abs(source.x_coordinates) <= 0.32)
+        & (source.y_coordinates >= -0.92)
+        & (source.y_coordinates <= -0.58)
+    )
+
+    assert np.mean(
+        result.y_coordinates[chin_region]
+    ) < np.mean(
+        source.y_coordinates[chin_region]
+    )
+
+
+def test_reduced_chin_length_moves_chin_upward():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            chin_length=0.72,
+        ),
+    )
+
+    chin_region = (
+        (np.abs(source.x_coordinates) <= 0.32)
+        & (source.y_coordinates >= -0.92)
+        & (source.y_coordinates <= -0.58)
+    )
+
+    assert np.mean(
+        result.y_coordinates[chin_region]
+    ) > np.mean(
+        source.y_coordinates[chin_region]
+    )
+
+
+def test_jaw_and_chin_deformation_preserves_horizontal_symmetry():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.20,
+            chin_width=1.25,
+            chin_length=1.15,
+        ),
+    )
+
+    assert result.x_coordinates == pytest.approx(
+        -np.fliplr(
+            result.x_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.y_coordinates == pytest.approx(
+        np.fliplr(
+            result.y_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.z_coordinates == pytest.approx(
+        np.fliplr(
+            result.z_coordinates,
+        ),
+        abs=1e-12,
+    )
+
+
+def test_jaw_and_chin_deformation_preserves_upper_face_and_far_edges():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.30,
+            chin_width=1.30,
+            chin_length=1.25,
+        ),
+    )
+
+    protected_region = (
+        (source.y_coordinates >= -0.10)
+        | (np.abs(source.x_coordinates) >= 0.78)
+    )
+
+    assert result.x_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.x_coordinates[
+            protected_region
+        ],
+    )
+    assert result.y_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.y_coordinates[
+            protected_region
+        ],
+    )
+    assert result.z_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.z_coordinates[
+            protected_region
+        ],
+    )
+
+
+def test_jaw_and_chin_deformation_preserves_z_coordinates():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.20,
+            chin_width=0.85,
+            chin_length=1.25,
+        ),
+    )
+
+    assert result.z_coordinates == pytest.approx(
+        source.z_coordinates,
+    )
