@@ -80,10 +80,6 @@ class AtlasParametricFaceLocalDeformer:
             x_coordinates=source_x,
             y_coordinates=source_y,
         )
-        mouth_mask = cls._mouth_mask(
-            x_coordinates=source_x,
-            y_coordinates=source_y,
-        )
         chin_width_mask = cls._chin_width_mask(
             x_coordinates=source_x,
             y_coordinates=source_y,
@@ -122,15 +118,6 @@ class AtlasParametricFaceLocalDeformer:
                 - 1.0
             )
             * eye_mask
-        )
-
-        mouth_width_factor = (
-            1.0
-            + (
-                parameters.mouth_width
-                - 1.0
-            )
-            * mouth_mask
         )
 
         chin_width_factor = (
@@ -174,14 +161,20 @@ class AtlasParametricFaceLocalDeformer:
             * nose_length_factor
         )
 
-        pre_eye_deformed_x = (
+        pre_mouth_deformed_x = (
             nose_deformed_x
-            * mouth_width_factor
             * chin_width_factor
         )
 
+        mouth_deformed_x = cls._deform_mouth_width(
+            x_coordinates=pre_mouth_deformed_x,
+            source_x_coordinates=source_x,
+            source_y_coordinates=source_y,
+            mouth_width=parameters.mouth_width,
+        )
+
         eye_deformed_x = cls._deform_eye_spacing(
-            x_coordinates=pre_eye_deformed_x,
+            x_coordinates=mouth_deformed_x,
             source_x_coordinates=source_x,
             source_y_coordinates=source_y,
             eye_spacing=parameters.eye_spacing,
@@ -447,21 +440,21 @@ class AtlasParametricFaceLocalDeformer:
         )
 
     @staticmethod
-    def _mouth_mask(
+    def _deform_mouth_width(
         *,
         x_coordinates: np.ndarray,
-        y_coordinates: np.ndarray,
+        source_x_coordinates: np.ndarray,
+        source_y_coordinates: np.ndarray,
+        mouth_width: float,
     ) -> np.ndarray:
-        mask = np.exp(
+        mouth_anchor_x = 0.38
+        protected_boundary_x = 0.75
+
+        vertical_weight = np.exp(
             -(
                 (
-                    x_coordinates
-                    / 0.38
-                )
-                ** 2
-                + (
                     (
-                        y_coordinates
+                        source_y_coordinates
                         - AtlasParametricFaceLocalDeformer.MOUTH_CENTER_Y
                     )
                     / 0.18
@@ -471,23 +464,121 @@ class AtlasParametricFaceLocalDeformer:
         )
 
         protected_region = (
-            (y_coordinates >= 0.0)
-            | (y_coordinates <= -0.72)
+            (source_y_coordinates >= 0.0)
+            | (source_y_coordinates <= -0.72)
             | (
                 np.abs(
-                    x_coordinates,
+                    source_x_coordinates,
                 )
-                >= 0.75
+                >= protected_boundary_x
             )
         )
 
-        mask = np.where(
+        vertical_weight = np.where(
             protected_region,
             0.0,
-            mask,
+            vertical_weight,
         )
 
-        return mask.astype(
+        effective_factor = (
+            1.0
+            + (
+                mouth_width
+                - 1.0
+            )
+            * vertical_weight
+        )
+
+        expanded_anchor = (
+            protected_boundary_x
+            - (
+                protected_boundary_x
+                - mouth_anchor_x
+            )
+            / effective_factor
+        )
+
+        compressed_anchor = (
+            mouth_anchor_x
+            * effective_factor
+        )
+
+        target_anchor = np.where(
+            effective_factor >= 1.0,
+            expanded_anchor,
+            compressed_anchor,
+        )
+
+        source_absolute_x = np.abs(
+            source_x_coordinates,
+        )
+
+        inner_scale = (
+            target_anchor
+            / mouth_anchor_x
+        )
+
+        outer_scale = (
+            (
+                protected_boundary_x
+                - target_anchor
+            )
+            / (
+                protected_boundary_x
+                - mouth_anchor_x
+            )
+        )
+
+        mapped_inner_x = (
+            source_absolute_x
+            * inner_scale
+        )
+
+        mapped_outer_x = (
+            target_anchor
+            + (
+                source_absolute_x
+                - mouth_anchor_x
+            )
+            * outer_scale
+        )
+
+        mapped_absolute_x = np.where(
+            source_absolute_x
+            <= mouth_anchor_x,
+            mapped_inner_x,
+            mapped_outer_x,
+        )
+
+        mapped_absolute_x = np.where(
+            source_absolute_x
+            >= protected_boundary_x,
+            source_absolute_x,
+            mapped_absolute_x,
+        )
+
+        mapped_source_x = np.copysign(
+            mapped_absolute_x,
+            source_x_coordinates,
+        )
+
+        mouth_displacement = (
+            mapped_source_x
+            - source_x_coordinates
+        )
+
+        result = (
+            x_coordinates
+            + mouth_displacement
+        )
+
+        result = np.where(
+            protected_region,
+            x_coordinates,
+            result,
+        )
+
+        return result.astype(
             np.float64,
             copy=False,
         )

@@ -1151,3 +1151,63 @@ def test_real_portrait_eye_spacing_has_no_surface_foldover():
     assert validity.inverted_normal_count == 0
     assert validity.minimum_signed_cell_area > 0.0
     assert validity.is_safe
+
+
+def test_real_portrait_mouth_width_preserves_horizontal_order():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            mouth_width=1.537264377,
+        ),
+    )
+
+    horizontal_steps = np.diff(
+        result.x_coordinates,
+        axis=1,
+    )
+
+    mouth_rows = (
+        (source.y_coordinates[:, 0] >= -0.55)
+        & (source.y_coordinates[:, 0] <= -0.22)
+    )
+
+    assert np.all(
+        horizontal_steps[
+            mouth_rows,
+            :,
+        ] > 0.0
+    )
+
+
+def test_real_portrait_mouth_width_has_no_surface_foldover():
+    from CORE.atlas_parametric_face_surface_validity_analyzer import (
+        AtlasParametricFaceSurfaceValidityAnalyzer,
+    )
+
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            mouth_width=1.537264377,
+        ),
+    )
+
+    validity = (
+        AtlasParametricFaceSurfaceValidityAnalyzer.analyze(
+            result,
+        )
+    )
+
+    assert validity.folded_cell_count == 0
+    assert validity.inverted_normal_count == 0
+    assert validity.minimum_signed_cell_area > 0.0
+    assert validity.is_safe
