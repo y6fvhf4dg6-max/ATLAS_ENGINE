@@ -10,16 +10,23 @@ from Test.fixtures.portrait.portrait_landmark_fixture import (
 
 EXPECTED_LANDMARK_NAMES = (
     "chin_tip",
+    "hairline_center",
+    "left_eye_center",
     "left_eye_inner",
     "left_eye_outer",
+    "left_face_edge",
+    "left_jaw",
     "mouth_left",
     "mouth_right",
     "nose_left",
     "nose_right",
     "nose_root",
     "nose_tip",
+    "right_eye_center",
     "right_eye_inner",
     "right_eye_outer",
+    "right_face_edge",
+    "right_jaw",
 )
 
 
