@@ -9,6 +9,9 @@ from CORE.atlas_frontal_face_reference_profile import (
 from CORE.atlas_parametric_face_parameters import (
     AtlasParametricFaceParameters,
 )
+from CORE.atlas_frontal_face_reference_profile_catalog import (
+    AtlasFrontalFaceReferenceProfileCatalog,
+)
 
 
 class AtlasFrontalFaceParameterInitializer:
@@ -22,15 +25,8 @@ class AtlasFrontalFaceParameterInitializer:
     deformation, depth rendering, or projection.
     """
 
-    DEFAULT_REFERENCE_PROFILE = AtlasFrontalFaceReferenceProfile(
-        name="synthetic-neutral",
-        face_width_ratio=0.7500,
-        eye_spacing_ratio=0.3250,
-        nose_width_ratio=0.1250,
-        nose_length_ratio=0.1875,
-        mouth_width_ratio=0.2250,
-        jaw_width_ratio=0.5500,
-        forehead_height_ratio=0.3750,
+    DEFAULT_REFERENCE_PROFILE = (
+        AtlasFrontalFaceReferenceProfileCatalog.SYNTHETIC_NEUTRAL
     )
 
     @classmethod

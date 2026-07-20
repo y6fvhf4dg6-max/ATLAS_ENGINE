@@ -12,6 +12,9 @@ from CORE.atlas_parametric_face_parameters import (
 from CORE.atlas_frontal_face_reference_profile import (
     AtlasFrontalFaceReferenceProfile,
 )
+from CORE.atlas_frontal_face_reference_profile_catalog import (
+    AtlasFrontalFaceReferenceProfileCatalog,
+)
 
 
 def _measurements(
@@ -388,3 +391,10 @@ def test_default_reference_profile_is_value_equivalent():
 
     assert implicit == explicit
     assert implicit is not explicit
+
+
+def test_default_reference_profile_uses_catalog_instance():
+    assert (
+        AtlasFrontalFaceParameterInitializer.DEFAULT_REFERENCE_PROFILE
+        is AtlasFrontalFaceReferenceProfileCatalog.SYNTHETIC_NEUTRAL
+    )
