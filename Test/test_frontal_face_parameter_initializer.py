@@ -9,6 +9,9 @@ from CORE.atlas_frontal_face_parameter_initializer import (
 from CORE.atlas_parametric_face_parameters import (
     AtlasParametricFaceParameters,
 )
+from CORE.atlas_frontal_face_reference_profile import (
+    AtlasFrontalFaceReferenceProfile,
+)
 
 
 def _measurements(
@@ -247,3 +250,141 @@ def test_initializer_is_deterministic():
 
     assert first == second
     assert first is not second
+
+
+def _reference_profile(
+    **overrides,
+) -> AtlasFrontalFaceReferenceProfile:
+    values = {
+        "name": "custom-reference",
+        "face_width_ratio": 0.60,
+        "eye_spacing_ratio": 0.26,
+        "nose_width_ratio": 0.10,
+        "nose_length_ratio": 0.15,
+        "mouth_width_ratio": 0.18,
+        "jaw_width_ratio": 0.44,
+        "forehead_height_ratio": 0.30,
+    }
+
+    values.update(
+        overrides,
+    )
+
+    return AtlasFrontalFaceReferenceProfile(
+        **values,
+    )
+
+
+def test_initializer_accepts_reference_profile():
+    parameters = AtlasFrontalFaceParameterInitializer.initialize(
+        _measurements(),
+        reference_profile=_reference_profile(),
+    )
+
+    assert isinstance(
+        parameters,
+        AtlasParametricFaceParameters,
+    )
+
+
+def test_custom_reference_profile_controls_ratios():
+    parameters = AtlasFrontalFaceParameterInitializer.initialize(
+        _measurements(),
+        reference_profile=_reference_profile(),
+    )
+
+    assert parameters.face_width == pytest.approx(
+        1.25,
+    )
+    assert parameters.eye_spacing == pytest.approx(
+        1.25,
+    )
+    assert parameters.nose_width == pytest.approx(
+        1.25,
+    )
+    assert parameters.nose_length == pytest.approx(
+        1.25,
+    )
+    assert parameters.mouth_width == pytest.approx(
+        1.25,
+    )
+    assert parameters.jaw_width == pytest.approx(
+        1.25,
+    )
+    assert parameters.forehead_height == pytest.approx(
+        1.25,
+    )
+
+
+def test_equivalent_reference_profile_produces_neutral_parameters():
+    profile = _reference_profile(
+        face_width_ratio=0.7500,
+        eye_spacing_ratio=0.3250,
+        nose_width_ratio=0.1250,
+        nose_length_ratio=0.1875,
+        mouth_width_ratio=0.2250,
+        jaw_width_ratio=0.5500,
+        forehead_height_ratio=0.3750,
+    )
+
+    parameters = AtlasFrontalFaceParameterInitializer.initialize(
+        _measurements(),
+        reference_profile=profile,
+    )
+
+    assert parameters.face_width == pytest.approx(
+        1.0,
+    )
+    assert parameters.eye_spacing == pytest.approx(
+        1.0,
+    )
+    assert parameters.nose_width == pytest.approx(
+        1.0,
+    )
+    assert parameters.nose_length == pytest.approx(
+        1.0,
+    )
+    assert parameters.mouth_width == pytest.approx(
+        1.0,
+    )
+    assert parameters.jaw_width == pytest.approx(
+        1.0,
+    )
+    assert parameters.forehead_height == pytest.approx(
+        1.0,
+    )
+
+
+def test_initializer_rejects_wrong_reference_profile_type():
+    with pytest.raises(
+        TypeError,
+        match="AtlasFrontalFaceReferenceProfile",
+    ):
+        AtlasFrontalFaceParameterInitializer.initialize(
+            _measurements(),
+            reference_profile=object(),
+        )
+
+
+def test_default_reference_profile_is_value_equivalent():
+    explicit_profile = AtlasFrontalFaceReferenceProfile(
+        name="synthetic-neutral",
+        face_width_ratio=0.7500,
+        eye_spacing_ratio=0.3250,
+        nose_width_ratio=0.1250,
+        nose_length_ratio=0.1875,
+        mouth_width_ratio=0.2250,
+        jaw_width_ratio=0.5500,
+        forehead_height_ratio=0.3750,
+    )
+
+    implicit = AtlasFrontalFaceParameterInitializer.initialize(
+        _measurements(),
+    )
+    explicit = AtlasFrontalFaceParameterInitializer.initialize(
+        _measurements(),
+        reference_profile=explicit_profile,
+    )
+
+    assert implicit == explicit
+    assert implicit is not explicit
