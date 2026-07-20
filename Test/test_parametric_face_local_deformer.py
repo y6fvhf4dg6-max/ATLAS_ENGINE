@@ -513,3 +513,144 @@ def test_eye_deformation_preserves_lower_face_and_far_edges():
             protected_region
         ],
     )
+
+
+def test_increased_mouth_width_expands_mouth_region():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            mouth_width=1.35,
+        ),
+    )
+
+    mouth_region = (
+        (np.abs(source.x_coordinates) <= 0.45)
+        & (source.y_coordinates >= -0.55)
+        & (source.y_coordinates <= -0.22)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[mouth_region]
+        )
+    ) > np.mean(
+        np.abs(
+            source.x_coordinates[mouth_region]
+        )
+    )
+
+
+def test_reduced_mouth_width_compresses_mouth_region():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            mouth_width=0.70,
+        ),
+    )
+
+    mouth_region = (
+        (np.abs(source.x_coordinates) <= 0.45)
+        & (source.y_coordinates >= -0.55)
+        & (source.y_coordinates <= -0.22)
+    )
+
+    assert np.mean(
+        np.abs(
+            result.x_coordinates[mouth_region]
+        )
+    ) < np.mean(
+        np.abs(
+            source.x_coordinates[mouth_region]
+        )
+    )
+
+
+def test_mouth_deformation_preserves_horizontal_symmetry():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            mouth_width=1.30,
+        ),
+    )
+
+    assert result.x_coordinates == pytest.approx(
+        -np.fliplr(
+            result.x_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.y_coordinates == pytest.approx(
+        np.fliplr(
+            result.y_coordinates,
+        ),
+        abs=1e-12,
+    )
+    assert result.z_coordinates == pytest.approx(
+        np.fliplr(
+            result.z_coordinates,
+        ),
+        abs=1e-12,
+    )
+
+
+def test_mouth_deformation_preserves_upper_face_chin_and_far_edges():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            mouth_width=1.35,
+        ),
+    )
+
+    protected_region = (
+        (source.y_coordinates >= 0.0)
+        | (source.y_coordinates <= -0.72)
+        | (np.abs(source.x_coordinates) >= 0.75)
+    )
+
+    assert result.x_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.x_coordinates[
+            protected_region
+        ],
+    )
+    assert result.y_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.y_coordinates[
+            protected_region
+        ],
+    )
+    assert result.z_coordinates[
+        protected_region
+    ] == pytest.approx(
+        source.z_coordinates[
+            protected_region
+        ],
+    )
+
+
+def test_mouth_width_does_not_change_y_or_z_coordinates():
+    source = _surface()
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            mouth_width=1.25,
+        ),
+    )
+
+    assert result.y_coordinates == pytest.approx(
+        source.y_coordinates,
+    )
+    assert result.z_coordinates == pytest.approx(
+        source.z_coordinates,
+    )

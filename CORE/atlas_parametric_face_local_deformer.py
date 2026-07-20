@@ -19,6 +19,7 @@ class AtlasParametricFaceLocalDeformer:
     - eye height
     - nose width
     - nose length
+    - mouth width
 
     Deformation uses smooth regional influence masks so
     distant facial regions remain unchanged.
@@ -30,6 +31,7 @@ class AtlasParametricFaceLocalDeformer:
 
     EYE_CENTER_Y = 0.22
     NOSE_CENTER_Y = 0.05
+    MOUTH_CENTER_Y = -0.38
 
     @classmethod
     def deform(
@@ -72,6 +74,10 @@ class AtlasParametricFaceLocalDeformer:
             x_coordinates=source_x,
             y_coordinates=source_y,
         )
+        mouth_mask = cls._mouth_mask(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+        )
 
         nose_width_factor = (
             1.0
@@ -109,6 +115,15 @@ class AtlasParametricFaceLocalDeformer:
             * eye_mask
         )
 
+        mouth_width_factor = (
+            1.0
+            + (
+                parameters.mouth_width
+                - 1.0
+            )
+            * mouth_mask
+        )
+
         nose_deformed_x = (
             source_x
             * nose_width_factor
@@ -126,6 +141,7 @@ class AtlasParametricFaceLocalDeformer:
         deformed_x = (
             nose_deformed_x
             * eye_spacing_factor
+            * mouth_width_factor
         )
 
         eye_y_offset = (
@@ -190,6 +206,52 @@ class AtlasParametricFaceLocalDeformer:
 
         protected_region = (
             (y_coordinates <= -0.20)
+            | (
+                np.abs(
+                    x_coordinates,
+                )
+                >= 0.75
+            )
+        )
+
+        mask = np.where(
+            protected_region,
+            0.0,
+            mask,
+        )
+
+        return mask.astype(
+            np.float64,
+            copy=False,
+        )
+
+    @staticmethod
+    def _mouth_mask(
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+    ) -> np.ndarray:
+        mask = np.exp(
+            -(
+                (
+                    x_coordinates
+                    / 0.38
+                )
+                ** 2
+                + (
+                    (
+                        y_coordinates
+                        - AtlasParametricFaceLocalDeformer.MOUTH_CENTER_Y
+                    )
+                    / 0.18
+                )
+                ** 2
+            )
+        )
+
+        protected_region = (
+            (y_coordinates >= 0.0)
+            | (y_coordinates <= -0.72)
             | (
                 np.abs(
                     x_coordinates,
