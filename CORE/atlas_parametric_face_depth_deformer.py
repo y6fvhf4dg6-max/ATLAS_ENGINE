@@ -26,6 +26,11 @@ class AtlasParametricFaceDepthDeformer:
     NOSE_TIP_RADIUS_X = 0.30
     NOSE_TIP_RADIUS_Y = 0.32
 
+    NOSE_BRIDGE_CENTER_X = 0.00
+    NOSE_BRIDGE_CENTER_Y = 0.08
+    NOSE_BRIDGE_RADIUS_X = 0.22
+    NOSE_BRIDGE_RADIUS_Y = 0.55
+
     @classmethod
     def deform(
         cls,
@@ -64,15 +69,30 @@ class AtlasParametricFaceDepthDeformer:
             dtype=np.float64,
         )
 
-        nose_tip_delta = cls._build_nose_tip_delta(
+        nose_tip_delta = cls._build_compact_projection(
             x_coordinates=source_x,
             y_coordinates=source_y,
+            center_x=cls.NOSE_TIP_CENTER_X,
+            center_y=cls.NOSE_TIP_CENTER_Y,
+            radius_x=cls.NOSE_TIP_RADIUS_X,
+            radius_y=cls.NOSE_TIP_RADIUS_Y,
             projection=depth_profile.nose_tip_projection,
+        )
+
+        nose_bridge_delta = cls._build_compact_projection(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+            center_x=cls.NOSE_BRIDGE_CENTER_X,
+            center_y=cls.NOSE_BRIDGE_CENTER_Y,
+            radius_x=cls.NOSE_BRIDGE_RADIUS_X,
+            radius_y=cls.NOSE_BRIDGE_RADIUS_Y,
+            projection=depth_profile.nose_bridge_projection,
         )
 
         deformed_z = (
             source_z
             + nose_tip_delta
+            + nose_bridge_delta
         )
 
         return AtlasParametricFaceSurface(
@@ -89,6 +109,27 @@ class AtlasParametricFaceDepthDeformer:
         y_coordinates: np.ndarray,
         projection: float,
     ) -> np.ndarray:
+        return cls._build_compact_projection(
+            x_coordinates=x_coordinates,
+            y_coordinates=y_coordinates,
+            center_x=cls.NOSE_TIP_CENTER_X,
+            center_y=cls.NOSE_TIP_CENTER_Y,
+            radius_x=cls.NOSE_TIP_RADIUS_X,
+            radius_y=cls.NOSE_TIP_RADIUS_Y,
+            projection=projection,
+        )
+
+    @staticmethod
+    def _build_compact_projection(
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+        center_x: float,
+        center_y: float,
+        radius_x: float,
+        radius_y: float,
+        projection: float,
+    ) -> np.ndarray:
         if projection == 0.0:
             return np.zeros_like(
                 x_coordinates,
@@ -99,17 +140,17 @@ class AtlasParametricFaceDepthDeformer:
             (
                 (
                     x_coordinates
-                    - cls.NOSE_TIP_CENTER_X
+                    - center_x
                 )
-                / cls.NOSE_TIP_RADIUS_X
+                / radius_x
             )
             ** 2
             + (
                 (
                     y_coordinates
-                    - cls.NOSE_TIP_CENTER_Y
+                    - center_y
                 )
-                / cls.NOSE_TIP_RADIUS_Y
+                / radius_y
             )
             ** 2
         )
