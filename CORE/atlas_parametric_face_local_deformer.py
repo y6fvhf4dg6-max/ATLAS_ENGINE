@@ -313,8 +313,8 @@ class AtlasParametricFaceLocalDeformer:
             compressed_anchor,
         )
 
-        source_absolute_x = np.abs(
-            source_x_coordinates,
+        current_absolute_x = np.abs(
+            x_coordinates,
         )
 
         inner_scale = (
@@ -334,52 +334,42 @@ class AtlasParametricFaceLocalDeformer:
         )
 
         mapped_inner_x = (
-            source_absolute_x
+            current_absolute_x
             * inner_scale
         )
 
         mapped_outer_x = (
             target_anchor
             + (
-                source_absolute_x
+                current_absolute_x
                 - eye_anchor_x
             )
             * outer_scale
         )
 
         mapped_absolute_x = np.where(
-            source_absolute_x
+            current_absolute_x
             <= eye_anchor_x,
             mapped_inner_x,
             mapped_outer_x,
         )
 
         mapped_absolute_x = np.where(
-            source_absolute_x
+            current_absolute_x
             >= protected_boundary_x,
-            source_absolute_x,
+            current_absolute_x,
             mapped_absolute_x,
         )
 
-        mapped_source_x = np.copysign(
+        mapped_current_x = np.copysign(
             mapped_absolute_x,
-            source_x_coordinates,
-        )
-
-        eye_displacement = (
-            mapped_source_x
-            - source_x_coordinates
-        )
-
-        result = (
-            x_coordinates
-            + eye_displacement
+            x_coordinates,
         )
 
         result = np.where(
             protected_region,
             x_coordinates,
-            result,
+            mapped_current_x,
         )
 
         return result.astype(
