@@ -115,15 +115,6 @@ class AtlasParametricFaceLocalDeformer:
             * nose_length_mask
         )
 
-        eye_spacing_factor = (
-            1.0
-            + (
-                parameters.eye_spacing
-                - 1.0
-            )
-            * eye_mask
-        )
-
         eye_height_factor = (
             1.0
             + (
@@ -183,15 +174,21 @@ class AtlasParametricFaceLocalDeformer:
             * nose_length_factor
         )
 
-        pre_jaw_deformed_x = (
+        pre_eye_deformed_x = (
             nose_deformed_x
-            * eye_spacing_factor
             * mouth_width_factor
             * chin_width_factor
         )
 
+        eye_deformed_x = cls._deform_eye_spacing(
+            x_coordinates=pre_eye_deformed_x,
+            source_x_coordinates=source_x,
+            source_y_coordinates=source_y,
+            eye_spacing=parameters.eye_spacing,
+        )
+
         deformed_x = cls._deform_jaw_width(
-            x_coordinates=pre_jaw_deformed_x,
+            x_coordinates=eye_deformed_x,
             source_x_coordinates=source_x,
             source_y_coordinates=source_y,
             jaw_width=parameters.jaw_width,
@@ -252,6 +249,149 @@ class AtlasParametricFaceLocalDeformer:
                 source_z,
                 dtype=np.float64,
             ),
+        )
+
+    @staticmethod
+    def _deform_eye_spacing(
+        *,
+        x_coordinates: np.ndarray,
+        source_x_coordinates: np.ndarray,
+        source_y_coordinates: np.ndarray,
+        eye_spacing: float,
+    ) -> np.ndarray:
+        eye_anchor_x = 0.36
+        protected_boundary_x = 0.75
+
+        vertical_weight = np.exp(
+            -(
+                (
+                    (
+                        source_y_coordinates
+                        - AtlasParametricFaceLocalDeformer.EYE_CENTER_Y
+                    )
+                    / 0.20
+                )
+                ** 2
+            )
+        )
+
+        protected_region = (
+            (source_y_coordinates <= -0.20)
+            | (
+                np.abs(
+                    source_x_coordinates,
+                )
+                >= protected_boundary_x
+            )
+        )
+
+        vertical_weight = np.where(
+            protected_region,
+            0.0,
+            vertical_weight,
+        )
+
+        effective_factor = (
+            1.0
+            + (
+                eye_spacing
+                - 1.0
+            )
+            * vertical_weight
+        )
+
+        expanded_anchor = (
+            protected_boundary_x
+            - (
+                protected_boundary_x
+                - eye_anchor_x
+            )
+            / effective_factor
+        )
+
+        compressed_anchor = (
+            eye_anchor_x
+            * effective_factor
+        )
+
+        target_anchor = np.where(
+            effective_factor >= 1.0,
+            expanded_anchor,
+            compressed_anchor,
+        )
+
+        source_absolute_x = np.abs(
+            source_x_coordinates,
+        )
+
+        inner_scale = (
+            target_anchor
+            / eye_anchor_x
+        )
+
+        outer_scale = (
+            (
+                protected_boundary_x
+                - target_anchor
+            )
+            / (
+                protected_boundary_x
+                - eye_anchor_x
+            )
+        )
+
+        mapped_inner_x = (
+            source_absolute_x
+            * inner_scale
+        )
+
+        mapped_outer_x = (
+            target_anchor
+            + (
+                source_absolute_x
+                - eye_anchor_x
+            )
+            * outer_scale
+        )
+
+        mapped_absolute_x = np.where(
+            source_absolute_x
+            <= eye_anchor_x,
+            mapped_inner_x,
+            mapped_outer_x,
+        )
+
+        mapped_absolute_x = np.where(
+            source_absolute_x
+            >= protected_boundary_x,
+            source_absolute_x,
+            mapped_absolute_x,
+        )
+
+        mapped_source_x = np.copysign(
+            mapped_absolute_x,
+            source_x_coordinates,
+        )
+
+        eye_displacement = (
+            mapped_source_x
+            - source_x_coordinates
+        )
+
+        result = (
+            x_coordinates
+            + eye_displacement
+        )
+
+        result = np.where(
+            protected_region,
+            x_coordinates,
+            result,
+        )
+
+        return result.astype(
+            np.float64,
+            copy=False,
         )
 
     @staticmethod
