@@ -245,6 +245,17 @@ class AtlasParametricFaceSurfaceValidityResult:
         )
 
     @property
+    def has_collapsed_edges(
+        self,
+    ) -> bool:
+        return (
+            self.minimum_horizontal_edge_length
+            <= self.edge_length_tolerance
+            or self.minimum_vertical_edge_length
+            <= self.edge_length_tolerance
+        )
+
+    @property
     def is_safe(
         self,
     ) -> bool:
@@ -252,6 +263,7 @@ class AtlasParametricFaceSurfaceValidityResult:
             self.has_foldover
             or self.has_degenerate_cells
             or self.has_inverted_normals
+            or self.has_collapsed_edges
         )
 
     @staticmethod

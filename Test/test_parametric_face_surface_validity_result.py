@@ -159,6 +159,36 @@ def test_inverted_normals_make_surface_not_safe():
     assert not result.is_safe
 
 
+def test_collapsed_horizontal_edge_makes_surface_not_safe():
+    result = _result(
+        minimum_horizontal_edge_length=0.0,
+    )
+
+    assert result.has_collapsed_edges
+    assert not result.is_safe
+
+
+def test_collapsed_vertical_edge_makes_surface_not_safe():
+    result = _result(
+        minimum_vertical_edge_length=1e-13,
+        edge_length_tolerance=1e-12,
+    )
+
+    assert result.has_collapsed_edges
+    assert not result.is_safe
+
+
+def test_edges_above_tolerance_are_not_collapsed():
+    result = _result(
+        minimum_horizontal_edge_length=2e-12,
+        minimum_vertical_edge_length=3e-12,
+        edge_length_tolerance=1e-12,
+    )
+
+    assert not result.has_collapsed_edges
+    assert result.is_safe
+
+
 @pytest.mark.parametrize(
     "field_name",
     [
