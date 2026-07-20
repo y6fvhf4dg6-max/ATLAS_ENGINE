@@ -1031,3 +1031,63 @@ def test_forehead_height_does_not_change_x_or_z_coordinates():
     assert result.z_coordinates == pytest.approx(
         source.z_coordinates,
     )
+
+
+def test_real_portrait_jaw_width_preserves_horizontal_order():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.551649849,
+        ),
+    )
+
+    horizontal_steps = np.diff(
+        result.x_coordinates,
+        axis=1,
+    )
+
+    jaw_rows = (
+        (source.y_coordinates[:, 0] >= -0.78)
+        & (source.y_coordinates[:, 0] <= -0.30)
+    )
+
+    assert np.all(
+        horizontal_steps[
+            jaw_rows,
+            :,
+        ] > 0.0
+    )
+
+
+def test_real_portrait_jaw_width_has_no_surface_foldover():
+    from CORE.atlas_parametric_face_surface_validity_analyzer import (
+        AtlasParametricFaceSurfaceValidityAnalyzer,
+    )
+
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.551649849,
+        ),
+    )
+
+    validity = (
+        AtlasParametricFaceSurfaceValidityAnalyzer.analyze(
+            result,
+        )
+    )
+
+    assert validity.folded_cell_count == 0
+    assert validity.inverted_normal_count == 0
+    assert validity.minimum_signed_cell_area > 0.0
+    assert validity.is_safe
