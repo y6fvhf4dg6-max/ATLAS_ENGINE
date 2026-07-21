@@ -36,6 +36,14 @@ class AtlasParametricFaceDepthDeformer:
     EYE_SOCKET_SCALE_X = 0.36
     EYE_SOCKET_SCALE_Y = 0.24
 
+    BROW_CENTER_X = 0.34
+    BROW_CENTER_Y = 0.41
+    BROW_SCALE_X = 0.38
+    BROW_SCALE_Y = 0.12
+    BROW_OUTER_CURVE_Y = 0.018
+    BROW_MEDIAL_HALF_WIDTH = 0.24
+    BROW_MEDIAL_MINIMUM_WEIGHT = 0.35
+
     @classmethod
     def deform(
         cls,
@@ -100,11 +108,18 @@ class AtlasParametricFaceDepthDeformer:
             depth=depth_profile.eye_socket_depth,
         )
 
+        brow_delta = cls._build_brow_ridge_delta(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+            projection=depth_profile.brow_projection,
+        )
+
         deformed_z = (
             source_z
             + nose_tip_delta
             + nose_bridge_delta
             + eye_socket_delta
+            + brow_delta
         )
 
         return AtlasParametricFaceSurface(
@@ -129,6 +144,101 @@ class AtlasParametricFaceDepthDeformer:
             radius_x=cls.NOSE_TIP_RADIUS_X,
             radius_y=cls.NOSE_TIP_RADIUS_Y,
             projection=projection,
+        )
+
+    @classmethod
+    def _build_brow_ridge_delta(
+        cls,
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+        projection: float,
+    ) -> np.ndarray:
+        if projection == 0.0:
+            return np.zeros_like(
+                x_coordinates,
+                dtype=np.float64,
+            )
+
+        absolute_x = np.abs(
+            x_coordinates,
+        )
+
+        outer_position = np.clip(
+            (
+                absolute_x
+                - cls.BROW_CENTER_X
+            )
+            / cls.BROW_CENTER_X,
+            -1.0,
+            1.0,
+        )
+
+        curved_center_y = (
+            cls.BROW_CENTER_Y
+            + cls.BROW_OUTER_CURVE_Y
+            * outer_position
+            * outer_position
+        )
+
+        radius_squared = (
+            (
+                (
+                    absolute_x
+                    - cls.BROW_CENTER_X
+                )
+                / cls.BROW_SCALE_X
+            )
+            ** 2
+            + (
+                (
+                    y_coordinates
+                    - curved_center_y
+                )
+                / cls.BROW_SCALE_Y
+            )
+            ** 2
+        )
+
+        ridge_weight = np.exp(
+            -radius_squared
+        )
+
+        medial_transition = np.clip(
+            absolute_x
+            / cls.BROW_MEDIAL_HALF_WIDTH,
+            0.0,
+            1.0,
+        )
+
+        medial_smoothstep = (
+            medial_transition
+            * medial_transition
+            * (
+                3.0
+                - 2.0
+                * medial_transition
+            )
+        )
+
+        medial_weight = (
+            cls.BROW_MEDIAL_MINIMUM_WEIGHT
+            + (
+                1.0
+                - cls.BROW_MEDIAL_MINIMUM_WEIGHT
+            )
+            * medial_smoothstep
+        )
+
+        return (
+            float(
+                projection,
+            )
+            * ridge_weight
+            * medial_weight
+        ).astype(
+            np.float64,
+            copy=False,
         )
 
     @classmethod

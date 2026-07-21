@@ -18,8 +18,8 @@ class AtlasParametricFaceDepthProfileCatalog:
 
     NEUTRAL_ANATOMICAL = AtlasParametricFaceDepthProfile(
         name="neutral-anatomical",
-        brow_projection=0.040,
-        eye_socket_depth=0.055,
+        brow_projection=0.026,
+        eye_socket_depth=0.035,
         cheek_projection=0.060,
         nose_bridge_projection=0.110,
         nose_tip_projection=0.160,

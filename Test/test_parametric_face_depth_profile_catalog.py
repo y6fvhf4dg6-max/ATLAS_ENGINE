@@ -28,10 +28,10 @@ def test_neutral_anatomical_profile_preserves_expected_depths():
     )
 
     assert profile.brow_projection == pytest.approx(
-        0.040,
+        0.026,
     )
     assert profile.eye_socket_depth == pytest.approx(
-        0.055,
+        0.035,
     )
     assert profile.cheek_projection == pytest.approx(
         0.060,
