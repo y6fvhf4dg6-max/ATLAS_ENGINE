@@ -1847,3 +1847,171 @@ def test_real_portrait_mouth_width_enters_protected_y_boundary_with_c2_smoothnes
         adjacent_step_changes.max()
         < 1.0e-05
     )
+
+
+def test_real_portrait_jaw_width_enters_below_upper_boundary_with_c2_smoothness():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.551649849,
+        ),
+    )
+
+    x_axis = source.x_coordinates[0, :]
+    y_axis = source.y_coordinates[:, 0]
+
+    sample_column = int(
+        np.argmin(
+            np.abs(
+                x_axis - 0.50
+            )
+        )
+    )
+
+    boundary_row = int(
+        np.argmin(
+            np.abs(
+                y_axis - (-0.10)
+            )
+        )
+    )
+
+    vertical_steps = np.diff(
+        result.x_coordinates[
+            :,
+            sample_column,
+        ]
+    )
+
+    local_steps = vertical_steps[
+        boundary_row - 4:
+        boundary_row + 4
+    ]
+
+    adjacent_step_changes = np.abs(
+        np.diff(
+            local_steps
+        )
+    )
+
+    assert (
+        adjacent_step_changes.max()
+        < 1.0e-05
+    )
+
+
+def test_real_portrait_jaw_width_has_smooth_horizontal_steps_at_anchor():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.551649849,
+        ),
+    )
+
+    x_axis = source.x_coordinates[0, :]
+    y_axis = source.y_coordinates[:, 0]
+
+    jaw_row = int(
+        np.argmin(
+            np.abs(
+                y_axis
+                - (-0.52)
+            )
+        )
+    )
+
+    anchor_column = int(
+        np.argmin(
+            np.abs(
+                x_axis
+                - 0.50
+            )
+        )
+    )
+
+    horizontal_steps = np.diff(
+        result.x_coordinates[
+            jaw_row,
+            :,
+        ]
+    )
+
+    local_steps = horizontal_steps[
+        anchor_column - 4:
+        anchor_column + 4
+    ]
+
+    assert np.all(
+        local_steps > 0.0
+    )
+
+    assert (
+        local_steps.max()
+        / local_steps.min()
+    ) < 1.10
+
+
+def test_real_portrait_jaw_width_has_smooth_horizontal_steps_at_outer_boundary():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            jaw_width=1.551649849,
+        ),
+    )
+
+    x_axis = source.x_coordinates[0, :]
+    y_axis = source.y_coordinates[:, 0]
+
+    jaw_row = int(
+        np.argmin(
+            np.abs(
+                y_axis
+                - (-0.52)
+            )
+        )
+    )
+
+    boundary_column = int(
+        np.argmin(
+            np.abs(
+                x_axis
+                - 0.78
+            )
+        )
+    )
+
+    horizontal_steps = np.diff(
+        result.x_coordinates[
+            jaw_row,
+            :,
+        ]
+    )
+
+    local_steps = horizontal_steps[
+        boundary_column - 4:
+        boundary_column + 4
+    ]
+
+    assert np.all(
+        local_steps > 0.0
+    )
+
+    assert (
+        local_steps.max()
+        / local_steps.min()
+    ) < 1.10

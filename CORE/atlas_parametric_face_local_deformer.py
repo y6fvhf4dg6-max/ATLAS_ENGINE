@@ -918,6 +918,41 @@ class AtlasParametricFaceLocalDeformer:
             )
         )
 
+        upper_transition = np.clip(
+            (
+                -0.10
+                - source_y_coordinates
+            )
+            / 0.30,
+            0.0,
+            1.0,
+        )
+
+        upper_transition_squared = (
+            upper_transition
+            * upper_transition
+        )
+        upper_transition_cubed = (
+            upper_transition_squared
+            * upper_transition
+        )
+
+        upper_transition = (
+            upper_transition_cubed
+            * (
+                10.0
+                - 15.0
+                * upper_transition
+                + 6.0
+                * upper_transition_squared
+            )
+        )
+
+        vertical_weight = (
+            vertical_weight
+            * upper_transition
+        )
+
         protected_region = (
             (source_y_coordinates >= -0.10)
             | (
@@ -967,41 +1002,87 @@ class AtlasParametricFaceLocalDeformer:
             source_x_coordinates,
         )
 
-        inner_scale = (
+        anchor_displacement = (
             target_anchor
-            / jaw_anchor_x
+            - jaw_anchor_x
         )
 
-        outer_scale = (
+        inner_t = np.clip(
+            source_absolute_x
+            / jaw_anchor_x,
+            0.0,
+            1.0,
+        )
+
+        inner_t_squared = (
+            inner_t
+            * inner_t
+        )
+        inner_t_cubed = (
+            inner_t_squared
+            * inner_t
+        )
+
+        inner_basis = (
+            inner_t_cubed
+            * (
+                10.0
+                - 15.0
+                * inner_t
+                + 6.0
+                * inner_t_squared
+            )
+        )
+
+        outer_t = np.clip(
             (
-                protected_boundary_x
-                - target_anchor
+                source_absolute_x
+                - jaw_anchor_x
             )
             / (
                 protected_boundary_x
                 - jaw_anchor_x
+            ),
+            0.0,
+            1.0,
+        )
+
+        outer_t_squared = (
+            outer_t
+            * outer_t
+        )
+        outer_t_cubed = (
+            outer_t_squared
+            * outer_t
+        )
+
+        outer_smootherstep = (
+            outer_t_cubed
+            * (
+                10.0
+                - 15.0
+                * outer_t
+                + 6.0
+                * outer_t_squared
             )
         )
 
-        mapped_inner_x = (
-            source_absolute_x
-            * inner_scale
+        outer_basis = (
+            1.0
+            - outer_smootherstep
         )
 
-        mapped_outer_x = (
-            target_anchor
-            + (
-                source_absolute_x
-                - jaw_anchor_x
-            )
-            * outer_scale
-        )
-
-        mapped_absolute_x = np.where(
+        horizontal_basis = np.where(
             source_absolute_x
             <= jaw_anchor_x,
-            mapped_inner_x,
-            mapped_outer_x,
+            inner_basis,
+            outer_basis,
+        )
+
+        mapped_absolute_x = (
+            source_absolute_x
+            + anchor_displacement
+            * horizontal_basis
         )
 
         mapped_absolute_x = np.where(
