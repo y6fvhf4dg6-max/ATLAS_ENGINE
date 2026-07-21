@@ -998,8 +998,8 @@ class AtlasParametricFaceLocalDeformer:
             compressed_anchor,
         )
 
-        source_absolute_x = np.abs(
-            source_x_coordinates,
+        current_absolute_x = np.abs(
+            x_coordinates,
         )
 
         anchor_displacement = (
@@ -1008,7 +1008,7 @@ class AtlasParametricFaceLocalDeformer:
         )
 
         inner_t = np.clip(
-            source_absolute_x
+            current_absolute_x
             / jaw_anchor_x,
             0.0,
             1.0,
@@ -1036,7 +1036,7 @@ class AtlasParametricFaceLocalDeformer:
 
         outer_t = np.clip(
             (
-                source_absolute_x
+                current_absolute_x
                 - jaw_anchor_x
             )
             / (
@@ -1073,44 +1073,34 @@ class AtlasParametricFaceLocalDeformer:
         )
 
         horizontal_basis = np.where(
-            source_absolute_x
+            current_absolute_x
             <= jaw_anchor_x,
             inner_basis,
             outer_basis,
         )
 
         mapped_absolute_x = (
-            source_absolute_x
+            current_absolute_x
             + anchor_displacement
             * horizontal_basis
         )
 
         mapped_absolute_x = np.where(
-            source_absolute_x
+            current_absolute_x
             >= protected_boundary_x,
-            source_absolute_x,
+            current_absolute_x,
             mapped_absolute_x,
         )
 
-        mapped_source_x = np.copysign(
+        mapped_current_x = np.copysign(
             mapped_absolute_x,
-            source_x_coordinates,
-        )
-
-        jaw_displacement = (
-            mapped_source_x
-            - source_x_coordinates
-        )
-
-        result = (
-            x_coordinates
-            + jaw_displacement
+            x_coordinates,
         )
 
         result = np.where(
             protected_region,
             x_coordinates,
-            result,
+            mapped_current_x,
         )
 
         return result.astype(
@@ -1277,11 +1267,60 @@ class AtlasParametricFaceLocalDeformer:
             )
         )
 
-        mask = np.where(
-            np.abs(
-                x_coordinates,
+        absolute_x = np.abs(
+            x_coordinates,
+        )
+
+        outer_transition_start = 0.45
+        protected_boundary_x = 0.70
+        outer_transition_width = (
+            protected_boundary_x
+            - outer_transition_start
+        )
+
+        outer_transition = np.clip(
+            (
+                absolute_x
+                - outer_transition_start
             )
-            >= 0.70,
+            / outer_transition_width,
+            0.0,
+            1.0,
+        )
+
+        outer_transition_squared = (
+            outer_transition
+            * outer_transition
+        )
+        outer_transition_cubed = (
+            outer_transition_squared
+            * outer_transition
+        )
+
+        outer_smootherstep = (
+            outer_transition_cubed
+            * (
+                10.0
+                - 15.0
+                * outer_transition
+                + 6.0
+                * outer_transition_squared
+            )
+        )
+
+        outer_weight = (
+            1.0
+            - outer_smootherstep
+        )
+
+        mask = (
+            mask
+            * outer_weight
+        )
+
+        mask = np.where(
+            absolute_x
+            >= protected_boundary_x,
             0.0,
             mask,
         )
@@ -1290,6 +1329,7 @@ class AtlasParametricFaceLocalDeformer:
             np.float64,
             copy=False,
         )
+
 
     @staticmethod
     def _nose_length_mask(

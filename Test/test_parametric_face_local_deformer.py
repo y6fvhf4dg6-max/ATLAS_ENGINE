@@ -2015,3 +2015,232 @@ def test_real_portrait_jaw_width_has_smooth_horizontal_steps_at_outer_boundary()
         local_steps.max()
         / local_steps.min()
     ) < 1.10
+
+
+def test_real_portrait_nose_width_exits_smoothly_at_outer_boundary():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            nose_width=2.317999259,
+        ),
+    )
+
+    x_axis = source.x_coordinates[0, :]
+    y_axis = source.y_coordinates[:, 0]
+
+    nose_row = int(
+        np.argmin(
+            np.abs(
+                y_axis - 0.02
+            )
+        )
+    )
+
+    active_columns = np.flatnonzero(
+        (x_axis >= 0.0)
+        & (x_axis < 0.70)
+    )
+    protected_columns = np.flatnonzero(
+        x_axis >= 0.70
+    )
+
+    last_active_column = int(
+        active_columns[-1]
+    )
+    first_protected_column = int(
+        protected_columns[0]
+    )
+
+    last_active_displacement = (
+        result.x_coordinates[
+            nose_row,
+            last_active_column,
+        ]
+        - source.x_coordinates[
+            nose_row,
+            last_active_column,
+        ]
+    )
+
+    protected_displacement = (
+        result.x_coordinates[
+            nose_row,
+            first_protected_column,
+        ]
+        - source.x_coordinates[
+            nose_row,
+            first_protected_column,
+        ]
+    )
+
+    assert protected_displacement == pytest.approx(
+        0.0,
+        abs=1.0e-12,
+    )
+
+    assert abs(
+        last_active_displacement
+    ) < 1.0e-4
+
+
+def test_real_portrait_nose_width_has_smooth_horizontal_steps_at_outer_boundary():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            nose_width=2.317999259,
+        ),
+    )
+
+    x_axis = source.x_coordinates[0, :]
+    y_axis = source.y_coordinates[:, 0]
+
+    nose_row = int(
+        np.argmin(
+            np.abs(
+                y_axis - 0.02
+            )
+        )
+    )
+
+    boundary_column = int(
+        np.argmin(
+            np.abs(
+                x_axis - 0.70
+            )
+        )
+    )
+
+    horizontal_steps = np.diff(
+        result.x_coordinates[
+            nose_row,
+            :,
+        ]
+    )
+
+    local_steps = horizontal_steps[
+        boundary_column - 4:
+        boundary_column + 4
+    ]
+
+    assert np.all(
+        local_steps > 0.0
+    )
+
+    assert (
+        local_steps.max()
+        / local_steps.min()
+    ) < 1.10
+
+
+def test_real_portrait_nose_width_enters_protected_x_boundary_with_c2_smoothness():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceLocalDeformer.deform(
+        source,
+        parameters=_parameters(
+            nose_width=2.317999259,
+        ),
+    )
+
+    x_axis = source.x_coordinates[0, :]
+    y_axis = source.y_coordinates[:, 0]
+
+    nose_row = int(
+        np.argmin(
+            np.abs(
+                y_axis - 0.02
+            )
+        )
+    )
+
+    boundary_column = int(
+        np.argmin(
+            np.abs(
+                x_axis - 0.70
+            )
+        )
+    )
+
+    horizontal_steps = np.diff(
+        result.x_coordinates[
+            nose_row,
+            :,
+        ]
+    )
+
+    local_steps = horizontal_steps[
+        boundary_column - 4:
+        boundary_column + 4
+    ]
+
+    adjacent_step_changes = np.abs(
+        np.diff(
+            local_steps
+        )
+    )
+
+    assert (
+        adjacent_step_changes.max()
+        < 1.0e-05
+    )
+
+
+def test_real_portrait_all_local_parameters_have_no_surface_foldover():
+    from CORE.atlas_parametric_face_deformation_pipeline import (
+        AtlasParametricFaceDeformationPipeline,
+    )
+    from CORE.atlas_parametric_face_surface_validity_analyzer import (
+        AtlasParametricFaceSurfaceValidityAnalyzer,
+    )
+
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=401,
+        column_count=401,
+    )
+
+    result = AtlasParametricFaceDeformationPipeline.deform(
+        source,
+        parameters=_parameters(
+            eye_spacing=1.402815658,
+            eye_height=1.0,
+            nose_width=2.317999259,
+            nose_length=1.468055497,
+            mouth_width=1.537264377,
+            chin_width=1.0,
+            chin_length=1.0,
+            jaw_width=1.551649849,
+            forehead_height=0.880143009,
+        ),
+    )
+
+    horizontal_steps = np.diff(
+        result.x_coordinates,
+        axis=1,
+    )
+
+    validity = (
+        AtlasParametricFaceSurfaceValidityAnalyzer.analyze(
+            result,
+        )
+    )
+
+    assert np.all(
+        horizontal_steps > 0.0
+    )
+    assert validity.folded_cell_count == 0
+    assert validity.inverted_normal_count == 0
+    assert validity.minimum_signed_cell_area > 0.0
+    assert validity.is_safe
