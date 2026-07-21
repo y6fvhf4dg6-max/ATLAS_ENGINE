@@ -268,6 +268,31 @@ class AtlasParametricFaceLocalDeformer:
             )
         )
 
+        lower_transition = np.clip(
+            (
+                source_y_coordinates
+                - (-0.20)
+            )
+            / 0.20,
+            0.0,
+            1.0,
+        )
+
+        lower_transition = (
+            lower_transition
+            * lower_transition
+            * (
+                3.0
+                - 2.0
+                * lower_transition
+            )
+        )
+
+        vertical_weight = (
+            vertical_weight
+            * lower_transition
+        )
+
         protected_region = (
             (source_y_coordinates <= -0.20)
             | (
@@ -347,11 +372,195 @@ class AtlasParametricFaceLocalDeformer:
             * outer_scale
         )
 
+        transition_half_width = 0.12
+        transition_start = (
+            eye_anchor_x
+            - transition_half_width
+        )
+        transition_end = (
+            eye_anchor_x
+            + transition_half_width
+        )
+        transition_width = (
+            transition_end
+            - transition_start
+        )
+
+        transition_t = np.clip(
+            (
+                current_absolute_x
+                - transition_start
+            )
+            / transition_width,
+            0.0,
+            1.0,
+        )
+
+        transition_start_value = (
+            transition_start
+            * inner_scale
+        )
+
+        transition_end_value = (
+            target_anchor
+            + (
+                transition_end
+                - eye_anchor_x
+            )
+            * outer_scale
+        )
+
+        hermite_h00 = (
+            2.0
+            * transition_t
+            * transition_t
+            * transition_t
+            - 3.0
+            * transition_t
+            * transition_t
+            + 1.0
+        )
+
+        hermite_h10 = (
+            transition_t
+            * transition_t
+            * transition_t
+            - 2.0
+            * transition_t
+            * transition_t
+            + transition_t
+        )
+
+        hermite_h01 = (
+            -2.0
+            * transition_t
+            * transition_t
+            * transition_t
+            + 3.0
+            * transition_t
+            * transition_t
+        )
+
+        hermite_h11 = (
+            transition_t
+            * transition_t
+            * transition_t
+            - transition_t
+            * transition_t
+        )
+
+        mapped_transition_x = (
+            hermite_h00
+            * transition_start_value
+            + hermite_h10
+            * transition_width
+            * inner_scale
+            + hermite_h01
+            * transition_end_value
+            + hermite_h11
+            * transition_width
+            * outer_scale
+        )
+
         mapped_absolute_x = np.where(
             current_absolute_x
-            <= eye_anchor_x,
+            <= transition_start,
             mapped_inner_x,
-            mapped_outer_x,
+            np.where(
+                current_absolute_x
+                >= transition_end,
+                mapped_outer_x,
+                mapped_transition_x,
+            ),
+        )
+
+        outer_transition_width = 0.24
+        outer_transition_start = (
+            protected_boundary_x
+            - outer_transition_width
+        )
+
+        outer_transition_t = np.clip(
+            (
+                current_absolute_x
+                - outer_transition_start
+            )
+            / outer_transition_width,
+            0.0,
+            1.0,
+        )
+
+        outer_start_value = (
+            target_anchor
+            + (
+                outer_transition_start
+                - eye_anchor_x
+            )
+            * outer_scale
+        )
+
+        outer_h00 = (
+            2.0
+            * outer_transition_t
+            * outer_transition_t
+            * outer_transition_t
+            - 3.0
+            * outer_transition_t
+            * outer_transition_t
+            + 1.0
+        )
+
+        outer_h10 = (
+            outer_transition_t
+            * outer_transition_t
+            * outer_transition_t
+            - 2.0
+            * outer_transition_t
+            * outer_transition_t
+            + outer_transition_t
+        )
+
+        outer_h01 = (
+            -2.0
+            * outer_transition_t
+            * outer_transition_t
+            * outer_transition_t
+            + 3.0
+            * outer_transition_t
+            * outer_transition_t
+        )
+
+        outer_h11 = (
+            outer_transition_t
+            * outer_transition_t
+            * outer_transition_t
+            - outer_transition_t
+            * outer_transition_t
+        )
+
+        mapped_outer_transition_x = (
+            outer_h00
+            * outer_start_value
+            + outer_h10
+            * outer_transition_width
+            * outer_scale
+            + outer_h01
+            * protected_boundary_x
+            + outer_h11
+            * outer_transition_width
+        )
+
+        mapped_absolute_x = np.where(
+            (
+                current_absolute_x
+                > outer_transition_start
+            )
+            & (
+                current_absolute_x
+                < protected_boundary_x
+            ),
+            mapped_outer_transition_x,
+            mapped_absolute_x,
         )
 
         mapped_absolute_x = np.where(
@@ -453,6 +662,72 @@ class AtlasParametricFaceLocalDeformer:
             )
         )
 
+        lower_transition = np.clip(
+            (
+                source_y_coordinates
+                - (-0.72)
+            )
+            / 0.30,
+            0.0,
+            1.0,
+        )
+
+        lower_transition_squared = (
+            lower_transition
+            * lower_transition
+        )
+        lower_transition_cubed = (
+            lower_transition_squared
+            * lower_transition
+        )
+
+        lower_transition = (
+            lower_transition_cubed
+            * (
+                10.0
+                - 15.0
+                * lower_transition
+                + 6.0
+                * lower_transition_squared
+            )
+        )
+
+        upper_transition = np.clip(
+            (
+                0.0
+                - source_y_coordinates
+            )
+            / 0.22,
+            0.0,
+            1.0,
+        )
+
+        upper_transition_squared = (
+            upper_transition
+            * upper_transition
+        )
+        upper_transition_cubed = (
+            upper_transition_squared
+            * upper_transition
+        )
+
+        upper_transition = (
+            upper_transition_cubed
+            * (
+                10.0
+                - 15.0
+                * upper_transition
+                + 6.0
+                * upper_transition_squared
+            )
+        )
+
+        vertical_weight = (
+            vertical_weight
+            * lower_transition
+            * upper_transition
+        )
+
         protected_region = (
             (source_y_coordinates >= 0.0)
             | (source_y_coordinates <= -0.72)
@@ -503,41 +778,87 @@ class AtlasParametricFaceLocalDeformer:
             source_x_coordinates,
         )
 
-        inner_scale = (
+        anchor_displacement = (
             target_anchor
-            / mouth_anchor_x
+            - mouth_anchor_x
         )
 
-        outer_scale = (
+        inner_t = np.clip(
+            source_absolute_x
+            / mouth_anchor_x,
+            0.0,
+            1.0,
+        )
+
+        inner_t_squared = (
+            inner_t
+            * inner_t
+        )
+        inner_t_cubed = (
+            inner_t_squared
+            * inner_t
+        )
+
+        inner_basis = (
+            inner_t_cubed
+            * (
+                10.0
+                - 15.0
+                * inner_t
+                + 6.0
+                * inner_t_squared
+            )
+        )
+
+        outer_t = np.clip(
             (
-                protected_boundary_x
-                - target_anchor
+                source_absolute_x
+                - mouth_anchor_x
             )
             / (
                 protected_boundary_x
                 - mouth_anchor_x
+            ),
+            0.0,
+            1.0,
+        )
+
+        outer_t_squared = (
+            outer_t
+            * outer_t
+        )
+        outer_t_cubed = (
+            outer_t_squared
+            * outer_t
+        )
+
+        outer_smootherstep = (
+            outer_t_cubed
+            * (
+                10.0
+                - 15.0
+                * outer_t
+                + 6.0
+                * outer_t_squared
             )
         )
 
-        mapped_inner_x = (
-            source_absolute_x
-            * inner_scale
+        outer_basis = (
+            1.0
+            - outer_smootherstep
         )
 
-        mapped_outer_x = (
-            target_anchor
-            + (
-                source_absolute_x
-                - mouth_anchor_x
-            )
-            * outer_scale
-        )
-
-        mapped_absolute_x = np.where(
+        horizontal_basis = np.where(
             source_absolute_x
             <= mouth_anchor_x,
-            mapped_inner_x,
-            mapped_outer_x,
+            inner_basis,
+            outer_basis,
+        )
+
+        mapped_absolute_x = (
+            source_absolute_x
+            + anchor_displacement
+            * horizontal_basis
         )
 
         mapped_absolute_x = np.where(
