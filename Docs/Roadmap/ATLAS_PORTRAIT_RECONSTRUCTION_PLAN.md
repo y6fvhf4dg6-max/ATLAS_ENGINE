@@ -650,79 +650,215 @@ Başarı kriterleri:
 - Ground-truth karşılaştırması yapılmalı
 - Çıktı CORE sözleşmesine dönüştürülebilmeli
 
-## FAZ 4 — Nötr parametrik yüz modeli
+## FAZ 4 — Analytic baseline ve rekonstrüksiyon fizibilitesi
 
 Amaç:
 
-- Sabit topolojili
-- Ticari kullanıma uygun
-- Hafif
-- Kontrol edilebilir
-- Landmark fitting’e uygun
+- Mevcut parametrik grid yüzeyini `ANALYTIC_BASELINE_V1` olarak dondurmak
+- Kabul edilmiş eye socket, brow ve cheek katmanlarını korumak
+- Analitik lokal anatomy alanlarının sınırlarını belgelemek
+- Production yüz geometrisi için uygun rekonstrüksiyon teknolojisini seçmek
+- Ticari kullanım, lisans, performans ve sürdürülebilirlik risklerini doğrulamak
 
-bir nötr yüz modeli seçmek veya oluşturmak.
+Korunacak baseline bileşenleri:
 
-Model seçilmeden önce:
+- Nötr parametrik yüz yüzeyi
+- Landmark ölçüm sözleşmesi
+- Frontal XY fitting
+- Surface validity analyzer
+- Shaded-preview renderer
+- Eye socket depth
+- Brow ridge projection
+- LOW SOFT cheek projection
+- Golden visual regression
 
-1. Lisans kontrolü
-2. Ticari kullanım kontrolü
-3. Yeniden dağıtım koşulları
-4. Vertex topolojisi
-5. Blendshape veya deformasyon uygunluğu
-6. Apple Silicon uyumluluğu
-7. Dosya boyutu
-8. Test fixture üretilebilirliği
+Kalıcı mimari karar:
 
-değerlendirilecektir.
+> Analitik Gaussian ve benzeri lokal alanlar, production yüz anatomisini bölge bölge kurmak için genişletilmeyecektir. Mevcut alanlar yalnız baseline, düşük frekanslı residual correction ve regresyon karşılaştırması amacıyla korunacaktır.
 
-## FAZ 5 — Landmark-driven fitting
+Kalıcı olarak reddedilen nose-wing yaklaşımı:
 
-İlk paket:
+- Bilateral Gaussian nose-wing projection
+- İki bağımsız ellipse veya compact projection
+- Yalnız `center_x`, `center_y`, `scale_x`, `scale_y` kalibrasyonuyla alar-base üretimi
 
-- Scale
-- Translation
-- Rotation
-- Face width
-- Face height
-- Eye spacing
-- Nose width
-- Nose length
-- Mouth width
-- Chin width
-- Jaw width
+Reddetme gerekçeleri:
 
-İkinci paket:
+- Ayrık bilateral lob artefaktı
+- Alar ring veya çengel görünümü
+- Nasal-base banding
+- Yatay moustache artefaktı
+- Semantik topoloji eksikliği
+- Burun ucu, ala, columella ve yanak arasında sınır sürekliliği kurulamaması
 
-- Nose projection
-- Chin projection
-- Forehead slope
-- Cheek projection
-- Facial convexity
+Rekonstrüksiyon adayları şu kriterlerle değerlendirilecektir:
+
+1. Ticari lisans
+2. Yeniden dağıtım koşulları
+3. Tek fotoğraf desteği
+4. Çoklu görünüş desteği
+5. Metrik kimlik geometrisi
+6. Dense ve semantik mesh topolojisi
+7. Burun, dudak ve göz çevresi anatomisi
+8. Mesh, normal ve UV dışa aktarımı
+9. Apple Silicon uyumluluğu
+10. CPU ve GPU gereksinimi
+11. Python ve bağımlılık uyumluluğu
+12. Deterministik fixture üretilebilirliği
+13. Çalışma süresi ve bellek tüketimi
+14. Uzun vadeli bakım riski
+
+İncelenecek yaklaşım sınıfları:
+
+- FLAME tabanlı fitting
+- MICA tipi identity-shape reconstruction
+- DECA veya EMOCA tipi coarse-to-fine reconstruction
+- Dense correspondence ve normal tabanlı fitting
+- Ticari kullanıma uygun eşdeğer alternatifler
+
+Kabul kriteri:
+
+> Birincil ve yedek rekonstrüksiyon yaklaşımı; lisans, geometri kalitesi, performans ve ATLAS entegrasyonu açısından ölçülebilir kriterlerle seçilmiş olmalıdır.
+
+## FAZ 5 — Canonical face geometry ve reconstruction adapter
+
+Production rekonstrüksiyon modeli doğrudan Relief Engine sözleşmelerine bağlanmayacaktır.
+
+Araya provider’dan bağımsız canonical geometri sözleşmesi konacaktır:
+
+`AtlasParametricFaceGeometry`
+
+Asgari içerik:
+
+- Vertices
+- Triangle faces
+- Surface normals
+- UV coordinates
+- Semantic vertex regions
+- Landmark-to-vertex map
+- Identity parameters
+- Expression parameters
+- Pose parameters
+- Confidence
+- Visibility
+- Metadata
+
+Asgari semantik bölgeler:
+
+- Forehead
+- Sol ve sağ brow
+- Sol ve sağ eye socket
+- Nose bridge
+- Nose tip
+- Sol ve sağ ala
+- Columella
+- Philtrum
+- Upper lip
+- Lower lip
+- Chin
+- Sol ve sağ cheek
+- Jaw
+
+Reconstruction adapter akışı:
+
+fotoğraf
+→ giriş ve kalite kontrolü
+→ yüz tespiti
+→ dense landmark veya correspondence
+→ identity / expression / pose fitting
+→ canonical mesh
+→ AtlasParametricFaceGeometry
+
+Adapter sorumlulukları:
+
+- Crop ve orientation
+- Kamera ve poz normalizasyonu
+- Expression normalizasyonu
+- Metrik veya normalize ölçek
+- Provider çıktısının canonical sözleşmeye dönüşümü
+- Confidence raporu
+- Deterministik metadata
+- Düşük güven durumunun açıkça raporlanması
 
 Testler:
 
-- Sentetik landmark fitting
-- Simetrik yüz
-- Asimetrik giriş
-- Aşırı parametre sınırları
+- Sentetik canonical mesh fixture
+- Sabit topoloji
+- Finite vertex ve normal değerleri
+- Triangle index doğrulaması
+- Semantik bölge kapsamı
+- Landmark-vertex eşleşmesi
+- Deterministik serialization
+- Expression ve identity ayrımı
 - Tek fotoğraf fallback
-- Üç fotoğraf fitting
-- Deterministik çıktı
-- Projection error
+- Çoklu görünüş davranışı
+- Provider değiştirilebilirliği
 
-## FAZ 6 — Depth render ve bas-relief compression
+Kabul kriteri:
 
-Kurallar:
+> Aynı giriş ve aynı model sürümü, canonical koordinat sisteminde kararlı ve test edilebilir bir yüz mesh’i üretmelidir.
+
+## FAZ 6 — Face geometry projection ve feature-sensitive relief compression
+
+Canonical 3B yüz geometrisi doğrudan STL’ye çevrilmeyecektir.
+
+İlk dönüşüm:
+
+canonical 3B face mesh
+→ frontal hizalama
+→ görünür yüzey projeksiyonu
+→ single-valued depth field
+
+Üretilecek yardımcı kanallar:
+
+- Frontal depth map
+- Surface normal map
+- Visibility mask
+- Semantic region map
+- Confidence map
+- Feature-preservation weight map
+
+Projeksiyon kuralları:
 
 - İlk kamera tercihi orthographic
+- Perspektif etkisi ayrıca test edilecek
 - Yüzün ön–arka aralığı ölçülecek
-- Burun ucu korunacak
-- Çene çıkıntısı korunacak
-- Göz çukurları kontrollü tutulacak
-- Yüz yanları aşırı ezilmeyecek
-- Depth normalize `0..1` üretilecek
-- Normal map üretilecek
-- Shaded preview zorunlu olacak
+- Self-occlusion açıkça yönetilecek
+- Burun yan yüzleri ve alar taban korunacak
+- Görünmeyen arka geometri depth’e taşınmayacak
+- Yüz dış silüeti kontrollü oluşturulacak
+- Çıktı single-valued height-field sözleşmesine uyacak
+
+Relief compression doğrudan lineer Z küçültmesi olmayacaktır.
+
+Production compression sistemi:
+
+global depth compression
++ gradient / normal preservation
++ semantic regional weights
++ confidence weighting
++ slope and print-safety limits
+
+Bölgesel ilkeler:
+
+- Burun çıkıntısı sıkıştırılırken yön ve silüet korunur
+- Göz çukurları kontrollü tutulur
+- Dudak profili ve ayrımı korunur
+- Yanaklar düşük frekanslı ve yumuşak işlenir
+- Alın aşırı bombe yapmadan sıkıştırılır
+- Çene ve jaw silüeti korunur
+- Saç, gözlük ve sakal ana yüz geometrisinden ayrı katmanlar olarak işlenir
+
+Doğrulama:
+
+- Çoklu ışık yönünde shaded preview
+- Normal sürekliliği
+- Gradient sürekliliği
+- Curvature sign kontrolleri
+- Slope limitleri
+- Folded cell ve inverted normal kontrolleri
+- Golden fixture
+- Gerçek portre karşılaştırması
 
 Başlangıç fiziksel aralığı:
 
@@ -731,7 +867,7 @@ Başlangıç fiziksel aralığı:
 - Relief height: yaklaşık `1.8–2.2 mm`
 - Sampling: yaklaşık `0.5 mm`
 
-Bu değerler fiziksel baskı öncesinde kilitlenmeyecektir.
+Bu değerler kabul edilmiş shaded preview ve fiziksel baskı öncesinde kilitlenmeyecektir.
 
 ## FAZ 7 — Yardımcı kimlik katmanları
 
@@ -967,6 +1103,8 @@ Terminal çalışma düzeni:
 
 # 19. UYGULAMA ÖNCELİK SIRASI
 
+Tamamlanmış ve korunacak ilk adımlar:
+
 1. Bu mimari planın eksiksiz kaydedilmesi
 2. Dosyanın Git durumunun doğrulanması
 3. Mevcut roadmap ve mimari belgelerle çakışma kontrolü
@@ -977,129 +1115,257 @@ Terminal çalışma düzeni:
 8. MediaPipe Face Landmarker spike
 9. Otomatik landmark sonucunun ground-truth ile karşılaştırılması
 10. Landmark hata metriğinin ve kabul eşiğinin tanımlanması
-11. Parametrik yüz modeli adaylarının araştırılması
-12. Lisans ve ticari kullanım kararının belgelenmesi
-13. Parametrik yüz modeli sözleşmesi
-14. Nötr yüz mesh fixture’ı
-15. Frontal landmark-driven fitting
-16. Tek fotoğraf fallback davranışı
-17. Çoklu görünüş fitting
-18. Burun ve çene projection desteği
-19. Frontal depth renderer
-20. Normal map üretimi
-21. Bas-relief compression
-22. Çoklu ışık yönünde shaded preview
-23. Yüz dış silüet düzeltmesi
-24. Saç çizgisi katmanı
-25. Kaş katmanı
-26. Gözlük katmanı
-27. Sakal ve bıyık katmanı
-28. Boyun ve kıyafet katmanı
-29. Mevcut Relief Engine ile entegrasyon
-30. Product profile entegrasyonu
-31. Quality report entegrasyonu
-32. Print-risk entegrasyonu
-33. Shaded preview kabul kapısı
-34. Manifold mesh üretimi
-35. STL üretimi
-36. Bambu Studio doğrulaması
-37. İlk fiziksel baskı
-38. Baskı sonrası tanınabilirlik değerlendirmesi
-39. Profil parametrelerinin kalibrasyonu
-40. Kalıcı portre ürün profili kataloğu
+11. Parametrik yüz modeli adaylarının ilk araştırması
+12. İlk lisans ve ticari kullanım incelemesi
+13. Parametrik yüz modeli ve fitting sözleşmeleri
+
+14. `ANALYTIC_BASELINE_V1` durumunun dondurulması
+15. Eye, brow ve cheek golden visual regression sözleşmesi
+16. Rekonstrüksiyon teknolojisi değerlendirme sözleşmesi
+17. Rekonstrüksiyon adaylarının kontrollü fizibilite spike’ları
+18. Kesin lisans ve ticari kullanım kararının belgelenmesi
+19. `AtlasParametricFaceGeometry` canonical sözleşmesi
+20. Sentetik canonical 3B yüz mesh fixture’ı
+21. Seçilen reconstruction adapter spike
+22. Gerçek portreden canonical yüz mesh’i üretimi
+23. Frontal kamera ve koordinat normalizasyonu
+24. Mesh-to-frontal-depth projection
+25. Normal, visibility, semantic ve confidence map üretimi
+26. Feature-sensitive bas-relief compression
+27. Çoklu ışık yönünde shaded preview
+28. Yüz dış silüet düzeltmesi
+29. Saç çizgisi ve saç katmanı
+30. Kaş, gözlük, sakal ve diğer accessory katmanları
+31. Boyun, omuz ve kıyafet katmanı
+32. Mevcut Relief Engine ile entegrasyon
+33. Product profile entegrasyonu
+34. Quality report ve print-risk entegrasyonu
+35. Shaded-preview kabul kapısı
+36. Manifold mesh üretimi
+37. STL üretimi ve Bambu Studio doğrulaması
+38. İlk fiziksel baskı
+39. Baskı sonrası tanınabilirlik ve üretilebilirlik değerlendirmesi
+40. Kalıcı portre ürün profili kataloğu ve kalibrasyonu
 
 İlk uygulanacak teknik paket:
 
-> Provider’dan bağımsız immutable `AtlasPortraitLandmarkResult` sözleşmesi.
+> Reconstruction Evaluation Contract
 
-Bu ilk pakette henüz:
+Bu paketin amacı, bir rekonstrüksiyon modelini hemen CORE’a bağlamak değil; aday sistemleri aynı ölçütlerle karşılaştırabilecek bağımsız ve test edilebilir bir değerlendirme sözleşmesi oluşturmaktır.
 
-- MediaPipe kurulmayacaktır.
-- Model indirilmeyecektir.
-- Parametrik yüz mesh’i oluşturulmayacaktır.
-- Depth map üretilmeyecektir.
-- STL üretilmeyecektir.
+İlk pakette tanımlanacak ölçütler:
 
-Önerilen ilk dosyalar:
+- Model ve yaklaşım kimliği
+- Model sürümü
+- Lisans türü
+- Ticari kullanım uygunluğu
+- Yeniden dağıtım koşulları
+- Tek fotoğraf desteği
+- Çoklu görünüş desteği
+- Sabit veya değişken topoloji
+- Vertex ve triangle sayısı
+- Surface normal desteği
+- UV desteği
+- Semantik yüz bölgeleri
+- Landmark-to-vertex eşleşmesi
+- Identity parametreleri
+- Expression parametreleri
+- Pose parametreleri
+- Confidence üretimi
+- Visibility üretimi
+- Apple Silicon uyumluluğu
+- Python uyumluluğu
+- CPU ve GPU gereksinimi
+- Çalışma süresi
+- Bellek kullanımı
+- Deterministik çıktı
+- Fixture üretilebilirliği
+- ATLAS adapter uygulanabilirliği
+- Uzun vadeli bakım riski
 
-- `CORE/atlas_portrait_landmark_result.py`
-- `Test/test_portrait_landmark_result.py`
+İlk teknik sözleşme için önerilen dosyalar:
 
-İlk sözleşmenin zorunlu alanları:
+- `CORE/atlas_portrait_reconstruction_evaluation.py`
+- `Test/test_portrait_reconstruction_evaluation.py`
 
-- `image_width`
-- `image_height`
-- `landmarks`
-- `confidence`
-- `provider_id`
-- `metadata`
-
-Landmark koordinatları normalize `0..1` olarak saklanacaktır.
-
-Gerekirse piksel koordinatları sözleşme tarafından deterministik biçimde hesaplanacaktır.
----
-
-# 20. MEVCUT KESİN NOKTA VE SIRADAKİ ADIM
-
-Son temiz proje durumu:
-
-- Commit: `52ce7e5 Integrate relief product profile`
-- Son tam regresyon: `854 passed in 4.87s`
-- Ana çalışma ağacında özel portre dosyaları Git dışında tutulmaktadır.
-- Mevcut 2.5D Relief Engine korunacaktır.
-- Değiştirilecek temel unsur, portreye ait ana depth kaynağıdır.
-
-Son başarısız deney:
-
-- `PORTRAIT_GRAPHIC_V1_DEPTH_SHADED_V3.png`
-
-Kesin sonuç:
-
-- Burun, yanak, ağız ve çene gerçek yüzey olarak okunmadı.
-- Sentetik Gaussian anatomy prior başarısız kabul edildi.
-- Yeni katsayı, gamma, smoothing, ambient veya slope denemesi yapılmayacak.
-- Depth Anything V2 yeniden açılmayacak.
-- Bambu depth ve fotoğraf hibriti yeniden açılmayacak.
-- `HYBRID V3` üretilmeyecek.
-- Shaded preview kabul edilmeden STL üretilmeyecek.
-
-Yeni ana teknik yön:
-
-> Portre rölyefinin ana yüz geometrisi, landmarklarla kişiye uyarlanmış parametrik 3B yüz yüzeyinden üretilecektir.
-
-Manuel landmark araçlarının rolü:
-
-- Kalibrasyon
-- Ground-truth üretimi
-- Otomatik provider doğrulaması
-- Düşük güven fallback
-
-Manuel landmark işaretleme nihai müşteri iş akışı değildir.
-
-Sıradaki kontrollü teknik paket:
-
-1. Mevcut landmark click-tool dosyalarının yapısı incelenecek.
-2. Provider’dan bağımsız immutable `AtlasPortraitLandmarkResult` sözleşmesi tasarlanacak.
-3. Önce test dosyası hazırlanacak.
-4. Sonra üretim sözleşmesi uygulanacak.
-5. Hedef testler çalıştırılacak.
-6. İlgili testler çalıştırılacak.
-7. Tam regresyon çalıştırılacak.
-8. Diff ve Git durumu kontrol edilecek.
-9. Yalnız hedef dosyalar commit edilecek.
+İlk sözleşme provider’dan bağımsız ve immutable olacaktır.
 
 Bu aşamada yapılmayacaklar:
 
-- MediaPipe kurulumu
-- Model indirme
-- Parametrik yüz mesh’i seçimi
+- Yeni rekonstrüksiyon modeli kurulumu
+- Model ağırlığı indirme
+- FLAME, MICA, DECA veya EMOCA entegrasyonu
+- Yeni Gaussian anatomy alanı
+- Nose-wing projection
+- Dudak veya göz kapağı projection alanı
+- Canonical mesh üretimi
 - Depth map üretimi
-- Accessory layer üretimi
 - STL üretimi
 - Fiziksel baskı
 
+Bir sonraki aşamaya geçiş kriteri:
+
+> En az iki rekonstrüksiyon adayı aynı değerlendirme sözleşmesiyle raporlanmış, lisans ve teknik uygunluk açısından karşılaştırılmış ve birincil ile yedek yaklaşım seçilmiş olmalıdır.
+
+14. maddeden itibaren ilerleme, mevcut analytic baseline’ın üzerine yeni lokal anatomik alanlar eklemek şeklinde yürütülmeyecektir.
+
+Yeni production sırası:
+
+1. Rekonstrüksiyon değerlendirme sözleşmesi
+2. Aday fizibilite spike’ları
+3. Lisans ve ticari kullanım kararı
+4. Canonical face geometry sözleşmesi
+5. Reconstruction adapter
+6. Mesh-to-depth projection
+7. Feature-sensitive relief compression
+8. Shaded-preview kabulü
+9. Fiziksel prototip
+10. Ürün profili kalibrasyonu
+
+---
+# 20. MEVCUT KESİN NOKTA VE SIRADAKİ ADIM
+
+Son doğrulanmış proje durumu:
+
+- Commit: `7fa01e0 Add parametric face visual regression`
+- Son tam regresyon: `1603 passed in 6.29s`
+- Mevcut genel 2.5D Relief Engine korunacaktır.
+- Özel portre görselleri ve özel landmark verileri Git dışında tutulmaktadır.
+- Bilinen bağımsız untracked devir ve deney dosyalarına dokunulmayacaktır.
+
+Tamamlanan portre altyapısı:
+
+- `AtlasPortraitLandmarkResult` immutable sözleşmesi
+- Landmark provider sınırı
+- Sentetik landmark fixture
+- Manuel ground-truth landmark seti
+- Landmark ölçüm ve karşılaştırma sistemi
+- Nötr parametrik grid yüzeyi
+- Frontal landmark-driven XY fitting
+- Yüz parametre kataloğu
+- Surface validity analyzer
+- Shaded-preview renderer
+- Depth profile sözleşmesi
+- Golden visual regression
+
+Dondurulan mevcut yaklaşım:
+
+`ANALYTIC_BASELINE_V1`
+
+Kabul edilen analytic baseline katmanları:
+
+- Eye socket depth: `0.035`
+- Brow projection: `0.026`
+- LOW SOFT cheek projection: `0.028`
+
+Golden visual regression şu alanları korur:
+
+- `401 × 401` sentetik nötr yüzey
+- Z minimum, maksimum, ortalama ve standart sapma
+- Z quantile özeti
+- Quantize edilmiş Z checksum
+- Shaded-preview pixel checksum
+- Surface validity sonucu
+- Folded-cell sayısı
+- Inverted-normal sayısı
+- Minimum triangle alanı
+- Minimum normal-Z değeri
+
+Son başarısız ve tamamen geri alınmış deney:
+
+- Bilateral Gaussian nose-wing projection
+
+Bu deney hedef testlerini geçmiş olmasına rağmen görsel olarak reddedilmiştir.
+
+Reddedilme nedenleri:
+
+- Ayrık bilateral lob görünümü
+- Alar ring veya çengel artefaktı
+- Nasal-base banding
+- Yatay moustache artefaktı
+- Burun ucu, ala, columella ve yanak arasında bağlantılı yüzey bulunmaması
+
+Kesin teknik teşhis:
+
+> Nose-wing başarısızlığı bir katsayı, merkez, genişlik veya yumuşatma ayarı sorunu değildir. Bağımsız bilateral Gaussian veya ellipse alanları, bağlantılı alar-base anatomisini temsil edememektedir.
+
+Kalıcı mimari karar:
+
+> Production portre anatomisi bağımsız lokal kabartı alanlarıyla kurulmayacaktır. Önce bütüncül, semantik ve bağlantılı bir 3B yüz geometrisi üretilecek; bas-relief sıkıştırması bundan sonra uygulanacaktır.
+
+Yeni production akışı:
+
+1. Portre fotoğraf girdisi ve kalite kontrolü
+2. Dense landmark veya correspondence
+3. Parametrik 3B yüz rekonstrüksiyonu
+4. Canonical face geometry
+5. Frontal hizalama ve görünür yüzey projeksiyonu
+6. Depth, normal, visibility, semantic ve confidence kanalları
+7. Feature-sensitive relief compression
+8. Accessory ve identity katmanları
+9. Surface validity ve print-risk kontrolü
+10. Çoklu ışık yönünde shaded preview
+11. Kullanıcı veya operatör onayı
+12. Manifold mesh
+13. STL
+14. Fiziksel baskı doğrulaması
+
+Mevcut analytic eye, brow ve cheek alanları silinmeyecektir.
+
+Yeni sistemdeki rolleri:
+
+- Karşılaştırma baseline’ı
+- Golden regression
+- Düşük frekanslı residual correction
+- Yeni rekonstrüksiyon sisteminin katkısını ölçme
+- Geriye dönük yüzey güvenliği kontrolü
+
+Ancak aşağıdaki bölgeler için yeni bağımsız Gaussian veya ellipse alanı geliştirilmeyecektir:
+
+- Nose wing ve alar base
+- Eyelid margins
+- Lips
+- Philtrum
+- Labiomental fold
+
+Sıradaki kontrollü teknik paket:
+
+`Reconstruction Evaluation Contract`
+
+Bu pakette:
+
+1. Provider’dan bağımsız immutable değerlendirme sonucu tanımlanacak.
+2. Rekonstrüksiyon yaklaşımı ve model sürümü kaydedilecek.
+3. Lisans ve ticari kullanım uygunluğu açıkça raporlanacak.
+4. Yeniden dağıtım koşulları kaydedilecek.
+5. Tek fotoğraf ve çoklu görünüş kabiliyeti raporlanacak.
+6. Mesh topolojisi ve semantik bölge desteği ölçülecek.
+7. Vertex, triangle, normal ve UV çıktıları doğrulanacak.
+8. Identity, expression ve pose ayrımı raporlanacak.
+9. Confidence ve visibility desteği kaydedilecek.
+10. Apple Silicon, Python, CPU ve GPU gereksinimleri ölçülecek.
+11. Çalışma süresi ve bellek tüketimi kaydedilecek.
+12. Determinizm ve fixture üretilebilirliği değerlendirilecek.
+13. ATLAS adapter uygulanabilirliği raporlanacak.
+14. Uzun vadeli bakım riski değerlendirilecek.
+15. Birincil ve yedek rekonstrüksiyon yaklaşımı seçilecek.
+
+Bu aşamada yapılmayacaklar:
+
+- Yeni Gaussian anatomy alanı
+- Yeni nose-wing projection
+- Dudak veya göz kapağı için lokal projection alanı
+- Rekonstrüksiyon modelinin doğrudan Relief Engine’e bağlanması
+- Production depth map üretimi
+- STL üretimi
+- Fiziksel baskı
+
+Bir sonraki aşamaya geçiş kriteri:
+
+> En az iki rekonstrüksiyon adayı aynı değerlendirme sözleşmesiyle karşılaştırılmalı; lisans, geometri kalitesi, performans ve ATLAS entegrasyonu açısından birincil ve yedek yaklaşım seçilmiş olmalıdır.
+
 Nihai teknik ilke:
 
-> 3B yüz formu + 2B kimlik ve detay bilgisi = tanınabilir portre rölyefi.
+> Önce semantik ve bütüncül 3B yüz geometrisi kurulacak. Bas-relief sıkıştırması, fiziksel ürün optimizasyonu ve STL üretimi bundan sonra uygulanacaktır.
 
 Bu belge, ATLAS_ENGINE portre rekonstrüksiyonu için geçerli ana eylem planıdır.
