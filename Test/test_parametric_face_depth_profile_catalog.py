@@ -34,7 +34,7 @@ def test_neutral_anatomical_profile_preserves_expected_depths():
         0.035,
     )
     assert profile.cheek_projection == pytest.approx(
-        0.060,
+        0.028,
     )
     assert profile.nose_bridge_projection == pytest.approx(
         0.110,

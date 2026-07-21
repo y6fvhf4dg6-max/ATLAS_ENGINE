@@ -1145,3 +1145,298 @@ def test_brow_projection_is_negligible_at_far_forehead():
     )
 
     assert abs(depth_delta) < 1.0e-4
+
+
+def _cheek_profile(
+    projection: float,
+) -> AtlasParametricFaceDepthProfile:
+    return AtlasParametricFaceDepthProfile(
+        name="cheek-test",
+        brow_projection=0.0,
+        eye_socket_depth=0.0,
+        cheek_projection=projection,
+        nose_bridge_projection=0.0,
+        nose_tip_projection=0.0,
+        nose_wing_projection=0.0,
+        upper_lip_projection=0.0,
+        lower_lip_projection=0.0,
+        philtrum_depth=0.0,
+        labiomental_fold_depth=0.0,
+        chin_projection=0.0,
+    )
+
+
+@pytest.mark.parametrize(
+    "center_x",
+    (
+        -0.43,
+        0.43,
+    ),
+)
+def test_cheek_projection_increases_z_at_each_cheek_center(
+    center_x,
+):
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_cheek_profile(
+            0.028,
+        ),
+    )
+
+    cheek_row = int(
+        np.argmin(
+            np.abs(
+                source.y_coordinates[:, 0]
+                + 0.08
+            )
+        )
+    )
+
+    cheek_column = int(
+        np.argmin(
+            np.abs(
+                source.x_coordinates[0, :]
+                - center_x
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates[
+            cheek_row,
+            cheek_column,
+        ]
+        - source.z_coordinates[
+            cheek_row,
+            cheek_column,
+        ]
+    )
+
+    assert depth_delta == pytest.approx(
+        0.028,
+        abs=1.0e-12,
+    )
+
+
+def test_cheek_projection_is_horizontally_symmetric():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_cheek_profile(
+            0.028,
+        ),
+    )
+
+    depth_delta = (
+        result.z_coordinates
+        - source.z_coordinates
+    )
+
+    assert depth_delta == pytest.approx(
+        np.fliplr(
+            depth_delta,
+        ),
+    )
+
+
+def test_cheek_projection_extends_into_outer_cheek():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_cheek_profile(
+            0.028,
+        ),
+    )
+
+    y_axis = source.y_coordinates[:, 0]
+    x_axis = source.x_coordinates[0, :]
+
+    cheek_row = int(
+        np.argmin(
+            np.abs(
+                y_axis + 0.08
+            )
+        )
+    )
+
+    outer_column = int(
+        np.argmin(
+            np.abs(
+                x_axis - 0.70
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates[
+            cheek_row,
+            outer_column,
+        ]
+        - source.z_coordinates[
+            cheek_row,
+            outer_column,
+        ]
+    )
+
+    assert depth_delta > 1.0e-4
+
+
+def test_cheek_projection_has_reduced_medial_connection():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_cheek_profile(
+            0.028,
+        ),
+    )
+
+    y_axis = source.y_coordinates[:, 0]
+    x_axis = source.x_coordinates[0, :]
+
+    cheek_row = int(
+        np.argmin(
+            np.abs(
+                y_axis + 0.08
+            )
+        )
+    )
+
+    center_column = int(
+        np.argmin(
+            np.abs(
+                x_axis
+            )
+        )
+    )
+
+    cheek_column = int(
+        np.argmin(
+            np.abs(
+                x_axis - 0.43
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates
+        - source.z_coordinates
+    )
+
+    medial_delta = depth_delta[
+        cheek_row,
+        center_column,
+    ]
+
+    cheek_delta = depth_delta[
+        cheek_row,
+        cheek_column,
+    ]
+
+    assert medial_delta > 0.0
+    assert medial_delta < cheek_delta * 0.10
+
+
+def test_cheek_projection_is_negligible_at_mouth_center():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_cheek_profile(
+            0.028,
+        ),
+    )
+
+    mouth_row = int(
+        np.argmin(
+            np.abs(
+                source.y_coordinates[:, 0]
+                + 0.38
+            )
+        )
+    )
+
+    center_column = int(
+        np.argmin(
+            np.abs(
+                source.x_coordinates[0, :]
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates[
+            mouth_row,
+            center_column,
+        ]
+        - source.z_coordinates[
+            mouth_row,
+            center_column,
+        ]
+    )
+
+    assert abs(depth_delta) < 1.0e-4
+
+
+def test_cheek_projection_is_negligible_at_far_temple_edge():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_cheek_profile(
+            0.028,
+        ),
+    )
+
+    cheek_row = int(
+        np.argmin(
+            np.abs(
+                source.y_coordinates[:, 0]
+                + 0.08
+            )
+        )
+    )
+
+    far_column = int(
+        np.argmin(
+            np.abs(
+                source.x_coordinates[0, :]
+                - 0.98
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates[
+            cheek_row,
+            far_column,
+        ]
+        - source.z_coordinates[
+            cheek_row,
+            far_column,
+        ]
+    )
+
+    assert abs(depth_delta) < 1.0e-4

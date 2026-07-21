@@ -44,6 +44,18 @@ class AtlasParametricFaceDepthDeformer:
     BROW_MEDIAL_HALF_WIDTH = 0.24
     BROW_MEDIAL_MINIMUM_WEIGHT = 0.35
 
+    CHEEK_CENTER_X = 0.43
+    CHEEK_OUTER_CENTER_Y = -0.08
+    CHEEK_MEDIAL_DROP_Y = 0.055
+    CHEEK_SCALE_X = 0.34
+    CHEEK_SCALE_Y = 0.28
+    CHEEK_MEDIAL_HALF_WIDTH = 0.34
+    CHEEK_MEDIAL_MINIMUM_WEIGHT = 0.18
+    CHEEK_LOWER_GUARD_START_Y = -0.38
+    CHEEK_LOWER_GUARD_WIDTH = 0.18
+    CHEEK_OUTER_TAPER_START = 1.00
+    CHEEK_OUTER_TAPER_WIDTH = 0.65
+
     @classmethod
     def deform(
         cls,
@@ -114,12 +126,19 @@ class AtlasParametricFaceDepthDeformer:
             projection=depth_profile.brow_projection,
         )
 
+        cheek_delta = cls._build_cheek_delta(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+            projection=depth_profile.cheek_projection,
+        )
+
         deformed_z = (
             source_z
             + nose_tip_delta
             + nose_bridge_delta
             + eye_socket_delta
             + brow_delta
+            + cheek_delta
         )
 
         return AtlasParametricFaceSurface(
@@ -144,6 +163,161 @@ class AtlasParametricFaceDepthDeformer:
             radius_x=cls.NOSE_TIP_RADIUS_X,
             radius_y=cls.NOSE_TIP_RADIUS_Y,
             projection=projection,
+        )
+
+    @classmethod
+    def _build_cheek_delta(
+        cls,
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+        projection: float,
+    ) -> np.ndarray:
+        if projection == 0.0:
+            return np.zeros_like(
+                x_coordinates,
+                dtype=np.float64,
+            )
+
+        absolute_x = np.abs(
+            x_coordinates,
+        )
+
+        medial_position = np.clip(
+            (
+                cls.CHEEK_CENTER_X
+                - absolute_x
+            )
+            / cls.CHEEK_CENTER_X,
+            0.0,
+            1.0,
+        )
+
+        curved_center_y = (
+            cls.CHEEK_OUTER_CENTER_Y
+            - cls.CHEEK_MEDIAL_DROP_Y
+            * medial_position
+        )
+
+        radius_squared = (
+            (
+                (
+                    absolute_x
+                    - cls.CHEEK_CENTER_X
+                )
+                / cls.CHEEK_SCALE_X
+            )
+            ** 2
+            + (
+                (
+                    y_coordinates
+                    - curved_center_y
+                )
+                / cls.CHEEK_SCALE_Y
+            )
+            ** 2
+        )
+
+        radius = np.sqrt(
+            radius_squared,
+        )
+
+        gaussian_weight = np.exp(
+            -radius_squared
+        )
+
+        medial_transition = np.clip(
+            absolute_x
+            / cls.CHEEK_MEDIAL_HALF_WIDTH,
+            0.0,
+            1.0,
+        )
+
+        medial_smoothstep = (
+            medial_transition
+            * medial_transition
+            * (
+                3.0
+                - 2.0
+                * medial_transition
+            )
+        )
+
+        medial_weight = (
+            cls.CHEEK_MEDIAL_MINIMUM_WEIGHT
+            + (
+                1.0
+                - cls.CHEEK_MEDIAL_MINIMUM_WEIGHT
+            )
+            * medial_smoothstep
+        )
+
+        lower_transition = np.clip(
+            (
+                y_coordinates
+                - cls.CHEEK_LOWER_GUARD_START_Y
+            )
+            / cls.CHEEK_LOWER_GUARD_WIDTH,
+            0.0,
+            1.0,
+        )
+
+        lower_guard = (
+            lower_transition
+            * lower_transition
+            * (
+                3.0
+                - 2.0
+                * lower_transition
+            )
+        )
+
+        outer_transition = np.clip(
+            (
+                radius
+                - cls.CHEEK_OUTER_TAPER_START
+            )
+            / cls.CHEEK_OUTER_TAPER_WIDTH,
+            0.0,
+            1.0,
+        )
+
+        outer_transition_squared = (
+            outer_transition
+            * outer_transition
+        )
+        outer_transition_cubed = (
+            outer_transition_squared
+            * outer_transition
+        )
+
+        outer_smootherstep = (
+            outer_transition_cubed
+            * (
+                10.0
+                - 15.0
+                * outer_transition
+                + 6.0
+                * outer_transition_squared
+            )
+        )
+
+        outer_weight = (
+            1.0
+            - outer_smootherstep
+        )
+
+        return (
+            float(
+                projection,
+            )
+            * gaussian_weight
+            * medial_weight
+            * lower_guard
+            * outer_weight
+        ).astype(
+            np.float64,
+            copy=False,
         )
 
     @classmethod

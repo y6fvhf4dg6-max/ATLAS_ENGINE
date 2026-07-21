@@ -20,7 +20,7 @@ class AtlasParametricFaceDepthProfileCatalog:
         name="neutral-anatomical",
         brow_projection=0.026,
         eye_socket_depth=0.035,
-        cheek_projection=0.060,
+        cheek_projection=0.028,
         nose_bridge_projection=0.110,
         nose_tip_projection=0.160,
         nose_wing_projection=0.045,
