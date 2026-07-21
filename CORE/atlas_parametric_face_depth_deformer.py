@@ -31,6 +31,11 @@ class AtlasParametricFaceDepthDeformer:
     NOSE_BRIDGE_RADIUS_X = 0.22
     NOSE_BRIDGE_RADIUS_Y = 0.55
 
+    EYE_SOCKET_CENTER_X = 0.36
+    EYE_SOCKET_CENTER_Y = 0.22
+    EYE_SOCKET_SCALE_X = 0.36
+    EYE_SOCKET_SCALE_Y = 0.24
+
     @classmethod
     def deform(
         cls,
@@ -89,10 +94,17 @@ class AtlasParametricFaceDepthDeformer:
             projection=depth_profile.nose_bridge_projection,
         )
 
+        eye_socket_delta = cls._build_eye_socket_delta(
+            x_coordinates=source_x,
+            y_coordinates=source_y,
+            depth=depth_profile.eye_socket_depth,
+        )
+
         deformed_z = (
             source_z
             + nose_tip_delta
             + nose_bridge_delta
+            + eye_socket_delta
         )
 
         return AtlasParametricFaceSurface(
@@ -117,6 +129,201 @@ class AtlasParametricFaceDepthDeformer:
             radius_x=cls.NOSE_TIP_RADIUS_X,
             radius_y=cls.NOSE_TIP_RADIUS_Y,
             projection=projection,
+        )
+
+    @classmethod
+    def _build_eye_socket_delta(
+        cls,
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+        depth: float,
+    ) -> np.ndarray:
+        if depth == 0.0:
+            return np.zeros_like(
+                x_coordinates,
+                dtype=np.float64,
+            )
+
+        left_radius = np.sqrt(
+            (
+                (
+                    x_coordinates
+                    + cls.EYE_SOCKET_CENTER_X
+                )
+                / cls.EYE_SOCKET_SCALE_X
+            )
+            ** 2
+            + (
+                (
+                    y_coordinates
+                    - cls.EYE_SOCKET_CENTER_Y
+                )
+                / cls.EYE_SOCKET_SCALE_Y
+            )
+            ** 2
+        )
+
+        right_radius = np.sqrt(
+            (
+                (
+                    x_coordinates
+                    - cls.EYE_SOCKET_CENTER_X
+                )
+                / cls.EYE_SOCKET_SCALE_X
+            )
+            ** 2
+            + (
+                (
+                    y_coordinates
+                    - cls.EYE_SOCKET_CENTER_Y
+                )
+                / cls.EYE_SOCKET_SCALE_Y
+            )
+            ** 2
+        )
+
+        nearest_radius = np.minimum(
+            left_radius,
+            right_radius,
+        )
+
+        gaussian_weight = np.exp(
+            -nearest_radius
+            * nearest_radius
+        )
+
+        outer_transition = np.clip(
+            (
+                nearest_radius
+                - 1.00
+            )
+            / 0.65,
+            0.0,
+            1.0,
+        )
+
+        outer_transition_squared = (
+            outer_transition
+            * outer_transition
+        )
+        outer_transition_cubed = (
+            outer_transition_squared
+            * outer_transition
+        )
+
+        outer_smootherstep = (
+            outer_transition_cubed
+            * (
+                10.0
+                - 15.0
+                * outer_transition
+                + 6.0
+                * outer_transition_squared
+            )
+        )
+
+        outer_weight = (
+            1.0
+            - outer_smootherstep
+        )
+
+        absolute_x = np.abs(
+            x_coordinates,
+        )
+
+        nasal_transition = np.clip(
+            (
+                absolute_x
+                - 0.12
+            )
+            / 0.18,
+            0.0,
+            1.0,
+        )
+
+        nasal_transition_squared = (
+            nasal_transition
+            * nasal_transition
+        )
+        nasal_transition_cubed = (
+            nasal_transition_squared
+            * nasal_transition
+        )
+
+        nasal_weight = (
+            nasal_transition_cubed
+            * (
+                10.0
+                - 15.0
+                * nasal_transition
+                + 6.0
+                * nasal_transition_squared
+            )
+        )
+
+        combined_weight = (
+            gaussian_weight
+            * outer_weight
+            * nasal_weight
+        )
+
+        return (
+            -float(
+                depth,
+            )
+            * combined_weight
+        ).astype(
+            np.float64,
+            copy=False,
+        )
+
+    @staticmethod
+    def _build_gaussian_projection(
+        *,
+        x_coordinates: np.ndarray,
+        y_coordinates: np.ndarray,
+        center_x: float,
+        center_y: float,
+        scale_x: float,
+        scale_y: float,
+        projection: float,
+    ) -> np.ndarray:
+        if projection == 0.0:
+            return np.zeros_like(
+                x_coordinates,
+                dtype=np.float64,
+            )
+
+        normalized_radius_squared = (
+            (
+                (
+                    x_coordinates
+                    - center_x
+                )
+                / scale_x
+            )
+            ** 2
+            + (
+                (
+                    y_coordinates
+                    - center_y
+                )
+                / scale_y
+            )
+            ** 2
+        )
+
+        return (
+            float(
+                projection,
+            )
+            * np.exp(
+                -normalized_radius_squared
+            )
+        ).astype(
+            np.float64,
+            copy=False,
         )
 
     @staticmethod

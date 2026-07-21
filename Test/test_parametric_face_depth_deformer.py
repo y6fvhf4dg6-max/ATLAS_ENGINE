@@ -647,3 +647,237 @@ def test_nose_bridge_projection_changes_only_z_coordinates():
         result.z_coordinates,
         source.z_coordinates,
     )
+
+
+def _eye_socket_profile(
+    depth: float,
+) -> AtlasParametricFaceDepthProfile:
+    return AtlasParametricFaceDepthProfile(
+        name="eye-socket-test",
+        brow_projection=0.0,
+        eye_socket_depth=depth,
+        cheek_projection=0.0,
+        nose_bridge_projection=0.0,
+        nose_tip_projection=0.0,
+        nose_wing_projection=0.0,
+        upper_lip_projection=0.0,
+        lower_lip_projection=0.0,
+        philtrum_depth=0.0,
+        labiomental_fold_depth=0.0,
+        chin_projection=0.0,
+    )
+
+
+@pytest.mark.parametrize(
+    "center_x",
+    (
+        -0.36,
+        0.36,
+    ),
+)
+def test_eye_socket_depth_reduces_z_at_each_eye_center(
+    center_x,
+):
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_eye_socket_profile(
+            0.055,
+        ),
+    )
+
+    center_row = int(
+        np.argmin(
+            np.abs(
+                source.y_coordinates[:, 0]
+                - 0.22
+            )
+        )
+    )
+    center_column = int(
+        np.argmin(
+            np.abs(
+                source.x_coordinates[0, :]
+                - center_x
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates[
+            center_row,
+            center_column,
+        ]
+        - source.z_coordinates[
+            center_row,
+            center_column,
+        ]
+    )
+
+    assert depth_delta == pytest.approx(
+        -0.055,
+        abs=1.0e-12,
+    )
+
+
+def test_eye_socket_depth_is_horizontally_symmetric():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_eye_socket_profile(
+            0.055,
+        ),
+    )
+
+    depth_delta = (
+        result.z_coordinates
+        - source.z_coordinates
+    )
+
+    assert depth_delta == pytest.approx(
+        np.fliplr(
+            depth_delta,
+        ),
+    )
+
+
+def test_eye_socket_depth_does_not_depress_nose_center():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_eye_socket_profile(
+            0.055,
+        ),
+    )
+
+    nose_row = int(
+        np.argmin(
+            np.abs(
+                source.y_coordinates[:, 0]
+                - 0.22
+            )
+        )
+    )
+    nose_column = int(
+        np.argmin(
+            np.abs(
+                source.x_coordinates[0, :]
+            )
+        )
+    )
+
+    assert result.z_coordinates[
+        nose_row,
+        nose_column,
+    ] == pytest.approx(
+        source.z_coordinates[
+            nose_row,
+            nose_column,
+        ],
+        abs=1.0e-12,
+    )
+
+
+def test_eye_socket_depth_extends_smoothly_beyond_old_compact_boundary():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_eye_socket_profile(
+            0.055,
+        ),
+    )
+
+    y_axis = source.y_coordinates[:, 0]
+    x_axis = source.x_coordinates[0, :]
+
+    eye_row = int(
+        np.argmin(
+            np.abs(
+                y_axis - 0.22
+            )
+        )
+    )
+
+    outer_column = int(
+        np.argmin(
+            np.abs(
+                x_axis - 0.65
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates[
+            eye_row,
+            outer_column,
+        ]
+        - source.z_coordinates[
+            eye_row,
+            outer_column,
+        ]
+    )
+
+    assert depth_delta < 0.0
+    assert abs(depth_delta) > 1.0e-4
+
+
+def test_eye_socket_depth_is_negligible_at_far_face_edge():
+    source = AtlasNeutralParametricFaceSurfaceBuilder.build(
+        row_count=201,
+        column_count=201,
+    )
+
+    result = AtlasParametricFaceDepthDeformer.deform(
+        source,
+        depth_profile=_eye_socket_profile(
+            0.055,
+        ),
+    )
+
+    y_axis = source.y_coordinates[:, 0]
+    x_axis = source.x_coordinates[0, :]
+
+    eye_row = int(
+        np.argmin(
+            np.abs(
+                y_axis - 0.22
+            )
+        )
+    )
+
+    far_column = int(
+        np.argmin(
+            np.abs(
+                x_axis - 0.95
+            )
+        )
+    )
+
+    depth_delta = (
+        result.z_coordinates[
+            eye_row,
+            far_column,
+        ]
+        - source.z_coordinates[
+            eye_row,
+            far_column,
+        ]
+    )
+
+    assert abs(depth_delta) < 1.0e-4
