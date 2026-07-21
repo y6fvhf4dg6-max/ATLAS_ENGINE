@@ -30,6 +30,7 @@ class AtlasPortraitFlameCanonicalModel:
     identity_shape_directions: np.ndarray
     expression_shape_directions: np.ndarray
     pose_directions: np.ndarray
+    pose_parameter_count: int
 
     joint_regressor: np.ndarray
     skinning_weights: np.ndarray
@@ -73,6 +74,11 @@ class AtlasPortraitFlameCanonicalModel:
             self.pose_directions,
             name="pose_directions",
             vertex_count=vertex_count,
+        )
+
+        pose_parameter_count = self._normalize_positive_integer(
+            self.pose_parameter_count,
+            name="pose_parameter_count",
         )
 
         joint_regressor = self._normalize_joint_regressor(
@@ -140,6 +146,11 @@ class AtlasPortraitFlameCanonicalModel:
         )
         object.__setattr__(
             self,
+            "pose_parameter_count",
+            pose_parameter_count,
+        )
+        object.__setattr__(
+            self,
             "joint_regressor",
             joint_regressor,
         )
@@ -192,7 +203,7 @@ class AtlasPortraitFlameCanonicalModel:
         )
 
     @property
-    def pose_parameter_count(
+    def pose_feature_count(
         self,
     ) -> int:
         return int(
@@ -221,6 +232,9 @@ class AtlasPortraitFlameCanonicalModel:
             ),
             "pose_parameter_count": (
                 self.pose_parameter_count
+            ),
+            "pose_feature_count": (
+                self.pose_feature_count
             ),
             "joint_count": self.joint_count,
             "template_vertices": (
@@ -490,6 +504,45 @@ class AtlasPortraitFlameCanonicalModel:
                 )
 
         return tree
+
+    @staticmethod
+    def _normalize_positive_integer(
+        value: Any,
+        *,
+        name: str,
+    ) -> int:
+        if isinstance(
+            value,
+            (
+                bool,
+                np.bool_,
+            ),
+        ):
+            raise TypeError(
+                f"{name} must be a positive integer."
+            )
+
+        if not isinstance(
+            value,
+            (
+                int,
+                np.integer,
+            ),
+        ):
+            raise TypeError(
+                f"{name} must be a positive integer."
+            )
+
+        normalized = int(
+            value,
+        )
+
+        if normalized < 1:
+            raise ValueError(
+                f"{name} must be greater than zero."
+            )
+
+        return normalized
 
     @staticmethod
     def _normalize_float_array(

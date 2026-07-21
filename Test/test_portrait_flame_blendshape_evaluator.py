@@ -138,6 +138,7 @@ def _canonical_model() -> AtlasPortraitFlameCanonicalModel:
             expression_shape_directions
         ),
         pose_directions=pose_directions,
+        pose_parameter_count=3,
         joint_regressor=joint_regressor,
         skinning_weights=skinning_weights,
         kinematic_tree=kinematic_tree,

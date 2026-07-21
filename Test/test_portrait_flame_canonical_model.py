@@ -156,6 +156,7 @@ def _model(
             _expression_directions()
         ),
         "pose_directions": _pose_directions(),
+        "pose_parameter_count": 6,
         "joint_regressor": _joint_regressor(),
         "skinning_weights": _skinning_weights(),
         "kinematic_tree": _kinematic_tree(),
@@ -182,7 +183,8 @@ def test_model_preserves_primary_dimensions():
     assert model.triangle_count == 2
     assert model.identity_parameter_count == 2
     assert model.expression_parameter_count == 1
-    assert model.pose_parameter_count == 3
+    assert model.pose_parameter_count == 6
+    assert model.pose_feature_count == 3
     assert model.joint_count == 2
 
 
@@ -307,6 +309,9 @@ def test_model_to_dict_reports_dimensions():
     ] == 1
     assert serialized[
         "pose_parameter_count"
+    ] == 6
+    assert serialized[
+        "pose_feature_count"
     ] == 3
     assert serialized[
         "joint_count"
@@ -511,6 +516,40 @@ def test_model_rejects_invalid_kinematic_root():
         _model(
             kinematic_tree=tree,
         )
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        0,
+        -1,
+        1.5,
+        True,
+        "6",
+    ],
+)
+def test_model_rejects_invalid_pose_parameter_count(
+    value,
+):
+    with pytest.raises(
+        (
+            TypeError,
+            ValueError,
+        ),
+        match="pose_parameter_count",
+    ):
+        _model(
+            pose_parameter_count=value,
+        )
+
+
+def test_pose_parameter_and_feature_counts_are_independent():
+    model = _model(
+        pose_parameter_count=9,
+    )
+
+    assert model.pose_parameter_count == 9
+    assert model.pose_feature_count == 3
 
 
 def test_model_rejects_non_mapping_metadata():
