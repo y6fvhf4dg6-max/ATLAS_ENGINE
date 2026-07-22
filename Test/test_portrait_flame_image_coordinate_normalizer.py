@@ -165,3 +165,129 @@ def test_normalizer_rejects_non_finite_values():
         AtlasPortraitFlameImageCoordinateNormalizer.normalize(
             value
         )
+
+
+def _triangle_faces() -> np.ndarray:
+    return np.array(
+        [
+            [0, 1, 2],
+            [1, 3, 2],
+        ],
+        dtype=np.int64,
+    )
+
+
+def test_mesh_normalizer_flips_y_and_reverses_triangle_winding():
+    vertices = np.array(
+        [
+            [-1.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [-1.0, -1.0, 0.0],
+            [1.0, -1.0, 0.0],
+        ],
+        dtype=np.float64,
+    )
+
+    normalized_vertices, normalized_faces = (
+        AtlasPortraitFlameImageCoordinateNormalizer
+        .normalize_mesh(
+            vertices=vertices,
+            triangle_faces=_triangle_faces(),
+        )
+    )
+
+    np.testing.assert_allclose(
+        normalized_vertices,
+        np.array(
+            [
+                [-1.0, -1.0, 0.0],
+                [1.0, -1.0, 0.0],
+                [-1.0, 1.0, 0.0],
+                [1.0, 1.0, 0.0],
+            ],
+            dtype=np.float64,
+        ),
+    )
+
+    np.testing.assert_array_equal(
+        normalized_faces,
+        np.array(
+            [
+                [0, 2, 1],
+                [1, 2, 3],
+            ],
+            dtype=np.int64,
+        ),
+    )
+
+
+def test_mesh_normalizer_returns_read_only_copies():
+    vertices = _points()
+    faces = np.array(
+        [
+            [0, 1, 2],
+        ],
+        dtype=np.int64,
+    )
+
+    normalized_vertices, normalized_faces = (
+        AtlasPortraitFlameImageCoordinateNormalizer
+        .normalize_mesh(
+            vertices=vertices,
+            triangle_faces=faces,
+        )
+    )
+
+    assert normalized_vertices.flags.writeable is False
+    assert normalized_faces.flags.writeable is False
+    assert not np.shares_memory(
+        normalized_vertices,
+        vertices,
+    )
+    assert not np.shares_memory(
+        normalized_faces,
+        faces,
+    )
+
+
+def test_mesh_normalizer_does_not_modify_sources():
+    vertices = _points()
+    faces = np.array(
+        [
+            [0, 1, 2],
+        ],
+        dtype=np.int64,
+    )
+
+    vertices_before = vertices.copy()
+    faces_before = faces.copy()
+
+    AtlasPortraitFlameImageCoordinateNormalizer.normalize_mesh(
+        vertices=vertices,
+        triangle_faces=faces,
+    )
+
+    np.testing.assert_array_equal(
+        vertices,
+        vertices_before,
+    )
+    np.testing.assert_array_equal(
+        faces,
+        faces_before,
+    )
+
+
+def test_mesh_normalizer_rejects_face_index_outside_vertex_range():
+    with pytest.raises(
+        ValueError,
+        match="vertex range",
+    ):
+        AtlasPortraitFlameImageCoordinateNormalizer.normalize_mesh(
+            vertices=_points(),
+            triangle_faces=np.array(
+                [
+                    [0, 1, 3],
+                ],
+                dtype=np.int64,
+            ),
+        )
