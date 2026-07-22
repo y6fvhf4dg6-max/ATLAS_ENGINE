@@ -7,6 +7,9 @@ from numbers import Integral
 from pathlib import Path
 from typing import Any
 
+from CORE.atlas_portrait_indexed_landmark_result import (
+    AtlasPortraitIndexedLandmarkResult,
+)
 from CORE.atlas_portrait_landmark_result import (
     AtlasPortraitLandmarkResult,
 )
@@ -175,6 +178,156 @@ class AtlasMediaPipePortraitLandmarkJsonLoader:
             image_width=image_width,
             image_height=image_height,
             landmarks=named_landmarks,
+            confidence=confidence,
+            provider_id=provider_id,
+            metadata=metadata,
+        )
+
+    @classmethod
+    def load_indexed(
+        cls,
+        path: Any,
+    ) -> AtlasPortraitIndexedLandmarkResult:
+        """
+        Loads the complete indexed MediaPipe landmark table.
+
+        Unlike load(), this entry preserves every exported
+        landmark ID and its normalized XYZ coordinates. It
+        uses the same schema, provider, coordinate, metadata,
+        and correspondence validation as the named loader.
+        """
+
+        json_path = cls._normalize_path(
+            path,
+        )
+
+        try:
+            raw_text = json_path.read_text(
+                encoding="utf-8",
+            )
+        except FileNotFoundError:
+            raise
+        except OSError as exc:
+            raise ValueError(
+                "Unable to read MediaPipe landmark JSON file."
+            ) from exc
+
+        try:
+            payload = json.loads(
+                raw_text,
+            )
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                "MediaPipe landmark JSON is invalid."
+            ) from exc
+
+        if not isinstance(
+            payload,
+            Mapping,
+        ):
+            raise ValueError(
+                "JSON root must be a mapping."
+            )
+
+        schema_version = cls._require_exact_text(
+            payload,
+            field_name="schema_version",
+            expected=cls.SCHEMA_VERSION,
+        )
+        provider_id = cls._require_exact_text(
+            payload,
+            field_name="provider_id",
+            expected=cls.PROVIDER_ID,
+        )
+
+        image_width = cls._normalize_positive_integer(
+            cls._require_field(
+                payload,
+                "image_width",
+            ),
+            field_name="image_width",
+        )
+        image_height = cls._normalize_positive_integer(
+            cls._require_field(
+                payload,
+                "image_height",
+            ),
+            field_name="image_height",
+        )
+        confidence = cls._normalize_confidence(
+            cls._require_field(
+                payload,
+                "confidence",
+            )
+        )
+
+        landmark_count = cls._normalize_non_negative_integer(
+            cls._require_field(
+                payload,
+                "landmark_count",
+            ),
+            field_name="landmark_count",
+        )
+
+        indexed_landmarks = cls._normalize_landmarks(
+            cls._require_field(
+                payload,
+                "landmarks",
+            )
+        )
+
+        (
+            AtlasFlameMediaPipeLandmarkCorrespondence
+            .validate_embedding_indices(
+                indexed_landmarks.keys(),
+            )
+        )
+
+        if landmark_count != len(
+            indexed_landmarks,
+        ):
+            raise ValueError(
+                "landmark_count must match the number "
+                "of landmark records."
+            )
+
+        raw_metadata = cls._require_field(
+            payload,
+            "metadata",
+        )
+
+        if not isinstance(
+            raw_metadata,
+            Mapping,
+        ):
+            raise TypeError(
+                "metadata must be a mapping."
+            )
+
+        landmark_ids = tuple(
+            sorted(
+                indexed_landmarks,
+            )
+        )
+
+        landmarks_3d = tuple(
+            indexed_landmarks[
+                landmark_id
+            ]
+            for landmark_id in landmark_ids
+        )
+
+        metadata = cls._build_metadata(
+            source_metadata=raw_metadata,
+            schema_version=schema_version,
+            landmark_count=landmark_count,
+        )
+
+        return AtlasPortraitIndexedLandmarkResult(
+            image_width=image_width,
+            image_height=image_height,
+            landmark_ids=landmark_ids,
+            landmarks_3d=landmarks_3d,
             confidence=confidence,
             provider_id=provider_id,
             metadata=metadata,

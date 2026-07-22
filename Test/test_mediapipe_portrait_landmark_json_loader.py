@@ -467,3 +467,183 @@ def test_loader_does_not_depend_on_mediapipe_package(
     assert result.metadata[
         "mediapipe_version"
     ] == "0.10.35"
+
+
+def test_load_indexed_returns_indexed_landmark_result(
+    tmp_path,
+):
+    from CORE.atlas_portrait_indexed_landmark_result import (
+        AtlasPortraitIndexedLandmarkResult,
+    )
+
+    result = (
+        AtlasMediaPipePortraitLandmarkJsonLoader
+        .load_indexed(
+            _write_payload(
+                tmp_path,
+            )
+        )
+    )
+
+    assert isinstance(
+        result,
+        AtlasPortraitIndexedLandmarkResult,
+    )
+
+
+def test_load_indexed_preserves_all_landmark_ids(
+    tmp_path,
+):
+    result = (
+        AtlasMediaPipePortraitLandmarkJsonLoader
+        .load_indexed(
+            _write_payload(
+                tmp_path,
+            )
+        )
+    )
+
+    assert result.landmark_count == 478
+    assert result.landmark_ids == tuple(
+        range(
+            478
+        )
+    )
+
+
+def test_load_indexed_preserves_xyz_coordinates(
+    tmp_path,
+):
+    payload = _payload()
+
+    result = (
+        AtlasMediaPipePortraitLandmarkJsonLoader
+        .load_indexed(
+            _write_payload(
+                tmp_path,
+                payload=payload,
+            )
+        )
+    )
+
+    for landmark_id in (
+        0,
+        4,
+        197,
+        477,
+    ):
+        source = payload[
+            "landmarks"
+        ][
+            landmark_id
+        ]
+
+        assert result.landmark_3d(
+            landmark_id
+        ) == pytest.approx(
+            (
+                source["x"],
+                source["y"],
+                source["z"],
+            ),
+            rel=0.0,
+            abs=1.0e-12,
+        )
+
+
+def test_load_indexed_preserves_dimensions_confidence_and_provider(
+    tmp_path,
+):
+    result = (
+        AtlasMediaPipePortraitLandmarkJsonLoader
+        .load_indexed(
+            _write_payload(
+                tmp_path,
+            )
+        )
+    )
+
+    assert result.image_width == 1024
+    assert result.image_height == 1024
+    assert result.confidence == pytest.approx(
+        1.0
+    )
+    assert result.provider_id == (
+        "mediapipe-face-landmarker-tasks"
+    )
+
+
+def test_load_indexed_preserves_deterministic_metadata(
+    tmp_path,
+):
+    result = (
+        AtlasMediaPipePortraitLandmarkJsonLoader
+        .load_indexed(
+            _write_payload(
+                tmp_path,
+            )
+        )
+    )
+
+    assert result.metadata == {
+        "correspondence_version": (
+            "flame-mediapipe-ground-truth-v1"
+        ),
+        "fixture_name": None,
+        "image_sha256": "abc123",
+        "landmark_count": 478,
+        "mediapipe_version": "0.10.35",
+        "model_asset": "face_landmarker.task",
+        "schema_version": (
+            "atlas-mediapipe-face-landmarks-v1"
+        ),
+        "synthetic": False,
+        "view_type": "front",
+    }
+
+
+def test_load_indexed_accepts_string_path(
+    tmp_path,
+):
+    path = _write_payload(
+        tmp_path,
+    )
+
+    result = (
+        AtlasMediaPipePortraitLandmarkJsonLoader
+        .load_indexed(
+            str(
+                path
+            )
+        )
+    )
+
+    assert result.landmark_count == 478
+
+
+def test_load_indexed_uses_same_validation_as_named_loader(
+    tmp_path,
+):
+    payload = _payload()
+
+    payload[
+        "landmarks"
+    ][
+        4
+    ][
+        "x"
+    ] = -0.01
+
+    with pytest.raises(
+        ValueError,
+        match="x",
+    ):
+        (
+            AtlasMediaPipePortraitLandmarkJsonLoader
+            .load_indexed(
+                _write_payload(
+                    tmp_path,
+                    payload=payload,
+                )
+            )
+        )
