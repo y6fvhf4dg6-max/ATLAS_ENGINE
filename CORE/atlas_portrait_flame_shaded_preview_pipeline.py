@@ -404,6 +404,10 @@ class AtlasPortraitFlameShadedPreviewPipeline:
                 visibility=visibility,
                 image_width=image_width,
                 image_height=image_height,
+                vertex_depths=mesh.vertices[
+                    :,
+                    2,
+                ],
             )
         )
 

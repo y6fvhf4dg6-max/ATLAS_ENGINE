@@ -264,15 +264,16 @@ def test_rasterizer_uses_nearest_triangle_depth():
         result.triangle_index_buffer[
             result.coverage_mask
         ]
-        == 1
+        == 0
     )
 
     assert np.allclose(
         result.depth_buffer[
             result.coverage_mask
         ],
-        np.ones(
+        np.full(
             result.covered_pixel_count,
+            3.0,
             dtype=np.float64,
         ),
         rtol=0.0,
@@ -558,3 +559,144 @@ def test_rasterizer_rejects_triangle_count_mismatch():
             image_width=5,
             image_height=5,
         )
+
+
+def _depth_interpolation_projection() -> (
+    AtlasPortraitFlameWeakPerspectiveProjection
+):
+    return AtlasPortraitFlameWeakPerspectiveProjection(
+        scale=1.0,
+        translation_x=0.0,
+        translation_y=0.0,
+        projected_vertices_2d=np.array(
+            [
+                [1.0, 1.0],
+                [3.0, 1.0],
+                [1.0, 3.0],
+                [1.0, 1.0],
+                [3.0, 1.0],
+                [1.0, 3.0],
+            ],
+            dtype=np.float64,
+        ),
+        triangle_faces=np.array(
+            [
+                [0, 1, 2],
+                [3, 4, 5],
+            ],
+            dtype=np.int64,
+        ),
+    )
+
+
+def _depth_interpolation_visibility() -> (
+    AtlasPortraitFlameTriangleVisibility
+):
+    return AtlasPortraitFlameTriangleVisibility(
+        visible_triangle_mask=np.array(
+            [
+                True,
+                True,
+            ],
+            dtype=np.bool_,
+        ),
+        front_facing_triangle_mask=np.array(
+            [
+                True,
+                True,
+            ],
+            dtype=np.bool_,
+        ),
+        signed_projected_areas=np.array(
+            [
+                2.0,
+                2.0,
+            ],
+            dtype=np.float64,
+        ),
+        mean_triangle_depths=np.array(
+            [
+                10.0 / 3.0,
+                8.0 / 3.0,
+            ],
+            dtype=np.float64,
+        ),
+    )
+
+
+def test_rasterizer_interpolates_vertex_depth_per_pixel():
+    result = AtlasPortraitFlameTriangleRasterizer.rasterize(
+        _depth_interpolation_projection(),
+        visibility=_depth_interpolation_visibility(),
+        vertex_depths=np.array(
+            [
+                10.0,
+                0.0,
+                0.0,
+                0.0,
+                4.0,
+                4.0,
+            ],
+            dtype=np.float64,
+        ),
+        image_width=5,
+        image_height=5,
+    )
+
+    assert result.triangle_index_buffer[
+        1,
+        1,
+    ] == 0
+    assert result.depth_buffer[
+        1,
+        1,
+    ] == pytest.approx(
+        10.0
+    )
+
+    assert result.triangle_index_buffer[
+        2,
+        2,
+    ] == 1
+    assert result.depth_buffer[
+        2,
+        2,
+    ] == pytest.approx(
+        4.0
+    )
+
+
+def test_rasterizer_treats_larger_interpolated_depth_as_nearer():
+    result = AtlasPortraitFlameTriangleRasterizer.rasterize(
+        _depth_interpolation_projection(),
+        visibility=_depth_interpolation_visibility(),
+        vertex_depths=np.array(
+            [
+                3.0,
+                3.0,
+                3.0,
+                7.0,
+                7.0,
+                7.0,
+            ],
+            dtype=np.float64,
+        ),
+        image_width=5,
+        image_height=5,
+    )
+
+    assert np.all(
+        result.triangle_index_buffer[
+            result.coverage_mask
+        ]
+        == 1
+    )
+
+    assert np.allclose(
+        result.depth_buffer[
+            result.coverage_mask
+        ],
+        7.0,
+        rtol=0.0,
+        atol=1.0e-12,
+    )

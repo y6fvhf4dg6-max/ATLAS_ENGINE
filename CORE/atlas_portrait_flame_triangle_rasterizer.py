@@ -392,14 +392,19 @@ class AtlasPortraitFlameTriangleRasterizer:
     coordinates. Integer pixel coordinates are sampled and triangle
     boundaries are included.
 
-    Occlusion uses a constant per-triangle mean depth supplied by the
-    visibility contract. Smaller depth values are treated as nearer.
+    Occlusion treats larger Z values as nearer in the normalized
+    FLAME image-coordinate system.
+
+    When vertex_depths are supplied, depth is interpolated per pixel
+    from triangle-corner depths using barycentric coordinates. When
+    omitted, the visibility contract's mean triangle depths provide
+    a compatibility fallback.
 
     Each covered pixel retains barycentric coordinates in triangle
     corner order for later vertex-attribute interpolation.
 
     This rasterizer performs no viewport transformation, perspective
-    correction, interpolated depth, shading, or preview export.
+    correction, shading, or preview export.
     """
 
     _EDGE_TOLERANCE = 1.0e-12
@@ -414,6 +419,7 @@ class AtlasPortraitFlameTriangleRasterizer:
         visibility: AtlasPortraitFlameTriangleVisibility,
         image_width: Any,
         image_height: Any,
+        vertex_depths: Any = None,
     ) -> AtlasPortraitFlameTriangleRasterization:
         if not isinstance(
             projection,
@@ -455,6 +461,44 @@ class AtlasPortraitFlameTriangleRasterizer:
                 "must match."
             )
 
+        normalized_vertex_depths: np.ndarray | None
+
+        if vertex_depths is None:
+            normalized_vertex_depths = None
+        else:
+            try:
+                normalized_vertex_depths = np.asarray(
+                    vertex_depths,
+                    dtype=np.float64,
+                ).copy()
+            except (
+                TypeError,
+                ValueError,
+            ) as exc:
+                raise ValueError(
+                    "vertex_depths must be numeric."
+                ) from exc
+
+            expected_depth_shape = (
+                projection.vertex_count,
+            )
+
+            if (
+                normalized_vertex_depths.shape
+                != expected_depth_shape
+            ):
+                raise ValueError(
+                    "vertex_depths must have shape "
+                    f"{expected_depth_shape}."
+                )
+
+            if not np.isfinite(
+                normalized_vertex_depths,
+            ).all():
+                raise ValueError(
+                    "vertex_depths contains non-finite values."
+                )
+
         buffer_shape = (
             normalized_height,
             normalized_width,
@@ -471,7 +515,7 @@ class AtlasPortraitFlameTriangleRasterizer:
         )
         depth_buffer = np.full(
             buffer_shape,
-            np.inf,
+            -np.inf,
             dtype=np.float64,
         )
         barycentric_coordinates = np.zeros(
@@ -502,11 +546,28 @@ class AtlasPortraitFlameTriangleRasterizer:
             ):
                 continue
 
-            triangle = projected_vertices[
-                faces[
-                    triangle_index
-                ]
+            face = faces[
+                triangle_index
             ]
+
+            triangle = projected_vertices[
+                face
+            ]
+
+            if normalized_vertex_depths is None:
+                triangle_vertex_depths = None
+                fallback_triangle_depth = float(
+                    visibility.mean_triangle_depths[
+                        triangle_index
+                    ]
+                )
+            else:
+                triangle_vertex_depths = (
+                    normalized_vertex_depths[
+                        face
+                    ]
+                )
+                fallback_triangle_depth = None
 
             minimum_x = max(
                 0,
@@ -571,12 +632,6 @@ class AtlasPortraitFlameTriangleRasterizer:
             ):
                 continue
 
-            triangle_depth = float(
-                visibility.mean_triangle_depths[
-                    triangle_index
-                ]
-            )
-
             for pixel_y in range(
                 minimum_y,
                 maximum_y + 1,
@@ -598,7 +653,17 @@ class AtlasPortraitFlameTriangleRasterizer:
                     if weights is None:
                         continue
 
-                    if triangle_depth >= depth_buffer[
+                    if triangle_vertex_depths is None:
+                        pixel_depth = fallback_triangle_depth
+                    else:
+                        pixel_depth = float(
+                            np.dot(
+                                weights,
+                                triangle_vertex_depths,
+                            )
+                        )
+
+                    if pixel_depth <= depth_buffer[
                         pixel_y,
                         pixel_x,
                     ]:
@@ -615,7 +680,7 @@ class AtlasPortraitFlameTriangleRasterizer:
                     depth_buffer[
                         pixel_y,
                         pixel_x,
-                    ] = triangle_depth
+                    ] = pixel_depth
                     barycentric_coordinates[
                         pixel_y,
                         pixel_x,
@@ -626,7 +691,11 @@ class AtlasPortraitFlameTriangleRasterizer:
             image_height=normalized_height,
             coverage_mask=coverage_mask,
             triangle_index_buffer=triangle_index_buffer,
-            depth_buffer=depth_buffer,
+            depth_buffer=np.where(
+                coverage_mask,
+                depth_buffer,
+                np.inf,
+            ),
             barycentric_coordinates=(
                 barycentric_coordinates
             ),
