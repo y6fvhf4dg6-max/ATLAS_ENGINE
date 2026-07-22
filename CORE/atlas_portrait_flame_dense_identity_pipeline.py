@@ -292,7 +292,7 @@ class AtlasPortraitFlameDenseIdentityPipeline:
             identity_fit_result=identity_fit_result,
             metadata={
                 "dense_landmark_count": (
-                    indexed_landmark_result.landmark_count
+                    embedding_count
                 ),
                 "model_family": "flame",
                 "model_version": model.metadata.get(

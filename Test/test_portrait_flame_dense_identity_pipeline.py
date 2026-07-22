@@ -796,3 +796,66 @@ def test_pipeline_rejects_invalid_configuration(
             monkeypatch,
             **overrides
         )
+
+
+def test_pipeline_metadata_counts_only_requested_dense_landmarks(
+    monkeypatch,
+):
+    (
+        landmark_indices,
+        landmark_face_indices,
+        landmark_barycentric_coordinates,
+    ) = _embedding()
+
+    indexed_result = AtlasPortraitIndexedLandmarkResult(
+        image_width=1024,
+        image_height=1024,
+        landmark_ids=tuple(
+            range(
+                478
+            )
+        ),
+        landmarks_3d=np.column_stack(
+            [
+                np.full(
+                    478,
+                    0.5,
+                    dtype=np.float64,
+                ),
+                np.full(
+                    478,
+                    0.5,
+                    dtype=np.float64,
+                ),
+                np.zeros(
+                    478,
+                    dtype=np.float64,
+                ),
+            ]
+        ),
+        confidence=1.0,
+        provider_id="synthetic-indexed-478",
+        metadata={
+            "image_sha256": "synthetic-sha256",
+            "synthetic": True,
+            "view_type": "front",
+        },
+    )
+
+    result, _, _, _, _ = _run(
+        monkeypatch,
+        indexed_landmark_result=indexed_result,
+        landmark_indices=landmark_indices,
+        landmark_face_indices=landmark_face_indices,
+        landmark_barycentric_coordinates=(
+            landmark_barycentric_coordinates
+        ),
+    )
+
+    assert indexed_result.landmark_count == 478
+    assert len(
+        landmark_indices
+    ) == 3
+    assert result.metadata[
+        "dense_landmark_count"
+    ] == 3
