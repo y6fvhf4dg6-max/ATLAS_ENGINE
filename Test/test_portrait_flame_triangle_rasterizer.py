@@ -438,6 +438,7 @@ def test_rasterization_to_dict_returns_plain_values():
         "coverage_mask",
         "triangle_index_buffer",
         "depth_buffer",
+        "barycentric_coordinates",
     }
 
     assert payload["image_width"] == 5

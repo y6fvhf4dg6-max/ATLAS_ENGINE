@@ -411,6 +411,7 @@ class AtlasPortraitFlameShadedPreviewPipeline:
             AtlasPortraitFlameShadedPreviewRenderer.render(
                 rasterization,
                 normal_field=normal_field,
+                triangle_faces=mesh.triangle_faces,
                 light_direction=light_direction,
                 ambient_strength=ambient_strength,
                 diffuse_strength=diffuse_strength,

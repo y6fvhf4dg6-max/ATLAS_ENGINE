@@ -26,8 +26,13 @@ class AtlasPortraitFlameTriangleRasterization:
         shape = (image_height, image_width)
         access = buffer[y, x]
 
-    Background pixels contain triangle index -1 and positive
-    infinite depth.
+    Background pixels contain:
+    - triangle index -1
+    - positive infinite depth
+    - zero barycentric coordinates
+
+    Covered pixels contain barycentric coordinates in the
+    triangle-face corner order.
     """
 
     image_width: int
@@ -35,6 +40,9 @@ class AtlasPortraitFlameTriangleRasterization:
     coverage_mask: np.ndarray
     triangle_index_buffer: np.ndarray
     depth_buffer: np.ndarray
+    barycentric_coordinates: Any = None
+
+    _BARYCENTRIC_TOLERANCE = 1.0e-12
 
     def __post_init__(
         self,
@@ -83,6 +91,15 @@ class AtlasPortraitFlameTriangleRasterization:
                 "depth_buffer must have shape "
                 f"{expected_shape}."
             )
+
+        barycentric_coordinates = (
+            self._normalize_barycentric_coordinates(
+                self.barycentric_coordinates,
+                coverage_mask=coverage_mask,
+                image_width=image_width,
+                image_height=image_height,
+            )
+        )
 
         if np.isnan(
             depth_buffer,
@@ -142,6 +159,9 @@ class AtlasPortraitFlameTriangleRasterization:
         depth_buffer.setflags(
             write=False,
         )
+        barycentric_coordinates.setflags(
+            write=False,
+        )
 
         object.__setattr__(
             self,
@@ -167,6 +187,11 @@ class AtlasPortraitFlameTriangleRasterization:
             self,
             "depth_buffer",
             depth_buffer,
+        )
+        object.__setattr__(
+            self,
+            "barycentric_coordinates",
+            barycentric_coordinates,
         )
 
     @property
@@ -206,7 +231,113 @@ class AtlasPortraitFlameTriangleRasterization:
                 self.triangle_index_buffer.tolist()
             ),
             "depth_buffer": self.depth_buffer.tolist(),
+            "barycentric_coordinates": (
+                self.barycentric_coordinates.tolist()
+            ),
         }
+
+    @classmethod
+    def _normalize_barycentric_coordinates(
+        cls,
+        value: Any,
+        *,
+        coverage_mask: np.ndarray,
+        image_width: int,
+        image_height: int,
+    ) -> np.ndarray:
+        expected_shape = (
+            image_height,
+            image_width,
+            3,
+        )
+
+        if value is None:
+            coordinates = np.zeros(
+                expected_shape,
+                dtype=np.float64,
+            )
+
+            coordinates[
+                coverage_mask,
+                0,
+            ] = 1.0
+
+            return coordinates
+
+        try:
+            coordinates = np.asarray(
+                value,
+                dtype=np.float64,
+            ).copy()
+        except (
+            TypeError,
+            ValueError,
+        ) as exc:
+            raise ValueError(
+                "barycentric_coordinates must be numeric."
+            ) from exc
+
+        if coordinates.shape != expected_shape:
+            raise ValueError(
+                "barycentric_coordinates must have shape "
+                f"{expected_shape}."
+            )
+
+        if not np.isfinite(
+            coordinates,
+        ).all():
+            raise ValueError(
+                "barycentric_coordinates contains "
+                "non-finite values."
+            )
+
+        background_coordinates = coordinates[
+            ~coverage_mask
+        ]
+
+        if not np.allclose(
+            background_coordinates,
+            0.0,
+            rtol=0.0,
+            atol=cls._BARYCENTRIC_TOLERANCE,
+        ):
+            raise ValueError(
+                "Background barycentric coordinates "
+                "must equal zero."
+            )
+
+        covered_coordinates = coordinates[
+            coverage_mask
+        ]
+
+        if covered_coordinates.size:
+            if np.any(
+                covered_coordinates
+                < -cls._BARYCENTRIC_TOLERANCE
+            ):
+                raise ValueError(
+                    "Covered barycentric coordinates "
+                    "must not be negative."
+                )
+
+            covered_sums = np.sum(
+                covered_coordinates,
+                axis=1,
+                dtype=np.float64,
+            )
+
+            if not np.allclose(
+                covered_sums,
+                1.0,
+                rtol=0.0,
+                atol=cls._BARYCENTRIC_TOLERANCE,
+            ):
+                raise ValueError(
+                    "Covered barycentric coordinates "
+                    "must sum to 1.0."
+                )
+
+        return coordinates
 
     @staticmethod
     def _normalize_dimension(
@@ -216,7 +347,10 @@ class AtlasPortraitFlameTriangleRasterization:
     ) -> int:
         if isinstance(
             value,
-            bool,
+            (
+                bool,
+                np.bool_,
+            ),
         ):
             raise ValueError(
                 f"{name} must be a positive integer."
@@ -261,8 +395,11 @@ class AtlasPortraitFlameTriangleRasterizer:
     Occlusion uses a constant per-triangle mean depth supplied by the
     visibility contract. Smaller depth values are treated as nearer.
 
+    Each covered pixel retains barycentric coordinates in triangle
+    corner order for later vertex-attribute interpolation.
+
     This rasterizer performs no viewport transformation, perspective
-    correction, interpolated vertex depth, shading, or preview export.
+    correction, interpolated depth, shading, or preview export.
     """
 
     _EDGE_TOLERANCE = 1.0e-12
@@ -318,27 +455,31 @@ class AtlasPortraitFlameTriangleRasterizer:
                 "must match."
             )
 
+        buffer_shape = (
+            normalized_height,
+            normalized_width,
+        )
+
         coverage_mask = np.zeros(
-            (
-                normalized_height,
-                normalized_width,
-            ),
+            buffer_shape,
             dtype=np.bool_,
         )
         triangle_index_buffer = np.full(
-            (
-                normalized_height,
-                normalized_width,
-            ),
+            buffer_shape,
             -1,
             dtype=np.int64,
         )
         depth_buffer = np.full(
+            buffer_shape,
+            np.inf,
+            dtype=np.float64,
+        )
+        barycentric_coordinates = np.zeros(
             (
                 normalized_height,
                 normalized_width,
+                3,
             ),
-            np.inf,
             dtype=np.float64,
         )
 
@@ -444,7 +585,7 @@ class AtlasPortraitFlameTriangleRasterizer:
                     minimum_x,
                     maximum_x + 1,
                 ):
-                    if not cls._contains_point(
+                    weights = cls._calculate_barycentric_coordinates(
                         triangle,
                         x=float(
                             pixel_x
@@ -452,7 +593,9 @@ class AtlasPortraitFlameTriangleRasterizer:
                         y=float(
                             pixel_y
                         ),
-                    ):
+                    )
+
+                    if weights is None:
                         continue
 
                     if triangle_depth >= depth_buffer[
@@ -473,6 +616,10 @@ class AtlasPortraitFlameTriangleRasterizer:
                         pixel_y,
                         pixel_x,
                     ] = triangle_depth
+                    barycentric_coordinates[
+                        pixel_y,
+                        pixel_x,
+                    ] = weights
 
         return AtlasPortraitFlameTriangleRasterization(
             image_width=normalized_width,
@@ -480,16 +627,19 @@ class AtlasPortraitFlameTriangleRasterizer:
             coverage_mask=coverage_mask,
             triangle_index_buffer=triangle_index_buffer,
             depth_buffer=depth_buffer,
+            barycentric_coordinates=(
+                barycentric_coordinates
+            ),
         )
 
     @classmethod
-    def _contains_point(
+    def _calculate_barycentric_coordinates(
         cls,
         triangle: np.ndarray,
         *,
         x: float,
         y: float,
-    ) -> bool:
+    ) -> np.ndarray | None:
         first = triangle[
             0
         ]
@@ -500,66 +650,150 @@ class AtlasPortraitFlameTriangleRasterizer:
             2
         ]
 
-        first_edge = cls._signed_edge(
-            first,
-            second,
-            x=x,
-            y=y,
-        )
-        second_edge = cls._signed_edge(
-            second,
-            third,
-            x=x,
-            y=y,
-        )
-        third_edge = cls._signed_edge(
-            third,
-            first,
-            x=x,
-            y=y,
-        )
-
-        return (
-            first_edge >= -cls._EDGE_TOLERANCE
-            and second_edge >= -cls._EDGE_TOLERANCE
-            and third_edge >= -cls._EDGE_TOLERANCE
-        )
-
-    @staticmethod
-    def _signed_edge(
-        start: np.ndarray,
-        end: np.ndarray,
-        *,
-        x: float,
-        y: float,
-    ) -> float:
-        return float(
+        denominator = (
             (
-                end[
+                second[
+                    1
+                ]
+                - third[
+                    1
+                ]
+            )
+            * (
+                first[
                     0
                 ]
-                - start[
+                - third[
+                    0
+                ]
+            )
+            + (
+                third[
+                    0
+                ]
+                - second[
                     0
                 ]
             )
             * (
-                y
-                - start[
+                first[
+                    1
+                ]
+                - third[
                     1
                 ]
             )
-            - (
-                end[
+        )
+
+        if abs(
+            float(
+                denominator
+            )
+        ) <= cls._EDGE_TOLERANCE:
+            return None
+
+        first_weight = (
+            (
+                second[
                     1
                 ]
-                - start[
+                - third[
                     1
                 ]
             )
             * (
                 x
-                - start[
+                - third[
                     0
                 ]
             )
+            + (
+                third[
+                    0
+                ]
+                - second[
+                    0
+                ]
+            )
+            * (
+                y
+                - third[
+                    1
+                ]
+            )
+        ) / denominator
+
+        second_weight = (
+            (
+                third[
+                    1
+                ]
+                - first[
+                    1
+                ]
+            )
+            * (
+                x
+                - third[
+                    0
+                ]
+            )
+            + (
+                first[
+                    0
+                ]
+                - third[
+                    0
+                ]
+            )
+            * (
+                y
+                - third[
+                    1
+                ]
+            )
+        ) / denominator
+
+        third_weight = (
+            1.0
+            - first_weight
+            - second_weight
         )
+
+        weights = np.array(
+            [
+                first_weight,
+                second_weight,
+                third_weight,
+            ],
+            dtype=np.float64,
+        )
+
+        if np.any(
+            weights
+            < -cls._EDGE_TOLERANCE
+        ):
+            return None
+
+        weights = np.where(
+            np.abs(
+                weights
+            )
+            <= cls._EDGE_TOLERANCE,
+            0.0,
+            weights,
+        )
+
+        weight_sum = float(
+            np.sum(
+                weights,
+                dtype=np.float64,
+            )
+        )
+
+        if weight_sum <= 0.0:
+            return None
+
+        weights /= weight_sum
+
+        return weights

@@ -20,14 +20,20 @@ class AtlasPortraitFlameShadedPreviewRenderer:
     """
     Renders deterministic grayscale FLAME mesh shading.
 
-    Covered pixels use the face normal referenced by the
-    rasterization triangle-index buffer. Lighting is
-    Lambertian with ambient and diffuse strengths.
+    Two shading modes are supported:
+
+    - flat shading:
+      triangle_faces is omitted and each covered pixel uses
+      the corresponding face normal.
+
+    - smooth shading:
+      triangle_faces is supplied and each covered pixel uses
+      barycentrically interpolated vertex normals.
 
     Background pixels receive a separate constant intensity.
 
-    The renderer performs no fitting, rasterization,
-    image writing, relief compression, or STL generation.
+    The renderer performs no fitting, rasterization, image writing,
+    relief compression, or STL generation.
     """
 
     DEFAULT_LIGHT_DIRECTION = (
@@ -40,6 +46,7 @@ class AtlasPortraitFlameShadedPreviewRenderer:
     DEFAULT_BACKGROUND_INTENSITY = 0.0
 
     _LIGHT_MAGNITUDE_EPSILON = 1.0e-12
+    _NORMAL_MAGNITUDE_EPSILON = 1.0e-12
 
     @classmethod
     def render(
@@ -49,6 +56,7 @@ class AtlasPortraitFlameShadedPreviewRenderer:
         ),
         *,
         normal_field: AtlasPortraitFlameNormalField,
+        triangle_faces: Any = None,
         light_direction: tuple[float, float, float] = (
             DEFAULT_LIGHT_DIRECTION
         ),
@@ -121,6 +129,16 @@ class AtlasPortraitFlameShadedPreviewRenderer:
                     "index outside normal_field face normals."
                 )
 
+        normalized_triangle_faces = None
+
+        if triangle_faces is not None:
+            normalized_triangle_faces = (
+                cls._normalize_triangle_faces(
+                    triangle_faces,
+                    normal_field=normal_field,
+                )
+            )
+
         shading = np.full(
             (
                 rasterization.image_height,
@@ -131,14 +149,30 @@ class AtlasPortraitFlameShadedPreviewRenderer:
         )
 
         if covered_indices.size:
+            if normalized_triangle_faces is None:
+                covered_normals = (
+                    normal_field.face_normals[
+                        covered_indices
+                    ]
+                )
+            else:
+                covered_normals = (
+                    cls._interpolate_vertex_normals(
+                        rasterization,
+                        normal_field=normal_field,
+                        triangle_faces=(
+                            normalized_triangle_faces
+                        ),
+                        covered_triangle_indices=(
+                            covered_indices
+                        ),
+                    )
+                )
+
             light_vector = np.asarray(
                 normalized_light_direction,
                 dtype=np.float64,
             )
-
-            covered_normals = normal_field.face_normals[
-                covered_indices
-            ]
 
             diffuse_response = np.einsum(
                 "ij,j->i",
@@ -181,6 +215,137 @@ class AtlasPortraitFlameShadedPreviewRenderer:
             ambient_strength=ambient_value,
             diffuse_strength=diffuse_value,
             background_intensity=background_value,
+        )
+
+    @classmethod
+    def _normalize_triangle_faces(
+        cls,
+        value: Any,
+        *,
+        normal_field: AtlasPortraitFlameNormalField,
+    ) -> np.ndarray:
+        try:
+            numeric_faces = np.asarray(
+                value,
+                dtype=np.float64,
+            )
+        except (
+            TypeError,
+            ValueError,
+        ) as exc:
+            raise ValueError(
+                "triangle_faces must be numeric."
+            ) from exc
+
+        if (
+            numeric_faces.ndim != 2
+            or numeric_faces.shape[1] != 3
+        ):
+            raise ValueError(
+                "triangle_faces must have shape (F, 3)."
+            )
+
+        if not np.isfinite(
+            numeric_faces,
+        ).all():
+            raise ValueError(
+                "triangle_faces contains non-finite values."
+            )
+
+        if not np.equal(
+            numeric_faces,
+            np.rint(
+                numeric_faces,
+            ),
+        ).all():
+            raise ValueError(
+                "triangle_faces must contain integer indices."
+            )
+
+        faces = numeric_faces.astype(
+            np.int64,
+            copy=True,
+        )
+
+        if faces.shape[0] != normal_field.face_count:
+            raise ValueError(
+                "triangle_faces face count must match "
+                "normal_field face_count."
+            )
+
+        if faces.size:
+            if np.any(
+                faces < 0,
+            ):
+                raise ValueError(
+                    "triangle_faces contains negative indices."
+                )
+
+            if np.any(
+                faces
+                >= normal_field.vertex_count
+            ):
+                raise ValueError(
+                    "triangle_faces contains indices outside "
+                    "normal_field vertex normals."
+                )
+
+        return faces
+
+    @classmethod
+    def _interpolate_vertex_normals(
+        cls,
+        rasterization: (
+            AtlasPortraitFlameTriangleRasterization
+        ),
+        *,
+        normal_field: AtlasPortraitFlameNormalField,
+        triangle_faces: np.ndarray,
+        covered_triangle_indices: np.ndarray,
+    ) -> np.ndarray:
+        covered_faces = triangle_faces[
+            covered_triangle_indices
+        ]
+
+        corner_normals = normal_field.vertex_normals[
+            covered_faces
+        ]
+
+        covered_weights = (
+            rasterization.barycentric_coordinates[
+                rasterization.coverage_mask
+            ]
+        )
+
+        interpolated_normals = np.einsum(
+            "ij,ijk->ik",
+            covered_weights,
+            corner_normals,
+        )
+
+        magnitudes = np.linalg.norm(
+            interpolated_normals,
+            axis=1,
+        )
+
+        if np.any(
+            magnitudes
+            <= cls._NORMAL_MAGNITUDE_EPSILON
+        ):
+            raise ValueError(
+                "Interpolated vertex normal magnitude "
+                "must be non-zero."
+            )
+
+        return (
+            interpolated_normals
+            / magnitudes[
+                :,
+                None,
+            ]
+        ).astype(
+            np.float64,
+            copy=False,
         )
 
     @classmethod
