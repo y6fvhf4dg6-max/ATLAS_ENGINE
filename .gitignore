@@ -106,3 +106,6 @@ Data/OSM/*.pbf
 # ---------------------------------------------------
 
 Data/RELIEF/real_portrait_01/
+
+.venv-mediapipe/
+Data/MODELS/MEDIAPIPE/
