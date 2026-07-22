@@ -539,10 +539,46 @@ class AtlasPortraitFlameCanonicalModelAdapter:
                 "integer values."
             )
 
-        return parent_row.astype(
+        normalized_parents = parent_row.astype(
             np.int64,
             copy=True,
         )
+
+        root_parent = int(
+            normalized_parents[
+                0
+            ]
+        )
+
+        unsigned_root_sentinels = {
+            int(
+                np.iinfo(
+                    np.uint8
+                ).max
+            ),
+            int(
+                np.iinfo(
+                    np.uint16
+                ).max
+            ),
+            int(
+                np.iinfo(
+                    np.uint32
+                ).max
+            ),
+            int(
+                np.iinfo(
+                    np.uint64
+                ).max
+            ),
+        }
+
+        if root_parent in unsigned_root_sentinels:
+            normalized_parents[
+                0
+            ] = -1
+
+        return normalized_parents
 
     @staticmethod
     def _normalize_parameter_count(

@@ -536,3 +536,40 @@ def test_adapter_rejects_non_mapping_source():
                 "invalid",
             ]
         )
+
+
+def test_adapter_normalizes_unsigned_kintree_root_sentinel():
+    source = _source_mapping()
+
+    source[
+        "kintree_table"
+    ] = np.array(
+        [
+            [
+                np.iinfo(
+                    np.uint32
+                ).max,
+                0,
+            ],
+            [
+                0,
+                1,
+            ],
+        ],
+        dtype=np.uint32,
+    )
+
+    model = _adapt(
+        source=source
+    )
+
+    np.testing.assert_array_equal(
+        model.kinematic_tree,
+        np.array(
+            [
+                -1,
+                0,
+            ],
+            dtype=np.int64,
+        ),
+    )
