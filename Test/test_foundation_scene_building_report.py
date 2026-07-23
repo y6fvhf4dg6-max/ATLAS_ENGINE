@@ -275,6 +275,7 @@ def test_pipeline_uses_explicit_foundation_z_override(monkeypatch):
         coordinate_engine,
         foundation_z,
         diagnostics=None,
+        debug=False,
     ):
         return {
             "bottom": [

@@ -336,6 +336,7 @@ class AtlasFoundationSceneBuilder:
                     sample_grid=5,
                     embed_depth_mm=0.30,
                     diagnostics=parent_diagnostics,
+                    debug=debug,
                 )
             )
 
@@ -546,6 +547,7 @@ class AtlasFoundationSceneBuilder:
                 embed_depth_mm=0.30,
                 foundation_z_override=foundation_z_override,
                 diagnostics=building_diagnostics,
+                debug=debug,
             )
 
             if not mesh:
@@ -655,6 +657,7 @@ class AtlasFoundationSceneBuilder:
                                 "foundation_z"
                             ),
                             diagnostics=component_diagnostics,
+                            debug=debug,
                         )
                     )
 

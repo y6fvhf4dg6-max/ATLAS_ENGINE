@@ -20,12 +20,14 @@ class AtlasFoundationFirstPipeline:
         embed_depth_mm=0.30,
         foundation_z_override=None,
         diagnostics=None,
+        debug=False,
     ):
         temporary_mesh = AtlasMeshBuilder.build_mesh(
             building,
             coordinate_engine,
             foundation_z=0.0,
             diagnostics=diagnostics,
+            debug=debug,
         )
 
         if temporary_mesh is None:
@@ -93,6 +95,7 @@ class AtlasFoundationFirstPipeline:
             coordinate_engine=coordinate_engine,
             foundation_z=foundation_z,
             diagnostics=diagnostics,
+            debug=debug,
         )
 
         if final_mesh is not None:

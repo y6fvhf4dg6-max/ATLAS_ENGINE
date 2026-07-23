@@ -72,6 +72,7 @@ class AtlasMeshBuilder:
         building,
         coordinate_engine,
         diagnostics=None,
+        debug=False,
     ):
         points = AtlasPolygonCleaner.clean(building.geometry)
 
@@ -117,7 +118,8 @@ class AtlasMeshBuilder:
             scaled_points,
         )
 
-        AtlasGeometryInspector.print_report(report)
+        if debug:
+            AtlasGeometryInspector.print_report(report)
 
         bounds = AtlasMeshBuilder._bounds_2d(scaled_points)
 
@@ -295,11 +297,13 @@ class AtlasMeshBuilder:
         coordinate_engine,
         foundation_z=0.0,
         diagnostics=None,
+        debug=False,
     ):
         scaled_points = AtlasMeshBuilder.prepare_geometry(
             building,
             coordinate_engine,
             diagnostics=diagnostics,
+            debug=debug,
         )
 
         if scaled_points is None:

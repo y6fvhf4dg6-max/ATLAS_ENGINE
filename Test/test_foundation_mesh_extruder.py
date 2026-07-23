@@ -581,3 +581,114 @@ def test_legacy_mesh_builder_preserves_submillimeter_minaret_footprint():
 
     assert max(xs) - min(xs) == pytest.approx(1.0)
     assert max(ys) - min(ys) == pytest.approx(1.0)
+
+def test_suspect_building_report_is_silent_when_debug_is_false(
+    capsys,
+):
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.80),
+            (6.0, 0.80),
+            (6.0, 0.0),
+        ],
+        area_m2=100.0,
+    )
+
+    AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        debug=False,
+    )
+
+    captured = capsys.readouterr()
+
+    assert (
+        "ATLAS GEOMETRY INSPECTOR — SUSPECT BUILDING"
+        not in captured.out
+    )
+
+
+def test_suspect_building_report_is_printed_when_debug_is_true(
+    capsys,
+):
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.80),
+            (6.0, 0.80),
+            (6.0, 0.0),
+        ],
+        area_m2=100.0,
+    )
+
+    AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        debug=True,
+    )
+
+    captured = capsys.readouterr()
+
+    assert (
+        "ATLAS GEOMETRY INSPECTOR — SUSPECT BUILDING"
+        in captured.out
+    )
+
+
+def test_legacy_mesh_builder_is_silent_when_debug_is_false(
+    capsys,
+):
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.80),
+            (6.0, 0.80),
+            (6.0, 0.0),
+        ],
+        area_m2=100.0,
+    )
+
+    AtlasMeshBuilder.build_mesh(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        debug=False,
+    )
+
+    captured = capsys.readouterr()
+
+    assert (
+        "ATLAS GEOMETRY INSPECTOR — SUSPECT BUILDING"
+        not in captured.out
+    )
+
+
+def test_legacy_mesh_builder_prints_report_when_debug_is_true(
+    capsys,
+):
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.80),
+            (6.0, 0.80),
+            (6.0, 0.0),
+        ],
+        area_m2=100.0,
+    )
+
+    AtlasMeshBuilder.build_mesh(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        debug=True,
+    )
+
+    captured = capsys.readouterr()
+
+    assert (
+        "ATLAS GEOMETRY INSPECTOR — SUSPECT BUILDING"
+        in captured.out
+    )

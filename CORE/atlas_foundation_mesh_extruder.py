@@ -58,11 +58,13 @@ class AtlasFoundationMeshExtruder:
         coordinate_engine,
         foundation_z,
         diagnostics=None,
+        debug=False,
     ):
         scaled_points = AtlasFoundationMeshExtruder._prepare_geometry(
             building,
             coordinate_engine,
             diagnostics=diagnostics,
+            debug=debug,
         )
 
         if scaled_points is None:
@@ -286,6 +288,7 @@ class AtlasFoundationMeshExtruder:
         building,
         coordinate_engine,
         diagnostics=None,
+        debug=False,
     ):
         points = AtlasPolygonCleaner.clean(building.geometry)
 
@@ -333,7 +336,8 @@ class AtlasFoundationMeshExtruder:
             scaled_points,
         )
 
-        AtlasGeometryInspector.print_report(report)
+        if debug:
+            AtlasGeometryInspector.print_report(report)
 
         bounds = AtlasFoundationMeshExtruder._bounds_2d(scaled_points)
 
