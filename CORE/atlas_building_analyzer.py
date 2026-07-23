@@ -1,9 +1,13 @@
 """
 ATLAS Engine
 
-Atlas Building Analyzer v1.1
+Atlas Building Analyzer v1.2
 Analyzes AtlasBuilding objects and creates a building profile.
 """
+
+import warnings
+
+from shapely.geometry import Polygon
 
 from CORE.atlas_geometry import AtlasGeometry
 
@@ -36,6 +40,119 @@ class AtlasBuildingAnalyzer:
         ratio = max(width, depth) / min(width, depth)
 
         return round(ratio, 2)
+
+    @staticmethod
+    def _footprint_polygon(building):
+        geometry = getattr(building, "geometry", None)
+
+        if not geometry or len(geometry) < 3:
+            return None
+
+        xy_points = AtlasGeometry.latlon_to_xy(geometry)
+
+        if len(xy_points) > 1 and xy_points[0] == xy_points[-1]:
+            xy_points = xy_points[:-1]
+
+        if len(xy_points) < 3:
+            return None
+
+        polygon = Polygon(xy_points)
+
+        if not polygon.is_valid:
+            polygon = polygon.buffer(0)
+
+        if polygon.is_empty or polygon.area <= 0.0:
+            return None
+
+        return polygon
+
+    @staticmethod
+    def _minimum_rotated_rectangle(polygon):
+        with warnings.catch_warnings():
+            warnings.simplefilter(
+                "ignore",
+                category=RuntimeWarning,
+            )
+            return polygon.minimum_rotated_rectangle
+
+    @staticmethod
+    def _minimum_rectangle_side_lengths(polygon):
+        rectangle = (
+            AtlasBuildingAnalyzer._minimum_rotated_rectangle(
+                polygon
+            )
+        )
+        coordinates = list(rectangle.exterior.coords)
+
+        if len(coordinates) < 5:
+            return None
+
+        side_lengths = []
+
+        for index in range(4):
+            x1, y1 = coordinates[index]
+            x2, y2 = coordinates[index + 1]
+
+            length = (
+                (x2 - x1) ** 2
+                + (y2 - y1) ** 2
+            ) ** 0.5
+
+            if length > 0.0:
+                side_lengths.append(length)
+
+        if len(side_lengths) != 4:
+            return None
+
+        short_side = min(side_lengths)
+        long_side = max(side_lengths)
+
+        if short_side <= 0.0:
+            return None
+
+        return short_side, long_side
+
+    @staticmethod
+    def oriented_aspect_ratio(building):
+        polygon = AtlasBuildingAnalyzer._footprint_polygon(building)
+
+        if polygon is None:
+            return 0.0
+
+        side_lengths = (
+            AtlasBuildingAnalyzer._minimum_rectangle_side_lengths(
+                polygon
+            )
+        )
+
+        if side_lengths is None:
+            return 0.0
+
+        short_side, long_side = side_lengths
+        ratio = long_side / short_side
+
+        return round(ratio, 2)
+
+    @staticmethod
+    def rectangularity(building):
+        polygon = AtlasBuildingAnalyzer._footprint_polygon(building)
+
+        if polygon is None:
+            return 0.0
+
+        rectangle = (
+            AtlasBuildingAnalyzer._minimum_rotated_rectangle(
+                polygon
+            )
+        )
+
+        if rectangle.is_empty or rectangle.area <= 0.0:
+            return 0.0
+
+        value = polygon.area / rectangle.area
+        value = min(max(value, 0.0), 1.0)
+
+        return round(value, 4)
 
     @staticmethod
     def reflex_vertex_count(building):
@@ -104,7 +221,12 @@ class AtlasBuildingAnalyzer:
         if btype in ("office", "commercial"):
             return "business"
 
-        if btype in ("house", "detached", "residential", "apartments"):
+        if btype in (
+            "house",
+            "detached",
+            "residential",
+            "apartments",
+        ):
             return "residential"
 
         if btype in ("school", "hospital"):
@@ -146,7 +268,15 @@ class AtlasBuildingAnalyzer:
             "height_m": building.estimated_height,
             "levels": building.levels,
             "roof": building.roof_type,
-            "aspect_ratio": AtlasBuildingAnalyzer.aspect_ratio(building),
+            "aspect_ratio": (
+                AtlasBuildingAnalyzer.aspect_ratio(building)
+            ),
+            "oriented_aspect_ratio": (
+                AtlasBuildingAnalyzer.oriented_aspect_ratio(building)
+            ),
+            "rectangularity": (
+                AtlasBuildingAnalyzer.rectangularity(building)
+            ),
             "reflex_vertices": (
                 AtlasBuildingAnalyzer.reflex_vertex_count(building)
             ),

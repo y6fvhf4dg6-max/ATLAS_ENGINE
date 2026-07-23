@@ -5,6 +5,9 @@ from CORE.atlas_building import AtlasBuilding
 from CORE.atlas_mesh_builder import AtlasMeshBuilder
 from CORE.road_mesh_builder import AtlasRoadMeshBuilder
 from CORE.atlas_foundation_first_pipeline import AtlasFoundationFirstPipeline
+from CORE.atlas_building_roof_metadata_profiler import (
+    AtlasBuildingRoofMetadataProfiler,
+)
 
 
 class AtlasSceneBuilder:
@@ -53,6 +56,9 @@ class AtlasSceneBuilder:
         accepted_buildings = 0
         skipped_buildings = 0
 
+        building_roof_profile_counts = {}
+        building_roof_decision_source_counts = {}
+
         for raw_building in raw_buildings:
             if max_buildings is not None and accepted_buildings >= max_buildings:
                 break
@@ -73,11 +79,42 @@ class AtlasSceneBuilder:
             )
 
             if mesh:
+                raw_tags = raw_building.get("tags", {})
+                is_building_part = (
+                    raw_tags.get("building:part") is not None
+                )
+
+                mesh = AtlasBuildingRoofMetadataProfiler.attach(
+                    mesh=mesh,
+                    atlas_building=atlas_building,
+                    is_building_part=is_building_part,
+                    profile_counts=(
+                        building_roof_profile_counts
+                    ),
+                    decision_source_counts=(
+                        building_roof_decision_source_counts
+                    ),
+                )
 
                 scene.add_building_mesh(mesh)
                 accepted_buildings += 1
             else:
                 skipped_buildings += 1
+
+        scene.metadata["building_report"] = {
+            "accepted": accepted_buildings,
+            "skipped": skipped_buildings,
+            "building_roof_profiles": dict(
+                sorted(
+                    building_roof_profile_counts.items()
+                )
+            ),
+            "building_roof_decision_sources": dict(
+                sorted(
+                    building_roof_decision_source_counts.items()
+                )
+            ),
+        }
 
         road_meshes = []
 
@@ -103,6 +140,14 @@ class AtlasSceneBuilder:
             print(f"Base plate        : {scene.count_layer_meshes('base_plate')}")
             print(f"Accepted buildings: {accepted_buildings}")
             print(f"Skipped buildings : {skipped_buildings}")
+            print(
+                "City roof profiles : "
+                f"{dict(sorted(building_roof_profile_counts.items()))}"
+            )
+            print(
+                "Roof decisions      : "
+                f"{dict(sorted(building_roof_decision_source_counts.items()))}"
+            )
             print(f"Building meshes   : {scene.count_layer_meshes('buildings')}")
             print(f"Road meshes       : {scene.count_layer_meshes('roads')}")
             print(f"Total meshes      : {scene.count_all_meshes()}")

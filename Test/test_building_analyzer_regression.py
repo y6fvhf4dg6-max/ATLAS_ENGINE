@@ -143,3 +143,75 @@ def test_analysis_includes_footprint_complexity_metrics():
 
     assert result["reflex_vertices"] == 1
     assert result["is_concave"] is True
+
+
+def test_oriented_aspect_ratio_detects_rotated_long_rectangle():
+    building = make_building(
+        geometry=[
+            (0.0000, 0.0000),
+            (0.0010, 0.0010),
+            (0.0012, 0.0008),
+            (0.0002, -0.0002),
+        ],
+    )
+
+    ratio = AtlasBuildingAnalyzer.oriented_aspect_ratio(building)
+
+    assert ratio > 4.0
+
+
+def test_rectangular_footprint_has_full_rectangularity():
+    building = make_building(
+        geometry=[
+            (0.0000, 0.0000),
+            (0.0000, 0.0020),
+            (0.0010, 0.0020),
+            (0.0010, 0.0000),
+        ],
+    )
+
+    rectangularity = AtlasBuildingAnalyzer.rectangularity(building)
+
+    assert rectangularity == 1.0
+
+
+def test_l_shaped_footprint_has_lower_rectangularity():
+    building = make_building(
+        geometry=[
+            (0.0000, 0.0000),
+            (0.0000, 0.0030),
+            (0.0010, 0.0030),
+            (0.0010, 0.0010),
+            (0.0030, 0.0010),
+            (0.0030, 0.0000),
+        ],
+    )
+
+    rectangularity = AtlasBuildingAnalyzer.rectangularity(building)
+
+    assert 0.0 < rectangularity < 0.75
+
+
+def test_oriented_metrics_return_zero_for_missing_geometry():
+    building = make_building(
+        geometry=None,
+    )
+
+    assert AtlasBuildingAnalyzer.oriented_aspect_ratio(building) == 0.0
+    assert AtlasBuildingAnalyzer.rectangularity(building) == 0.0
+
+
+def test_analysis_includes_oriented_footprint_metrics():
+    building = make_building(
+        geometry=[
+            (0.0000, 0.0000),
+            (0.0000, 0.0020),
+            (0.0010, 0.0020),
+            (0.0010, 0.0000),
+        ],
+    )
+
+    result = AtlasBuildingAnalyzer.analyze(building)
+
+    assert result["oriented_aspect_ratio"] == 2.0
+    assert result["rectangularity"] == 1.0

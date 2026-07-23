@@ -1,6 +1,10 @@
 # CORE/atlas_foundation_scene_builder.py
 
 from CORE.atlas_scene import AtlasScene
+from CORE.atlas_building_analyzer import AtlasBuildingAnalyzer
+from CORE.atlas_building_roof_profiler import (
+    AtlasBuildingRoofProfiler,
+)
 from CORE.atlas_foundation_first_pipeline import (
     AtlasFoundationFirstPipeline,
 )
@@ -61,6 +65,107 @@ class AtlasFoundationSceneBuilder:
     - Basit şapel ve kale kanatlarına tek beşik çatı uygular
     - Karmaşık kale kanatlarına çok parçalı beşik çatı uygular
     """
+
+    @staticmethod
+    def _building_roof_metadata(
+        atlas_building,
+        is_building_part,
+    ):
+        if getattr(
+            atlas_building,
+            "is_castle_building",
+            False,
+        ):
+            return None
+
+        oriented_aspect_ratio = (
+            AtlasBuildingAnalyzer.oriented_aspect_ratio(
+                atlas_building
+            )
+        )
+        rectangularity = (
+            AtlasBuildingAnalyzer.rectangularity(
+                atlas_building
+            )
+        )
+
+        if (
+            oriented_aspect_ratio <= 0.0
+            or not 0.0 <= rectangularity <= 1.0
+        ):
+            return {
+                "building_roof_profile": "flat",
+                "building_roof_decision_source": "fallback",
+                "building_oriented_aspect_ratio": (
+                    oriented_aspect_ratio
+                ),
+                "building_rectangularity": rectangularity,
+            }
+
+        decision = AtlasBuildingRoofProfiler.classify(
+            roof_shape=getattr(
+                atlas_building,
+                "roof_type",
+                None,
+            ),
+            aspect_ratio=oriented_aspect_ratio,
+            rectangularity=rectangularity,
+            is_building_part=is_building_part,
+        )
+
+        return {
+            "building_roof_profile": decision[
+                "roof_profile"
+            ],
+            "building_roof_decision_source": decision[
+                "decision_source"
+            ],
+            "building_oriented_aspect_ratio": (
+                oriented_aspect_ratio
+            ),
+            "building_rectangularity": rectangularity,
+        }
+
+    @staticmethod
+    def _attach_building_roof_metadata(
+        mesh,
+        atlas_building,
+        is_building_part,
+        profile_counts,
+        decision_source_counts,
+    ):
+        metadata = (
+            AtlasFoundationSceneBuilder
+            ._building_roof_metadata(
+                atlas_building=atlas_building,
+                is_building_part=is_building_part,
+            )
+        )
+
+        if metadata is None:
+            return mesh
+
+        mesh.update(metadata)
+
+        profile = metadata["building_roof_profile"]
+        decision_source = metadata[
+            "building_roof_decision_source"
+        ]
+
+        profile_counts[profile] = (
+            profile_counts.get(profile, 0)
+            + 1
+        )
+
+        decision_source_counts[decision_source] = (
+            decision_source_counts.get(
+                decision_source,
+                0,
+            )
+            + 1
+        )
+
+        return mesh
 
     @staticmethod
     def build_scene(
@@ -168,6 +273,9 @@ class AtlasFoundationSceneBuilder:
             )
 
         castle_profile_counts = {}
+        building_roof_profile_counts = {}
+        building_roof_decision_source_counts = {}
+
         tower_roof_count = 0
         gable_roof_count = 0
         multi_gable_roof_count = 0
@@ -477,6 +585,21 @@ class AtlasFoundationSceneBuilder:
                 False,
             )
 
+            mesh = (
+                AtlasFoundationSceneBuilder
+                ._attach_building_roof_metadata(
+                    mesh=mesh,
+                    atlas_building=atlas_building,
+                    is_building_part=is_building_part,
+                    profile_counts=(
+                        building_roof_profile_counts
+                    ),
+                    decision_source_counts=(
+                        building_roof_decision_source_counts
+                    ),
+                )
+            )
+
             if not mesh["is_castle_building"]:
                 mesh = AtlasMinaretRoofBuilder.apply(
                     mesh=mesh,
@@ -647,6 +770,16 @@ class AtlasFoundationSceneBuilder:
             "rejected_building_parts": rejected_building_parts,
             "skipped": skipped_buildings,
             "castle_buildings": castle_buildings,
+            "building_roof_profiles": dict(
+                sorted(
+                    building_roof_profile_counts.items()
+                )
+            ),
+            "building_roof_decision_sources": dict(
+                sorted(
+                    building_roof_decision_source_counts.items()
+                )
+            ),
             "rejection_counts": dict(
                 sorted(building_rejection_counts.items())
             ),
@@ -684,6 +817,16 @@ class AtlasFoundationSceneBuilder:
                 )
 
             print(f"Castle buildings   : " f"{castle_buildings}")
+
+            print(
+                "City roof profiles : "
+                f"{dict(sorted(building_roof_profile_counts.items()))}"
+            )
+
+            print(
+                "Roof decisions      : "
+                f"{dict(sorted(building_roof_decision_source_counts.items()))}"
+            )
 
             for profile_name in sorted(castle_profile_counts):
                 print(
