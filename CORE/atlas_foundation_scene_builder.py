@@ -5,6 +5,9 @@ from CORE.atlas_building_analyzer import AtlasBuildingAnalyzer
 from CORE.atlas_building_roof_profiler import (
     AtlasBuildingRoofProfiler,
 )
+from CORE.atlas_building_gable_roof_builder import (
+    AtlasBuildingGableRoofBuilder,
+)
 from CORE.atlas_foundation_first_pipeline import (
     AtlasFoundationFirstPipeline,
 )
@@ -598,6 +601,10 @@ class AtlasFoundationSceneBuilder:
                         building_roof_decision_source_counts
                     ),
                 )
+            )
+
+            mesh = AtlasBuildingGableRoofBuilder.apply(
+                mesh
             )
 
             if not mesh["is_castle_building"]:

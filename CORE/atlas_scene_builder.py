@@ -8,6 +8,9 @@ from CORE.atlas_foundation_first_pipeline import AtlasFoundationFirstPipeline
 from CORE.atlas_building_roof_metadata_profiler import (
     AtlasBuildingRoofMetadataProfiler,
 )
+from CORE.atlas_building_gable_roof_builder import (
+    AtlasBuildingGableRoofBuilder,
+)
 
 
 class AtlasSceneBuilder:
@@ -94,6 +97,10 @@ class AtlasSceneBuilder:
                     decision_source_counts=(
                         building_roof_decision_source_counts
                     ),
+                )
+
+                mesh = AtlasBuildingGableRoofBuilder.apply(
+                    mesh
                 )
 
                 scene.add_building_mesh(mesh)

@@ -3,6 +3,16 @@ from types import SimpleNamespace
 from CORE.atlas_foundation_scene_builder import (
     AtlasFoundationSceneBuilder,
 )
+from CORE.atlas_foundation_first_pipeline import (
+    AtlasFoundationFirstPipeline,
+)
+from CORE.atlas_scene_builder import AtlasSceneBuilder
+from CORE.atlas_castle_footprint_regularizer import (
+    AtlasCastleFootprintRegularizer,
+)
+from CORE.atlas_castle_building_profiler import (
+    AtlasCastleBuildingProfiler,
+)
 
 
 def make_building(
@@ -275,3 +285,149 @@ def test_roof_metadata_counts_accumulate():
         "inferred": 1,
         "building_part": 1,
     }
+
+
+def test_foundation_scene_applies_gable_roof_geometry(
+    monkeypatch,
+):
+    bottom = [
+        (0.0, 0.0, 0.0),
+        (8.0, 0.0, 0.0),
+        (8.0, 3.0, 0.0),
+        (0.0, 3.0, 0.0),
+    ]
+
+    top = [
+        (0.0, 0.0, 4.0),
+        (8.0, 0.0, 4.0),
+        (8.0, 3.0, 4.0),
+        (0.0, 3.0, 4.0),
+    ]
+
+    original_triangles = [
+        (bottom[0], bottom[2], bottom[1]),
+        (bottom[0], bottom[3], bottom[2]),
+        (top[0], top[1], top[2]),
+        (top[0], top[2], top[3]),
+        (bottom[0], bottom[1], top[1]),
+        (bottom[0], top[1], top[0]),
+        (bottom[1], bottom[2], top[2]),
+        (bottom[1], top[2], top[1]),
+        (bottom[2], bottom[3], top[3]),
+        (bottom[2], top[3], top[2]),
+        (bottom[3], bottom[0], top[0]),
+        (bottom[3], top[0], top[3]),
+    ]
+
+    mesh = {
+        "bottom": bottom,
+        "top": top,
+        "walls": [
+            (
+                bottom[0],
+                bottom[1],
+                top[1],
+                top[0],
+            ),
+            (
+                bottom[1],
+                bottom[2],
+                top[2],
+                top[1],
+            ),
+            (
+                bottom[2],
+                bottom[3],
+                top[3],
+                top[2],
+            ),
+            (
+                bottom[3],
+                bottom[0],
+                top[0],
+                top[3],
+            ),
+        ],
+        "triangles": list(original_triangles),
+        "bottom_z": 0.0,
+        "top_z": 4.0,
+    }
+
+    atlas_building = SimpleNamespace(
+        geometry=[
+            (39.0000, 32.0000),
+            (39.0000, 32.0040),
+            (39.0010, 32.0040),
+            (39.0010, 32.0000),
+        ],
+        tags={"building": "yes"},
+        roof_type=None,
+        is_castle_building=False,
+        castle_profile=None,
+        castle_roof_profile=None,
+        estimated_height=4.0,
+    )
+
+    raw_building = {
+        "id": 601,
+        "geometry": atlas_building.geometry,
+        "tags": atlas_building.tags,
+    }
+
+    monkeypatch.setattr(
+        AtlasSceneBuilder,
+        "_is_raw_building_usable",
+        staticmethod(lambda *args, **kwargs: True),
+    )
+
+    monkeypatch.setattr(
+        AtlasSceneBuilder,
+        "_to_atlas_building",
+        staticmethod(lambda raw: atlas_building),
+    )
+
+    monkeypatch.setattr(
+        AtlasCastleFootprintRegularizer,
+        "prepare",
+        staticmethod(
+            lambda raw_building, castles: raw_building
+        ),
+    )
+
+    monkeypatch.setattr(
+        AtlasCastleBuildingProfiler,
+        "apply_to_building",
+        staticmethod(
+            lambda atlas_building, raw_building, castles: (
+                atlas_building
+            )
+        ),
+    )
+
+    monkeypatch.setattr(
+        AtlasFoundationFirstPipeline,
+        "build_building_mesh",
+        staticmethod(lambda **kwargs: mesh),
+    )
+
+    scene = AtlasFoundationSceneBuilder.build_scene(
+        raw_buildings=[raw_building],
+        coordinate_engine=object(),
+        terrain_mesh=object(),
+        castles=[],
+        debug=False,
+    )
+
+    result_mesh = scene.layers["buildings"][0]
+
+    assert result_mesh["building_roof_profile"] == "gable"
+    assert result_mesh["building_gable_roof_applied"] is True
+    assert result_mesh["roof_geometry"] == "gable"
+
+    assert len(
+        result_mesh["building_gable_roof_triangles"]
+    ) == 8
+
+    assert len(result_mesh["triangles"]) == (
+        len(original_triangles) + 8
+    )
