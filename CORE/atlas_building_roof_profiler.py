@@ -23,6 +23,7 @@ class AtlasBuildingRoofProfiler:
         aspect_ratio,
         rectangularity,
         is_building_part,
+        is_special_architectural_building=False,
     ):
         aspect_ratio = float(aspect_ratio)
         rectangularity = float(rectangularity)
@@ -61,6 +62,14 @@ class AtlasBuildingRoofProfiler:
             return {
                 "roof_profile": "flat",
                 "decision_source": "building_part",
+                "aspect_ratio": aspect_ratio,
+                "rectangularity": rectangularity,
+            }
+
+        if is_special_architectural_building:
+            return {
+                "roof_profile": "flat",
+                "decision_source": "special_architecture",
                 "aspect_ratio": aspect_ratio,
                 "rectangularity": rectangularity,
             }

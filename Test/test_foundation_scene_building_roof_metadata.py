@@ -662,3 +662,127 @@ def test_normal_parent_does_not_mark_building_part_as_monument_column():
         "atlas:monument_column_part"
         not in result["tags"]
     )
+
+
+def test_elevated_component_inside_mausoleum_is_special_architecture():
+    building = make_building(
+        geometry=[
+            (39.0002, 32.0002),
+            (39.0002, 32.0008),
+            (39.0008, 32.0008),
+            (39.0008, 32.0002),
+        ],
+    )
+    building.tags.update(
+        {
+            "building:min_level": "6",
+            "min_height": "22",
+            "height": "25",
+        }
+    )
+
+    parent_record = {
+        "id": 28241512,
+        "geometry": [
+            (39.0000, 32.0000),
+            (39.0000, 32.0010),
+            (39.0010, 32.0010),
+            (39.0010, 32.0000),
+        ],
+        "tags": {
+            "building": "yes",
+            "historic": "tomb",
+            "tomb": "mausoleum",
+        },
+    }
+
+    assert (
+        AtlasFoundationSceneBuilder
+        ._is_special_architectural_component(
+            atlas_building=building,
+            containing_parent_record=parent_record,
+        )
+        is True
+    )
+
+
+def test_finds_smallest_containing_special_architectural_parent():
+    target_record = {
+        "id": 397750660,
+        "geometry": [
+            (39.0000033, 32.0000000),
+            (39.0000033, 32.0010000),
+            (39.0010033, 32.0010000),
+            (39.0010033, 32.0000000),
+        ],
+        "tags": {
+            "building": "yes",
+            "min_height": "22",
+            "building:min_level": "6",
+        },
+    }
+
+    mausoleum_record = {
+        "id": 28241512,
+        "geometry": [
+            (39.0000, 32.0000),
+            (39.0000, 32.0010),
+            (39.0010, 32.0010),
+            (39.0010, 32.0000),
+        ],
+        "tags": {
+            "building": "yes",
+            "historic": "tomb",
+            "tomb": "mausoleum",
+        },
+    }
+
+    unrelated_record = {
+        "id": 999,
+        "geometry": [
+            (40.0000, 33.0000),
+            (40.0000, 33.0010),
+            (40.0010, 33.0010),
+            (40.0010, 33.0000),
+        ],
+        "tags": {
+            "building": "yes",
+        },
+    }
+
+    result = (
+        AtlasFoundationSceneBuilder
+        ._find_containing_special_parent_record(
+            raw_building=target_record,
+            raw_buildings=[
+                target_record,
+                mausoleum_record,
+                unrelated_record,
+            ],
+        )
+    )
+
+    assert result["id"] == 28241512
+
+
+def test_all_parents_with_parts_require_shared_foundation_cache():
+    hierarchy = {
+        "parents": {
+            100: {
+                "parent": {"id": 100},
+                "part_ids": [101],
+            },
+            200: {
+                "parent": {"id": 200},
+                "part_ids": [201, 202],
+            },
+        },
+        "suppressed_parent_ids": [200],
+    }
+
+    result = (
+        AtlasFoundationSceneBuilder
+        ._shared_foundation_parent_ids(hierarchy)
+    )
+
+    assert result == {100, 200}

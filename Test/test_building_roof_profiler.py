@@ -119,3 +119,32 @@ def test_invalid_geometry_metrics_are_rejected(
             rectangularity=rectangularity,
             is_building_part=False,
         )
+
+
+def test_special_architectural_building_does_not_receive_inferred_roof():
+    result = AtlasBuildingRoofProfiler.classify(
+        roof_shape=None,
+        aspect_ratio=1.10,
+        rectangularity=0.95,
+        is_building_part=False,
+        is_special_architectural_building=True,
+    )
+
+    assert result["roof_profile"] == "flat"
+    assert (
+        result["decision_source"]
+        == "special_architecture"
+    )
+
+
+def test_special_architectural_building_preserves_explicit_osm_roof():
+    result = AtlasBuildingRoofProfiler.classify(
+        roof_shape="gable",
+        aspect_ratio=1.10,
+        rectangularity=0.95,
+        is_building_part=False,
+        is_special_architectural_building=True,
+    )
+
+    assert result["roof_profile"] == "gable"
+    assert result["decision_source"] == "osm"

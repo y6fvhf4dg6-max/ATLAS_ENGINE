@@ -59,6 +59,7 @@ from CORE.atlas_ancient_theatre_upper_gallery_builder import (
 
 
 class AtlasFoundationSceneBuilder:
+    SPECIAL_ARCHITECTURE_CONTAINMENT_RATIO_MINIMUM = 0.995
     """
     ATLAS Foundation Scene Builder v0.3
 
@@ -71,6 +72,22 @@ class AtlasFoundationSceneBuilder:
     - Basit şapel ve kale kanatlarına tek beşik çatı uygular
     - Karmaşık kale kanatlarına çok parçalı beşik çatı uygular
     """
+
+    @staticmethod
+    def _shared_foundation_parent_ids(
+        building_part_hierarchy,
+    ):
+        parents = (
+            building_part_hierarchy.get("parents", {})
+            or {}
+        )
+
+        return {
+            parent_id
+            for parent_id, parent_data in parents.items()
+            if parent_data
+            and parent_data.get("part_ids")
+        }
 
     @staticmethod
     def _mark_monument_column_part(
@@ -110,9 +127,140 @@ class AtlasFoundationSceneBuilder:
         }
 
     @staticmethod
+    def _find_containing_special_parent_record(
+        raw_building,
+        raw_buildings,
+    ):
+        target_polygon = (
+            AtlasBuildingPartHierarchyProfiler
+            ._make_polygon(raw_building)
+        )
+
+        if target_polygon is None:
+            return None
+
+        target_id = raw_building.get("id")
+        best_parent_record = None
+        best_parent_area = None
+
+        for candidate in raw_buildings:
+            if candidate.get("id") == target_id:
+                continue
+
+            tags = candidate.get("tags", {}) or {}
+
+            historic = str(
+                tags.get("historic", "")
+            ).strip().lower()
+            tomb = str(
+                tags.get("tomb", "")
+            ).strip().lower()
+            tourism = str(
+                tags.get("tourism", "")
+            ).strip().lower()
+
+            is_special_parent = (
+                historic not in {"", "no"}
+                or tomb not in {"", "no"}
+                or tags.get("memorial") is not None
+                or tourism == "artwork"
+            )
+
+            if not is_special_parent:
+                continue
+
+            candidate_polygon = (
+                AtlasBuildingPartHierarchyProfiler
+                ._make_polygon(candidate)
+            )
+
+            if candidate_polygon is None:
+                continue
+
+            intersection = candidate_polygon.intersection(
+                target_polygon
+            )
+
+            if intersection.is_empty:
+                continue
+
+            containment_ratio = (
+                intersection.area / target_polygon.area
+            )
+
+            if (
+                containment_ratio
+                < AtlasFoundationSceneBuilder
+                .SPECIAL_ARCHITECTURE_CONTAINMENT_RATIO_MINIMUM
+            ):
+                continue
+
+            candidate_area = candidate_polygon.area
+
+            if (
+                best_parent_record is None
+                or candidate_area < best_parent_area
+            ):
+                best_parent_record = candidate
+                best_parent_area = candidate_area
+
+        return best_parent_record
+
+    @staticmethod
+    def _is_special_architectural_component(
+        atlas_building,
+        containing_parent_record,
+    ):
+        if (
+            atlas_building is None
+            or containing_parent_record is None
+        ):
+            return False
+
+        building_tags = (
+            getattr(atlas_building, "tags", None)
+            or {}
+        )
+        parent_tags = (
+            containing_parent_record.get("tags", {})
+            or {}
+        )
+
+        historic = str(
+            parent_tags.get("historic", "")
+        ).strip().lower()
+        tomb = str(
+            parent_tags.get("tomb", "")
+        ).strip().lower()
+
+        is_special_parent = (
+            historic not in {"", "no"}
+            or tomb not in {"", "no"}
+            or parent_tags.get("memorial") is not None
+            or parent_tags.get("tourism") == "artwork"
+        )
+
+        if not is_special_parent:
+            return False
+
+        def positive_number(value):
+            try:
+                return float(str(value).strip()) > 0.0
+            except (TypeError, ValueError):
+                return False
+
+        return (
+            positive_number(building_tags.get("min_height"))
+            or positive_number(
+                building_tags.get("building:min_level")
+            )
+        )
+
+    @staticmethod
     def _building_roof_metadata(
         atlas_building,
         is_building_part,
+        containing_parent_record=None,
     ):
         if getattr(
             atlas_building,
@@ -179,6 +327,15 @@ class AtlasFoundationSceneBuilder:
             aspect_ratio=oriented_aspect_ratio,
             rectangularity=rectangularity,
             is_building_part=is_building_part,
+            is_special_architectural_building=(
+                AtlasFoundationSceneBuilder
+                ._is_special_architectural_component(
+                    atlas_building=atlas_building,
+                    containing_parent_record=(
+                        containing_parent_record
+                    ),
+                )
+            ),
         )
 
         return {
@@ -201,12 +358,16 @@ class AtlasFoundationSceneBuilder:
         is_building_part,
         profile_counts,
         decision_source_counts,
+        containing_parent_record=None,
     ):
         metadata = (
             AtlasFoundationSceneBuilder
             ._building_roof_metadata(
                 atlas_building=atlas_building,
                 is_building_part=is_building_part,
+                containing_parent_record=(
+                    containing_parent_record
+                ),
             )
         )
 
@@ -355,9 +516,16 @@ class AtlasFoundationSceneBuilder:
             ]
         )
 
+        shared_foundation_parent_ids = (
+            AtlasFoundationSceneBuilder
+            ._shared_foundation_parent_ids(
+                building_part_hierarchy
+            )
+        )
+
         parent_foundation_z_cache = {}
 
-        for parent_id in suppressed_parent_ids:
+        for parent_id in shared_foundation_parent_ids:
             parent_data = building_part_hierarchy[
                 "parents"
             ].get(parent_id)
@@ -420,6 +588,35 @@ class AtlasFoundationSceneBuilder:
             is_building_part = (
                 raw_tags.get("building:part") is not None
             )
+
+            containing_parent_record = None
+
+            if not is_building_part:
+                def positive_number(value):
+                    try:
+                        return (
+                            float(str(value).strip()) > 0.0
+                        )
+                    except (TypeError, ValueError):
+                        return False
+
+                has_elevated_component_semantics = (
+                    positive_number(
+                        raw_tags.get("min_height")
+                    )
+                    or positive_number(
+                        raw_tags.get("building:min_level")
+                    )
+                )
+
+                if has_elevated_component_semantics:
+                    containing_parent_record = (
+                        AtlasFoundationSceneBuilder
+                        ._find_containing_special_parent_record(
+                            raw_building=raw_building,
+                            raw_buildings=raw_buildings,
+                        )
+                    )
 
             if bbox is not None and not (
                 AtlasFoundationSceneBuilder._geometry_intersects_bbox(
@@ -695,6 +892,9 @@ class AtlasFoundationSceneBuilder:
                     ),
                     decision_source_counts=(
                         building_roof_decision_source_counts
+                    ),
+                    containing_parent_record=(
+                        containing_parent_record
                     ),
                 )
             )
