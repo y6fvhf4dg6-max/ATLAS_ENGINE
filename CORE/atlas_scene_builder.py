@@ -11,6 +11,9 @@ from CORE.atlas_building_roof_metadata_profiler import (
 from CORE.atlas_building_gable_roof_builder import (
     AtlasBuildingGableRoofBuilder,
 )
+from CORE.atlas_building_hipped_roof_builder import (
+    AtlasBuildingHippedRoofBuilder,
+)
 
 
 class AtlasSceneBuilder:
@@ -100,6 +103,10 @@ class AtlasSceneBuilder:
                 )
 
                 mesh = AtlasBuildingGableRoofBuilder.apply(
+                    mesh
+                )
+
+                mesh = AtlasBuildingHippedRoofBuilder.apply(
                     mesh
                 )
 

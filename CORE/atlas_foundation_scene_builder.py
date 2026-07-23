@@ -8,6 +8,9 @@ from CORE.atlas_building_roof_profiler import (
 from CORE.atlas_building_gable_roof_builder import (
     AtlasBuildingGableRoofBuilder,
 )
+from CORE.atlas_building_hipped_roof_builder import (
+    AtlasBuildingHippedRoofBuilder,
+)
 from CORE.atlas_foundation_first_pipeline import (
     AtlasFoundationFirstPipeline,
 )
@@ -604,6 +607,10 @@ class AtlasFoundationSceneBuilder:
             )
 
             mesh = AtlasBuildingGableRoofBuilder.apply(
+                mesh
+            )
+
+            mesh = AtlasBuildingHippedRoofBuilder.apply(
                 mesh
             )
 
