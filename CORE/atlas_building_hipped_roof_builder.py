@@ -137,16 +137,34 @@ class AtlasBuildingHippedRoofBuilder:
 
         roof_triangles = []
 
+        ring_coordinates = [
+            (float(point[0]), float(point[1]))
+            for point in ring
+        ]
+
+        ring_is_counter_clockwise = (
+            AtlasBuildingHippedRoofBuilder
+            ._signed_area_2d(ring_coordinates)
+            > 0.0
+        )
+
         for index, point_1 in enumerate(ring):
             point_2 = ring[(index + 1) % len(ring)]
 
-            roof_triangles.append(
-                (
+            if ring_is_counter_clockwise:
+                triangle = (
                     point_1,
                     point_2,
                     apex,
                 )
-            )
+            else:
+                triangle = (
+                    point_2,
+                    point_1,
+                    apex,
+                )
+
+            roof_triangles.append(triangle)
 
         mesh["triangles"] = [
             *remaining_triangles,

@@ -397,3 +397,92 @@ def test_non_star_shaped_footprint_has_no_visibility_kernel():
     )
 
     assert apex_xy is None
+
+
+def _clockwise_rectangular_mesh():
+    bottom = [
+        (0.0, 5.0, 1.0),
+        (8.0, 5.0, 1.0),
+        (8.0, 0.0, 1.0),
+        (0.0, 0.0, 1.0),
+    ]
+
+    top = [
+        (0.0, 5.0, 5.0),
+        (8.0, 5.0, 5.0),
+        (8.0, 0.0, 5.0),
+        (0.0, 0.0, 5.0),
+    ]
+
+    triangles = [
+        # Alt kapak: dış normal aşağı
+        (bottom[0], bottom[1], bottom[2]),
+        (bottom[0], bottom[2], bottom[3]),
+        # Üst kapak: dış normal yukarı
+        (top[0], top[2], top[1]),
+        (top[0], top[3], top[2]),
+    ]
+
+    walls = []
+
+    for index, bottom_1 in enumerate(bottom):
+        next_index = (index + 1) % len(bottom)
+
+        bottom_2 = bottom[next_index]
+        top_1 = top[index]
+        top_2 = top[next_index]
+
+        triangles.extend(
+            [
+                (bottom_1, bottom_2, top_2),
+                (bottom_1, top_2, top_1),
+            ]
+        )
+
+        walls.append(
+            (
+                bottom_1,
+                bottom_2,
+                top_2,
+                top_1,
+            )
+        )
+
+    return {
+        "bottom": bottom,
+        "top": top,
+        "walls": walls,
+        "triangles": triangles,
+        "foundation_z": 1.0,
+        "building_roof_profile": "hipped",
+    }
+
+
+def _triangle_normal_z(triangle):
+    point_1, point_2, point_3 = triangle
+
+    edge_1_x = point_2[0] - point_1[0]
+    edge_1_y = point_2[1] - point_1[1]
+
+    edge_2_x = point_3[0] - point_1[0]
+    edge_2_y = point_3[1] - point_1[1]
+
+    return (
+        edge_1_x * edge_2_y
+        - edge_1_y * edge_2_x
+    )
+
+
+def test_clockwise_hipped_roof_faces_point_upward():
+    mesh = _clockwise_rectangular_mesh()
+
+    result = AtlasBuildingHippedRoofBuilder.apply(mesh)
+
+    roof_triangles = result[
+        "building_hipped_roof_triangles"
+    ]
+
+    assert len(roof_triangles) == 4
+
+    for triangle in roof_triangles:
+        assert _triangle_normal_z(triangle) > 0.0
