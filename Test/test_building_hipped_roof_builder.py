@@ -486,3 +486,19 @@ def test_clockwise_hipped_roof_faces_point_upward():
 
     for triangle in roof_triangles:
         assert _triangle_normal_z(triangle) > 0.0
+
+
+def test_general_hipped_roof_does_not_modify_castle_mesh():
+    mesh = _rectangular_mesh()
+    mesh["is_castle_building"] = True
+
+    original_triangles = list(mesh["triangles"])
+    original_top_z = mesh.get("top_z")
+
+    result = AtlasBuildingHippedRoofBuilder.apply(mesh)
+
+    assert result is mesh
+    assert result["triangles"] == original_triangles
+    assert result.get("top_z") == original_top_z
+    assert "building_hipped_roof_applied" not in result
+    assert "roof_geometry" not in result

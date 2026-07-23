@@ -38,6 +38,9 @@ class AtlasBuildingGableRoofBuilder:
         if mesh.get("building_roof_profile") != "gable":
             return mesh
 
+        if mesh.get("is_castle_building") is True:
+            return mesh
+
         top_points = mesh.get("top", [])
         bottom_points = mesh.get("bottom", [])
 

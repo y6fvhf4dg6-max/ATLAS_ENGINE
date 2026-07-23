@@ -288,3 +288,19 @@ def test_gable_roof_derives_z_levels_from_real_mesh_points():
     assert result["top_z"] == result["roof_top_z"]
     assert len(result["building_gable_roof_triangles"]) == 8
     assert len(result["triangles"]) == 20
+
+
+def test_general_gable_roof_does_not_modify_castle_mesh():
+    mesh = build_rectangular_building_mesh()
+    mesh["is_castle_building"] = True
+
+    original_triangles = list(mesh["triangles"])
+    original_top_z = mesh.get("top_z")
+
+    result = AtlasBuildingGableRoofBuilder.apply(mesh)
+
+    assert result is mesh
+    assert result["triangles"] == original_triangles
+    assert result.get("top_z") == original_top_z
+    assert "building_gable_roof_applied" not in result
+    assert "roof_geometry" not in result

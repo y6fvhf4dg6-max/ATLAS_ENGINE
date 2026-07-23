@@ -36,6 +36,9 @@ class AtlasBuildingHippedRoofBuilder:
         if mesh.get("building_roof_profile") != "hipped":
             return mesh
 
+        if mesh.get("is_castle_building") is True:
+            return mesh
+
         top_points = mesh.get("top", [])
         bottom_points = mesh.get("bottom", [])
 
