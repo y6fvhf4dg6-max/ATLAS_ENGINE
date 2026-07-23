@@ -83,6 +83,33 @@ class AtlasFoundationFirstEngine:
     BASE_PLATE_HEIGHT_MM = 0.80
 
     @staticmethod
+    def _resolve_scene_scale(
+        bbox,
+        target_size_mm,
+        bed_width_mm,
+        bed_depth_mm,
+        margin_mm,
+        fixed_xy_scale,
+        use_fixed_xy_scale,
+        debug=True,
+    ):
+        if use_fixed_xy_scale:
+            return AtlasScaleEngine.calculate_dimensions_from_scale(
+                bbox=bbox,
+                xy_scale=fixed_xy_scale,
+                debug=debug,
+            )
+
+        return AtlasScaleEngine.calculate_fit_from_bbox(
+            bbox=bbox,
+            target_size_mm=target_size_mm,
+            bed_width_mm=bed_width_mm,
+            bed_depth_mm=bed_depth_mm,
+            margin_mm=margin_mm,
+            debug=debug,
+        )
+
+    @staticmethod
     def generate_city_stl(
         pbf_path,
         bbox,
@@ -103,6 +130,7 @@ class AtlasFoundationFirstEngine:
         castle_focus=False,
         castle_focus_padding_m=10.0,
         fixed_xy_scale=5500.0,
+        use_fixed_xy_scale=False,
         debug=True,
     ):
         source_bbox = bbox
@@ -246,28 +274,30 @@ class AtlasFoundationFirstEngine:
 
             working_bbox = focus_result["bbox"]
 
-        if use_castle_focus and castle_only:
-            fixed_dimensions = AtlasScaleEngine.calculate_dimensions_from_scale(
-                bbox=working_bbox,
-                xy_scale=fixed_xy_scale,
-                debug=debug,
+        fixed_scale_mode = bool(
+            use_fixed_xy_scale
+            or (
+                use_castle_focus
+                and castle_only
             )
+        )
 
-            xy_scale = fixed_dimensions["xy_scale"]
+        scale_result = AtlasFoundationFirstEngine._resolve_scene_scale(
+            bbox=working_bbox,
+            target_size_mm=target_size_mm,
+            bed_width_mm=bed_width_mm,
+            bed_depth_mm=bed_depth_mm,
+            margin_mm=margin_mm,
+            fixed_xy_scale=fixed_xy_scale,
+            use_fixed_xy_scale=fixed_scale_mode,
+            debug=debug,
+        )
 
-            size_x_mm = fixed_dimensions["size_x_mm"]
+        xy_scale = scale_result["xy_scale"]
 
-            size_y_mm = fixed_dimensions["size_y_mm"]
-
-        else:
-            xy_scale = AtlasScaleEngine.calculate_xy_scale_from_bbox(
-                bbox=working_bbox,
-                target_size_mm=target_size_mm,
-                bed_width_mm=bed_width_mm,
-                bed_depth_mm=bed_depth_mm,
-                margin_mm=margin_mm,
-                debug=debug,
-            )
+        if fixed_scale_mode:
+            size_x_mm = scale_result["size_x_mm"]
+            size_y_mm = scale_result["size_y_mm"]
 
         south, west, _north, _east = working_bbox
 
