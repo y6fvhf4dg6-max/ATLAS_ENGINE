@@ -25,6 +25,7 @@ class AtlasMeshBuilder:
     MIN_MODEL_DEPTH_MM = 1.20
     MIN_BUILDING_PART_WIDTH_MM = 1.00
     MIN_BUILDING_PART_DEPTH_MM = 1.00
+    DIMENSION_EPSILON_MM = 1e-9
     MIN_POINT_COUNT = 4
 
     @staticmethod
@@ -141,7 +142,12 @@ class AtlasMeshBuilder:
             else AtlasMeshBuilder.MIN_MODEL_DEPTH_MM
         )
 
-        if AtlasMeshBuilder._is_minaret(building):
+        if (
+            AtlasMeshBuilder._is_minaret(building)
+            or AtlasMeshBuilder._is_monument_column_part(
+                building
+            )
+        ):
             scaled_points = (
                 AtlasMeshBuilder
                 ._expand_to_minimum_dimensions(
@@ -158,7 +164,11 @@ class AtlasMeshBuilder:
         width_mm = bounds["max_x"] - bounds["min_x"]
         depth_mm = bounds["max_y"] - bounds["min_y"]
 
-        if width_mm < minimum_width_mm:
+        if (
+            width_mm
+            + AtlasMeshBuilder.DIMENSION_EPSILON_MM
+            < minimum_width_mm
+        ):
             return AtlasMeshBuilder._reject(
                 diagnostics,
                 "model_width_below_minimum",
@@ -166,7 +176,11 @@ class AtlasMeshBuilder:
                 minimum_width_mm=minimum_width_mm,
             )
 
-        if depth_mm < minimum_depth_mm:
+        if (
+            depth_mm
+            + AtlasMeshBuilder.DIMENSION_EPSILON_MM
+            < minimum_depth_mm
+        ):
             return AtlasMeshBuilder._reject(
                 diagnostics,
                 "model_depth_below_minimum",
@@ -200,6 +214,21 @@ class AtlasMeshBuilder:
                 tags.get("man_made") == "tower"
                 or tags.get("building:part") is not None
             )
+        )
+
+    @staticmethod
+    def _is_monument_column_part(building):
+        tags = getattr(
+            building,
+            "tags",
+            {},
+        ) or {}
+
+        return (
+            tags.get("building:part") is not None
+            and tags.get(
+                "atlas:monument_column_part"
+            ) == "yes"
         )
 
     @staticmethod

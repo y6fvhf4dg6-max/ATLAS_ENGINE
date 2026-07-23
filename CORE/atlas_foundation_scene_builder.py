@@ -73,6 +73,43 @@ class AtlasFoundationSceneBuilder:
     """
 
     @staticmethod
+    def _mark_monument_column_part(
+        raw_building,
+        parent_record,
+    ):
+        raw_tags = raw_building.get("tags", {}) or {}
+
+        if raw_tags.get("building:part") is None:
+            return raw_building
+
+        parent_tags = (
+            parent_record.get("tags", {})
+            if parent_record is not None
+            else {}
+        ) or {}
+
+        is_mausoleum_parent = (
+            parent_tags.get("tomb") == "mausoleum"
+            or (
+                parent_tags.get("historic") == "tomb"
+                and parent_tags.get("building") is not None
+            )
+        )
+
+        if not is_mausoleum_parent:
+            return raw_building
+
+        marked_tags = dict(raw_tags)
+        marked_tags[
+            "atlas:monument_column_part"
+        ] = "yes"
+
+        return {
+            **raw_building,
+            "tags": marked_tags,
+        }
+
+    @staticmethod
     def _building_roof_metadata(
         atlas_building,
         is_building_part,
@@ -83,6 +120,31 @@ class AtlasFoundationSceneBuilder:
             False,
         ):
             return None
+
+        tags = dict(
+            getattr(
+                atlas_building,
+                "tags",
+                {},
+            )
+            or {}
+        )
+
+        is_mausoleum = (
+            tags.get("tomb") == "mausoleum"
+            or (
+                tags.get("historic") == "tomb"
+                and tags.get("building") is not None
+            )
+        )
+
+        if is_mausoleum:
+            return {
+                "building_roof_profile": "flat",
+                "building_roof_decision_source": "monument",
+                "building_oriented_aspect_ratio": 0.0,
+                "building_rectangularity": 0.0,
+            }
 
         oriented_aspect_ratio = (
             AtlasBuildingAnalyzer.oriented_aspect_ratio(
@@ -378,8 +440,37 @@ class AtlasFoundationSceneBuilder:
                 record_building_rejection("raw_building_unusable")
                 continue
 
+            building_for_preparation = raw_building
+
+            if is_building_part:
+                parent_id = building_part_hierarchy[
+                    "part_to_parent"
+                ].get(
+                    raw_building.get("id")
+                )
+
+                parent_data = building_part_hierarchy[
+                    "parents"
+                ].get(
+                    parent_id
+                )
+
+                parent_record = (
+                    parent_data.get("parent")
+                    if parent_data is not None
+                    else None
+                )
+
+                building_for_preparation = (
+                    AtlasFoundationSceneBuilder
+                    ._mark_monument_column_part(
+                        raw_building=raw_building,
+                        parent_record=parent_record,
+                    )
+                )
+
             prepared_building = AtlasCastleFootprintRegularizer.prepare(
-                raw_building=raw_building,
+                raw_building=building_for_preparation,
                 castles=castles,
             )
 

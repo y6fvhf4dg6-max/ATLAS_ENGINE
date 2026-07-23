@@ -553,3 +553,112 @@ def test_foundation_scene_applies_hipped_roof_geometry(
     assert result_mesh["building_hipped_removed_top_triangles"] == 2
     assert len(result_mesh["building_hipped_roof_triangles"]) == 4
     assert len(result_mesh["triangles"]) == 14
+
+
+def test_mausoleum_building_is_forced_to_flat_roof_metadata():
+    building = make_building(
+        geometry=[
+            (39.0000, 32.0000),
+            (39.0000, 32.0010),
+            (39.0010, 32.0010),
+            (39.0010, 32.0000),
+        ],
+    )
+    building.tags.update(
+        {
+            "historic": "tomb",
+            "tomb": "mausoleum",
+        }
+    )
+
+    result = (
+        AtlasFoundationSceneBuilder
+        ._building_roof_metadata(
+            atlas_building=building,
+            is_building_part=False,
+        )
+    )
+
+    assert result["building_roof_profile"] == "flat"
+    assert (
+        result["building_roof_decision_source"]
+        == "monument"
+    )
+
+
+def test_mausoleum_parent_marks_building_part_as_monument_column():
+    raw_part = {
+        "id": 101,
+        "geometry": [
+            (39.0000, 32.0000),
+            (39.0000, 32.0001),
+            (39.0001, 32.0001),
+            (39.0001, 32.0000),
+        ],
+        "tags": {
+            "building:part": "yes",
+            "height": "15",
+        },
+    }
+    parent_record = {
+        "id": 202,
+        "tags": {
+            "building": "yes",
+            "historic": "tomb",
+            "tomb": "mausoleum",
+        },
+    }
+
+    result = (
+        AtlasFoundationSceneBuilder
+        ._mark_monument_column_part(
+            raw_building=raw_part,
+            parent_record=parent_record,
+        )
+    )
+
+    assert result is not raw_part
+    assert result["tags"] is not raw_part["tags"]
+    assert (
+        result["tags"]["atlas:monument_column_part"]
+        == "yes"
+    )
+    assert (
+        "atlas:monument_column_part"
+        not in raw_part["tags"]
+    )
+
+
+def test_normal_parent_does_not_mark_building_part_as_monument_column():
+    raw_part = {
+        "id": 101,
+        "geometry": [
+            (39.0000, 32.0000),
+            (39.0000, 32.0001),
+            (39.0001, 32.0001),
+            (39.0001, 32.0000),
+        ],
+        "tags": {
+            "building:part": "yes",
+        },
+    }
+    parent_record = {
+        "id": 202,
+        "tags": {
+            "building": "yes",
+        },
+    }
+
+    result = (
+        AtlasFoundationSceneBuilder
+        ._mark_monument_column_part(
+            raw_building=raw_part,
+            parent_record=parent_record,
+        )
+    )
+
+    assert result is raw_part
+    assert (
+        "atlas:monument_column_part"
+        not in result["tags"]
+    )

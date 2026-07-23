@@ -50,6 +50,7 @@ class AtlasFoundationMeshExtruder:
     MIN_MODEL_DEPTH_MM = 1.20
     MIN_BUILDING_PART_WIDTH_MM = 1.00
     MIN_BUILDING_PART_DEPTH_MM = 1.00
+    DIMENSION_EPSILON_MM = 1e-9
     MIN_POINT_COUNT = 4
 
     @staticmethod
@@ -359,13 +360,19 @@ class AtlasFoundationMeshExtruder:
             else AtlasFoundationMeshExtruder.MIN_MODEL_DEPTH_MM
         )
 
-        is_minaret = (
+        should_expand_footprint = (
             AtlasFoundationMeshExtruder._is_minaret(
                 building
             )
+            or (
+                AtlasFoundationMeshExtruder
+                ._is_monument_column_part(
+                    building
+                )
+            )
         )
 
-        if is_minaret:
+        if should_expand_footprint:
             scaled_points = (
                 AtlasFoundationMeshExtruder
                 ._expand_to_minimum_dimensions(
@@ -384,7 +391,11 @@ class AtlasFoundationMeshExtruder:
         width_mm = bounds["max_x"] - bounds["min_x"]
         depth_mm = bounds["max_y"] - bounds["min_y"]
 
-        if width_mm < minimum_width_mm:
+        if (
+            width_mm
+            + AtlasFoundationMeshExtruder.DIMENSION_EPSILON_MM
+            < minimum_width_mm
+        ):
             return AtlasFoundationMeshExtruder._reject(
                 diagnostics,
                 "model_width_below_minimum",
@@ -392,7 +403,11 @@ class AtlasFoundationMeshExtruder:
                 minimum_width_mm=minimum_width_mm,
             )
 
-        if depth_mm < minimum_depth_mm:
+        if (
+            depth_mm
+            + AtlasFoundationMeshExtruder.DIMENSION_EPSILON_MM
+            < minimum_depth_mm
+        ):
             return AtlasFoundationMeshExtruder._reject(
                 diagnostics,
                 "model_depth_below_minimum",
@@ -426,6 +441,21 @@ class AtlasFoundationMeshExtruder:
                 tags.get("man_made") == "tower"
                 or tags.get("building:part") is not None
             )
+        )
+
+    @staticmethod
+    def _is_monument_column_part(building):
+        tags = getattr(
+            building,
+            "tags",
+            {},
+        ) or {}
+
+        return (
+            tags.get("building:part") is not None
+            and tags.get(
+                "atlas:monument_column_part"
+            ) == "yes"
         )
 
     @staticmethod

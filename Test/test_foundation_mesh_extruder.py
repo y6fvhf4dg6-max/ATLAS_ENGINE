@@ -692,3 +692,74 @@ def test_legacy_mesh_builder_prints_report_when_debug_is_true(
         "ATLAS GEOMETRY INSPECTOR — SUSPECT BUILDING"
         in captured.out
     )
+
+
+def test_monument_column_part_expands_to_printable_dimensions():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.75),
+            (0.82, 0.75),
+            (0.82, 0.0),
+        ],
+        area_m2=7.5,
+        estimated_height=15.0,
+        is_building_part=True,
+        tags={
+            "building:part": "yes",
+            "atlas:monument_column_part": "yes",
+        },
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is not None
+    assert diagnostics["accepted"] is True
+
+    xs = [point[0] for point in mesh["bottom"]]
+    ys = [point[1] for point in mesh["bottom"]]
+
+    assert max(xs) - min(xs) == pytest.approx(1.0)
+    assert max(ys) - min(ys) == pytest.approx(1.0)
+
+
+def test_legacy_mesh_builder_expands_monument_column_part():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 0.75),
+            (0.82, 0.75),
+            (0.82, 0.0),
+        ],
+        area_m2=7.5,
+        estimated_height=15.0,
+        is_building_part=True,
+        tags={
+            "building:part": "yes",
+            "atlas:monument_column_part": "yes",
+        },
+    )
+
+    diagnostics = {}
+
+    points = AtlasMeshBuilder.prepare_geometry(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        diagnostics=diagnostics,
+    )
+
+    assert points is not None
+    assert diagnostics == {}
+
+    xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
+
+    assert max(xs) - min(xs) == pytest.approx(1.0)
+    assert max(ys) - min(ys) == pytest.approx(1.0)
