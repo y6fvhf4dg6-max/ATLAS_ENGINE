@@ -14,6 +14,9 @@ Normal şehir binaları için dört eğimli kırma çatı üretir.
 
 import math
 
+from shapely.geometry import Point
+from shapely.geometry import Polygon
+
 
 class AtlasBuildingHippedRoofBuilder:
     POINT_PRECISION = 9
@@ -118,18 +121,17 @@ class AtlasBuildingHippedRoofBuilder:
             .MAX_ROOF_HEIGHT_MM,
         )
 
-        centroid_x = (
-            sum(point[0] for point in ring)
-            / len(ring)
-        )
-        centroid_y = (
-            sum(point[1] for point in ring)
-            / len(ring)
+        apex_xy = (
+            AtlasBuildingHippedRoofBuilder
+            ._select_apex_xy(ring)
         )
 
+        if apex_xy is None:
+            return mesh
+
         apex = (
-            centroid_x,
-            centroid_y,
+            apex_xy[0],
+            apex_xy[1],
             float(top_z) + roof_height_mm,
         )
 
@@ -168,6 +170,234 @@ class AtlasBuildingHippedRoofBuilder:
         mesh["building_hipped_roof_applied"] = True
 
         return mesh
+
+    @staticmethod
+    def _select_apex_xy(ring):
+        polygon = Polygon(
+            [
+                (point[0], point[1])
+                for point in ring
+            ]
+        )
+
+        if polygon.is_empty or not polygon.is_valid:
+            return None
+
+        coordinates = [
+            (float(point[0]), float(point[1]))
+            for point in ring
+        ]
+
+        kernel = (
+            AtlasBuildingHippedRoofBuilder
+            ._build_visibility_kernel(coordinates)
+        )
+
+        if len(kernel) < 3:
+            return None
+
+        kernel_polygon = Polygon(kernel)
+
+        if (
+            kernel_polygon.is_empty
+            or not kernel_polygon.is_valid
+            or kernel_polygon.area
+            <= AtlasBuildingHippedRoofBuilder.Z_TOLERANCE
+        ):
+            return None
+
+        arithmetic_center = Point(
+            sum(point[0] for point in coordinates)
+            / len(coordinates),
+            sum(point[1] for point in coordinates)
+            / len(coordinates),
+        )
+
+        if kernel_polygon.covers(arithmetic_center):
+            selected_point = arithmetic_center
+        else:
+            selected_point = kernel_polygon.centroid
+
+            if not kernel_polygon.covers(selected_point):
+                selected_point = (
+                    kernel_polygon.representative_point()
+                )
+
+        if not kernel_polygon.covers(selected_point):
+            return None
+
+        return (
+            float(selected_point.x),
+            float(selected_point.y),
+        )
+
+    @staticmethod
+    def _build_visibility_kernel(coordinates):
+        if len(coordinates) < 3:
+            return []
+
+        xs = [point[0] for point in coordinates]
+        ys = [point[1] for point in coordinates]
+
+        min_x = min(xs)
+        max_x = max(xs)
+        min_y = min(ys)
+        max_y = max(ys)
+
+        span = max(
+            max_x - min_x,
+            max_y - min_y,
+            1.0,
+        )
+        margin = span * 4.0
+
+        kernel = [
+            (min_x - margin, min_y - margin),
+            (max_x + margin, min_y - margin),
+            (max_x + margin, max_y + margin),
+            (min_x - margin, max_y + margin),
+        ]
+
+        signed_area = (
+            AtlasBuildingHippedRoofBuilder
+            ._signed_area_2d(coordinates)
+        )
+
+        if abs(signed_area) <= (
+            AtlasBuildingHippedRoofBuilder
+            .Z_TOLERANCE
+        ):
+            return []
+
+        orientation = 1.0 if signed_area > 0.0 else -1.0
+
+        for index, edge_start in enumerate(coordinates):
+            edge_end = coordinates[
+                (index + 1) % len(coordinates)
+            ]
+
+            kernel = (
+                AtlasBuildingHippedRoofBuilder
+                ._clip_polygon_to_interior_half_plane(
+                    polygon=kernel,
+                    edge_start=edge_start,
+                    edge_end=edge_end,
+                    orientation=orientation,
+                )
+            )
+
+            if len(kernel) < 3:
+                return []
+
+        return kernel
+
+    @staticmethod
+    def _clip_polygon_to_interior_half_plane(
+        polygon,
+        edge_start,
+        edge_end,
+        orientation,
+    ):
+        if not polygon:
+            return []
+
+        result = []
+
+        previous = polygon[-1]
+        previous_value = (
+            AtlasBuildingHippedRoofBuilder
+            ._oriented_edge_value(
+                point=previous,
+                edge_start=edge_start,
+                edge_end=edge_end,
+                orientation=orientation,
+            )
+        )
+        previous_inside = previous_value >= (
+            -AtlasBuildingHippedRoofBuilder
+            .Z_TOLERANCE
+        )
+
+        for current in polygon:
+            current_value = (
+                AtlasBuildingHippedRoofBuilder
+                ._oriented_edge_value(
+                    point=current,
+                    edge_start=edge_start,
+                    edge_end=edge_end,
+                    orientation=orientation,
+                )
+            )
+            current_inside = current_value >= (
+                -AtlasBuildingHippedRoofBuilder
+                .Z_TOLERANCE
+            )
+
+            if current_inside != previous_inside:
+                denominator = (
+                    previous_value - current_value
+                )
+
+                if abs(denominator) > (
+                    AtlasBuildingHippedRoofBuilder
+                    .Z_TOLERANCE
+                ):
+                    ratio = previous_value / denominator
+
+                    intersection = (
+                        previous[0]
+                        + ratio
+                        * (current[0] - previous[0]),
+                        previous[1]
+                        + ratio
+                        * (current[1] - previous[1]),
+                    )
+                    result.append(intersection)
+
+            if current_inside:
+                result.append(current)
+
+            previous = current
+            previous_value = current_value
+            previous_inside = current_inside
+
+        return result
+
+    @staticmethod
+    def _oriented_edge_value(
+        point,
+        edge_start,
+        edge_end,
+        orientation,
+    ):
+        edge_x = edge_end[0] - edge_start[0]
+        edge_y = edge_end[1] - edge_start[1]
+
+        point_x = point[0] - edge_start[0]
+        point_y = point[1] - edge_start[1]
+
+        cross_product = (
+            edge_x * point_y
+            - edge_y * point_x
+        )
+
+        return orientation * cross_product
+
+    @staticmethod
+    def _signed_area_2d(coordinates):
+        area_twice = 0.0
+
+        for index, point_1 in enumerate(coordinates):
+            point_2 = coordinates[
+                (index + 1) % len(coordinates)
+            ]
+
+            area_twice += (
+                point_1[0] * point_2[1]
+                - point_2[0] * point_1[1]
+            )
+
+        return area_twice * 0.5
 
     @staticmethod
     def _derive_z_level(points, mode):
