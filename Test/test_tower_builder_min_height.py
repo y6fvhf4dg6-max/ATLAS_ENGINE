@@ -16,3 +16,18 @@ def test_builder_uses_min_height_when_height_non_numeric_and_levels_missing():
     )
     geom = AtlasTowerBuilder.build(lm)
     assert geom.height_m == 90.0
+def test_builder_uses_levels_when_height_non_numeric():
+    lm = AtlasLandmark(
+        id=105,
+        landmark_type=AtlasLandmarkType.TOWER,
+        geometry=((0, 0), (1, 0), (1, 1), (0, 1)),
+        tags={
+            "height": "unknown",
+            "building:levels": "12",
+        },
+        source="OSM",
+    )
+
+    result = AtlasTowerBuilder.build(lm)
+
+    assert result.height_m == 12 * AtlasTowerBuilder.FLOOR_HEIGHT_M
