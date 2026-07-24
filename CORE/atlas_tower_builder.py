@@ -18,6 +18,7 @@ class AtlasTowerGeometry:
 
 class AtlasTowerBuilder:
     DEFAULT_HEIGHT_M = 60.0
+    FOOTPRINT_HEIGHT_FACTOR = 6.0
     FLOOR_HEIGHT_M   = 3.5
 
     @staticmethod
@@ -26,6 +27,21 @@ class AtlasTowerBuilder:
             return float(val)
         except (TypeError, ValueError):
             return None
+    @staticmethod
+    def _estimate_height_from_footprint(footprint):
+        if not footprint:
+            return None
+
+        xs = [p[0] for p in footprint]
+        ys = [p[1] for p in footprint]
+
+        span = max(max(xs) - min(xs), max(ys) - min(ys))
+        estimated = span * AtlasTowerBuilder.FOOTPRINT_HEIGHT_FACTOR
+
+        if estimated <= AtlasTowerBuilder.DEFAULT_HEIGHT_M:
+            return None
+        return estimated
+
 
     @staticmethod
     def build(landmark) -> "AtlasTowerGeometry":
@@ -43,7 +59,11 @@ class AtlasTowerBuilder:
         # 3) min_height
         if height_m is None:
             height_m = AtlasTowerBuilder._try_float(landmark.tags.get("min_height"))
-
+        # 4) footprint tahmini
+        if height_m is None:
+            height_m = AtlasTowerBuilder._estimate_height_from_footprint(
+                landmark.geometry
+            )
         # 4) varsayılan
         if height_m is None:
             height_m = AtlasTowerBuilder.DEFAULT_HEIGHT_M

@@ -66,3 +66,22 @@ def test_builder_preserves_footprint():
     result = AtlasTowerBuilder.build(lm)
 
     assert result.footprint == footprint
+def test_builder_estimates_height_from_footprint_when_no_height_information():
+    footprint = (
+        (0.0, 0.0),
+        (12.0, 0.0),
+        (12.0, 12.0),
+        (0.0, 12.0),
+    )
+
+    lm = AtlasLandmark(
+        id=108,
+        landmark_type=AtlasLandmarkType.TOWER,
+        geometry=footprint,
+        tags={},
+        source="OSM",
+    )
+
+    result = AtlasTowerBuilder.build(lm)
+
+    assert result.height_m > AtlasTowerBuilder.DEFAULT_HEIGHT_M
