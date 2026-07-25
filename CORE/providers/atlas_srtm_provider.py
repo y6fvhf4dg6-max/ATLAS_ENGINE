@@ -2,22 +2,23 @@
 
 import math
 import os
-import struct
+
+import numpy as np
 
 from CORE.atlas_terrain_provider import AtlasTerrainProvider
 
 
 class AtlasSRTMProvider(AtlasTerrainProvider):
     """
-    ATLAS SRTM Provider v0.2
+    ATLAS SRTM Provider v0.3
 
-    Reads SRTM .hgt tiles.
-
-    Expected file example:
-    Data/TERRAIN/SRTM/N39E032.hgt
+    Supports:
+    - SRTM1: 3601 × 3601
+    - SRTM3: 1201 × 1201
     """
 
     TILE_SIZE = 3601
+    SUPPORTED_TILE_SIZES = (3601, 1201)
     NO_DATA_VALUE = -32768
 
     def __init__(self, data_dir="Data/TERRAIN/SRTM", debug=True):
@@ -35,18 +36,28 @@ class AtlasSRTMProvider(AtlasTerrainProvider):
             return None
 
         data = self._load_tile(tile_path)
+        tile_size = int(data.shape[0])
 
         lat_floor = math.floor(lat)
         lon_floor = math.floor(lon)
 
-        row = int(round((lat_floor + 1.0 - lat) * (self.TILE_SIZE - 1)))
-        col = int(round((lon - lon_floor) * (self.TILE_SIZE - 1)))
+        row = int(
+            round(
+                (lat_floor + 1.0 - lat)
+                * (tile_size - 1)
+            )
+        )
+        col = int(
+            round(
+                (lon - lon_floor)
+                * (tile_size - 1)
+            )
+        )
 
-        row = max(0, min(self.TILE_SIZE - 1, row))
-        col = max(0, min(self.TILE_SIZE - 1, col))
+        row = max(0, min(tile_size - 1, row))
+        col = max(0, min(tile_size - 1, col))
 
-        index = row * self.TILE_SIZE + col
-        height = data[index]
+        height = data[row, col]
 
         if height == self.NO_DATA_VALUE:
             return None
@@ -57,20 +68,27 @@ class AtlasSRTMProvider(AtlasTerrainProvider):
         if tile_path in self.tile_cache:
             return self.tile_cache[tile_path]
 
-        expected_values = self.TILE_SIZE * self.TILE_SIZE
+        data = np.fromfile(tile_path, dtype=">i2")
+        actual_values = int(data.size)
 
-        with open(tile_path, "rb") as file:
-            raw = file.read()
+        tile_size = None
+        for candidate in self.SUPPORTED_TILE_SIZES:
+            if actual_values == candidate * candidate:
+                tile_size = candidate
+                break
 
-        actual_values = len(raw) // 2
-
-        if actual_values != expected_values:
+        if tile_size is None:
+            expected = ", ".join(
+                str(size * size)
+                for size in self.SUPPORTED_TILE_SIZES
+            )
             raise ValueError(
                 f"Invalid SRTM tile size: {tile_path} "
-                f"expected {expected_values} values, got {actual_values}"
+                f"expected one of [{expected}] values, "
+                f"got {actual_values}"
             )
 
-        data = struct.unpack(f">{expected_values}h", raw)
+        data = data.reshape((tile_size, tile_size))
         self.tile_cache[tile_path] = data
 
         return data
