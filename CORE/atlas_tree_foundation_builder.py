@@ -90,6 +90,13 @@ class AtlasTreeFoundationBuilder:
                 base_z=base_z,
                 rng=rng,
             )
+        elif tree_kind == "park_tree_symbol":
+            triangles = AtlasTreeFoundationBuilder._build_park_tree_symbol(
+                x=x,
+                y=y,
+                base_z=base_z,
+                rng=rng,
+            )
         else:
             triangles = AtlasTreeFoundationBuilder._build_round_tree(
                 x=x,
@@ -98,9 +105,14 @@ class AtlasTreeFoundationBuilder:
                 rng=rng,
             )
 
+        tags = dict(tree.get("tags") or {})
+
         return {
             "type": "tree_foundation",
+            "tree_id": tree.get("id", index),
             "tree_type": tree_kind,
+            "source": AtlasTreeFoundationBuilder._resolve_source(tree),
+            "tags": tags,
             "bottom": [],
             "top": [],
             "walls": [],
@@ -120,7 +132,7 @@ class AtlasTreeFoundationBuilder:
         source = (tree.get("source") or tags.get("source") or "").lower()
 
         if source == "worldcover":
-            return "round"
+            return "park_tree_symbol"
 
         leaf_type = tags.get("leaf_type")
         genus = (tags.get("genus") or "").lower()
@@ -306,6 +318,164 @@ class AtlasTreeFoundationBuilder:
         AtlasTreeFoundationBuilder._cap_bottom(triangles, trunk_bottom, (x, y, base_z))
 
         return triangles
+
+    @staticmethod
+    def _round_crown_profile(
+        crown_radius,
+        crown_height,
+    ):
+        del crown_radius, crown_height
+
+        return [
+            (0.00, 0.28),
+            (0.16, 0.68),
+            (0.38, 1.00),
+            (0.64, 0.82),
+            (0.84, 0.46),
+            (1.00, 0.00),
+        ]
+
+    @staticmethod
+    def _round_crown_lobes(rng):
+        lobes = []
+
+        for angle_index in range(4):
+            angle = (
+                2.0
+                * math.pi
+                * angle_index
+                / 4.0
+                + rng.uniform(-0.30, 0.30)
+            )
+
+            offset = rng.uniform(0.06, 0.18)
+
+            lobes.append(
+                {
+                    "offset_x": math.cos(angle) * offset,
+                    "offset_y": math.sin(angle) * offset,
+                    "radius_scale": rng.uniform(0.82, 1.12),
+                    "height_scale": rng.uniform(0.88, 1.10),
+                }
+            )
+
+        return lobes
+
+    @staticmethod
+    def _park_tree_symbol_profile():
+        return [
+            (0.00, 0.52),
+            (0.22, 0.78),
+            (0.52, 1.00),
+            (0.78, 0.64),
+            (1.00, 0.00),
+        ]
+
+    @staticmethod
+    def _park_tree_symbol_dimensions(rng):
+        return {
+            "height_mm": rng.uniform(1.0, 1.4),
+            "diameter_mm": rng.uniform(0.60, 1.10),
+        }
+
+    @staticmethod
+    def _build_park_tree_symbol(
+        x,
+        y,
+        base_z,
+        rng,
+    ):
+        dimensions = (
+            AtlasTreeFoundationBuilder
+            ._park_tree_symbol_dimensions(rng)
+        )
+        profile = (
+            AtlasTreeFoundationBuilder
+            ._park_tree_symbol_profile()
+        )
+
+        height = dimensions["height_mm"]
+        radius = dimensions["diameter_mm"] / 2.0
+        segment_count = AtlasTreeFoundationBuilder.TREE_SEGMENTS
+
+        rings = []
+
+        for height_scale, radius_scale in profile:
+            if radius_scale <= 0.0:
+                continue
+
+            ring = []
+
+            for index in range(segment_count):
+                angle = (
+                    2.0
+                    * math.pi
+                    * index
+                    / segment_count
+                )
+
+                ring.append(
+                    (
+                        x + math.cos(angle) * radius * radius_scale,
+                        y + math.sin(angle) * radius * radius_scale,
+                        base_z + height * height_scale,
+                    )
+                )
+
+            rings.append(ring)
+
+        triangles = []
+
+        for lower, upper in zip(rings, rings[1:]):
+            AtlasTreeFoundationBuilder._ring_to_ring(
+                triangles,
+                lower,
+                upper,
+            )
+
+        tip = (
+            x,
+            y,
+            base_z + height,
+        )
+
+        AtlasTreeFoundationBuilder._ring_to_tip(
+            triangles,
+            rings[-1],
+            tip,
+        )
+        AtlasTreeFoundationBuilder._cap_bottom(
+            triangles,
+            rings[0],
+            (x, y, base_z),
+        )
+
+        return triangles
+
+    @staticmethod
+    def _resolve_source(tree):
+        tags = tree.get("tags") or {}
+
+        source = tree.get("source") or tags.get("source")
+
+        if not isinstance(source, str):
+            return "osm"
+
+        normalized = source.strip().lower()
+
+        known_sources = {
+            "worldcover",
+            "osm_green_area_fill",
+            "osm",
+        }
+
+        if normalized in known_sources:
+            return normalized
+
+        if "://" in normalized or normalized.startswith("www."):
+            return "osm"
+
+        return normalized or "osm"
 
     @staticmethod
     def _ring_to_ring(triangles, lower, upper):
