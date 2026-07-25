@@ -81,6 +81,48 @@ class AtlasFoundationSampler:
             ),
         )
 
+        cell_levels = terrain_mesh.get("cell_levels")
+        is_terraced = bool(
+            metadata.get("terraced")
+            or terrain_mesh.get("type")
+            == "terrain_terraced_closed_slab"
+        )
+
+        expected_rows = row_count - 1
+        expected_columns = column_count - 1
+
+        valid_cell_levels = (
+            is_terraced
+            and isinstance(cell_levels, (list, tuple))
+            and len(cell_levels) == expected_rows
+            and expected_rows > 0
+            and expected_columns > 0
+            and all(
+                isinstance(row, (list, tuple))
+                and len(row) == expected_columns
+                for row in cell_levels
+            )
+        )
+
+        if valid_cell_levels:
+            cell_x = int(
+                x / size_x_mm * expected_columns
+            )
+            cell_y = int(
+                y / size_y_mm * expected_rows
+            )
+
+            cell_x = max(
+                0,
+                min(expected_columns - 1, cell_x),
+            )
+            cell_y = max(
+                0,
+                min(expected_rows - 1, cell_y),
+            )
+
+            return float(cell_levels[cell_y][cell_x])
+
         gx = x / size_x_mm * (column_count - 1)
 
         gy = y / size_y_mm * (row_count - 1)
