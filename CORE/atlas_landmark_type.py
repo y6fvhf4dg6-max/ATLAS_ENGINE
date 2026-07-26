@@ -16,6 +16,7 @@ class AtlasLandmarkType(Enum):
     CHIMNEY = auto()
 
     ARCH = auto()
+    BRIDGE = auto()
 
     CASTLE = auto()
     FORTRESS = auto()
