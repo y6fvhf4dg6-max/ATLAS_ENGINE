@@ -154,3 +154,28 @@ def test_bridge_builder_rejects_invalid_pier_counts():
 
         assert result.metadata["bridge_pier_count"] == 0
         assert result.metadata["bridge_pier_positions"] == ()
+
+def test_bridge_builder_falls_back_for_invalid_pier_dimensions():
+    landmark = AtlasLandmark(
+        id=112,
+        landmark_type=AtlasLandmarkType.BRIDGE,
+        geometry=((0.0, 0.0), (20.0, 0.0)),
+        tags={
+            "bridge": "yes",
+            "bridge:pier_count": "2",
+            "bridge:pier_width": "0",
+            "bridge:pier_depth": "-1",
+        },
+        source="osm",
+    )
+
+    result = AtlasBridgeBuilder.build(landmark)
+
+    assert (
+        result.metadata["bridge_pier_width_m"]
+        == AtlasBridgeBuilder.DEFAULT_PIER_WIDTH_M
+    )
+    assert (
+        result.metadata["bridge_pier_depth_m"]
+        == AtlasBridgeBuilder.DEFAULT_PIER_DEPTH_M
+    )

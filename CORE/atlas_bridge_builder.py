@@ -55,13 +55,13 @@ class AtlasBridgeBuilder:
         pier_width_m = AtlasBridgeBuilder._try_float(
             tags.get("bridge:pier_width")
         )
-        if pier_width_m is None:
+        if pier_width_m is None or pier_width_m <= 0.0:
             pier_width_m = AtlasBridgeBuilder.DEFAULT_PIER_WIDTH_M
 
         pier_depth_m = AtlasBridgeBuilder._try_float(
             tags.get("bridge:pier_depth")
         )
-        if pier_depth_m is None:
+        if pier_depth_m is None or pier_depth_m <= 0.0:
             pier_depth_m = AtlasBridgeBuilder.DEFAULT_PIER_DEPTH_M
 
         pier_base_m = 0.0
