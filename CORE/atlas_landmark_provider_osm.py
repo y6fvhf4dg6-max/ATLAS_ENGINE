@@ -14,6 +14,11 @@ class AtlasLandmarkProviderOsm(AtlasLandmarkProvider):
 
         if tags.get("bridge") == "yes" or tags.get("man_made") == "bridge":
             landmark_type = AtlasLandmarkType.BRIDGE
+        elif (
+            tags.get("man_made") == "tower"
+            or tags.get("historic") == "tower"
+        ):
+            landmark_type = AtlasLandmarkType.TOWER
         elif tags.get("historic") == "memorial":
             landmark_type = AtlasLandmarkType.MEMORIAL
         else:
