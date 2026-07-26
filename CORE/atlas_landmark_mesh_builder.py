@@ -1,4 +1,8 @@
 from CORE.atlas_bridge_builder import AtlasBridgeBuilder
+from CORE.atlas_foundation_sampler import AtlasFoundationSampler
+from CORE.atlas_foundation_surface_builder import (
+    AtlasFoundationSurfaceBuilder,
+)
 from CORE.atlas_landmark_geometry_mesher import (
     AtlasLandmarkGeometryMesher,
 )
@@ -29,12 +33,17 @@ class AtlasLandmarkMeshBuilder:
         if terrain_mesh is None:
             return mesh
 
+        foundation_z = cls._resolve_foundation_z(
+            terrain_mesh=terrain_mesh,
+            footprint=geometry.footprint,
+        )
+
         mesh["triangles"] = [
             tuple(
                 (
                     x,
                     y,
-                    z + float(terrain_mesh.sample_height(x, y)),
+                    z + foundation_z,
                 )
                 for x, y, z in triangle
             )
@@ -47,7 +56,7 @@ class AtlasLandmarkMeshBuilder:
                     (
                         x,
                         y,
-                        z + float(terrain_mesh.sample_height(x, y)),
+                        z + foundation_z,
                     )
                     for x, y, z in mesh[key]
                 )
@@ -58,11 +67,103 @@ class AtlasLandmarkMeshBuilder:
                     (
                         x,
                         y,
-                        z + float(terrain_mesh.sample_height(x, y)),
+                        z + foundation_z,
                     )
                     for x, y, z in ring
                 )
                 for ring in mesh["rings"]
             )
 
+        mesh["foundation_z"] = foundation_z
+
         return mesh
+
+    @classmethod
+    def _resolve_foundation_z(
+        cls,
+        *,
+        terrain_mesh,
+        footprint,
+    ):
+        footprint = tuple(
+            (float(x), float(y))
+            for x, y in footprint
+        )
+
+        if not footprint:
+            return 0.0
+
+        if isinstance(terrain_mesh, dict):
+            xs = tuple(x for x, _ in footprint)
+            ys = tuple(y for _, y in footprint)
+
+            surface = AtlasFoundationSurfaceBuilder.build_surface(
+                terrain_mesh=terrain_mesh,
+                bounds={
+                    "min_x": min(xs),
+                    "max_x": max(xs),
+                    "min_y": min(ys),
+                    "max_y": max(ys),
+                },
+                footprint_points=footprint,
+            )
+
+            if surface is None:
+                return 0.0
+
+            return float(surface["foundation_z"])
+
+        sample_height = getattr(
+            terrain_mesh,
+            "sample_height",
+            None,
+        )
+
+        if callable(sample_height):
+            center_x = (
+                sum(x for x, _ in footprint)
+                / len(footprint)
+            )
+            center_y = (
+                sum(y for _, y in footprint)
+                / len(footprint)
+            )
+
+            return float(
+                sample_height(center_x, center_y)
+            )
+
+        raise TypeError(
+            "terrain_mesh must provide sample_height(x, y) "
+            "or be a foundation terrain slab dictionary"
+        )
+
+    @staticmethod
+    def _sample_terrain_height(
+        *,
+        terrain_mesh,
+        x,
+        y,
+    ):
+        sample_height = getattr(
+            terrain_mesh,
+            "sample_height",
+            None,
+        )
+
+        if callable(sample_height):
+            return float(sample_height(x, y))
+
+        if isinstance(terrain_mesh, dict):
+            return float(
+                AtlasFoundationSampler.terrain_z_at_xy(
+                    terrain_mesh=terrain_mesh,
+                    x=x,
+                    y=y,
+                )
+            )
+
+        raise TypeError(
+            "terrain_mesh must provide sample_height(x, y) "
+            "or be a foundation terrain slab dictionary"
+        )

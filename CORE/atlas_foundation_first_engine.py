@@ -1,6 +1,10 @@
 # CORE/atlas_foundation_first_engine.py
 
 from CORE.atlas_local_osm_reader import AtlasLocalOSMReader
+from CORE.atlas_landmark_foundation_builder import AtlasLandmarkFoundationBuilder
+from CORE.atlas_landmark_building_deduplicator import (
+    AtlasLandmarkBuildingDeduplicator,
+)
 from CORE.atlas_scale_engine import AtlasScaleEngine
 from CORE.atlas_coordinate_engine import AtlasCoordinateEngine
 from CORE.atlas_terrain_pipeline import AtlasTerrainPipeline
@@ -145,6 +149,18 @@ class AtlasFoundationFirstEngine:
             [],
         )
 
+        landmarks = data.get(
+            "landmarks",
+            [],
+        )
+
+        raw_buildings = (
+            AtlasLandmarkBuildingDeduplicator.filter_buildings(
+                raw_buildings=raw_buildings,
+                landmarks=landmarks,
+            )
+        )
+
         trees = data.get(
             "trees",
             [],
@@ -238,6 +254,7 @@ class AtlasFoundationFirstEngine:
             )
             print("=" * 70)
             print(f"Reader buildings        : " f"{len(raw_buildings)}")
+            print(f"Reader landmarks        : " f"{len(landmarks)}")
             print(f"Reader trees            : " f"{len(trees)}")
             print(f"Reader roads            : " f"{len(roads)}")
             print(f"Reader pedestrian paths : " f"{len(pedestrian_paths)}")
@@ -426,6 +443,13 @@ class AtlasFoundationFirstEngine:
             )
         )
 
+        landmark_meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+            landmarks=([] if castle_only else landmarks),
+            coordinate_engine=coordinate_engine,
+            terrain_mesh=terrain_slab,
+            debug=debug,
+        )
+
         artwork_meshes = AtlasArtworkFoundationBuilder.build_artworks(
             artworks=(
                 []
@@ -482,6 +506,8 @@ class AtlasFoundationFirstEngine:
 
         meshes.extend(artwork_meshes)
 
+        meshes.extend(landmark_meshes)
+
         meshes.extend(tree_meshes)
 
         meshes.extend(water_meshes)
@@ -508,6 +534,7 @@ class AtlasFoundationFirstEngine:
                 f"{len(elevated_area_meshes)}"
             )
             print(f"Artwork meshes     : " f"{len(artwork_meshes)}")
+            print(f"Landmark meshes    : " f"{len(landmark_meshes)}")
             print(f"Tree meshes        : " f"{len(tree_meshes)}")
             print(f"Water meshes       : " f"{len(water_meshes)}")
             print(f"Castle wall meshes : " f"{len(castle_wall_meshes)}")
@@ -550,6 +577,7 @@ class AtlasFoundationFirstEngine:
         return {
             "output_path": output_path,
             "reader_buildings": len(raw_buildings),
+            "reader_landmarks": len(landmarks),
             "reader_trees": len(trees),
             "reader_roads": len(roads),
             "reader_pedestrian_paths": len(pedestrian_paths),
@@ -567,6 +595,7 @@ class AtlasFoundationFirstEngine:
             "water_meshes": len(water_meshes),
             "elevated_area_meshes": len(elevated_area_meshes),
             "artwork_meshes": len(artwork_meshes),
+            "landmark_meshes": len(landmark_meshes),
             "castle_wall_meshes": len(castle_wall_meshes),
             "castle_shell_meshes": len(castle_shell_meshes),
             "castle_tower_cap_meshes": len(castle_tower_cap_meshes),
@@ -578,6 +607,7 @@ class AtlasFoundationFirstEngine:
                 "parks": park_meshes,
                 "elevated_areas": elevated_area_meshes,
                 "artworks": artwork_meshes,
+                "landmarks": landmark_meshes,
                 "trees": tree_meshes,
                 "waters": water_meshes,
                 "castle_walls": (castle_wall_meshes),

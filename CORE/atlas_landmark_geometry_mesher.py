@@ -45,6 +45,39 @@ class AtlasLandmarkGeometryMesher:
         return triangles
 
     @staticmethod
+    def _center_fan_triangulate(ring, reverse=False):
+        if len(ring) < 3:
+            return []
+
+        center = (
+            sum(point[0] for point in ring) / len(ring),
+            sum(point[1] for point in ring) / len(ring),
+            sum(point[2] for point in ring) / len(ring),
+        )
+
+        triangles = []
+
+        for index in range(len(ring)):
+            next_index = (index + 1) % len(ring)
+
+            triangle = (
+                center,
+                ring[index],
+                ring[next_index],
+            )
+
+            if reverse:
+                triangle = (
+                    triangle[0],
+                    triangle[2],
+                    triangle[1],
+                )
+
+            triangles.append(triangle)
+
+        return triangles
+
+    @staticmethod
     def _connect_rings(lower, upper):
         triangles = []
         count = len(lower)
@@ -305,40 +338,99 @@ class AtlasLandmarkGeometryMesher:
         )
 
         levels = (
-            (0.00, 1.00),
-            (0.55, 0.78),
-            (0.72, 1.18),
-            (0.80, 1.18),
-            (0.88, 0.72),
-            (1.00, 0.58),
+            (0.00, 1.00, "prismatic"),
+            (0.58, 1.00, "prismatic"),
+            (0.62, 1.20, "radial"),
+            (0.66, 1.45, "radial"),
+            (0.70, 1.45, "radial"),
+            (0.73, 1.62, "radial"),
+            (0.77, 1.62, "radial"),
+            (0.80, 2.05, "radial"),
+            (0.88, 2.05, "radial"),
+            (0.92, 1.88, "radial"),
+            (0.97, 1.35, "radial"),
+            (1.00, 0.55, "radial"),
         )
 
         rings = []
         segments = 16
 
-        for height_ratio, radius_ratio in levels:
-            z = float(geometry.height_m) * height_ratio
-            radius = base_radius * radius_ratio
+        min_x = min(x for x, _ in footprint)
+        max_x = max(x for x, _ in footprint)
+        min_y = min(y for _, y in footprint)
+        max_y = max(y for _, y in footprint)
 
-            ring = tuple(
-                (
-                    center_x + radius * math.cos(
-                        2.0 * math.pi * index / segments
-                    ),
-                    center_y + radius * math.sin(
-                        2.0 * math.pi * index / segments
-                    ),
-                    z,
+        half_width = (max_x - min_x) / 2.0
+        half_height = (max_y - min_y) / 2.0
+
+        prismatic_xy = []
+
+        for index in range(segments):
+            angle = 2.0 * math.pi * index / segments
+            direction_x = math.cos(angle)
+            direction_y = math.sin(angle)
+
+            scale_candidates = []
+
+            if abs(direction_x) > 1e-12:
+                scale_candidates.append(
+                    half_width / abs(direction_x)
                 )
-                for index in range(segments)
+
+            if abs(direction_y) > 1e-12:
+                scale_candidates.append(
+                    half_height / abs(direction_y)
+                )
+
+            distance = min(scale_candidates)
+
+            prismatic_xy.append(
+                (
+                    center_x + direction_x * distance,
+                    center_y + direction_y * distance,
+                )
             )
+
+        body_scale = 0.78
+
+        prismatic_xy = tuple(
+            (
+                center_x + (x - center_x) * body_scale,
+                center_y + (y - center_y) * body_scale,
+            )
+            for x, y in prismatic_xy
+        )
+
+        for height_ratio, radius_ratio, ring_kind in levels:
+            z = float(geometry.height_m) * height_ratio
+
+            if ring_kind == "prismatic":
+                ring = tuple(
+                    (x, y, z)
+                    for x, y in prismatic_xy
+                )
+            else:
+                radius = base_radius * radius_ratio
+                ring = tuple(
+                    (
+                        center_x + radius * math.cos(
+                            2.0 * math.pi * index / segments
+                        ),
+                        center_y + radius * math.sin(
+                            2.0 * math.pi * index / segments
+                        ),
+                        z,
+                    )
+                    for index in range(segments)
+                )
+
             rings.append(ring)
 
         triangles = []
         walls = []
 
         triangles.extend(
-            cls._fan_triangulate(rings[0], reverse=True)
+            cls._center_fan_triangulate(rings[0], reverse=True)
         )
 
         for lower, upper in zip(rings, rings[1:]):
@@ -358,7 +450,7 @@ class AtlasLandmarkGeometryMesher:
                 )
 
         triangles.extend(
-            cls._fan_triangulate(rings[-1])
+            cls._center_fan_triangulate(rings[-1])
         )
 
         return {
