@@ -83,3 +83,35 @@ def test_bridge_mesh_adds_closed_pier_prisms():
     assert all(len(pier["top"]) == 4 for pier in mesh["piers"])
     assert all(len(pier["triangles"]) == 12 for pier in mesh["piers"])
     assert len(mesh["triangles"]) == 36
+
+def test_bridge_piers_follow_diagonal_bridge_axis():
+    geometry = AtlasBridgeGeometry(
+        footprint=(
+            (1.0, -1.0),
+            (11.0, 9.0),
+            (9.0, 11.0),
+            (-1.0, 1.0),
+        ),
+        height_m=8.0,
+        landmark_kind="bridge",
+        metadata={
+            "bridge_deck_thickness_m": 1.0,
+            "bridge_pier_positions": ((5.0, 5.0),),
+            "bridge_pier_width_m": 2.0,
+            "bridge_pier_depth_m": 1.0,
+            "bridge_pier_base_m": 0.0,
+            "bridge_pier_top_m": 7.0,
+        },
+    )
+
+    mesh = AtlasLandmarkGeometryMesher.build(geometry)
+    bottom = mesh["piers"][0]["bottom"]
+
+    axis_edge = (
+        bottom[1][0] - bottom[0][0],
+        bottom[1][1] - bottom[0][1],
+    )
+
+    assert axis_edge[0] > 0.0
+    assert axis_edge[1] > 0.0
+    assert abs(axis_edge[0] - axis_edge[1]) < 1e-12
