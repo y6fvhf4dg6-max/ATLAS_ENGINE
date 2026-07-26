@@ -90,8 +90,13 @@ def test_galata_parapets_rise_above_deck_edges():
             for point in parapet["top"]
         ]
 
-        assert min(bottom_levels) >= min(
-            point[2] for point in bridge["top"]
+        assert min(bottom_levels) >= (
+            min(
+                point[2]
+                for point in bridge["top"]
+            )
+            - parapet["deck_embed_mm"]
+            - 1e-12
         )
         assert min(top_levels) > min(bottom_levels)
         assert max(top_levels) > max(bottom_levels)
@@ -188,13 +193,45 @@ def test_galata_parapets_remove_all_densified_end_segments():
     )
 
     assert len(parapets) == 2
-    assert tuple(
-        parapet["outer_bottom"]
-        for parapet in parapets
-    ) == expected_paths
 
-    for parapet in parapets:
+    for parapet, expected_path in zip(
+        parapets,
+        expected_paths,
+    ):
         path = parapet["outer_bottom"]
+
+        assert len(path) == len(expected_path)
+
+        for generated, source in zip(
+            path,
+            expected_path,
+        ):
+            generated_longitudinal = (
+                AtlasGalataBridgeParapetMesher
+                ._longitudinal(
+                    generated,
+                    frame,
+                )
+            )
+            source_longitudinal = (
+                AtlasGalataBridgeParapetMesher
+                ._longitudinal(
+                    source,
+                    frame,
+                )
+            )
+
+            assert abs(
+                generated_longitudinal
+                - source_longitudinal
+            ) < 1e-9
+            assert abs(
+                generated[2]
+                - (
+                    source[2]
+                    - parapet["deck_embed_mm"]
+                )
+            ) < 1e-9
 
         for first, second in zip(path, path[1:]):
             delta_x = second[0] - first[0]
@@ -210,3 +247,63 @@ def test_galata_parapets_remove_all_densified_end_segments():
             )
 
             assert longitudinal >= lateral
+
+
+def test_galata_parapets_are_inset_and_embedded_into_deck():
+    from CORE.atlas_galata_bridge_parapet_mesher import (
+        AtlasGalataBridgeParapetMesher,
+    )
+
+    deck_top = (
+        (0.0, 0.0, 3.7),
+        (20.0, 0.0, 3.7),
+        (20.0, 6.0, 3.7),
+        (0.0, 6.0, 3.7),
+    )
+
+    frame, side_paths = (
+        AtlasGalataBridgeParapetMesher
+        ._resolve_side_paths(deck_top)
+    )
+
+    parapets = AtlasGalataBridgeParapetMesher.build(
+        deck_top
+    )
+
+    assert len(parapets) == 2
+
+    for parapet, source_path in zip(
+        parapets,
+        side_paths,
+    ):
+        outer_bottom = parapet["outer_bottom"]
+
+        assert outer_bottom != source_path
+
+        for generated, source in zip(
+            outer_bottom,
+            source_path,
+        ):
+            generated_lateral = (
+                AtlasGalataBridgeParapetMesher
+                ._lateral(
+                    generated,
+                    frame,
+                )
+            )
+            source_lateral = (
+                AtlasGalataBridgeParapetMesher
+                ._lateral(
+                    source,
+                    frame,
+                )
+            )
+
+            assert (
+                abs(generated_lateral)
+                < abs(source_lateral)
+            )
+            assert generated[2] < source[2]
+
+        assert parapet["edge_inset_mm"] > 0.0
+        assert parapet["deck_embed_mm"] > 0.0

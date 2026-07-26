@@ -4,6 +4,8 @@ import math
 class AtlasGalataBridgeParapetMesher:
     DEFAULT_WIDTH_MM = 0.45
     DEFAULT_HEIGHT_MM = 0.35
+    DEFAULT_EDGE_INSET_MM = 0.05
+    DEFAULT_DECK_EMBED_MM = 0.05
 
     @staticmethod
     def _resolve_frame(points):
@@ -233,6 +235,8 @@ class AtlasGalataBridgeParapetMesher:
         frame,
         width_mm,
         height_mm,
+        edge_inset_mm,
+        deck_embed_mm,
     ):
         if len(path) < 2:
             raise ValueError(
@@ -262,7 +266,14 @@ class AtlasGalataBridgeParapetMesher:
             * frame["normal_y"]
         )
 
-        outer_bottom = tuple(path)
+        outer_bottom = tuple(
+            (
+                x + inward_x * edge_inset_mm,
+                y + inward_y * edge_inset_mm,
+                z - deck_embed_mm,
+            )
+            for x, y, z in path
+        )
 
         inner_bottom = tuple(
             (
@@ -275,20 +286,20 @@ class AtlasGalataBridgeParapetMesher:
 
         outer_top = tuple(
             (
-                x,
-                y,
-                z + height_mm,
+                source_x + inward_x * edge_inset_mm,
+                source_y + inward_y * edge_inset_mm,
+                source_z + height_mm,
             )
-            for x, y, z in outer_bottom
+            for source_x, source_y, source_z in path
         )
 
         inner_top = tuple(
             (
-                x,
-                y,
-                z + height_mm,
+                x + inward_x * width_mm,
+                y + inward_y * width_mm,
+                z,
             )
-            for x, y, z in inner_bottom
+            for x, y, z in outer_top
         )
 
         triangles = []
@@ -367,6 +378,8 @@ class AtlasGalataBridgeParapetMesher:
             "triangles": tuple(triangles),
             "width_mm": width_mm,
             "height_mm": height_mm,
+            "edge_inset_mm": edge_inset_mm,
+            "deck_embed_mm": deck_embed_mm,
         }
 
     @classmethod
@@ -375,6 +388,8 @@ class AtlasGalataBridgeParapetMesher:
         deck_top,
         width_mm=None,
         height_mm=None,
+        edge_inset_mm=None,
+        deck_embed_mm=None,
     ):
         deck_top = tuple(
             (
@@ -400,6 +415,16 @@ class AtlasGalataBridgeParapetMesher:
             if height_mm is None
             else float(height_mm)
         )
+        edge_inset_mm = (
+            cls.DEFAULT_EDGE_INSET_MM
+            if edge_inset_mm is None
+            else float(edge_inset_mm)
+        )
+        deck_embed_mm = (
+            cls.DEFAULT_DECK_EMBED_MM
+            if deck_embed_mm is None
+            else float(deck_embed_mm)
+        )
 
         if width_mm <= 0.0:
             raise ValueError(
@@ -409,6 +434,21 @@ class AtlasGalataBridgeParapetMesher:
         if height_mm <= 0.0:
             raise ValueError(
                 "Parapet height must be greater than 0"
+            )
+
+        if edge_inset_mm <= 0.0:
+            raise ValueError(
+                "Parapet edge inset must be greater than 0"
+            )
+
+        if edge_inset_mm >= width_mm:
+            raise ValueError(
+                "Parapet edge inset must be smaller than width"
+            )
+
+        if deck_embed_mm <= 0.0:
+            raise ValueError(
+                "Parapet deck embed must be greater than 0"
             )
 
         frame, side_paths = cls._resolve_side_paths(
@@ -421,6 +461,8 @@ class AtlasGalataBridgeParapetMesher:
                 frame=frame,
                 width_mm=width_mm,
                 height_mm=height_mm,
+                edge_inset_mm=edge_inset_mm,
+                deck_embed_mm=deck_embed_mm,
             )
             for path in side_paths
         )
