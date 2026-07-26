@@ -12,7 +12,9 @@ class AtlasLandmarkProviderOsm(AtlasLandmarkProvider):
     def from_osm(cls, osm):
         tags = dict(osm.get("tags", {}))
 
-        if tags.get("historic") == "memorial":
+        if tags.get("bridge") == "yes" or tags.get("man_made") == "bridge":
+            landmark_type = AtlasLandmarkType.BRIDGE
+        elif tags.get("historic") == "memorial":
             landmark_type = AtlasLandmarkType.MEMORIAL
         else:
             landmark_type = AtlasLandmarkType.UNKNOWN
