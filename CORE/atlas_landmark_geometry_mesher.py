@@ -72,12 +72,21 @@ class AtlasLandmarkGeometryMesher:
         if len(footprint) < 3:
             raise ValueError("Bridge footprint requires at least 3 points")
 
+        deck_thickness_m = float(
+            geometry.metadata.get(
+                "bridge_deck_thickness_m",
+                geometry.height_m,
+            )
+        )
+        top_z = float(geometry.height_m)
+        bottom_z = max(0.0, top_z - deck_thickness_m)
+
         bottom = tuple(
-            (x, y, 0.0)
+            (x, y, bottom_z)
             for x, y in footprint
         )
         top = tuple(
-            (x, y, float(geometry.height_m))
+            (x, y, top_z)
             for x, y in footprint
         )
 
