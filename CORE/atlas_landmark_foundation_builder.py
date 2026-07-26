@@ -1,10 +1,78 @@
 from dataclasses import replace
 
+from CORE.atlas_bridge_builder import AtlasBridgeGeometry
+from CORE.atlas_bridge_longitudinal_profile import (
+    AtlasBridgeLongitudinalProfile,
+)
+from CORE.atlas_galata_bridge_parapet_mesher import (
+    AtlasGalataBridgeParapetMesher,
+)
+from CORE.atlas_galata_bridge_support_mesher import (
+    AtlasGalataBridgeSupportMesher,
+)
+from CORE.atlas_galata_bridge_support_resolver import (
+    AtlasGalataBridgeSupportResolver,
+)
+from CORE.atlas_landmark_geometry_mesher import (
+    AtlasLandmarkGeometryMesher,
+)
 from CORE.atlas_landmark_mesh_builder import AtlasLandmarkMeshBuilder
 from CORE.atlas_landmark_provider_osm import AtlasLandmarkProviderOsm
 
 
 class AtlasLandmarkFoundationBuilder:
+    MIN_PRINTABLE_BRIDGE_DECK_THICKNESS_MM = 0.80
+    GALATA_SUPPORT_DECK_EMBED_MM = 0.15
+
+    @staticmethod
+    def _scale_bridge_metadata(
+        metadata,
+        coordinate_engine,
+    ):
+        metadata = dict(metadata)
+
+        scalar_height_keys = (
+            "bridge_deck_thickness_m",
+            "bridge_pier_width_m",
+            "bridge_pier_depth_m",
+            "bridge_pier_base_m",
+            "bridge_pier_top_m",
+            "bridge_pier_height_m",
+            "bridge_shore_top_m",
+        )
+
+        for key in scalar_height_keys:
+            if key in metadata:
+                metadata[key] = (
+                    coordinate_engine.height_to_stl_mm(
+                        metadata[key]
+                    )
+                )
+
+        if "bridge_deck_thickness_m" in metadata:
+            metadata["bridge_deck_thickness_m"] = max(
+                float(
+                    metadata[
+                        "bridge_deck_thickness_m"
+                    ]
+                ),
+                AtlasLandmarkFoundationBuilder
+                .MIN_PRINTABLE_BRIDGE_DECK_THICKNESS_MM,
+            )
+
+        if "bridge_pier_positions" in metadata:
+            metadata["bridge_pier_positions"] = tuple(
+                (
+                    x * 1000.0 / coordinate_engine.xy_scale,
+                    y * 1000.0 / coordinate_engine.xy_scale,
+                )
+                for x, y in metadata[
+                    "bridge_pier_positions"
+                ]
+            )
+
+        return metadata
+
     @classmethod
     def build_landmarks(
         cls,
@@ -81,25 +149,252 @@ class AtlasLandmarkFoundationBuilder:
                 coordinate_engine.geometry_to_stl_mm(geometry)
             )
 
-            scaled_geometry = replace(
-                resolved_geometry,
-                footprint=stl_footprint,
-                height_m=coordinate_engine.height_to_stl_mm(
+            scaled_height = (
+                coordinate_engine.height_to_stl_mm(
                     resolved_geometry.height_m
-                ),
+                )
             )
 
-            mesh = AtlasLandmarkMeshBuilder.build(
-                replace(
-                    landmark,
-                    geometry=scaled_geometry.footprint,
-                    tags={
-                        **dict(landmark.tags),
-                        "height": str(scaled_geometry.height_m),
-                    },
-                ),
-                terrain_mesh=terrain_mesh,
+            if isinstance(
+                resolved_geometry,
+                AtlasBridgeGeometry,
+            ):
+                metadata = cls._scale_bridge_metadata(
+                    metadata=resolved_geometry.metadata,
+                    coordinate_engine=coordinate_engine,
+                )
+
+                scaled_geometry = replace(
+                    resolved_geometry,
+                    footprint=stl_footprint,
+                    height_m=scaled_height,
+                    metadata=metadata,
+                )
+            else:
+                scaled_geometry = replace(
+                    resolved_geometry,
+                    footprint=stl_footprint,
+                    height_m=scaled_height,
+                )
+
+            mesh = AtlasLandmarkGeometryMesher.build(
+                scaled_geometry
             )
+
+            foundation_z = (
+                AtlasLandmarkMeshBuilder
+                ._resolve_foundation_z(
+                    terrain_mesh=terrain_mesh,
+                    footprint=scaled_geometry.footprint,
+                )
+            )
+
+            mesh["triangles"] = [
+                tuple(
+                    (
+                        x,
+                        y,
+                        z + foundation_z,
+                    )
+                    for x, y, z in triangle
+                )
+                for triangle in mesh["triangles"]
+            ]
+
+            for key in ("bottom", "top"):
+                if key in mesh:
+                    mesh[key] = tuple(
+                        (
+                            x,
+                            y,
+                            z + foundation_z,
+                        )
+                        for x, y, z in mesh[key]
+                    )
+
+            if "rings" in mesh:
+                mesh["rings"] = tuple(
+                    tuple(
+                        (
+                            x,
+                            y,
+                            z + foundation_z,
+                        )
+                        for x, y, z in ring
+                    )
+                    for ring in mesh["rings"]
+                )
+
+            if "deck_sections" in mesh:
+                translated_sections = []
+
+                for section in mesh["deck_sections"]:
+                    translated = dict(section)
+
+                    for key in ("bottom", "top"):
+                        translated[key] = tuple(
+                            (
+                                x,
+                                y,
+                                z + foundation_z,
+                            )
+                            for x, y, z in section[key]
+                        )
+
+                    translated["walls"] = tuple(
+                        tuple(
+                            (
+                                x,
+                                y,
+                                z + foundation_z,
+                            )
+                            for x, y, z in wall
+                        )
+                        for wall in section["walls"]
+                    )
+
+                    translated["triangles"] = tuple(
+                        tuple(
+                            (
+                                x,
+                                y,
+                                z + foundation_z,
+                            )
+                            for x, y, z in triangle
+                        )
+                        for triangle in section[
+                            "triangles"
+                        ]
+                    )
+
+                    translated_sections.append(
+                        translated
+                    )
+
+                mesh["deck_sections"] = tuple(
+                    translated_sections
+                )
+
+            is_galata_bridge = (
+                isinstance(
+                    resolved_geometry,
+                    AtlasBridgeGeometry,
+                )
+                and landmark.tags.get("wikidata")
+                == "Q81523"
+            )
+
+            if (
+                is_galata_bridge
+                and mesh.get("bottom")
+            ):
+                frame = (
+                    AtlasGalataBridgeSupportResolver
+                    ._resolve_frame(
+                        scaled_geometry.footprint
+                    )
+                )
+
+                supports = (
+                    AtlasGalataBridgeSupportResolver
+                    .resolve(
+                        footprint=(
+                            scaled_geometry.footprint
+                        )
+                    )
+                )
+
+                deck_bottom_z = min(
+                    point[2]
+                    for point in mesh["bottom"]
+                )
+
+                profile = AtlasBridgeLongitudinalProfile(
+                    shore_top_m=float(
+                        metadata["bridge_shore_top_m"]
+                    ),
+                    center_top_m=float(
+                        scaled_geometry.height_m
+                    ),
+                    approach_ratio=float(
+                        metadata.get(
+                            "bridge_approach_ratio",
+                            0.20,
+                        )
+                    ),
+                    deck_thickness_m=float(
+                        metadata[
+                            "bridge_deck_thickness_m"
+                        ]
+                    ),
+                    full_span_convex=bool(
+                        metadata.get(
+                            "bridge_full_span_convex",
+                            False,
+                        )
+                    ),
+                )
+
+                support_meshes = []
+
+                for support in supports:
+                    local_bottom_z = (
+                        foundation_z
+                        + profile.bottom_z_at(
+                            support[
+                                "longitudinal_position"
+                            ]
+                        )
+                    )
+
+                    support_meshes.extend(
+                        AtlasGalataBridgeSupportMesher
+                        .build(
+                            supports=(support,),
+                            axis=(
+                                frame["axis_x"],
+                                frame["axis_y"],
+                            ),
+                            base_z=foundation_z,
+                            top_z=(
+                                local_bottom_z
+                                + cls.GALATA_SUPPORT_DECK_EMBED_MM
+                            ),
+                        )
+                    )
+
+                support_meshes = tuple(
+                    support_meshes
+                )
+
+                mesh["supports"] = support_meshes
+
+                mesh["triangles"].extend(
+                    triangle
+                    for support in support_meshes
+                    for triangle in support[
+                        "triangles"
+                    ]
+                )
+
+                parapets = (
+                    AtlasGalataBridgeParapetMesher
+                    .build(
+                        deck_top=mesh["top"],
+                    )
+                )
+
+                mesh["parapets"] = parapets
+
+                mesh["triangles"].extend(
+                    triangle
+                    for parapet in parapets
+                    for triangle in parapet[
+                        "triangles"
+                    ]
+                )
+
+            mesh["foundation_z"] = foundation_z
         except (TypeError, ValueError, AttributeError):
             return None
 

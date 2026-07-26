@@ -179,3 +179,51 @@ def test_bridge_builder_falls_back_for_invalid_pier_dimensions():
         result.metadata["bridge_pier_depth_m"]
         == AtlasBridgeBuilder.DEFAULT_PIER_DEPTH_M
     )
+
+
+def test_bridge_builder_keeps_galata_deck_continuous():
+    landmark = AtlasLandmark(
+        id=280961352,
+        landmark_type=AtlasLandmarkType.BRIDGE,
+        geometry=(
+            (0.0, -5.0),
+            (80.0, -5.0),
+            (80.0, 5.0),
+            (0.0, 5.0),
+        ),
+        tags={
+            "man_made": "bridge",
+            "name": "Galata Köprüsü",
+            "wikidata": "Q81523",
+        },
+        source="osm",
+    )
+
+    result = AtlasBridgeBuilder.build(landmark)
+
+    assert result.metadata["bridge_approach_profile"] is False
+    assert result.metadata["bridge_segmented_deck"] is False
+    assert result.metadata["bridge_shore_top_m"] == 6.0
+    assert result.metadata["bridge_approach_ratio"] == 0.20
+
+
+def test_bridge_builder_does_not_assign_galata_profile_to_generic_bridge():
+    landmark = AtlasLandmark(
+        id=999,
+        landmark_type=AtlasLandmarkType.BRIDGE,
+        geometry=(
+            (0.0, -5.0),
+            (80.0, -5.0),
+            (80.0, 5.0),
+            (0.0, 5.0),
+        ),
+        tags={
+            "man_made": "bridge",
+            "name": "Generic Bridge",
+        },
+        source="osm",
+    )
+
+    result = AtlasBridgeBuilder.build(landmark)
+
+    assert result.metadata["bridge_approach_profile"] is False

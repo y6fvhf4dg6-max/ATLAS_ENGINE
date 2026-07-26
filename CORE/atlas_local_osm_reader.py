@@ -120,20 +120,38 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         man_made = tags.get("man_made")
         historic = tags.get("historic")
 
-        return (
-            man_made in {
-                "tower",
-                "lighthouse",
-                "obelisk",
-                "bridge",
-            }
-            or historic in {
-                "tower",
-                "memorial",
-                "monument",
-            }
-            or tags.get("bridge") == "yes"
-        )
+        if man_made in {
+            "tower",
+            "lighthouse",
+            "obelisk",
+            "bridge",
+        }:
+            return True
+
+        if historic in {
+            "tower",
+            "memorial",
+            "monument",
+        }:
+            return True
+
+        if tags.get("bridge") != "yes":
+            return False
+
+        if tags.get("railway") in {
+            "tram",
+            "subway",
+        }:
+            return False
+
+        if tags.get("highway") in {
+            "footway",
+            "pedestrian",
+            "steps",
+        }:
+            return False
+
+        return True
 
     @staticmethod
     def _is_artwork(tags):

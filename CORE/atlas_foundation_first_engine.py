@@ -2,6 +2,9 @@
 
 from CORE.atlas_local_osm_reader import AtlasLocalOSMReader
 from CORE.atlas_landmark_foundation_builder import AtlasLandmarkFoundationBuilder
+from CORE.atlas_bridge_landmark_deduplicator import (
+    AtlasBridgeLandmarkDeduplicator,
+)
 from CORE.atlas_landmark_building_deduplicator import (
     AtlasLandmarkBuildingDeduplicator,
 )
@@ -10,6 +13,9 @@ from CORE.atlas_coordinate_engine import AtlasCoordinateEngine
 from CORE.atlas_terrain_pipeline import AtlasTerrainPipeline
 from CORE.atlas_foundation_scene_builder import (
     AtlasFoundationSceneBuilder,
+)
+from CORE.atlas_foundation_scene_xy_mesh_clipper import (
+    AtlasFoundationSceneXYMeshClipper,
 )
 from CORE.atlas_debug_reporter import AtlasDebugReporter
 from CORE.atlas_road_foundation_builder import (
@@ -152,6 +158,12 @@ class AtlasFoundationFirstEngine:
         landmarks = data.get(
             "landmarks",
             [],
+        )
+
+        landmarks = (
+            AtlasBridgeLandmarkDeduplicator.filter_landmarks(
+                landmarks
+            )
         )
 
         raw_buildings = (
@@ -459,6 +471,39 @@ class AtlasFoundationFirstEngine:
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
+        )
+
+        product_max_x = (
+            float(size_x_mm)
+            if size_x_mm is not None
+            else float(target_size_mm)
+        )
+        product_max_y = (
+            float(size_y_mm)
+            if size_y_mm is not None
+            else float(target_size_mm)
+        )
+
+        road_meshes = (
+            AtlasFoundationSceneXYMeshClipper
+            .clip_meshes(
+                meshes=road_meshes,
+                min_x=0.0,
+                max_x=product_max_x,
+                min_y=0.0,
+                max_y=product_max_y,
+            )
+        )
+
+        landmark_meshes = (
+            AtlasFoundationSceneXYMeshClipper
+            .clip_meshes(
+                meshes=landmark_meshes,
+                min_x=0.0,
+                max_x=product_max_x,
+                min_y=0.0,
+                max_y=product_max_y,
+            )
         )
 
         tree_meshes = AtlasTreeFoundationBuilder.build_trees(

@@ -68,6 +68,17 @@ class AtlasBridgeBuilder:
         pier_top_m = max(0.0, height_m - deck_thickness_m)
         pier_height_m = max(0.0, pier_top_m - pier_base_m)
 
+        is_galata_bridge = (
+            str(tags.get("wikidata", "")).strip()
+            == "Q81523"
+        )
+
+        approach_profile = False
+        segmented_deck = False
+        full_span_convex = is_galata_bridge
+        shore_top_m = 6.0 if is_galata_bridge else height_m
+        approach_ratio = 0.20
+
         footprint = geometry
         span_m = AtlasBridgeBuilder.DEFAULT_SPAN_M
         pier_count = 0
@@ -125,5 +136,10 @@ class AtlasBridgeBuilder:
                 "bridge_pier_base_m": pier_base_m,
                 "bridge_pier_top_m": pier_top_m,
                 "bridge_pier_height_m": pier_height_m,
+                "bridge_approach_profile": approach_profile,
+                "bridge_segmented_deck": segmented_deck,
+                "bridge_full_span_convex": full_span_convex,
+                "bridge_shore_top_m": shore_top_m,
+                "bridge_approach_ratio": approach_ratio,
             },
         )
