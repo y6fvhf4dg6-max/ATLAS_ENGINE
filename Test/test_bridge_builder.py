@@ -136,3 +136,21 @@ def test_bridge_builder_resolves_pier_vertical_extent():
     assert result.metadata["bridge_pier_base_m"] == 0.0
     assert result.metadata["bridge_pier_top_m"] == 7.0
     assert result.metadata["bridge_pier_height_m"] == 7.0
+
+def test_bridge_builder_rejects_invalid_pier_counts():
+    for index, invalid_value in enumerate(("0", "-2", "2.5", "invalid"), start=108):
+        landmark = AtlasLandmark(
+            id=index,
+            landmark_type=AtlasLandmarkType.BRIDGE,
+            geometry=((0.0, 0.0), (12.0, 0.0)),
+            tags={
+                "bridge": "yes",
+                "bridge:pier_count": invalid_value,
+            },
+            source="osm",
+        )
+
+        result = AtlasBridgeBuilder.build(landmark)
+
+        assert result.metadata["bridge_pier_count"] == 0
+        assert result.metadata["bridge_pier_positions"] == ()
