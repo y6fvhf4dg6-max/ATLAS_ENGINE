@@ -48,3 +48,31 @@ def test_bridge_builder_expands_centerline_into_deck_footprint():
     )
     assert result.metadata["bridge_span_m"] == 20.0
     assert result.metadata["bridge_width_m"] == 6.0
+
+def test_bridge_builder_resolves_deck_thickness():
+    default_landmark = AtlasLandmark(
+        id=103,
+        landmark_type=AtlasLandmarkType.BRIDGE,
+        geometry=((0.0, 0.0), (10.0, 0.0)),
+        tags={"bridge": "yes"},
+        source="osm",
+    )
+    tagged_landmark = AtlasLandmark(
+        id=104,
+        landmark_type=AtlasLandmarkType.BRIDGE,
+        geometry=((0.0, 0.0), (10.0, 0.0)),
+        tags={
+            "bridge": "yes",
+            "bridge:deck_thickness": "1.5 m",
+        },
+        source="osm",
+    )
+
+    default_result = AtlasBridgeBuilder.build(default_landmark)
+    tagged_result = AtlasBridgeBuilder.build(tagged_landmark)
+
+    assert (
+        default_result.metadata["bridge_deck_thickness_m"]
+        == AtlasBridgeBuilder.DEFAULT_DECK_THICKNESS_M
+    )
+    assert tagged_result.metadata["bridge_deck_thickness_m"] == 1.5

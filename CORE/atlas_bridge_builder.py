@@ -16,6 +16,7 @@ class AtlasBridgeBuilder:
     DEFAULT_WIDTH_M = 10.0
     DEFAULT_SPAN_M = 50.0
     DEFAULT_HEIGHT_M = 8.0
+    DEFAULT_DECK_THICKNESS_M = 1.0
 
     @staticmethod
     def _try_float(value):
@@ -42,6 +43,12 @@ class AtlasBridgeBuilder:
         )
         if width_m is None:
             width_m = AtlasBridgeBuilder.DEFAULT_WIDTH_M
+
+        deck_thickness_m = AtlasBridgeBuilder._try_float(
+            tags.get("bridge:deck_thickness")
+        )
+        if deck_thickness_m is None:
+            deck_thickness_m = AtlasBridgeBuilder.DEFAULT_DECK_THICKNESS_M
 
         footprint = geometry
         span_m = AtlasBridgeBuilder.DEFAULT_SPAN_M
@@ -71,5 +78,6 @@ class AtlasBridgeBuilder:
             metadata={
                 "bridge_span_m": span_m,
                 "bridge_width_m": width_m,
+                "bridge_deck_thickness_m": deck_thickness_m,
             },
         )
