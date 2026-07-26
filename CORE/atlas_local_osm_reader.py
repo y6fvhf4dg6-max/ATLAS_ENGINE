@@ -36,6 +36,7 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         self.castle_metadata = []
         self.castle_walls = []
         self.defensive_towers = []
+        self.landmarks = []
 
     def inside_bbox(self, lat, lon):
         return self.south <= lat <= self.north and self.west <= lon <= self.east
@@ -103,6 +104,37 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                 }
             )
 
+        if self._is_landmark(tags):
+            self.landmarks.append(
+                {
+                    "id": n.id,
+                    "lat": lat,
+                    "lon": lon,
+                    "geometry_type": "node",
+                    "tags": tags,
+                }
+            )
+
+    @staticmethod
+    def _is_landmark(tags):
+        man_made = tags.get("man_made")
+        historic = tags.get("historic")
+
+        return (
+            man_made in {
+                "tower",
+                "lighthouse",
+                "obelisk",
+                "bridge",
+            }
+            or historic in {
+                "tower",
+                "memorial",
+                "monument",
+            }
+            or tags.get("bridge") == "yes"
+        )
+
     @staticmethod
     def _is_artwork(tags):
         if tags.get("tourism") != "artwork":
@@ -115,6 +147,9 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
 
     def way(self, w):
         tags = dict(w.tags)
+
+        if self._is_landmark(tags):
+            self._read_landmark(w, tags)
 
         if self._is_castle(tags):
             self._read_castle(w, tags)
@@ -158,6 +193,30 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         if self._is_park_or_green_area(tags):
             self._read_park(w, tags)
             return
+
+    def _read_landmark(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 3:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        if geometry[0] == geometry[-1]:
+            geometry.pop()
+
+        if len(geometry) < 3:
+            return
+
+        self.landmarks.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "geometry_type": "way",
+                "tags": tags,
+            }
+        )
 
     def _read_water(self, w, tags):
         geometry = self._extract_way_geometry(w)
@@ -995,4 +1054,5 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             "castle_metadata": reader.castle_metadata,
             "castle_walls": reader.castle_walls,
             "defensive_towers": reader.defensive_towers,
+            "landmarks": reader.landmarks,
         }
