@@ -126,11 +126,98 @@ class AtlasLandmarkGeometryMesher:
                 )
             )
 
+        piers = []
+        pier_positions = tuple(
+            geometry.metadata.get("bridge_pier_positions", ())
+        )
+
+        if pier_positions:
+            edge_dx = footprint[1][0] - footprint[0][0]
+            edge_dy = footprint[1][1] - footprint[0][1]
+            edge_length = math.hypot(edge_dx, edge_dy)
+
+            if edge_length <= 0.0:
+                raise ValueError("Bridge footprint has a zero-length axis")
+
+            axis_x = edge_dx / edge_length
+            axis_y = edge_dy / edge_length
+            normal_x = -axis_y
+            normal_y = axis_x
+
+            pier_width_m = float(
+                geometry.metadata.get("bridge_pier_width_m", 2.0)
+            )
+            pier_depth_m = float(
+                geometry.metadata.get("bridge_pier_depth_m", 1.0)
+            )
+            pier_base_m = float(
+                geometry.metadata.get("bridge_pier_base_m", 0.0)
+            )
+            pier_top_m = float(
+                geometry.metadata.get("bridge_pier_top_m", bottom_z)
+            )
+
+            half_width = pier_width_m / 2.0
+            half_depth = pier_depth_m / 2.0
+
+            for center_x, center_y in pier_positions:
+                center_x = float(center_x)
+                center_y = float(center_y)
+
+                pier_footprint = (
+                    (
+                        center_x - axis_x * half_depth - normal_x * half_width,
+                        center_y - axis_y * half_depth - normal_y * half_width,
+                    ),
+                    (
+                        center_x + axis_x * half_depth - normal_x * half_width,
+                        center_y + axis_y * half_depth - normal_y * half_width,
+                    ),
+                    (
+                        center_x + axis_x * half_depth + normal_x * half_width,
+                        center_y + axis_y * half_depth + normal_y * half_width,
+                    ),
+                    (
+                        center_x - axis_x * half_depth + normal_x * half_width,
+                        center_y - axis_y * half_depth + normal_y * half_width,
+                    ),
+                )
+
+                pier_bottom = tuple(
+                    (x, y, pier_base_m)
+                    for x, y in pier_footprint
+                )
+                pier_top = tuple(
+                    (x, y, pier_top_m)
+                    for x, y in pier_footprint
+                )
+
+                pier_triangles = []
+                pier_triangles.extend(
+                    cls._fan_triangulate(pier_bottom, reverse=True)
+                )
+                pier_triangles.extend(
+                    cls._fan_triangulate(pier_top)
+                )
+                pier_triangles.extend(
+                    cls._connect_rings(pier_bottom, pier_top)
+                )
+
+                piers.append(
+                    {
+                        "bottom": pier_bottom,
+                        "top": pier_top,
+                        "triangles": pier_triangles,
+                    }
+                )
+                triangles.extend(pier_triangles)
+
         return {
             "type": "bridge",
             "bottom": bottom,
             "top": top,
             "walls": walls,
+            "piers": piers,
             "triangles": triangles,
             "metadata": dict(geometry.metadata),
         }

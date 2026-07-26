@@ -17,6 +17,8 @@ class AtlasBridgeBuilder:
     DEFAULT_SPAN_M = 50.0
     DEFAULT_HEIGHT_M = 8.0
     DEFAULT_DECK_THICKNESS_M = 1.0
+    DEFAULT_PIER_WIDTH_M = 2.0
+    DEFAULT_PIER_DEPTH_M = 1.0
 
     @staticmethod
     def _try_float(value):
@@ -50,8 +52,36 @@ class AtlasBridgeBuilder:
         if deck_thickness_m is None:
             deck_thickness_m = AtlasBridgeBuilder.DEFAULT_DECK_THICKNESS_M
 
+        pier_width_m = AtlasBridgeBuilder._try_float(
+            tags.get("bridge:pier_width")
+        )
+        if pier_width_m is None:
+            pier_width_m = AtlasBridgeBuilder.DEFAULT_PIER_WIDTH_M
+
+        pier_depth_m = AtlasBridgeBuilder._try_float(
+            tags.get("bridge:pier_depth")
+        )
+        if pier_depth_m is None:
+            pier_depth_m = AtlasBridgeBuilder.DEFAULT_PIER_DEPTH_M
+
+        pier_base_m = 0.0
+        pier_top_m = max(0.0, height_m - deck_thickness_m)
+        pier_height_m = max(0.0, pier_top_m - pier_base_m)
+
         footprint = geometry
         span_m = AtlasBridgeBuilder.DEFAULT_SPAN_M
+        pier_count = 0
+        pier_positions = ()
+
+        pier_count_value = AtlasBridgeBuilder._try_float(
+            tags.get("bridge:pier_count")
+        )
+        if (
+            pier_count_value is not None
+            and pier_count_value >= 1
+            and pier_count_value.is_integer()
+        ):
+            pier_count = int(pier_count_value)
 
         if len(geometry) == 2:
             (x1, y1), (x2, y2) = geometry
@@ -71,6 +101,15 @@ class AtlasBridgeBuilder:
                     (float(x1) + offset_x, float(y1) + offset_y),
                 )
 
+                if pier_count > 0:
+                    pier_positions = tuple(
+                        (
+                            float(x1) + dx * index / (pier_count + 1),
+                            float(y1) + dy * index / (pier_count + 1),
+                        )
+                        for index in range(1, pier_count + 1)
+                    )
+
         return AtlasBridgeGeometry(
             footprint=footprint,
             height_m=height_m,
@@ -79,5 +118,12 @@ class AtlasBridgeBuilder:
                 "bridge_span_m": span_m,
                 "bridge_width_m": width_m,
                 "bridge_deck_thickness_m": deck_thickness_m,
+                "bridge_pier_count": pier_count,
+                "bridge_pier_positions": pier_positions,
+                "bridge_pier_width_m": pier_width_m,
+                "bridge_pier_depth_m": pier_depth_m,
+                "bridge_pier_base_m": pier_base_m,
+                "bridge_pier_top_m": pier_top_m,
+                "bridge_pier_height_m": pier_height_m,
             },
         )
