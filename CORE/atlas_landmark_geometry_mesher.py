@@ -1,5 +1,6 @@
 import math
 
+from CORE.atlas_bridge_builder import AtlasBridgeGeometry
 from CORE.atlas_lighthouse_builder import AtlasLighthouseGeometry
 from CORE.atlas_tower_builder import AtlasTowerGeometry
 
@@ -7,6 +8,9 @@ from CORE.atlas_tower_builder import AtlasTowerGeometry
 class AtlasLandmarkGeometryMesher:
     @classmethod
     def build(cls, geometry):
+        if isinstance(geometry, AtlasBridgeGeometry):
+            return cls._build_bridge_mesh(geometry)
+
         if isinstance(geometry, AtlasLighthouseGeometry):
             return cls._build_lighthouse_mesh(geometry)
 
@@ -57,6 +61,70 @@ class AtlasLandmarkGeometryMesher:
             triangles.append((a, c, d))
 
         return triangles
+
+    @classmethod
+    def _build_bridge_mesh(cls, geometry):
+        footprint = tuple(
+            (float(x), float(y))
+            for x, y in geometry.footprint
+        )
+
+        if len(footprint) < 3:
+            raise ValueError("Bridge footprint requires at least 3 points")
+
+        bottom = tuple(
+            (x, y, 0.0)
+            for x, y in footprint
+        )
+        top = tuple(
+            (x, y, float(geometry.height_m))
+            for x, y in footprint
+        )
+
+        walls = []
+        triangles = []
+
+        triangles.extend(
+            cls._fan_triangulate(bottom, reverse=True)
+        )
+        triangles.extend(
+            cls._fan_triangulate(top)
+        )
+
+        for index in range(len(bottom)):
+            next_index = (index + 1) % len(bottom)
+
+            wall = (
+                bottom[index],
+                bottom[next_index],
+                top[next_index],
+                top[index],
+            )
+            walls.append(wall)
+
+            triangles.append(
+                (
+                    bottom[index],
+                    bottom[next_index],
+                    top[next_index],
+                )
+            )
+            triangles.append(
+                (
+                    bottom[index],
+                    top[next_index],
+                    top[index],
+                )
+            )
+
+        return {
+            "type": "bridge",
+            "bottom": bottom,
+            "top": top,
+            "walls": walls,
+            "triangles": triangles,
+            "metadata": dict(geometry.metadata),
+        }
 
     @classmethod
     def _build_tower_mesh(cls, geometry):
