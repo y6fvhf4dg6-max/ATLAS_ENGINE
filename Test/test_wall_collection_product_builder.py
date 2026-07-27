@@ -98,3 +98,18 @@ def test_wall_collection_rejects_scene_larger_than_opening():
             frame_spec=AtlasWallFrameSpec(),
             frame_depth_mm=6.0,
         )
+
+
+def test_wall_collection_accepts_submicron_float_overflow_at_opening_limit():
+    city_result = _city_result()
+    city_result["terrain_size_x_mm"] = 134.0000000001
+    city_result["terrain_size_y_mm"] = 134.0000000001
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+    )
+
+    assert product["opening_width_mm"] == pytest.approx(134.0)
+    assert product["opening_height_mm"] == pytest.approx(134.0)

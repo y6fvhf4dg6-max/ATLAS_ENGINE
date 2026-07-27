@@ -7,6 +7,8 @@ from CORE.atlas_wall_frame_spec import AtlasWallFrameSpec
 
 
 class AtlasWallCollectionProductBuilder:
+    OPENING_TOLERANCE_MM = 0.001
+
     @staticmethod
     def _translate_mesh(mesh, offset_x_mm, offset_y_mm):
         translated = deepcopy(mesh)
@@ -40,12 +42,20 @@ class AtlasWallCollectionProductBuilder:
             city_result["terrain_size_y_mm"]
         )
 
-        if terrain_size_x_mm > frame_spec.inner_width_mm:
+        if (
+            terrain_size_x_mm
+            > frame_spec.inner_width_mm
+            + AtlasWallCollectionProductBuilder.OPENING_TOLERANCE_MM
+        ):
             raise ValueError(
                 "city terrain width exceeds frame opening"
             )
 
-        if terrain_size_y_mm > frame_spec.inner_height_mm:
+        if (
+            terrain_size_y_mm
+            > frame_spec.inner_height_mm
+            + AtlasWallCollectionProductBuilder.OPENING_TOLERANCE_MM
+        ):
             raise ValueError(
                 "city terrain height exceeds frame opening"
             )
