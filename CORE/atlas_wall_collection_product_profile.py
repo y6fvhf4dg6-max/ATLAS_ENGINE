@@ -24,8 +24,15 @@ class AtlasWallCollectionProductProfile:
             "name",
             self.name.strip(),
         )
+        normalized_product_type = self.product_type.strip().lower()
+
+        if normalized_product_type not in {"city", "landmark", "nature"}:
+            raise ValueError(
+                "product_type must be one of: city, landmark, nature"
+            )
+
         object.__setattr__(
             self,
             "product_type",
-            self.product_type.strip().lower(),
+            normalized_product_type,
         )
