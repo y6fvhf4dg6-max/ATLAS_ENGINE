@@ -459,6 +459,7 @@ class AtlasFoundationFirstEngine:
             landmarks=([] if castle_only else landmarks),
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
+            road_meshes=road_meshes,
             debug=debug,
         )
 

@@ -4,6 +4,18 @@ from CORE.atlas_bridge_builder import AtlasBridgeGeometry
 from CORE.atlas_bridge_longitudinal_profile import (
     AtlasBridgeLongitudinalProfile,
 )
+from CORE.atlas_bridge_road_approach_mesher import (
+    AtlasBridgeRoadApproachMesher,
+)
+from CORE.atlas_bridge_road_approach_profile import (
+    AtlasBridgeRoadApproachProfile,
+)
+from CORE.atlas_bridge_road_approach_resolver import (
+    AtlasBridgeRoadApproachResolver,
+)
+from CORE.atlas_bridge_road_approach_target_resolver import (
+    AtlasBridgeRoadApproachTargetResolver,
+)
 from CORE.atlas_galata_bridge_parapet_mesher import (
     AtlasGalataBridgeParapetMesher,
 )
@@ -23,6 +35,8 @@ from CORE.atlas_landmark_provider_osm import AtlasLandmarkProviderOsm
 class AtlasLandmarkFoundationBuilder:
     MIN_PRINTABLE_BRIDGE_DECK_THICKNESS_MM = 0.80
     GALATA_SUPPORT_DECK_EMBED_MM = 0.15
+    GALATA_ROAD_APPROACH_LENGTH_MM = 3.00
+    GALATA_ROAD_TOP_Z_MM = 0.80
 
     @staticmethod
     def _scale_bridge_metadata(
@@ -79,6 +93,7 @@ class AtlasLandmarkFoundationBuilder:
         landmarks,
         coordinate_engine,
         terrain_mesh,
+        road_meshes=(),
         debug=True,
     ):
         meshes = []
@@ -89,6 +104,7 @@ class AtlasLandmarkFoundationBuilder:
                 source=source,
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_mesh,
+                road_meshes=road_meshes,
             )
 
             if mesh is None:
@@ -117,6 +133,7 @@ class AtlasLandmarkFoundationBuilder:
         source,
         coordinate_engine,
         terrain_mesh,
+        road_meshes=(),
     ):
         geometry = tuple(source.get("geometry", ()))
 
@@ -390,6 +407,122 @@ class AtlasLandmarkFoundationBuilder:
                     triangle
                     for parapet in parapets
                     for triangle in parapet[
+                        "triangles"
+                    ]
+                )
+
+                road_approaches = []
+
+                if road_meshes:
+                    approach_specs = (
+                        AtlasBridgeRoadApproachResolver
+                        .resolve(
+                            mesh["top"]
+                        )
+                    )
+
+                    for approach_spec in approach_specs:
+                        approach_target = (
+                            AtlasBridgeRoadApproachTargetResolver
+                            .resolve(
+                                start_edge=approach_spec[
+                                    "start_edge"
+                                ],
+                                outward_axis=approach_spec[
+                                    "outward_axis"
+                                ],
+                                road_meshes=road_meshes,
+                            )
+                        )
+
+                        approach_profile = (
+                            AtlasBridgeRoadApproachProfile(
+                                bridge_top_z=(
+                                    approach_spec[
+                                        "bridge_top_z"
+                                    ]
+                                ),
+                                road_top_z=(
+                                    approach_target[
+                                        "road_top_z"
+                                    ]
+                                ),
+                                length_mm=(
+                                    approach_target[
+                                        "length_mm"
+                                    ]
+                                ),
+                                deck_thickness_mm=(
+                                    cls
+                                    .MIN_PRINTABLE_BRIDGE_DECK_THICKNESS_MM
+                                ),
+                            )
+                        )
+
+                        approach_mesh = (
+                            AtlasBridgeRoadApproachMesher
+                            .build(
+                                start_edge=(
+                                    approach_spec[
+                                        "start_edge"
+                                    ]
+                                ),
+                                outward_axis=(
+                                    approach_spec[
+                                        "outward_axis"
+                                    ]
+                                ),
+                                target_edge=(
+                                    approach_target[
+                                        "target_edge"
+                                    ]
+                                ),
+                                profile=approach_profile,
+                            )
+                        )
+
+                        approach_mesh[
+                            "start_edge"
+                        ] = approach_spec[
+                            "start_edge"
+                        ]
+                        approach_mesh[
+                            "target_edge"
+                        ] = approach_target[
+                            "target_edge"
+                        ]
+                        approach_mesh[
+                            "end_point_count"
+                        ] = approach_spec[
+                            "end_point_count"
+                        ]
+                        approach_mesh[
+                            "source_distance_mm"
+                        ] = approach_target[
+                            "source_distance_mm"
+                        ]
+                        approach_mesh[
+                            "road_mesh_index"
+                        ] = approach_target[
+                            "road_mesh_index"
+                        ]
+
+                        road_approaches.append(
+                            approach_mesh
+                        )
+
+                road_approaches = tuple(
+                    road_approaches
+                )
+
+                mesh["road_approaches"] = (
+                    road_approaches
+                )
+
+                mesh["triangles"].extend(
+                    triangle
+                    for approach in road_approaches
+                    for triangle in approach[
                         "triangles"
                     ]
                 )
