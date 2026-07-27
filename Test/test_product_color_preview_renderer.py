@@ -30,7 +30,7 @@ def _city_result():
             "roads": [_mesh("road", 30.0, 40.0, 0.4)],
             "parks": [_mesh("green_area", 50.0, 60.0, 0.3)],
             "trees": [_mesh("tree", 70.0, 80.0, 0.5)],
-            "water": [_mesh("water", 90.0, 100.0, 0.2)],
+            "waters": [_mesh("water", 90.0, 100.0, 0.2)],
         },
     }
 
@@ -104,3 +104,21 @@ def test_renderer_does_not_modify_original_city_result():
         city_result["mesh_groups"]["terrain"][0]["triangles"][0][0]
         == original_vertex
     )
+
+
+def test_renderer_maps_engine_waters_group_to_water_material_batch():
+    city_result = _city_result()
+    city_result["mesh_groups"]["waters"] = [
+        _mesh("water", 90.0, 100.0, 0.2),
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
+        ),
+    )
+
+    assert len(scene["material_batches"]["water"]["meshes"]) == 1

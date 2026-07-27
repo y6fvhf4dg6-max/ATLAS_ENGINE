@@ -16,7 +16,7 @@ class AtlasProductColorPreviewRenderer:
         "roads": "roads",
         "parks": "parks",
         "trees": "trees",
-        "water": "water",
+        "waters": "water",
     }
 
     @staticmethod
