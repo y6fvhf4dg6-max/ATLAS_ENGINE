@@ -17,6 +17,9 @@ from CORE.atlas_foundation_scene_builder import (
 from CORE.atlas_foundation_scene_xy_mesh_clipper import (
     AtlasFoundationSceneXYMeshClipper,
 )
+from CORE.atlas_foundation_scene_xy_bounds_filter import (
+    AtlasFoundationSceneXYBoundsFilter,
+)
 from CORE.atlas_debug_reporter import AtlasDebugReporter
 from CORE.atlas_road_foundation_builder import (
     AtlasRoadFoundationBuilder,
@@ -62,6 +65,21 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
+    @staticmethod
+    def _keep_road_meshes_inside_product_bounds(
+        road_meshes,
+        product_max_x,
+        product_max_y,
+    ):
+        return AtlasFoundationSceneXYBoundsFilter.keep_fully_inside(
+            meshes=road_meshes,
+            min_x=0.0,
+            max_x=float(product_max_x),
+            min_y=0.0,
+            max_y=float(product_max_y),
+            tolerance=1e-9,
+        )
+
     """
     ATLAS Foundation-First Engine v0.5
 
@@ -486,13 +504,11 @@ class AtlasFoundationFirstEngine:
         )
 
         road_meshes = (
-            AtlasFoundationSceneXYMeshClipper
-            .clip_meshes(
-                meshes=road_meshes,
-                min_x=0.0,
-                max_x=product_max_x,
-                min_y=0.0,
-                max_y=product_max_y,
+            AtlasFoundationFirstEngine
+            ._keep_road_meshes_inside_product_bounds(
+                road_meshes=road_meshes,
+                product_max_x=product_max_x,
+                product_max_y=product_max_y,
             )
         )
 
