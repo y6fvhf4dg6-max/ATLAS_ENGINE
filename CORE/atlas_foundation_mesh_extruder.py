@@ -124,25 +124,30 @@ class AtlasFoundationMeshExtruder:
         top_points = []
         wall_quads = []
         triangles = []
+        flat_roof_triangles = []
+        wall_triangles = []
 
         for x, y in scaled_points:
             bottom_points.append((x, y, bottom_z))
             top_points.append((x, y, top_z))
 
         for triangle in flat_triangles:
-            triangles.append(
+            bottom_triangle = (
                 AtlasFoundationMeshExtruder._make_bottom_triangle(
                     triangle,
                     bottom_z,
                 )
             )
-
-            triangles.append(
+            top_triangle = (
                 AtlasFoundationMeshExtruder._make_top_triangle(
                     triangle,
                     top_z,
                 )
             )
+
+            triangles.append(bottom_triangle)
+            triangles.append(top_triangle)
+            flat_roof_triangles.append(top_triangle)
 
         point_count = len(scaled_points)
 
@@ -154,7 +159,7 @@ class AtlasFoundationMeshExtruder:
 
             wall_quads.append((bottom_1, bottom_2, top_2, top_1))
 
-            triangles.extend(
+            edge_wall_triangles = (
                 AtlasFoundationMeshExtruder._make_wall_triangles(
                     bottom_1,
                     bottom_2,
@@ -163,12 +168,18 @@ class AtlasFoundationMeshExtruder:
                 )
             )
 
+            triangles.extend(edge_wall_triangles)
+            wall_triangles.extend(edge_wall_triangles)
+
         mesh = {
             "type": "building",
             "bottom": bottom_points,
             "top": top_points,
             "walls": wall_quads,
             "triangles": triangles,
+            "building_flat_roof_triangles": flat_roof_triangles,
+            "building_roof_triangles": flat_roof_triangles,
+            "building_wall_triangles": wall_triangles,
             "foundation_z": foundation_z,
             "base_offset_mm": base_offset_mm,
             "bottom_z": bottom_z,

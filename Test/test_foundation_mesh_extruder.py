@@ -805,3 +805,46 @@ def test_base_building_mesh_preserves_flat_roof_and_wall_triangles():
         triangle in mesh["triangles"]
         for triangle in wall_triangles
     )
+
+
+def test_foundation_extruder_preserves_flat_roof_and_wall_triangles():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=8.0,
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=1.25,
+    )
+
+    assert mesh is not None
+
+    flat_roof_triangles = mesh["building_flat_roof_triangles"]
+    roof_triangles = mesh["building_roof_triangles"]
+    wall_triangles = mesh["building_wall_triangles"]
+
+    assert roof_triangles == flat_roof_triangles
+    assert len(flat_roof_triangles) == 2
+    assert len(wall_triangles) == 8
+
+    assert all(
+        all(vertex[2] == pytest.approx(9.25) for vertex in triangle)
+        for triangle in flat_roof_triangles
+    )
+
+    assert all(
+        triangle in mesh["triangles"]
+        for triangle in flat_roof_triangles
+    )
+    assert all(
+        triangle in mesh["triangles"]
+        for triangle in wall_triangles
+    )
+
