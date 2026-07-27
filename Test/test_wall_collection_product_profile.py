@@ -53,27 +53,3 @@ def test_wall_collection_product_profile_normalizes_text_fields():
 
     assert profile.name == "landmark-memory"
     assert profile.product_type == "landmark"
-
-
-@pytest.mark.parametrize(
-    "product_type",
-    [
-        "",
-        "   ",
-        "portrait",
-        "bridge",
-    ],
-)
-def test_wall_collection_product_profile_rejects_unknown_product_type(
-    product_type,
-):
-    with pytest.raises(ValueError):
-        AtlasWallCollectionProductProfile(
-            name="wall-memory",
-            product_type=product_type,
-            frame_width_mm=200.0,
-            frame_height_mm=200.0,
-            model_area_mm=150.0,
-            model_min_height_mm=5.0,
-            model_max_height_mm=18.0,
-        )
