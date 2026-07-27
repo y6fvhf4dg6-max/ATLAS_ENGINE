@@ -1,0 +1,49 @@
+import pytest
+
+from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+
+def test_label_text_spec_defines_two_line_koeln_graduation_label():
+    spec = AtlasLabelTextSpec(
+        primary_text="KÖLN ÜNİVERSİTESİ",
+        secondary_text="MEZUNİYET",
+    )
+
+    assert spec.primary_text == "KÖLN ÜNİVERSİTESİ"
+    assert spec.secondary_text == "MEZUNİYET"
+    assert spec.primary_height_mm == pytest.approx(4.2)
+    assert spec.secondary_height_mm == pytest.approx(2.8)
+    assert spec.depth_mm == pytest.approx(0.6)
+    assert spec.max_width_mm == pytest.approx(108.0)
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    (
+        "primary_height_mm",
+        "secondary_height_mm",
+        "depth_mm",
+        "max_width_mm",
+    ),
+)
+def test_label_text_spec_rejects_non_positive_dimensions(field_name):
+    values = {
+        "primary_text": "KÖLN ÜNİVERSİTESİ",
+        "secondary_text": "MEZUNİYET",
+        "primary_height_mm": 4.2,
+        "secondary_height_mm": 2.8,
+        "depth_mm": 0.6,
+        "max_width_mm": 108.0,
+    }
+    values[field_name] = 0.0
+
+    with pytest.raises(ValueError):
+        AtlasLabelTextSpec(**values)
+
+
+def test_label_text_spec_rejects_empty_primary_text():
+    with pytest.raises(ValueError):
+        AtlasLabelTextSpec(
+            primary_text="   ",
+            secondary_text="MEZUNİYET",
+        )
