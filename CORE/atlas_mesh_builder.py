@@ -355,6 +355,8 @@ class AtlasMeshBuilder:
         top_points = []
         wall_quads = []
         triangles = []
+        flat_roof_triangles = []
+        wall_triangles = []
 
         top_z = foundation_z + height_mm
 
@@ -370,13 +372,15 @@ class AtlasMeshBuilder:
                 )
             )
 
-            triangles.append(
+            flat_roof_triangle = (
                 AtlasMeshBuilder._make_top_triangle(
                     triangle,
                     height_mm,
                     foundation_z,
                 )
             )
+            flat_roof_triangles.append(flat_roof_triangle)
+            triangles.append(flat_roof_triangle)
 
         point_count = len(scaled_points)
 
@@ -388,20 +392,27 @@ class AtlasMeshBuilder:
 
             wall_quads.append((bottom_1, bottom_2, top_2, top_1))
 
-            wall_triangles = AtlasMeshBuilder._make_wall_triangles(
-                bottom_1,
-                bottom_2,
-                top_1,
-                top_2,
+            edge_wall_triangles = (
+                AtlasMeshBuilder._make_wall_triangles(
+                    bottom_1,
+                    bottom_2,
+                    top_1,
+                    top_2,
+                )
             )
 
-            triangles.extend(wall_triangles)
+            wall_triangles.extend(edge_wall_triangles)
+
+        triangles.extend(wall_triangles)
 
         mesh = {
             "bottom": bottom_points,
             "top": top_points,
             "walls": wall_quads,
             "triangles": triangles,
+            "building_flat_roof_triangles": flat_roof_triangles,
+            "building_roof_triangles": flat_roof_triangles,
+            "building_wall_triangles": wall_triangles,
             "foundation_z": foundation_z,
         }
 

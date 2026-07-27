@@ -304,3 +304,27 @@ def test_general_gable_roof_does_not_modify_castle_mesh():
     assert result.get("top_z") == original_top_z
     assert "building_gable_roof_applied" not in result
     assert "roof_geometry" not in result
+
+
+
+def test_gable_roof_updates_semantic_surface_metadata():
+    mesh = build_rectangular_building_mesh()
+
+    flat_roof_triangles = list(mesh["triangles"][2:4])
+    wall_triangles = list(mesh["triangles"][4:12])
+
+    mesh["building_flat_roof_triangles"] = (
+        flat_roof_triangles
+    )
+    mesh["building_roof_triangles"] = (
+        flat_roof_triangles
+    )
+    mesh["building_wall_triangles"] = wall_triangles
+
+    result = AtlasBuildingGableRoofBuilder.apply(mesh)
+
+    assert result["building_flat_roof_triangles"] == []
+    assert result["building_roof_triangles"] == (
+        result["building_gable_roof_triangles"]
+    )
+    assert result["building_wall_triangles"] == wall_triangles

@@ -188,6 +188,8 @@ class AtlasBuildingHippedRoofBuilder:
         mesh["building_hipped_roof_triangles"] = (
             roof_triangles
         )
+        mesh["building_flat_roof_triangles"] = []
+        mesh["building_roof_triangles"] = roof_triangles
         mesh["building_hipped_roof_applied"] = True
 
         return mesh

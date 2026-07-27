@@ -250,6 +250,8 @@ class AtlasBuildingGableRoofBuilder:
         mesh["building_gable_roof_triangles"] = (
             roof_triangles
         )
+        mesh["building_flat_roof_triangles"] = []
+        mesh["building_roof_triangles"] = roof_triangles
         mesh["roof_height_mm"] = roof_height_mm
         mesh["roof_long_side_mm"] = long_side_mm
         mesh["roof_short_side_mm"] = short_side_mm
