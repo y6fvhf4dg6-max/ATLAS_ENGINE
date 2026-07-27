@@ -145,3 +145,59 @@ def test_wall_collection_adds_optional_integrated_label_plate_without_moving_cit
     assert max(y for _, y, _ in vertices) == pytest.approx(-53.0)
     assert min(z for _, _, z in vertices) == pytest.approx(6.0)
     assert max(z for _, _, z in vertices) == pytest.approx(7.2)
+
+
+def test_wall_collection_adds_two_line_label_text_on_front_of_plate():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=14.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="KÖLN",
+            secondary_text="50.9375° N · 6.9603° E",
+            primary_height_mm=4.2,
+            secondary_height_mm=2.8,
+            depth_mm=0.6,
+            max_width_mm=108.0,
+        ),
+    )
+
+    assert product["city_offset_x_mm"] == pytest.approx(-50.0)
+    assert product["city_offset_y_mm"] == pytest.approx(-60.0)
+
+    assert len(product["label_plate_meshes"]) == 1
+    assert len(product["label_text_meshes"]) == 2
+    assert len(product["meshes"]) == 6
+
+    primary_mesh, secondary_mesh = product["label_text_meshes"]
+
+    assert primary_mesh["type"] == "label_text"
+    assert secondary_mesh["type"] == "label_text"
+    assert primary_mesh["text"] == "KÖLN"
+    assert secondary_mesh["text"] == "50.9375° N · 6.9603° E"
+
+    primary_vertices = _all_vertices(primary_mesh)
+    secondary_vertices = _all_vertices(secondary_mesh)
+
+    assert min(z for _, _, z in primary_vertices) == pytest.approx(7.2)
+    assert max(z for _, _, z in primary_vertices) == pytest.approx(7.8)
+    assert min(z for _, _, z in secondary_vertices) == pytest.approx(7.2)
+    assert max(z for _, _, z in secondary_vertices) == pytest.approx(7.8)
+
+    assert min(y for _, y, _ in primary_vertices) > max(
+        y for _, y, _ in secondary_vertices
+    )
+
+    for vertices in (primary_vertices, secondary_vertices):
+        assert min(x for x, _, _ in vertices) >= -54.0 - 1e-6
+        assert max(x for x, _, _ in vertices) <= 54.0 + 1e-6
+        assert min(y for _, y, _ in vertices) >= -67.0 - 1e-6
+        assert max(y for _, y, _ in vertices) <= -53.0 + 1e-6

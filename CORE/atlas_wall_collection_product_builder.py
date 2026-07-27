@@ -4,6 +4,8 @@ from copy import deepcopy
 
 from CORE.atlas_label_plate_mesher import AtlasLabelPlateMesher
 from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+from CORE.atlas_label_text_mesher import AtlasLabelTextMesher
+from CORE.atlas_label_text_spec import AtlasLabelTextSpec
 from CORE.atlas_wall_frame_mesher import AtlasWallFrameMesher
 from CORE.atlas_wall_frame_spec import AtlasWallFrameSpec
 
@@ -42,6 +44,7 @@ class AtlasWallCollectionProductBuilder:
         frame_spec: AtlasWallFrameSpec,
         frame_depth_mm: float,
         label_plate_spec: AtlasLabelPlateSpec | None = None,
+        label_text_spec: AtlasLabelTextSpec | None = None,
     ) -> dict:
         terrain_size_x_mm = float(
             city_result["terrain_size_x_mm"]
@@ -91,6 +94,12 @@ class AtlasWallCollectionProductBuilder:
         frame_meshes = [frame_mesh]
 
         label_plate_meshes = []
+        label_text_meshes = []
+
+        if label_text_spec is not None and label_plate_spec is None:
+            raise ValueError(
+                "label text requires label plate"
+            )
 
         if label_plate_spec is not None:
             if label_plate_spec.width_mm > frame_spec.inner_width_mm:
@@ -116,10 +125,78 @@ class AtlasWallCollectionProductBuilder:
                 )
             )
 
+            if label_text_spec is not None:
+                line_gap_mm = 1.0
+                total_text_height_mm = (
+                    label_text_spec.primary_height_mm
+                    + line_gap_mm
+                    + label_text_spec.secondary_height_mm
+                )
+
+                if total_text_height_mm > label_plate_spec.height_mm:
+                    raise ValueError(
+                        "label text height exceeds label plate height"
+                    )
+
+                text_front_z_mm = (
+                    float(frame_depth_mm)
+                    + label_plate_spec.depth_mm
+                )
+
+                primary_center_y_mm = (
+                    label_center_y_mm
+                    + (
+                        label_text_spec.secondary_height_mm
+                        + line_gap_mm
+                    )
+                    / 2.0
+                )
+
+                primary_mesh = AtlasLabelTextMesher.build_line(
+                    text=label_text_spec.primary_text,
+                    height_mm=label_text_spec.primary_height_mm,
+                    depth_mm=label_text_spec.depth_mm,
+                    max_width_mm=label_text_spec.max_width_mm,
+                )
+                label_text_meshes.append(
+                    AtlasWallCollectionProductBuilder._translate_mesh(
+                        primary_mesh,
+                        0.0,
+                        primary_center_y_mm,
+                        text_front_z_mm,
+                    )
+                )
+
+                if label_text_spec.secondary_text:
+                    secondary_center_y_mm = (
+                        label_center_y_mm
+                        - (
+                            label_text_spec.primary_height_mm
+                            + line_gap_mm
+                        )
+                        / 2.0
+                    )
+
+                    secondary_mesh = AtlasLabelTextMesher.build_line(
+                        text=label_text_spec.secondary_text,
+                        height_mm=label_text_spec.secondary_height_mm,
+                        depth_mm=label_text_spec.depth_mm,
+                        max_width_mm=label_text_spec.max_width_mm,
+                    )
+                    label_text_meshes.append(
+                        AtlasWallCollectionProductBuilder._translate_mesh(
+                            secondary_mesh,
+                            0.0,
+                            secondary_center_y_mm,
+                            text_front_z_mm,
+                        )
+                    )
+
         meshes = [
             *frame_meshes,
             *city_meshes,
             *label_plate_meshes,
+            *label_text_meshes,
         ]
 
         return {
@@ -134,5 +211,6 @@ class AtlasWallCollectionProductBuilder:
             "frame_meshes": frame_meshes,
             "city_meshes": city_meshes,
             "label_plate_meshes": label_plate_meshes,
+            "label_text_meshes": label_text_meshes,
             "meshes": meshes,
         }
