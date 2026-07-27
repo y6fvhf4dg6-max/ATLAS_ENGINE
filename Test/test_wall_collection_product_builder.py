@@ -113,3 +113,35 @@ def test_wall_collection_accepts_submicron_float_overflow_at_opening_limit():
 
     assert product["opening_width_mm"] == pytest.approx(134.0)
     assert product["opening_height_mm"] == pytest.approx(134.0)
+
+
+def test_wall_collection_adds_optional_integrated_label_plate_without_moving_city():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=14.0,
+            depth_mm=1.2,
+        ),
+    )
+
+    assert product["city_offset_x_mm"] == pytest.approx(-50.0)
+    assert product["city_offset_y_mm"] == pytest.approx(-60.0)
+
+    assert len(product["label_plate_meshes"]) == 1
+    assert len(product["meshes"]) == 4
+
+    label_mesh = product["label_plate_meshes"][0]
+    vertices = _all_vertices(label_mesh)
+
+    assert label_mesh["type"] == "label_plate"
+    assert min(x for x, _, _ in vertices) == pytest.approx(-59.0)
+    assert max(x for x, _, _ in vertices) == pytest.approx(59.0)
+    assert min(y for _, y, _ in vertices) == pytest.approx(-67.0)
+    assert max(y for _, y, _ in vertices) == pytest.approx(-53.0)
+    assert min(z for _, _, z in vertices) == pytest.approx(6.0)
+    assert max(z for _, _, z in vertices) == pytest.approx(7.2)
