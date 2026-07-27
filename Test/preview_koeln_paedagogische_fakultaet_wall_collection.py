@@ -1,4 +1,8 @@
+import argparse
+
 from CORE.atlas_foundation_first_engine import AtlasFoundationFirstEngine
+from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+from CORE.atlas_label_text_spec import AtlasLabelTextSpec
 from CORE.atlas_product_area_engine import AtlasProductAreaEngine
 from CORE.atlas_wall_collection_stl_exporter import (
     AtlasWallCollectionSTLExporter,
@@ -29,12 +33,85 @@ CITY_SIZE_MM = 134.0
 SCALE_RATIO = 5500.0
 
 
-def main():
+
+class WallCollectionPreviewArguments(argparse.Namespace):
+    primary_text: str
+    secondary_text: str
+
+    def validate_label_text(self) -> None:
+        primary_text = str(self.primary_text).strip()
+        secondary_text = str(self.secondary_text).strip()
+
+        if secondary_text and not primary_text:
+            raise ValueError(
+                "secondary text requires primary text"
+            )
+
+
+class WallCollectionPreviewArgumentParser(
+    argparse.ArgumentParser
+):
+    def parse_args(
+        self,
+        args=None,
+        namespace=None,
+    ):
+        if namespace is None:
+            namespace = WallCollectionPreviewArguments()
+
+        return super().parse_args(
+            args=args,
+            namespace=namespace,
+        )
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = WallCollectionPreviewArgumentParser(
+        description=(
+            "Generate the Köln wall collection preview "
+            "with an optional customer label."
+        ),
+    )
+
+    parser.add_argument(
+        "--primary-text",
+        default="",
+        help="Optional primary label line.",
+    )
+    parser.add_argument(
+        "--secondary-text",
+        default="",
+        help="Optional secondary label line.",
+    )
+
+    return parser
+
+
+def main(argv=None):
+    arguments = build_parser().parse_args(
+        argv,
+        namespace=WallCollectionPreviewArguments(),
+    )
+    arguments.validate_label_text()
+
+    primary_text = arguments.primary_text.strip()
+    secondary_text = arguments.secondary_text.strip()
+
     frame_spec = AtlasWallFrameSpec(
         outer_width_mm=PRODUCT_OUTER_SIZE_MM,
         outer_height_mm=PRODUCT_OUTER_SIZE_MM,
         frame_width_mm=FRAME_WIDTH_MM,
     )
+
+    label_plate_spec = None
+    label_text_spec = None
+
+    if primary_text:
+        label_plate_spec = AtlasLabelPlateSpec()
+        label_text_spec = AtlasLabelTextSpec(
+            primary_text=primary_text,
+            secondary_text=secondary_text,
+        )
 
     bbox = AtlasProductAreaEngine.build_bbox_from_center(
         center_lat=CENTER_LAT,
@@ -78,6 +155,8 @@ def main():
         output_path=PRODUCT_OUTPUT_PATH,
         frame_spec=frame_spec,
         frame_depth_mm=FRAME_DEPTH_MM,
+        label_plate_spec=label_plate_spec,
+        label_text_spec=label_text_spec,
     )
 
     print("")

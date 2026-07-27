@@ -63,4 +63,4 @@ def test_competitor_profile_exposes_semantic_building_surface_colors():
     profile = AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
 
     assert profile.building_wall_rgb == profile.building_rgb
-    assert profile.building_roof_rgb == profile.building_rgb
+    assert profile.building_roof_rgb == (156, 48, 42)
