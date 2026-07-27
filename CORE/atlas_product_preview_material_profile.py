@@ -10,6 +10,8 @@ class AtlasProductPreviewMaterialProfile:
     name: str
     frame_rgb: RGB
     building_rgb: RGB
+    building_wall_rgb: RGB
+    building_roof_rgb: RGB
     terrain_rgb: RGB
     road_rgb: RGB
     green_rgb: RGB
@@ -45,6 +47,8 @@ class AtlasProductPreviewMaterialProfile:
             name="COMPETITOR_COMPARISON_V1",
             frame_rgb=(28, 28, 28),
             building_rgb=(232, 228, 216),
+            building_wall_rgb=(232, 228, 216),
+            building_roof_rgb=(232, 228, 216),
             terrain_rgb=(205, 190, 160),
             road_rgb=(190, 184, 170),
             green_rgb=(105, 137, 78),

@@ -75,6 +75,14 @@ class AtlasProductColorPreviewRenderer:
                 "rgb": material_profile.building_rgb,
                 "meshes": [],
             },
+            "building_walls": {
+                "rgb": material_profile.building_wall_rgb,
+                "meshes": [],
+            },
+            "building_roofs": {
+                "rgb": material_profile.building_roof_rgb,
+                "meshes": [],
+            },
             "roads": {
                 "rgb": material_profile.road_rgb,
                 "meshes": [],
@@ -97,6 +105,36 @@ class AtlasProductColorPreviewRenderer:
 
         for group_name, batch_name in cls.GROUP_TO_BATCH.items():
             for mesh in mesh_groups.get(group_name, []):
+                if (
+                    group_name == "buildings"
+                    and "building_wall_triangles" in mesh
+                    and "building_roof_triangles" in mesh
+                ):
+                    wall_mesh = {
+                        "type": mesh.get("type", "building"),
+                        "triangles": mesh["building_wall_triangles"],
+                    }
+                    roof_mesh = {
+                        "type": mesh.get("type", "building"),
+                        "triangles": mesh["building_roof_triangles"],
+                    }
+
+                    material_batches["building_walls"]["meshes"].append(
+                        cls._translate_mesh(
+                            wall_mesh,
+                            city_offset_x_mm,
+                            city_offset_y_mm,
+                        )
+                    )
+                    material_batches["building_roofs"]["meshes"].append(
+                        cls._translate_mesh(
+                            roof_mesh,
+                            city_offset_x_mm,
+                            city_offset_y_mm,
+                        )
+                    )
+                    continue
+
                 material_batches[batch_name]["meshes"].append(
                     cls._translate_mesh(
                         mesh,

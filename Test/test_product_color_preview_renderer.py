@@ -122,3 +122,44 @@ def test_renderer_maps_engine_waters_group_to_water_material_batch():
     )
 
     assert len(scene["material_batches"]["water"]["meshes"]) == 1
+
+
+
+def test_renderer_splits_semantic_building_walls_and_roofs():
+    wall_triangle = (
+        (10.0, 20.0, 0.8),
+        (11.0, 20.0, 0.8),
+        (10.0, 20.0, 5.0),
+    )
+    roof_triangle = (
+        (10.0, 20.0, 5.0),
+        (11.0, 20.0, 5.0),
+        (10.0, 21.0, 5.0),
+    )
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [
+        {
+            "type": "building",
+            "triangles": [wall_triangle, roof_triangle],
+            "building_wall_triangles": [wall_triangle],
+            "building_roof_triangles": [roof_triangle],
+        },
+    ]
+
+    profile = AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    batches = scene["material_batches"]
+
+    assert batches["building_walls"]["rgb"] == profile.building_wall_rgb
+    assert batches["building_roofs"]["rgb"] == profile.building_roof_rgb
+    assert len(batches["building_walls"]["meshes"]) == 1
+    assert len(batches["building_roofs"]["meshes"]) == 1
+    assert batches["buildings"]["meshes"] == []
