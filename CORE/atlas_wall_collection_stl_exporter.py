@@ -3,6 +3,8 @@ from __future__ import annotations
 from CORE.atlas_wall_collection_product_builder import (
     AtlasWallCollectionProductBuilder,
 )
+from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+from CORE.atlas_label_text_spec import AtlasLabelTextSpec
 from CORE.atlas_wall_frame_spec import AtlasWallFrameSpec
 from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
@@ -15,11 +17,15 @@ class AtlasWallCollectionSTLExporter:
         output_path,
         frame_spec: AtlasWallFrameSpec,
         frame_depth_mm: float,
+        label_plate_spec: AtlasLabelPlateSpec | None = None,
+        label_text_spec: AtlasLabelTextSpec | None = None,
     ) -> dict:
         product = AtlasWallCollectionProductBuilder.build(
             city_result=city_result,
             frame_spec=frame_spec,
             frame_depth_mm=frame_depth_mm,
+            label_plate_spec=label_plate_spec,
+            label_text_spec=label_text_spec,
         )
 
         AtlasSTLWriter.write(
