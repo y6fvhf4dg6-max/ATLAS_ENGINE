@@ -64,3 +64,51 @@ def test_competitor_profile_exposes_semantic_building_surface_colors():
 
     assert profile.building_wall_rgb == profile.building_rgb
     assert profile.building_roof_rgb == (156, 48, 42)
+
+def test_koeln_premium_v1_uses_locked_five_color_palette():
+    profile = AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+
+    white = (245, 245, 240)
+    red = (170, 35, 30)
+    green = (80, 125, 65)
+    black = (20, 20, 20)
+    blue = (70, 140, 180)
+
+    assert profile.name == "KOELN_PREMIUM_V1"
+
+    assert profile.frame_rgb == white
+    assert profile.terrain_rgb == white
+    assert profile.building_rgb == white
+    assert profile.building_wall_rgb == white
+    assert profile.road_rgb == white
+    assert profile.label_text_rgb == white
+
+    assert profile.building_roof_rgb == red
+
+    assert profile.green_rgb == green
+    assert profile.tree_rgb == green
+
+    assert profile.label_plate_rgb == black
+
+    assert profile.water_rgb == blue
+
+    assert {
+        profile.frame_rgb,
+        profile.terrain_rgb,
+        profile.building_rgb,
+        profile.building_wall_rgb,
+        profile.building_roof_rgb,
+        profile.road_rgb,
+        profile.green_rgb,
+        profile.tree_rgb,
+        profile.water_rgb,
+        profile.label_plate_rgb,
+        profile.label_text_rgb,
+    } == {
+        white,
+        red,
+        green,
+        black,
+        blue,
+    }
+

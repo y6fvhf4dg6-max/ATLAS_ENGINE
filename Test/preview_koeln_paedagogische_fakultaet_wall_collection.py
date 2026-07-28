@@ -4,6 +4,15 @@ from CORE.atlas_foundation_first_engine import AtlasFoundationFirstEngine
 from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
 from CORE.atlas_label_text_spec import AtlasLabelTextSpec
 from CORE.atlas_product_area_engine import AtlasProductAreaEngine
+from CORE.atlas_product_color_preview_renderer import (
+    AtlasProductColorPreviewRenderer,
+)
+from CORE.atlas_product_preview_material_profile import (
+    AtlasProductPreviewMaterialProfile,
+)
+from CORE.atlas_wall_collection_multicolor_stl_exporter import (
+    AtlasWallCollectionMulticolorSTLExporter,
+)
 from CORE.atlas_wall_collection_stl_exporter import (
     AtlasWallCollectionSTLExporter,
 )
@@ -20,6 +29,15 @@ CITY_OUTPUT_PATH = (
 PRODUCT_OUTPUT_PATH = (
     "OUTPUT/STL/"
     "koeln_paedagogische_fakultaet_wall_collection_150mm.stl"
+)
+
+MULTICOLOR_OUTPUT_DIRECTORY = (
+    "OUTPUT/STL/"
+    "koeln_paedagogische_fakultaet_multicolor"
+)
+
+MULTICOLOR_PRODUCT_NAME = (
+    "koeln_paedagogische_fakultaet_150mm"
 )
 
 CENTER_LAT = 50.93428235
@@ -159,6 +177,27 @@ def main(argv=None):
         label_text_spec=label_text_spec,
     )
 
+    material_profile = (
+        AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+    )
+
+    color_scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=frame_spec,
+        frame_depth_mm=FRAME_DEPTH_MM,
+        material_profile=material_profile,
+        label_plate_spec=label_plate_spec,
+        label_text_spec=label_text_spec,
+    )
+
+    multicolor_result = (
+        AtlasWallCollectionMulticolorSTLExporter.export_scene(
+            scene=color_scene,
+            output_directory=MULTICOLOR_OUTPUT_DIRECTORY,
+            product_name=MULTICOLOR_PRODUCT_NAME,
+        )
+    )
+
     print("")
     print("=" * 70)
     print("ATLAS WALL COLLECTION — FIRST REAL PRODUCT")
@@ -193,6 +232,21 @@ def main(argv=None):
     print(f"City triangles      : {city_result['triangles']}")
     print(f"Intermediate STL    : {CITY_OUTPUT_PATH}")
     print(f"Final product STL   : {PRODUCT_OUTPUT_PATH}")
+    print(
+        f"Multicolor profile  : "
+        f"{multicolor_result['profile_name']}"
+    )
+    print(
+        f"Multicolor parts    : "
+        f"{multicolor_result['part_count']}"
+    )
+
+    for color_name, part in multicolor_result["parts"].items():
+        print(
+            f"  {color_name:<7}          : "
+            f"{part['output_path']}"
+        )
+
     print("=" * 70)
 
 

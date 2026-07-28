@@ -78,20 +78,34 @@ Toplam fiziksel renk:
 
 En fazla 5
 
-Sabit renkler:
+Köln Premium V1 kilitli paleti:
 
-1. Frame + Label Plate
-2. Terrain + Roads
-3. Building Walls + Label Text
-4. Building Roofs (kırmızı / terracotta)
+1. Beyaz
+   - frame
+   - terrain
+   - roads
+   - building walls
+   - label text
+2. Kırmızı
+   - building roofs
+   - ileride seçili vurgu binası
+3. Yeşil
+   - parks
+   - trees
+4. Siyah
+   - label plate
+   - ileride plaka simgesi
+5. Mavi
+   - water
 
-Beşinci renk:
+Köln PBF sahnesinde su mesh'i bulunmadığı için mevcut gerçek paket dört STL üretmektedir:
 
-- Yeşil (park, ağaç, çimen)
+- white
+- red
+- green
+- black
 
-veya
-
-- Mavi (su alanları)
+Su bulunan ürünlerde blue STL otomatik olarak eklenir.
 
 
 ---
@@ -104,18 +118,29 @@ OSM / SRTM
 → parks
 → trees
 → buildings
-→ roof geometry
+→ semantic wall / roof separation
 → frame
+→ hidden keyhole hanger
 → label plate
 → label text
-→ single STL
+→ combined STL
+→ aligned multicolor STL package
 
-Final STL tek dosyada:
+Üretim çıktıları:
 
-- frame
-- city
-- label plate
-- label text
+1. Birleşik referans STL
+2. Aynı koordinat sisteminde renk bazlı ayrı STL dosyaları
+
+Köln gerçek çok renkli paket çıktıları:
+
+- `koeln_paedagogische_fakultaet_150mm__white.stl`
+- `koeln_paedagogische_fakultaet_150mm__red.stl`
+- `koeln_paedagogische_fakultaet_150mm__green.stl`
+- `koeln_paedagogische_fakultaet_150mm__black.stl`
+
+Çıktı klasörü:
+
+`OUTPUT/STL/koeln_paedagogische_fakultaet_multicolor/`
 
 ---
 
@@ -161,6 +186,52 @@ Wall Collection v1 etiket geometrisi dijital olarak kilitlenmiştir:
 Bu kilit yalnız etiket tasarımını kapsar. Köln fiziksel baskıyla doğrulanmadan genel Wall Collection standardı nihai olarak kilitlenmiş sayılmaz.
 
 ---
+
+## Fiziksel Köln baskısı ve askı revizyonu
+
+İlk gerçek beyaz Köln baskısı incelendi.
+
+Fiziksel gözlemler:
+
+- filament liflenmesi/stringing mevcut
+- tek renk ürün yeterli premium ayrışmayı sağlamıyor
+- siyah plaka ve beyaz yazı gerekli
+- kırmızı çatılar gerekli
+- yeşil alan katmanı gerekli
+- Pädagogische Fakultät binası özel olarak ayrıştırılmalı
+- plakaya mezuniyet kepi veya alternatif simge eklenmeli
+
+Askı kararı:
+
+- Mevcut revize keyhole askı kabul edildi.
+- Çivi başı girişi: 5.0 mm
+- Kilit kanalı: 3.0 mm
+- Kilitleme hareketi: 1.0 mm
+- Kapalı üst taşıyıcı duvar: 1.75 mm
+- 150, 200 ve 260 mm ürünlere genel motor standardı olarak uygulanır.
+- Commit: `404c0d2 Improve wall hanger nail retention`
+- Push tamamlandı.
+- Wall Collection ilgili regresyon: 28 passed
+
+## Çok renkli Köln üretim durumu
+
+Tamamlanan:
+
+- `KOELN_PREMIUM_V1` malzeme profili
+- semantik bina duvarı / çatı ayrımı
+- beş renkli STL paket exporter'ı
+- aynı RGB sınıfındaki mesh gruplarını tek STL içinde birleştirme
+- gerçek Köln dört renkli STL paketi üretimi
+- ilgili entegrasyon paketi: 25 passed
+
+Açık işler:
+
+- Pädagogische Fakultät hedef binasını komple kırmızı ayırmak
+- plakaya mezuniyet kepi veya seçilen simgeyi eklemek
+- STL parçalarını Bambu Studio'da tek assembly olarak açıp hizalamayı doğrulamak
+- filament atamalarını yapmak
+- dilimleme süresi ve filament tüketimini ölçmek
+- stringing sorununu baskı profili seviyesinde çözmek
 
 ## Köln tamamlanma kriterleri
 
@@ -209,9 +280,7 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Docs/STANDARDS/ATLAS_WALL_COLLECTION_REFERENCE_STANDARD.md
-
-Bu belge, Köln referans ürününden çıkarılan ve gelecekteki tüm Wall Collection ürünlerinde kullanılacak ortak standartları tanımlayacaktır.
+Köln için üretilen beyaz, kırmızı, yeşil ve siyah STL dosyalarını Bambu Studio'da tek assembly olarak açmak; parçaların aynı koordinatlarda kusursuz hizalandığını doğrulamak ve doğru filament slotlarını atamak.
 
 
 ---

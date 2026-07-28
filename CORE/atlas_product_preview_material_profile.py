@@ -59,3 +59,27 @@ class AtlasProductPreviewMaterialProfile:
             label_plate_rgb=(28, 28, 28),
             label_text_rgb=(232, 228, 216),
         )
+
+    @classmethod
+    def koeln_premium_v1(cls):
+        white = (245, 245, 240)
+        red = (170, 35, 30)
+        green = (80, 125, 65)
+        black = (20, 20, 20)
+        blue = (70, 140, 180)
+
+        return cls(
+            name="KOELN_PREMIUM_V1",
+            frame_rgb=white,
+            building_rgb=white,
+            building_wall_rgb=white,
+            building_roof_rgb=red,
+            terrain_rgb=white,
+            road_rgb=white,
+            green_rgb=green,
+            tree_rgb=green,
+            water_rgb=blue,
+            label_plate_rgb=black,
+            label_text_rgb=white,
+        )
+

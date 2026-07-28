@@ -64,22 +64,56 @@ Temel fikir:
 ## Fiziksel baskı standardı
 
 - Hedef yazıcı: Bambu Lab P2S Combo
-- En fazla 5 renk kullanılacak.
-- Çatılar kırmızı veya terracotta olacak.
+- Motor en fazla 5 fiziksel renk üretir.
+- Köln Premium V1 renk paleti:
 
-Sabit renk sınıfları:
+1. Beyaz:
+   - çerçeve
+   - terrain
+   - yollar
+   - bina duvarları
+   - plaka yazısı
+2. Kırmızı:
+   - bina çatıları
+   - ileride seçili vurgu binası
+3. Yeşil:
+   - parklar
+   - yeşil alanlar
+   - ağaçlar
+4. Siyah:
+   - bilgi plakası
+   - ileride plaka simgesi
+5. Mavi:
+   - deniz
+   - nehir
+   - göl
+   - kanal
+   - havuz
 
-1. Frame + Label Plate: siyah veya antrasit
-2. Terrain + Roads: sıcak taş veya kum tonu
-3. Building Walls + Label Text: kırık beyaz
-4. Building Roofs: kırmızı veya terracotta
+Köln sahnesinde mevcut su mesh'i bulunmadığı için ilk gerçek paket dört aktif renk üretmektedir: beyaz, kırmızı, yeşil ve siyah. Su içeren sahnelerde mavi STL otomatik olarak üretilir.
 
-Beşinci renk sahneye göre seçilir:
+Motor semantik material gruplarını gerçek baskı renklerine birleştirerek aynı koordinat sisteminde ayrı STL dosyaları üretir.
 
-- Yeşil: parklar, ağaçlar ve çimen
-- Mavi: deniz, nehir, göl, kanal ve havuz
+## Fiziksel Köln baskısından aktarılan motor kazanımları
 
-Dijital preview içindeki daha fazla material sınıfı fiziksel baskı standardı değildir.
+- İlk fiziksel Köln baskısında filament liflenmesi/stringing görüldü; bu konu baskı profili ve filament kalibrasyonu kapsamında çözülmelidir.
+- Askı geometrisi ana motor seviyesinde revize edildi.
+- Askı ölçüleri:
+  - çivi başı girişi: 5.0 mm
+  - kilit kanalı: 3.0 mm
+  - kilitleme hareketi: 1.0 mm
+  - üst kapalı taşıyıcı duvar: 1.75 mm
+- Askı değişikliği 150, 200 ve 260 mm Wall Collection ürünlerinin tamamına uygulanır.
+- Askı commit'i:
+  - `404c0d2 Improve wall hanger nail retention`
+- Wall Collection askı ve ürün regresyonu:
+  - 28 passed
+- Çok renkli üretim zinciri:
+  - `AtlasProductColorPreviewRenderer`
+  - `AtlasWallCollectionMulticolorSTLExporter`
+  - `KOELN_PREMIUM_V1`
+- Çok renkli zincir doğrulaması:
+  - 25 passed
 
 ## Ana belge yapısı
 
