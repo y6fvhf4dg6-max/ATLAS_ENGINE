@@ -15,6 +15,7 @@ from CORE.atlas_wall_hanger_spec import AtlasWallHangerSpec
 
 class AtlasWallCollectionProductBuilder:
     OPENING_TOLERANCE_MM = 0.001
+    LABEL_FRAME_EMBED_MM = 5.0
 
     @staticmethod
     def _translate_mesh(
@@ -122,6 +123,7 @@ class AtlasWallCollectionProductBuilder:
                 -(frame_spec.outer_height_mm / 2.0)
                 + frame_spec.frame_width_mm
                 + (label_plate_spec.height_mm / 2.0)
+                - AtlasWallCollectionProductBuilder.LABEL_FRAME_EMBED_MM
             )
 
             label_plate_mesh = AtlasLabelPlateMesher.build(

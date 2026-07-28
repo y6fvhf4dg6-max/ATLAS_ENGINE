@@ -141,8 +141,8 @@ def test_wall_collection_adds_optional_integrated_label_plate_without_moving_cit
     assert label_mesh["type"] == "label_plate"
     assert min(x for x, _, _ in vertices) == pytest.approx(-59.0)
     assert max(x for x, _, _ in vertices) == pytest.approx(59.0)
-    assert min(y for _, y, _ in vertices) == pytest.approx(-67.0)
-    assert max(y for _, y, _ in vertices) == pytest.approx(-53.0)
+    assert min(y for _, y, _ in vertices) == pytest.approx(-72.0)
+    assert max(y for _, y, _ in vertices) == pytest.approx(-58.0)
     assert min(z for _, _, z in vertices) == pytest.approx(6.0)
     assert max(z for _, _, z in vertices) == pytest.approx(7.2)
 
