@@ -163,3 +163,52 @@ def test_renderer_splits_semantic_building_walls_and_roofs():
     assert len(batches["building_walls"]["meshes"]) == 1
     assert len(batches["building_roofs"]["meshes"]) == 1
     assert batches["buildings"]["meshes"] == []
+
+
+def test_renderer_adds_optional_label_plate_and_text_material_batches():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    profile = AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+        label_plate_spec=AtlasLabelPlateSpec(),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="KÖLN",
+            secondary_text="2001",
+        ),
+    )
+
+    batches = scene["material_batches"]
+
+    assert batches["label_plate"]["rgb"] == profile.label_plate_rgb
+    assert batches["label_text"]["rgb"] == profile.label_text_rgb
+
+    assert len(batches["label_plate"]["meshes"]) == 1
+    assert len(batches["label_text"]["meshes"]) == 2
+
+    assert batches["label_plate"]["meshes"][0]["type"] == "label_plate"
+    assert batches["label_text"]["meshes"][0]["type"] == "label_text"
+    assert batches["label_text"]["meshes"][1]["type"] == "label_text"
+
+def test_renderer_uses_integrated_hidden_hanger_frame():
+    profile = AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=150.0,
+            outer_height_mm=150.0,
+            frame_width_mm=8.0,
+        ),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    frame_mesh = scene["material_batches"]["frame"]["meshes"][0]
+
+    assert frame_mesh["type"] == "wall_frame_with_hidden_hangers"
