@@ -1,4 +1,6 @@
 from CORE.atlas_foundation_first_engine import AtlasFoundationFirstEngine
+from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+from CORE.atlas_label_text_spec import AtlasLabelTextSpec
 from CORE.atlas_product_area_engine import AtlasProductAreaEngine
 from CORE.atlas_product_color_preview_obj_exporter import (
     AtlasProductColorPreviewOBJExporter,
@@ -10,6 +12,10 @@ from CORE.atlas_product_preview_material_profile import (
     AtlasProductPreviewMaterialProfile,
 )
 from CORE.atlas_wall_frame_spec import AtlasWallFrameSpec
+from Test.preview_koeln_paedagogische_fakultaet_wall_collection import (
+    WallCollectionPreviewArguments,
+    build_parser,
+)
 
 
 PBF_PATH = "Data/OSM/koeln-paedagogische-fakultaet-test.osm.pbf"
@@ -35,7 +41,26 @@ CITY_SIZE_MM = 134.0
 SCALE_RATIO = 5500.0
 
 
-def main():
+def main(argv=None):
+    arguments = build_parser().parse_args(
+        argv,
+        namespace=WallCollectionPreviewArguments(),
+    )
+    arguments.validate_label_text()
+
+    primary_text = arguments.primary_text.strip()
+    secondary_text = arguments.secondary_text.strip()
+
+    label_plate_spec = None
+    label_text_spec = None
+
+    if primary_text:
+        label_plate_spec = AtlasLabelPlateSpec()
+        label_text_spec = AtlasLabelTextSpec(
+            primary_text=primary_text,
+            secondary_text=secondary_text,
+        )
+
     frame_spec = AtlasWallFrameSpec(
         outer_width_mm=PRODUCT_OUTER_SIZE_MM,
         outer_height_mm=PRODUCT_OUTER_SIZE_MM,
@@ -75,6 +100,8 @@ def main():
         material_profile=(
             AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
         ),
+        label_plate_spec=label_plate_spec,
+        label_text_spec=label_text_spec,
     )
 
     result = AtlasProductColorPreviewOBJExporter.export(

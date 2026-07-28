@@ -7,7 +7,7 @@ def test_default_label_plate_defines_integrated_personalization_surface():
     spec = AtlasLabelPlateSpec()
 
     assert spec.width_mm == pytest.approx(118.0)
-    assert spec.height_mm == pytest.approx(14.0)
+    assert spec.height_mm == pytest.approx(11.0)
     assert spec.depth_mm == pytest.approx(1.2)
 
 

@@ -17,6 +17,8 @@ class AtlasProductPreviewMaterialProfile:
     green_rgb: RGB
     tree_rgb: RGB
     water_rgb: RGB
+    label_plate_rgb: RGB = (28, 28, 28)
+    label_text_rgb: RGB = (232, 228, 216)
 
     def __post_init__(self):
         for field in fields(self):
@@ -54,4 +56,6 @@ class AtlasProductPreviewMaterialProfile:
             green_rgb=(105, 137, 78),
             tree_rgb=(73, 105, 58),
             water_rgb=(104, 165, 184),
+            label_plate_rgb=(28, 28, 28),
+            label_text_rgb=(232, 228, 216),
         )
