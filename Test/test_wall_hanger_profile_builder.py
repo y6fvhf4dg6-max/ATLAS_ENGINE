@@ -33,8 +33,8 @@ def test_wall_hanger_profile_builds_valid_keyhole_inside_top_frame_band():
 
     min_x, min_y, max_x, max_y = polygon.bounds
 
-    assert min_x == pytest.approx(-2.75, abs=0.02)
-    assert max_x == pytest.approx(2.75, abs=0.02)
+    assert min_x == pytest.approx(-2.50, abs=0.02)
+    assert max_x == pytest.approx(2.50, abs=0.02)
 
     assert min_y >= 67.0
     assert max_y <= 75.0
@@ -85,3 +85,28 @@ def test_wall_hanger_profile_rejects_position_outside_frame():
             hanger_spec=hanger_spec,
             center_x_mm=74.0,
         )
+
+def test_wall_hanger_profile_preserves_closed_outer_retaining_wall():
+    frame_spec = AtlasWallFrameSpec()
+    hanger_spec = AtlasWallHangerSpec.for_product_size(
+        outer_width_mm=150.0,
+        outer_height_mm=150.0,
+        frame_width_mm=8.0,
+        frame_depth_mm=6.0,
+    )
+
+    profile = AtlasWallHangerProfileBuilder.build(
+        frame_spec=frame_spec,
+        hanger_spec=hanger_spec,
+        center_x_mm=0.0,
+    )
+
+    polygon = Polygon(profile["ring"])
+    _, _, _, max_y = polygon.bounds
+
+    outer_top_y_mm = frame_spec.outer_height_mm / 2.0
+    retaining_wall_mm = outer_top_y_mm - max_y
+
+    assert retaining_wall_mm >= 1.49
+    assert profile["closed_outer_wall_mm"] >= 1.49
+

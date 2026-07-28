@@ -121,10 +121,16 @@ class AtlasWallHangerProfileBuilder:
             for x, y in list(profile_polygon.exterior.coords)[:-1]
         ]
 
+        closed_outer_wall_mm = (
+            outer_half_y
+            - max_y
+        )
+
         return {
             "type": "wall_hanger_keyhole_profile",
             "center_x_mm": center_x_mm,
             "head_center_y_mm": head_center_y_mm,
             "neck_top_y_mm": neck_top_y_mm,
+            "closed_outer_wall_mm": closed_outer_wall_mm,
             "ring": ring,
         }

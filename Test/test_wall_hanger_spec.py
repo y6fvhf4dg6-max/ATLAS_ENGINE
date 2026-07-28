@@ -13,9 +13,9 @@ def test_150mm_wall_collection_uses_single_center_hanger():
 
     assert spec.hanger_count == 1
     assert spec.center_x_positions_mm == pytest.approx((0.0,))
-    assert spec.head_diameter_mm == pytest.approx(5.5)
-    assert spec.neck_width_mm == pytest.approx(3.2)
-    assert spec.locking_travel_mm == pytest.approx(2.0)
+    assert spec.head_diameter_mm == pytest.approx(5.0)
+    assert spec.neck_width_mm == pytest.approx(3.0)
+    assert spec.locking_travel_mm == pytest.approx(1.0)
     assert spec.recess_depth_mm == pytest.approx(3.0)
 
 
