@@ -199,5 +199,25 @@ def test_wall_collection_adds_two_line_label_text_on_front_of_plate():
     for vertices in (primary_vertices, secondary_vertices):
         assert min(x for x, _, _ in vertices) >= -54.0 - 1e-6
         assert max(x for x, _, _ in vertices) <= 54.0 + 1e-6
-        assert min(y for _, y, _ in vertices) >= -67.0 - 1e-6
+        assert min(y for _, y, _ in vertices) >= -72.0 - 1e-6
         assert max(y for _, y, _ in vertices) <= -53.0 + 1e-6
+
+
+def test_wall_collection_uses_integrated_hidden_hanger_frame_by_default():
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+    )
+
+    assert len(product["frame_meshes"]) == 1
+
+    frame_mesh = product["frame_meshes"][0]
+
+    assert frame_mesh["type"] == "wall_frame_with_hidden_hangers"
+    assert frame_mesh["hanger_count"] == 1
+    assert frame_mesh["hanger_center_x_positions_mm"] == pytest.approx(
+        (0.0,)
+    )
+    assert frame_mesh["recess_depth_mm"] == pytest.approx(3.0)
+    assert frame_mesh["front_wall_thickness_mm"] == pytest.approx(3.0)

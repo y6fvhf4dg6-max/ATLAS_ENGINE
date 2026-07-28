@@ -6,8 +6,11 @@ from CORE.atlas_label_plate_mesher import AtlasLabelPlateMesher
 from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
 from CORE.atlas_label_text_mesher import AtlasLabelTextMesher
 from CORE.atlas_label_text_spec import AtlasLabelTextSpec
-from CORE.atlas_wall_frame_mesher import AtlasWallFrameMesher
+from CORE.atlas_wall_frame_hanger_mesher import (
+    AtlasWallFrameHangerMesher,
+)
 from CORE.atlas_wall_frame_spec import AtlasWallFrameSpec
+from CORE.atlas_wall_hanger_spec import AtlasWallHangerSpec
 
 
 class AtlasWallCollectionProductBuilder:
@@ -86,9 +89,17 @@ class AtlasWallCollectionProductBuilder:
                     )
                 )
 
-        frame_mesh = AtlasWallFrameMesher.build(
-            spec=frame_spec,
-            depth_mm=frame_depth_mm,
+        hanger_spec = AtlasWallHangerSpec.for_product_size(
+            outer_width_mm=frame_spec.outer_width_mm,
+            outer_height_mm=frame_spec.outer_height_mm,
+            frame_width_mm=frame_spec.frame_width_mm,
+            frame_depth_mm=frame_depth_mm,
+        )
+
+        frame_mesh = AtlasWallFrameHangerMesher.build(
+            frame_spec=frame_spec,
+            hanger_spec=hanger_spec,
+            frame_depth_mm=frame_depth_mm,
         )
 
         frame_meshes = [frame_mesh]
