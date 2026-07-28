@@ -21,6 +21,11 @@ class AtlasLandmarkProviderOsm(AtlasLandmarkProvider):
             landmark_type = AtlasLandmarkType.TOWER
         elif tags.get("historic") == "memorial":
             landmark_type = AtlasLandmarkType.MEMORIAL
+        elif (
+            tags.get("historic") == "tomb"
+            and tags.get("tomb") == "rock-cut"
+        ):
+            landmark_type = AtlasLandmarkType.ROCK_CUT_TOMB
         else:
             landmark_type = AtlasLandmarkType.UNKNOWN
 

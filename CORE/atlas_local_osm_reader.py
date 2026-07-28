@@ -135,6 +135,12 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         }:
             return True
 
+        if (
+            historic == "tomb"
+            and tags.get("tomb") == "rock-cut"
+        ):
+            return True
+
         if tags.get("bridge") != "yes":
             return False
 

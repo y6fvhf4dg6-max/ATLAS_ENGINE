@@ -11,6 +11,7 @@ from CORE.atlas_castle_shell_triangulator import (
     AtlasCastleShellTriangulator,
 )
 from CORE.atlas_lighthouse_builder import AtlasLighthouseGeometry
+from CORE.atlas_rock_cut_tomb_builder import AtlasRockCutTombGeometry
 from CORE.atlas_tower_builder import AtlasTowerGeometry
 
 
@@ -26,9 +27,97 @@ class AtlasLandmarkGeometryMesher:
         if isinstance(geometry, AtlasTowerGeometry):
             return cls._build_tower_mesh(geometry)
 
+        if isinstance(geometry, AtlasRockCutTombGeometry):
+            return cls._build_rock_cut_tomb_mesh(geometry)
+
         raise TypeError(
             f"Unsupported landmark geometry: {type(geometry).__name__}"
         )
+
+    @classmethod
+    def _build_rock_cut_tomb_mesh(cls, geometry):
+        footprint = tuple(
+            (
+                float(x),
+                float(y),
+            )
+            for x, y in geometry.footprint
+        )
+
+        if len(footprint) < 3:
+            raise ValueError(
+                "Rock-cut tomb footprint requires at least three points"
+            )
+
+        height = float(geometry.height_m)
+
+        if height <= 0.0:
+            raise ValueError(
+                "Rock-cut tomb height must be positive"
+            )
+
+        bottom = tuple(
+            (
+                x,
+                y,
+                0.0,
+            )
+            for x, y in footprint
+        )
+
+        top = tuple(
+            (
+                x,
+                y,
+                height,
+            )
+            for x, y in footprint
+        )
+
+        triangles = []
+
+        triangles.extend(
+            cls._polygon_triangulate(
+                bottom,
+                reverse=True,
+            )
+        )
+
+        triangles.extend(
+            cls._polygon_triangulate(top)
+        )
+
+        for index in range(len(footprint)):
+            next_index = (
+                index + 1
+            ) % len(footprint)
+
+            bottom_left = bottom[index]
+            bottom_right = bottom[next_index]
+            top_left = top[index]
+            top_right = top[next_index]
+
+            triangles.extend(
+                (
+                    (
+                        bottom_left,
+                        bottom_right,
+                        top_right,
+                    ),
+                    (
+                        bottom_left,
+                        top_right,
+                        top_left,
+                    ),
+                )
+            )
+
+        return {
+            "type": "rock_cut_tomb",
+            "triangles": triangles,
+            "bottom": bottom,
+            "top": top,
+        }
 
     @staticmethod
     def _fan_triangulate(ring, reverse=False):

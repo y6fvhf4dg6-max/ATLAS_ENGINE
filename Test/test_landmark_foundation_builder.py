@@ -318,3 +318,65 @@ def test_galata_bridge_supports_embed_into_continuous_deck():
             support_top_z - deck_bottom_z
             == pytest.approx(0.15)
         )
+
+
+def test_rock_cut_tomb_node_gets_printable_stl_footprint():
+    source = {
+        "id": 5825276872,
+        "geometry_type": "node",
+        "lat": 50.0,
+        "lon": 8.0,
+        "tags": {
+            "historic": "tomb",
+            "tomb": "rock-cut",
+            "tourism": "attraction",
+        },
+    }
+
+    footprint = (
+        AtlasLandmarkFoundationBuilder
+        ._resolve_stl_footprint(
+            source=source,
+            coordinate_engine=FakeCoordinateEngine(),
+        )
+    )
+
+    expected = (
+        (-4.0, -1.0),
+        (4.0, -1.0),
+        (4.0, 1.0),
+        (-4.0, 1.0),
+    )
+
+    assert len(footprint) == len(expected)
+
+    for actual_point, expected_point in zip(
+        footprint,
+        expected,
+    ):
+        assert actual_point == pytest.approx(expected_point)
+
+
+def test_rock_cut_tomb_node_builds_landmark_mesh():
+    source = {
+        "id": 5825276872,
+        "geometry_type": "node",
+        "lat": 50.0,
+        "lon": 8.0,
+        "tags": {
+            "historic": "tomb",
+            "tomb": "rock-cut",
+            "tourism": "attraction",
+        },
+    }
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=FakeTerrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert meshes[0]["landmark_id"] == 5825276872
+    assert meshes[0]["type"] == "rock_cut_tomb"

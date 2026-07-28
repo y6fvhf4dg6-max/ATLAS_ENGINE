@@ -7,6 +7,7 @@ class AtlasLandmarkType(Enum):
     MEMORIAL = auto()
     STATUE = auto()
     OBELISK = auto()
+    ROCK_CUT_TOMB = auto()
 
     CLOCK_TOWER = auto()
     TOWER = auto()

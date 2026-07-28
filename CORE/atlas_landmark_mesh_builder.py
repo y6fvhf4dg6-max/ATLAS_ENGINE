@@ -8,6 +8,7 @@ from CORE.atlas_landmark_geometry_mesher import (
 )
 from CORE.atlas_landmark_type import AtlasLandmarkType
 from CORE.atlas_lighthouse_builder import AtlasLighthouseBuilder
+from CORE.atlas_rock_cut_tomb_builder import AtlasRockCutTombBuilder
 from CORE.atlas_tower_builder import AtlasTowerBuilder
 
 
@@ -15,6 +16,7 @@ class AtlasLandmarkMeshBuilder:
     _BUILDERS = {
         AtlasLandmarkType.BRIDGE: AtlasBridgeBuilder,
         AtlasLandmarkType.LIGHTHOUSE: AtlasLighthouseBuilder,
+        AtlasLandmarkType.ROCK_CUT_TOMB: AtlasRockCutTombBuilder,
         AtlasLandmarkType.TOWER: AtlasTowerBuilder,
     }
 

@@ -127,6 +127,62 @@ class AtlasLandmarkFoundationBuilder:
 
         return meshes
 
+    @staticmethod
+    def _resolve_stl_footprint(
+        *,
+        source,
+        coordinate_engine,
+    ):
+        geometry = tuple(source.get("geometry", ()))
+
+        if len(geometry) >= 3:
+            return tuple(
+                coordinate_engine.geometry_to_stl_mm(geometry)
+            )
+
+        tags = source.get("tags", {}) or {}
+
+        is_rock_cut_tomb_node = (
+            source.get("geometry_type") == "node"
+            and tags.get("historic") == "tomb"
+            and tags.get("tomb") == "rock-cut"
+        )
+
+        if not is_rock_cut_tomb_node:
+            return ()
+
+        lat = float(source["lat"])
+        lon = float(source["lon"])
+
+        center = tuple(
+            coordinate_engine.geometry_to_stl_mm(
+                ((lat, lon),)
+            )
+        )[0]
+
+        center_x, center_y = center
+        half_width_mm = 4.0
+        half_depth_mm = 1.0
+
+        return (
+            (
+                center_x - half_width_mm,
+                center_y - half_depth_mm,
+            ),
+            (
+                center_x + half_width_mm,
+                center_y - half_depth_mm,
+            ),
+            (
+                center_x + half_width_mm,
+                center_y + half_depth_mm,
+            ),
+            (
+                center_x - half_width_mm,
+                center_y + half_depth_mm,
+            ),
+        )
+
     @classmethod
     def _build_landmark_mesh(
         cls,
@@ -137,7 +193,12 @@ class AtlasLandmarkFoundationBuilder:
     ):
         geometry = tuple(source.get("geometry", ()))
 
-        if len(geometry) < 3:
+        stl_footprint = cls._resolve_stl_footprint(
+            source=source,
+            coordinate_engine=coordinate_engine,
+        )
+
+        if len(stl_footprint) < 3:
             return None
 
         landmark = AtlasLandmarkProviderOsm.from_source(source)
@@ -161,10 +222,6 @@ class AtlasLandmarkFoundationBuilder:
             )
 
             resolved_geometry = builder.build(metric_landmark)
-
-            stl_footprint = tuple(
-                coordinate_engine.geometry_to_stl_mm(geometry)
-            )
 
             scaled_height = (
                 coordinate_engine.height_to_stl_mm(
