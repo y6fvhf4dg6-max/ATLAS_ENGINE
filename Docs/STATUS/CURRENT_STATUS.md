@@ -15,7 +15,7 @@ okunmalıdır.
 
 ## Güncelleme tarihi
 
-2026-07-28
+2026-07-29
 
 ---
 
@@ -136,7 +136,8 @@ Köln gerçek çok renkli paket çıktıları:
 - `koeln_paedagogische_fakultaet_150mm__white.stl`
 - `koeln_paedagogische_fakultaet_150mm__red.stl`
 - `koeln_paedagogische_fakultaet_150mm__green.stl`
-- `koeln_paedagogische_fakultaet_150mm__black.stl`
+
+Son gerçek topoloji üretimi etiket parametreleri olmadan çalıştırıldığı için bu doğrulamada siyah plaka STL'si üretilmedi. Etiket plakası etkinleştirildiğinde `black` STL aynı multicolor exporter tarafından oluşturulur.
 
 Çıktı klasörü:
 
@@ -221,8 +222,29 @@ Tamamlanan:
 - semantik bina duvarı / çatı ayrımı
 - beş renkli STL paket exporter'ı
 - aynı RGB sınıfındaki mesh gruplarını tek STL içinde birleştirme
-- gerçek Köln dört renkli STL paketi üretimi
-- ilgili entegrasyon paketi: 25 passed
+- aynı renk grubundaki birebir yinelenen üçgenleri exporter seviyesinde tekilleştirme
+- aynı yükseklikte tamamen örtülen gereksiz `building:part` meshlerini renderer seviyesinde eleme
+- `leisure:park` tarafından tamamen örtülen `landuse:grass` meshlerini eleme
+- aynı renkli komşu parkların ortak iç sınır duvarlarını kaldırma
+- yalnız tek noktada temas eden park katılarını baskı toleransının altında ayrıştırma
+- farklı yükseklikteki komşu bina renk katılarını silmeden ayrıştırma
+- semantik bina üçgenleri, `bottom`, `top` ve çatı metadata geometrisini birlikte taşıma
+- gerçek Köln white, red ve green STL üretimi
+- renderer ve multicolor exporter paketi: `20 passed`
+- commit: `9436dea Fix multicolor wall collection topology`
+- push: `origin/main`
+
+Topoloji temizliğinden önceki non-manifold değerleri:
+
+- white: `95`
+- red: `88`
+- green: `26`
+
+Son gerçek Köln multicolor STL doğrulaması:
+
+- white: `20356` triangle, `0 open edge`, `0 non-manifold edge`
+- red: `9188` triangle, `0 open edge`, `0 non-manifold edge`
+- green: `32588` triangle, `0 open edge`, `0 non-manifold edge`
 
 Açık işler:
 
@@ -280,7 +302,7 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Köln için üretilen beyaz, kırmızı, yeşil ve siyah STL dosyalarını Bambu Studio'da tek assembly olarak açmak; parçaların aynı koordinatlarda kusursuz hizalandığını doğrulamak ve doğru filament slotlarını atamak.
+Köln preview üretimini siyah etiket plakası ve beyaz etiket yazısı parametreleriyle çalıştırmak; ardından white, red, green ve black STL dosyalarını Bambu Studio'da tek assembly olarak açarak koordinat hizalamasını ve filament slotlarını doğrulamak.
 
 
 ---

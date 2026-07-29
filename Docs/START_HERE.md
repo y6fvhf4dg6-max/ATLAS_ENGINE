@@ -113,7 +113,20 @@ Motor semantik material gruplarını gerçek baskı renklerine birleştirerek ay
   - `AtlasWallCollectionMulticolorSTLExporter`
   - `KOELN_PREMIUM_V1`
 - Çok renkli zincir doğrulaması:
-  - 25 passed
+  - Renderer ve exporter odaklı paket: `20 passed`
+- Köln gerçek multicolor STL topolojisi doğrulandı:
+  - white: `0 open edge`, `0 non-manifold edge`
+  - red: `0 open edge`, `0 non-manifold edge`
+  - green: `0 open edge`, `0 non-manifold edge`
+- Renderer seviyesinde uygulanan kalıcı topoloji kuralları:
+  - aynı yükseklikte tamamen örtülen gereksiz `building:part` meshleri elenir
+  - `leisure:park`, tamamen örttüğü `landuse:grass` yüzeyine öncelik verir
+  - aynı renkli komşu parkların ortak iç sınır duvarları kaldırılır
+  - yalnız tek noktada temas eden park katıları baskı toleransının altında ayrıştırılır
+  - farklı yükseklikteki komşu bina renk katıları korunarak mikroskobik biçimde ayrıştırılır
+- Aynı renk grubundaki birebir yinelenen üçgenler exporter seviyesinde tekilleştirilir.
+- Kilit commit:
+  - `9436dea Fix multicolor wall collection topology`
 
 ## Ana belge yapısı
 
