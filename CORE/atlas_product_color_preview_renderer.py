@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from shapely.geometry import Polygon
+
 from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
 from CORE.atlas_label_text_spec import AtlasLabelTextSpec
 from CORE.atlas_product_preview_material_profile import (
     AtlasProductPreviewMaterialProfile,
+)
+from CORE.atlas_polygon_triangulator import (
+    AtlasPolygonTriangulator,
 )
 from CORE.atlas_wall_collection_product_builder import (
     AtlasWallCollectionProductBuilder,
@@ -18,6 +23,8 @@ from CORE.atlas_wall_frame_spec import AtlasWallFrameSpec
 
 
 class AtlasProductColorPreviewRenderer:
+    DEFAULT_COLOR_ROOF_THICKNESS_MM = 0.40
+
     GROUP_TO_BATCH = {
         "terrain": "terrain",
         "buildings": "buildings",
@@ -49,6 +56,951 @@ class AtlasProductColorPreviewRenderer:
             ]
 
         return translated
+
+    @staticmethod
+    def _replace_z(
+        point: tuple,
+        *,
+        source_z: float,
+        target_z: float,
+        tolerance: float = 1e-6,
+    ) -> tuple:
+        x, y, z = point
+
+        if abs(float(z) - float(source_z)) <= tolerance:
+            z = target_z
+
+        return (
+            float(x),
+            float(y),
+            float(z),
+        )
+
+    @staticmethod
+    def _triangulate_ring_at_z(
+        points: list,
+        *,
+        z_level: float,
+        reverse: bool = False,
+    ) -> list:
+        ring = []
+
+        for point in points:
+            if len(point) < 2:
+                continue
+
+            xy = (
+                float(point[0]),
+                float(point[1]),
+            )
+
+            if ring and xy == ring[-1]:
+                continue
+
+            ring.append(xy)
+
+        if len(ring) > 1 and ring[0] == ring[-1]:
+            ring.pop()
+
+        flat_triangles = AtlasPolygonTriangulator.triangulate(
+            ring
+        )
+
+        triangles = []
+
+        for first, second, third in flat_triangles:
+            first_3d = (
+                float(first[0]),
+                float(first[1]),
+                float(z_level),
+            )
+            second_3d = (
+                float(second[0]),
+                float(second[1]),
+                float(z_level),
+            )
+            third_3d = (
+                float(third[0]),
+                float(third[1]),
+                float(z_level),
+            )
+
+            if reverse:
+                triangles.append(
+                    (
+                        first_3d,
+                        third_3d,
+                        second_3d,
+                    )
+                )
+            else:
+                triangles.append(
+                    (
+                        first_3d,
+                        second_3d,
+                        third_3d,
+                    )
+                )
+
+        return triangles
+
+    @classmethod
+    def _build_pitched_roof_color_solids(
+        cls,
+        *,
+        mesh: dict,
+    ) -> tuple[dict, dict] | None:
+        roof_geometry = mesh.get("roof_geometry")
+
+        if roof_geometry not in {"gable", "hipped"}:
+            return None
+
+        wall_triangles = list(
+            mesh.get("building_wall_triangles", [])
+        )
+        roof_triangles = list(
+            mesh.get("building_roof_triangles", [])
+        )
+        top_points = list(mesh.get("top", []))
+
+        if (
+            not wall_triangles
+            or not roof_triangles
+            or len(top_points) < 3
+        ):
+            return None
+
+        body_top_z = mesh.get("body_top_z")
+
+        if body_top_z is None:
+            body_top_z = max(
+                float(point[2])
+                for triangle in wall_triangles
+                for point in triangle
+            )
+
+        bottom_points = list(mesh.get("bottom", []))
+
+        if bottom_points:
+            bottom_z = min(
+                float(point[2])
+                for point in bottom_points
+            )
+        else:
+            bottom_z = min(
+                float(point[2])
+                for triangle in wall_triangles
+                for point in triangle
+            )
+
+        body_top_triangles = cls._triangulate_ring_at_z(
+            top_points,
+            z_level=float(body_top_z),
+            reverse=False,
+        )
+
+        if not body_top_triangles:
+            return None
+
+        bottom_triangles = [
+            triangle
+            for triangle in mesh.get("triangles", [])
+            if all(
+                abs(
+                    float(point[2])
+                    - bottom_z
+                ) <= 1e-6
+                for point in triangle
+            )
+        ]
+
+        if not bottom_triangles:
+            bottom_triangles = cls._triangulate_ring_at_z(
+                bottom_points or top_points,
+                z_level=bottom_z,
+                reverse=True,
+            )
+
+        closed_roof_triangles = list(roof_triangles)
+
+        if roof_geometry == "hipped":
+            roof_bottom_triangles = (
+                cls._triangulate_ring_at_z(
+                    top_points,
+                    z_level=float(body_top_z),
+                    reverse=True,
+                )
+            )
+
+            if not roof_bottom_triangles:
+                return None
+
+            closed_roof_triangles.extend(
+                roof_bottom_triangles
+            )
+
+        wall_mesh = {
+            "type": "building_wall_color_solid",
+            "triangles": [
+                *bottom_triangles,
+                *wall_triangles,
+                *body_top_triangles,
+            ],
+        }
+        roof_mesh = {
+            "type": "building_roof_color_solid",
+            "triangles": closed_roof_triangles,
+        }
+
+        return wall_mesh, roof_mesh
+
+    @classmethod
+    def _build_flat_roof_color_solids(
+        cls,
+        *,
+        mesh: dict,
+    ) -> tuple[dict, dict] | None:
+        roof_triangles = list(
+            mesh.get(
+                "building_flat_roof_triangles",
+                [],
+            )
+        )
+        wall_triangles = list(
+            mesh.get(
+                "building_wall_triangles",
+                [],
+            )
+        )
+
+        if not roof_triangles or not wall_triangles:
+            return None
+
+        roof_z_values = {
+            round(float(point[2]), 6)
+            for triangle in roof_triangles
+            for point in triangle
+        }
+
+        if len(roof_z_values) != 1:
+            return None
+
+        roof_top_z = float(next(iter(roof_z_values)))
+        bottom_points = list(mesh.get("bottom", []))
+
+        if bottom_points:
+            bottom_z = min(
+                float(point[2])
+                for point in bottom_points
+            )
+        else:
+            bottom_z = min(
+                float(point[2])
+                for triangle in wall_triangles
+                for point in triangle
+            )
+
+        available_height = roof_top_z - bottom_z
+
+        if available_height <= 0.0:
+            return None
+
+        roof_thickness_mm = min(
+            cls.DEFAULT_COLOR_ROOF_THICKNESS_MM,
+            available_height / 2.0,
+        )
+        roof_bottom_z = roof_top_z - roof_thickness_mm
+
+        lowered_wall_triangles = [
+            tuple(
+                cls._replace_z(
+                    point,
+                    source_z=roof_top_z,
+                    target_z=roof_bottom_z,
+                )
+                for point in triangle
+            )
+            for triangle in wall_triangles
+        ]
+
+        wall_top_triangles = [
+            tuple(
+                cls._replace_z(
+                    point,
+                    source_z=roof_top_z,
+                    target_z=roof_bottom_z,
+                )
+                for point in triangle
+            )
+            for triangle in roof_triangles
+        ]
+
+        bottom_triangles = [
+            triangle
+            for triangle in mesh.get("triangles", [])
+            if all(
+                abs(float(point[2]) - bottom_z) <= 1e-6
+                for point in triangle
+            )
+        ]
+
+        if not bottom_triangles:
+            bottom_triangles = cls._triangulate_ring_at_z(
+                bottom_points or mesh.get("top", []),
+                z_level=bottom_z,
+                reverse=True,
+            )
+
+        roof_bottom_triangles = [
+            (
+                cls._replace_z(
+                    triangle[0],
+                    source_z=roof_top_z,
+                    target_z=roof_bottom_z,
+                ),
+                cls._replace_z(
+                    triangle[2],
+                    source_z=roof_top_z,
+                    target_z=roof_bottom_z,
+                ),
+                cls._replace_z(
+                    triangle[1],
+                    source_z=roof_top_z,
+                    target_z=roof_bottom_z,
+                ),
+            )
+            for triangle in roof_triangles
+        ]
+
+        boundary_edges = {}
+
+        for triangle in roof_triangles:
+            for first, second in (
+                (triangle[0], triangle[1]),
+                (triangle[1], triangle[2]),
+                (triangle[2], triangle[0]),
+            ):
+                first_key = tuple(
+                    round(float(value), 6)
+                    for value in first
+                )
+                second_key = tuple(
+                    round(float(value), 6)
+                    for value in second
+                )
+                key = tuple(sorted((first_key, second_key)))
+
+                if key in boundary_edges:
+                    boundary_edges[key]["count"] += 1
+                else:
+                    boundary_edges[key] = {
+                        "count": 1,
+                        "first": first,
+                        "second": second,
+                    }
+
+        roof_side_triangles = []
+
+        for edge in boundary_edges.values():
+            if edge["count"] != 1:
+                continue
+
+            top_first = edge["first"]
+            top_second = edge["second"]
+            bottom_first = cls._replace_z(
+                top_first,
+                source_z=roof_top_z,
+                target_z=roof_bottom_z,
+            )
+            bottom_second = cls._replace_z(
+                top_second,
+                source_z=roof_top_z,
+                target_z=roof_bottom_z,
+            )
+
+            roof_side_triangles.extend(
+                [
+                    (
+                        bottom_first,
+                        bottom_second,
+                        top_second,
+                    ),
+                    (
+                        bottom_first,
+                        top_second,
+                        top_first,
+                    ),
+                ]
+            )
+
+        wall_mesh = {
+            "type": "building_wall_color_solid",
+            "triangles": [
+                *bottom_triangles,
+                *lowered_wall_triangles,
+                *wall_top_triangles,
+            ],
+        }
+        roof_mesh = {
+            "type": "building_roof_color_solid",
+            "triangles": [
+                *roof_triangles,
+                *roof_bottom_triangles,
+                *roof_side_triangles,
+            ],
+        }
+
+        return wall_mesh, roof_mesh
+
+    @staticmethod
+    def _safe_footprint_polygon(mesh: dict) -> Polygon | None:
+        points = list(mesh.get("bottom", []))
+
+        if len(points) < 3:
+            points = list(mesh.get("top", []))
+
+        ring = []
+
+        for point in points:
+            if len(point) < 2:
+                continue
+
+            xy = (
+                float(point[0]),
+                float(point[1]),
+            )
+
+            if ring and xy == ring[-1]:
+                continue
+
+            ring.append(xy)
+
+        if len(ring) > 1 and ring[0] == ring[-1]:
+            ring.pop()
+
+        if len(ring) < 3:
+            return None
+
+        try:
+            polygon = Polygon(ring)
+        except (TypeError, ValueError):
+            return None
+
+        if not polygon.is_valid:
+            polygon = polygon.buffer(0)
+
+        if (
+            polygon.is_empty
+            or not polygon.is_valid
+            or polygon.area <= 0.0
+        ):
+            return None
+
+        return polygon
+
+    @staticmethod
+    def _mesh_bottom_top_z(
+        mesh: dict,
+    ) -> tuple[float, float] | None:
+        bottom_points = list(mesh.get("bottom", []))
+        top_points = list(mesh.get("top", []))
+
+        bottom_z = mesh.get("foundation_z")
+        top_z = mesh.get("body_top_z")
+
+        if bottom_points:
+            bottom_z = min(
+                float(point[2])
+                for point in bottom_points
+                if len(point) >= 3
+            )
+
+        if top_points:
+            top_z = max(
+                float(point[2])
+                for point in top_points
+                if len(point) >= 3
+            )
+
+        if bottom_z is None or top_z is None:
+            return None
+
+        return (
+            float(bottom_z),
+            float(top_z),
+        )
+
+    @classmethod
+    def _filter_covered_same_height_building_parts(
+        cls,
+        meshes: list,
+        *,
+        z_tolerance: float = 1e-6,
+        coverage_tolerance: float = 1e-6,
+    ) -> list:
+        prepared = []
+
+        for mesh in meshes:
+            polygon = cls._safe_footprint_polygon(mesh)
+            z_range = cls._mesh_bottom_top_z(mesh)
+
+            prepared.append(
+                {
+                    "mesh": mesh,
+                    "polygon": polygon,
+                    "z_range": z_range,
+                    "is_building_part": bool(
+                        mesh.get("is_building_part")
+                        or (
+                            mesh.get(
+                                "building_roof_decision_source"
+                            )
+                            == "building_part"
+                        )
+                    ),
+                }
+            )
+
+        retained = []
+
+        for candidate in prepared:
+            if not candidate["is_building_part"]:
+                retained.append(candidate["mesh"])
+                continue
+
+            candidate_polygon = candidate["polygon"]
+
+            if candidate_polygon is None:
+                retained.append(candidate["mesh"])
+                continue
+
+            covered = False
+
+            for parent in prepared:
+                if parent is candidate:
+                    continue
+
+                if parent["is_building_part"]:
+                    continue
+
+                parent_polygon = parent["polygon"]
+
+                if parent_polygon is None:
+                    continue
+
+                if parent_polygon.buffer(
+                    coverage_tolerance
+                ).covers(candidate_polygon):
+                    covered = True
+                    break
+
+            if not covered:
+                retained.append(candidate["mesh"])
+
+        return retained
+
+    @classmethod
+    def _separate_touching_building_solids(
+        cls,
+        meshes: list,
+        *,
+        separation_mm: float = 1e-4,
+    ) -> list:
+        separated = [deepcopy(mesh) for mesh in meshes]
+        polygons = [
+            cls._safe_footprint_polygon(mesh)
+            for mesh in separated
+        ]
+
+        for first_index in range(len(separated)):
+            first_polygon = polygons[first_index]
+
+            if first_polygon is None:
+                continue
+
+            for second_index in range(
+                first_index + 1,
+                len(separated),
+            ):
+                second_polygon = polygons[second_index]
+
+                if second_polygon is None:
+                    continue
+
+                if not first_polygon.intersects(second_polygon):
+                    continue
+
+                first_centroid = first_polygon.centroid
+                second_centroid = second_polygon.centroid
+
+                offset_x = (
+                    float(second_centroid.x)
+                    - float(first_centroid.x)
+                )
+                offset_y = (
+                    float(second_centroid.y)
+                    - float(first_centroid.y)
+                )
+                length = (
+                    offset_x * offset_x
+                    + offset_y * offset_y
+                ) ** 0.5
+
+                if length <= 1e-12:
+                    offset_x = separation_mm
+                    offset_y = 0.0
+                else:
+                    offset_x = (
+                        offset_x / length
+                    ) * separation_mm
+                    offset_y = (
+                        offset_y / length
+                    ) * separation_mm
+
+                separated[second_index] = (
+                    cls._translate_mesh_geometry_xy(
+                        separated[second_index],
+                        offset_x_mm=offset_x,
+                        offset_y_mm=offset_y,
+                    )
+                )
+                polygons[second_index] = (
+                    cls._safe_footprint_polygon(
+                        separated[second_index]
+                    )
+                )
+
+        return separated
+
+    @classmethod
+    def _filter_covered_grass_parks(
+        cls,
+        meshes: list,
+        *,
+        coverage_tolerance: float = 1e-6,
+    ) -> list:
+        prepared = []
+
+        for mesh in meshes:
+            prepared.append(
+                {
+                    "mesh": mesh,
+                    "park_type": mesh.get("park_type"),
+                    "polygon": cls._safe_footprint_polygon(mesh),
+                }
+            )
+
+        retained = []
+
+        for candidate in prepared:
+            if candidate["park_type"] != "landuse:grass":
+                retained.append(candidate["mesh"])
+                continue
+
+            candidate_polygon = candidate["polygon"]
+
+            if candidate_polygon is None:
+                retained.append(candidate["mesh"])
+                continue
+
+            covered = False
+
+            for parent in prepared:
+                if parent is candidate:
+                    continue
+
+                if parent["park_type"] != "leisure:park":
+                    continue
+
+                parent_polygon = parent["polygon"]
+
+                if parent_polygon is None:
+                    continue
+
+                if parent_polygon.buffer(
+                    coverage_tolerance
+                ).covers(candidate_polygon):
+                    covered = True
+                    break
+
+            if not covered:
+                retained.append(candidate["mesh"])
+
+        return retained
+
+    @staticmethod
+    def _triangle_xy_area(triangle: tuple) -> float:
+        first, second, third = triangle
+
+        return abs(
+            (
+                float(first[0])
+                * (
+                    float(second[1])
+                    - float(third[1])
+                )
+                + float(second[0])
+                * (
+                    float(third[1])
+                    - float(first[1])
+                )
+                + float(third[0])
+                * (
+                    float(first[1])
+                    - float(second[1])
+                )
+            )
+            / 2.0
+        )
+
+    @classmethod
+    def _remove_internal_park_boundary_walls(
+        cls,
+        meshes: list,
+        *,
+        boundary_tolerance: float = 1e-6,
+    ) -> list:
+        prepared = [
+            {
+                "mesh": mesh,
+                "polygon": cls._safe_footprint_polygon(mesh),
+            }
+            for mesh in meshes
+        ]
+
+        shared_boundaries = {
+            index: []
+            for index in range(len(prepared))
+        }
+
+        for first_index, first in enumerate(prepared):
+            first_polygon = first["polygon"]
+
+            if first_polygon is None:
+                continue
+
+            for second_index in range(
+                first_index + 1,
+                len(prepared),
+            ):
+                second_polygon = prepared[
+                    second_index
+                ]["polygon"]
+
+                if second_polygon is None:
+                    continue
+
+                shared = first_polygon.boundary.intersection(
+                    second_polygon.boundary
+                )
+
+                if shared.is_empty or shared.length <= 0.0:
+                    continue
+
+                shared_boundaries[first_index].append(shared)
+                shared_boundaries[second_index].append(shared)
+
+        cleaned_meshes = []
+
+        for mesh_index, prepared_mesh in enumerate(prepared):
+            mesh = prepared_mesh["mesh"]
+            boundaries = shared_boundaries[mesh_index]
+
+            if not boundaries:
+                cleaned_meshes.append(mesh)
+                continue
+
+            cleaned = deepcopy(mesh)
+            retained_triangles = []
+
+            for triangle in mesh.get("triangles", []):
+                if (
+                    cls._triangle_xy_area(triangle)
+                    > boundary_tolerance
+                ):
+                    retained_triangles.append(triangle)
+                    continue
+
+                xy_points = [
+                    (
+                        float(point[0]),
+                        float(point[1]),
+                    )
+                    for point in triangle
+                ]
+
+                lies_on_shared_boundary = any(
+                    all(
+                        boundary.distance(
+                            Polygon(
+                                [
+                                    xy_point,
+                                    (
+                                        xy_point[0]
+                                        + boundary_tolerance,
+                                        xy_point[1],
+                                    ),
+                                    (
+                                        xy_point[0],
+                                        xy_point[1]
+                                        + boundary_tolerance,
+                                    ),
+                                ]
+                            ).centroid
+                        )
+                        <= boundary_tolerance
+                        for xy_point in xy_points
+                    )
+                    for boundary in boundaries
+                )
+
+                if not lies_on_shared_boundary:
+                    retained_triangles.append(triangle)
+
+            cleaned["triangles"] = retained_triangles
+            cleaned_meshes.append(cleaned)
+
+        return cleaned_meshes
+
+    @classmethod
+    def _translate_mesh_geometry_xy(
+        cls,
+        mesh: dict,
+        *,
+        offset_x_mm: float,
+        offset_y_mm: float,
+    ) -> dict:
+        translated = deepcopy(mesh)
+
+        triangle_keys = (
+            "triangles",
+            "building_wall_triangles",
+            "building_roof_triangles",
+            "building_flat_roof_triangles",
+            "building_gable_roof_triangles",
+            "building_hipped_roof_triangles",
+        )
+
+        for key in triangle_keys:
+            if key not in translated:
+                continue
+
+            translated[key] = [
+                tuple(
+                    (
+                        float(point[0]) + offset_x_mm,
+                        float(point[1]) + offset_y_mm,
+                        float(point[2]),
+                    )
+                    for point in triangle
+                )
+                for triangle in translated[key]
+            ]
+
+        for key in ("bottom", "top"):
+            if key not in translated:
+                continue
+
+            translated[key] = [
+                (
+                    float(point[0]) + offset_x_mm,
+                    float(point[1]) + offset_y_mm,
+                    float(point[2]),
+                )
+                for point in translated[key]
+            ]
+
+        if translated.get("roof_apex") is not None:
+            point = translated["roof_apex"]
+            translated["roof_apex"] = (
+                float(point[0]) + offset_x_mm,
+                float(point[1]) + offset_y_mm,
+                float(point[2]),
+            )
+
+        return translated
+
+    @classmethod
+    def _separate_point_touching_park_solids(
+        cls,
+        meshes: list,
+        *,
+        separation_mm: float = 1e-4,
+    ) -> list:
+        separated = [deepcopy(mesh) for mesh in meshes]
+        polygons = [
+            cls._safe_footprint_polygon(mesh)
+            for mesh in separated
+        ]
+
+        for first_index in range(len(separated)):
+            first_polygon = polygons[first_index]
+
+            if first_polygon is None:
+                continue
+
+            for second_index in range(
+                first_index + 1,
+                len(separated),
+            ):
+                second_polygon = polygons[second_index]
+
+                if second_polygon is None:
+                    continue
+
+                intersection = first_polygon.intersection(
+                    second_polygon
+                )
+
+                if intersection.is_empty:
+                    continue
+
+                if intersection.geom_type not in {
+                    "Point",
+                    "MultiPoint",
+                }:
+                    continue
+
+                first_centroid = first_polygon.centroid
+                second_centroid = second_polygon.centroid
+
+                offset_x = (
+                    float(second_centroid.x)
+                    - float(first_centroid.x)
+                )
+                offset_y = (
+                    float(second_centroid.y)
+                    - float(first_centroid.y)
+                )
+                length = (
+                    offset_x * offset_x
+                    + offset_y * offset_y
+                ) ** 0.5
+
+                if length <= 1e-12:
+                    offset_x = separation_mm
+                    offset_y = 0.0
+                else:
+                    offset_x = (
+                        offset_x / length
+                    ) * separation_mm
+                    offset_y = (
+                        offset_y / length
+                    ) * separation_mm
+
+                separated[second_index] = (
+                    cls._translate_mesh_geometry_xy(
+                        separated[second_index],
+                        offset_x_mm=offset_x,
+                        offset_y_mm=offset_y,
+                    )
+                )
+                second_polygon = cls._safe_footprint_polygon(
+                    separated[second_index]
+                )
+                polygons[second_index] = second_polygon
+
+        return separated
 
     @classmethod
     def build_scene(
@@ -129,21 +1081,82 @@ class AtlasProductColorPreviewRenderer:
 
         mesh_groups = city_result.get("mesh_groups", {})
 
+        building_meshes = (
+            cls._filter_covered_same_height_building_parts(
+                list(mesh_groups.get("buildings", []))
+            )
+        )
+        building_meshes = (
+            cls._separate_touching_building_solids(
+                building_meshes
+            )
+        )
+        park_meshes = cls._filter_covered_grass_parks(
+            list(mesh_groups.get("parks", []))
+        )
+        park_meshes = (
+            cls._separate_point_touching_park_solids(
+                park_meshes
+            )
+        )
+        park_meshes = (
+            cls._remove_internal_park_boundary_walls(
+                park_meshes
+            )
+        )
+
         for group_name, batch_name in cls.GROUP_TO_BATCH.items():
-            for mesh in mesh_groups.get(group_name, []):
+            if group_name == "buildings":
+                group_meshes = building_meshes
+            elif group_name == "parks":
+                group_meshes = park_meshes
+            else:
+                group_meshes = mesh_groups.get(group_name, [])
+
+            for mesh in group_meshes:
                 if (
                     group_name == "buildings"
                     and "building_wall_triangles" in mesh
                     and "building_roof_triangles" in mesh
                 ):
-                    wall_mesh = {
-                        "type": mesh.get("type", "building"),
-                        "triangles": mesh["building_wall_triangles"],
-                    }
-                    roof_mesh = {
-                        "type": mesh.get("type", "building"),
-                        "triangles": mesh["building_roof_triangles"],
-                    }
+                    color_solids = (
+                        cls._build_flat_roof_color_solids(
+                            mesh=mesh,
+                        )
+                    )
+
+                    if color_solids is None:
+                        color_solids = (
+                            cls._build_pitched_roof_color_solids(
+                                mesh=mesh,
+                            )
+                        )
+
+                    if color_solids is None:
+                        wall_mesh = {
+                            "type": mesh.get(
+                                "type",
+                                "building",
+                            ),
+                            "triangles": (
+                                mesh[
+                                    "building_wall_triangles"
+                                ]
+                            ),
+                        }
+                        roof_mesh = {
+                            "type": mesh.get(
+                                "type",
+                                "building",
+                            ),
+                            "triangles": (
+                                mesh[
+                                    "building_roof_triangles"
+                                ]
+                            ),
+                        }
+                    else:
+                        wall_mesh, roof_mesh = color_solids
 
                     material_batches["building_walls"]["meshes"].append(
                         cls._translate_mesh(

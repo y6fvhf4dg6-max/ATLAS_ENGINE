@@ -152,3 +152,47 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
     assert result["parts"]["blue"]["output_path"] == (
         tmp_path / "koeln_premium__blue.stl"
     )
+
+def test_multicolor_exporter_deduplicates_identical_triangles_across_same_color_batches(
+    monkeypatch,
+    tmp_path,
+):
+    white = (245, 245, 240)
+    shared_mesh = _mesh(0.0)
+
+    scene = {
+        "type": "product_color_preview_scene",
+        "profile_name": "TEST_PROFILE",
+        "material_batches": {
+            "terrain": {
+                "rgb": white,
+                "meshes": [shared_mesh],
+            },
+            "building_walls": {
+                "rgb": white,
+                "meshes": [shared_mesh],
+            },
+        },
+    }
+
+    writes = []
+
+    def fake_write(meshes, output_path, solid_name="ATLAS_MODEL"):
+        writes.append(meshes)
+        return output_path
+
+    monkeypatch.setattr(
+        "CORE.atlas_wall_collection_multicolor_stl_exporter."
+        "AtlasSTLWriter.write",
+        fake_write,
+    )
+
+    AtlasWallCollectionMulticolorSTLExporter.export_scene(
+        scene=scene,
+        output_directory=tmp_path,
+        product_name="dedup_test",
+    )
+
+    assert len(writes) == 1
+    assert len(writes[0]) == 1
+    assert len(writes[0][0]["triangles"]) == 1

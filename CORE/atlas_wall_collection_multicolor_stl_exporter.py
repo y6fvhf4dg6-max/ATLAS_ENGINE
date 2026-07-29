@@ -113,8 +113,34 @@ class AtlasWallCollectionMulticolorSTLExporter:
                 f"{color_name.upper()}"
             )
 
+            merged_triangles = []
+            seen_triangle_keys = set()
+
+            for mesh in group["meshes"]:
+                for triangle in mesh.get("triangles", []):
+                    triangle_key = tuple(
+                        sorted(
+                            tuple(
+                                round(float(value), 6)
+                                for value in point
+                            )
+                            for point in triangle
+                        )
+                    )
+
+                    if triangle_key in seen_triangle_keys:
+                        continue
+
+                    seen_triangle_keys.add(triangle_key)
+                    merged_triangles.append(triangle)
+
             AtlasSTLWriter.write(
-                meshes=group["meshes"],
+                meshes=[
+                    {
+                        "type": "multicolor_merged_color_mesh",
+                        "triangles": merged_triangles,
+                    }
+                ],
                 output_path=output_path,
                 solid_name=solid_name,
             )
