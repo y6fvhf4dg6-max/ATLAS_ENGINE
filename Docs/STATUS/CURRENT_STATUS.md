@@ -264,10 +264,14 @@ Tamamlanan son Köln adımları:
   - siyah proje filamenti → AMS A4
 - Kod commit'i:
   - `40cdf17 Add Köln graduation label and building highlight`
+- Bambu Studio projesi kalıcı olarak kaydedildi:
+  - `/Users/Kubi/Documents/koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
+- Proje ayrıca ATLAS_ENGINE üretim çıktısına kopyalandı:
+  - `OUTPUT/3MF/koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
+  - doğrulanan dosya boyutu: `810 KB`
 
 Açık işler:
 
-- Bambu Studio projesini `koeln_paedagogische_fakultaet_150mm_FINAL.3mf` adıyla kaydetmek
 - sipariş edilen nihai filamentler geldikten sonra dört renkli referans baskıyı almak
 - gerçek baskıda renk, yazı, çerçeve, çatı ve küçük detay kalitesini değerlendirmek
 - stringing sorununu baskı profili ve filament kalibrasyonu seviyesinde doğrulamak
@@ -334,13 +338,11 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Bambu Studio'daki doğrulanmış Köln projesini:
+Sipariş edilen nihai filamentler geldikten sonra:
 
-`koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
+`OUTPUT/3MF/koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
 
-adıyla kalıcı olarak kaydetmek.
-
-Nihai filamentler geldikten sonra bu proje açılacak, gerçek dört renk ataması kontrol edilecek ve Köln referans ürününün son fiziksel baskısı alınacaktır.
+projesini Bambu Studio'da açmak, gerçek dört renk atamasını kontrol etmek ve Köln referans ürününün son fiziksel baskısını almak.
 
 
 ---
