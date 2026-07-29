@@ -129,6 +129,7 @@ def main(argv=None):
         label_text_spec = AtlasLabelTextSpec(
             primary_text=primary_text,
             secondary_text=secondary_text,
+            graduation_cap=True,
         )
 
     bbox = AtlasProductAreaEngine.build_bbox_from_center(
@@ -188,6 +189,9 @@ def main(argv=None):
         material_profile=material_profile,
         label_plate_spec=label_plate_spec,
         label_text_spec=label_text_spec,
+        highlighted_building_source_ids={
+            125014714,
+        },
     )
 
     multicolor_result = (

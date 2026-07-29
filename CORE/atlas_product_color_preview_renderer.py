@@ -1012,7 +1012,15 @@ class AtlasProductColorPreviewRenderer:
         material_profile: AtlasProductPreviewMaterialProfile,
         label_plate_spec: AtlasLabelPlateSpec | None = None,
         label_text_spec: AtlasLabelTextSpec | None = None,
+        highlighted_building_source_ids=None,
     ) -> dict:
+        highlighted_building_source_ids = {
+            str(source_id)
+            for source_id in (
+                highlighted_building_source_ids or ()
+            )
+        }
+
         terrain_size_x_mm = float(city_result["terrain_size_x_mm"])
         terrain_size_y_mm = float(city_result["terrain_size_y_mm"])
 
@@ -1158,19 +1166,54 @@ class AtlasProductColorPreviewRenderer:
                     else:
                         wall_mesh, roof_mesh = color_solids
 
-                    material_batches["building_walls"]["meshes"].append(
-                        cls._translate_mesh(
-                            wall_mesh,
-                            city_offset_x_mm,
-                            city_offset_y_mm,
-                        )
+                    source_id = mesh.get("source_id")
+
+                    wall_mesh["source_id"] = source_id
+                    roof_mesh["source_id"] = source_id
+
+                    translated_wall_mesh = cls._translate_mesh(
+                        wall_mesh,
+                        city_offset_x_mm,
+                        city_offset_y_mm,
                     )
-                    material_batches["building_roofs"]["meshes"].append(
-                        cls._translate_mesh(
-                            roof_mesh,
-                            city_offset_x_mm,
-                            city_offset_y_mm,
+                    translated_roof_mesh = cls._translate_mesh(
+                        roof_mesh,
+                        city_offset_x_mm,
+                        city_offset_y_mm,
+                    )
+
+                    if (
+                        source_id is not None
+                        and str(source_id)
+                        in highlighted_building_source_ids
+                    ):
+                        highlighted_mesh = {
+                            "type": "highlighted_building",
+                            "source_id": source_id,
+                            "triangles": list(
+                                mesh.get("triangles", [])
+                            ),
+                        }
+                        material_batches[
+                            "building_roofs"
+                        ]["meshes"].append(
+                            cls._translate_mesh(
+                                highlighted_mesh,
+                                city_offset_x_mm,
+                                city_offset_y_mm,
+                            )
                         )
+                        continue
+
+                    material_batches[
+                        "building_walls"
+                    ]["meshes"].append(
+                        translated_wall_mesh
+                    )
+                    material_batches[
+                        "building_roofs"
+                    ]["meshes"].append(
+                        translated_roof_mesh
                     )
                     continue
 
@@ -1195,6 +1238,9 @@ class AtlasProductColorPreviewRenderer:
             )
             material_batches["label_text"]["meshes"].extend(
                 product["label_text_meshes"]
+            )
+            material_batches["label_text"]["meshes"].extend(
+                product["label_graduation_cap_meshes"]
             )
 
         return {

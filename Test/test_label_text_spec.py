@@ -47,3 +47,23 @@ def test_label_text_spec_rejects_empty_primary_text():
             primary_text="   ",
             secondary_text="MEZUNİYET",
         )
+
+
+
+def test_label_text_spec_disables_graduation_cap_by_default():
+    spec = AtlasLabelTextSpec(
+        primary_text="KÖLN",
+        secondary_text="2001",
+    )
+
+    assert spec.graduation_cap is False
+
+
+def test_label_text_spec_can_enable_graduation_cap():
+    spec = AtlasLabelTextSpec(
+        primary_text="KÖLN ÜNİVERSİTESİ",
+        secondary_text="MEZUNİYET",
+        graduation_cap=True,
+    )
+
+    assert spec.graduation_cap is True

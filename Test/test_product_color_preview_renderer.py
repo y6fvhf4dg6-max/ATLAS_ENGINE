@@ -180,6 +180,7 @@ def test_renderer_adds_optional_label_plate_and_text_material_batches():
         label_text_spec=AtlasLabelTextSpec(
             primary_text="KÖLN",
             secondary_text="2001",
+            graduation_cap=True,
         ),
     )
 
@@ -189,11 +190,15 @@ def test_renderer_adds_optional_label_plate_and_text_material_batches():
     assert batches["label_text"]["rgb"] == profile.label_text_rgb
 
     assert len(batches["label_plate"]["meshes"]) == 1
-    assert len(batches["label_text"]["meshes"]) == 2
+    assert len(batches["label_text"]["meshes"]) == 3
 
     assert batches["label_plate"]["meshes"][0]["type"] == "label_plate"
     assert batches["label_text"]["meshes"][0]["type"] == "label_text"
     assert batches["label_text"]["meshes"][1]["type"] == "label_text"
+    assert (
+        batches["label_text"]["meshes"][2]["type"]
+        == "label_graduation_cap"
+    )
 
 def test_renderer_uses_integrated_hidden_hanger_frame():
     profile = AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
@@ -1087,3 +1092,104 @@ def test_renderer_separates_adjacent_different_height_building_color_solids():
     assert _non_manifold_edge_count(wall_triangles) == 0
     assert _open_edge_count(roof_triangles) == 0
     assert _non_manifold_edge_count(roof_triangles) == 0
+
+
+def test_renderer_highlights_selected_building_entirely_in_red():
+    selected_source_id = 125014714
+
+    selected_wall = (
+        (10.0, 20.0, 0.8),
+        (11.0, 20.0, 0.8),
+        (10.0, 20.0, 5.0),
+    )
+    selected_roof = (
+        (10.0, 20.0, 5.0),
+        (11.0, 20.0, 5.0),
+        (10.0, 21.0, 5.0),
+    )
+
+    normal_wall = (
+        (20.0, 20.0, 0.8),
+        (21.0, 20.0, 0.8),
+        (20.0, 20.0, 5.0),
+    )
+    normal_roof = (
+        (20.0, 20.0, 5.0),
+        (21.0, 20.0, 5.0),
+        (20.0, 21.0, 5.0),
+    )
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [
+        {
+            "type": "building",
+            "source_id": selected_source_id,
+            "triangles": [
+                selected_wall,
+                selected_roof,
+            ],
+            "building_wall_triangles": [selected_wall],
+            "building_roof_triangles": [selected_roof],
+        },
+        {
+            "type": "building",
+            "source_id": 999,
+            "triangles": [
+                normal_wall,
+                normal_roof,
+            ],
+            "building_wall_triangles": [normal_wall],
+            "building_roof_triangles": [normal_roof],
+        },
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+        highlighted_building_source_ids={
+            selected_source_id,
+        },
+    )
+
+    batches = scene["material_batches"]
+
+    assert len(batches["building_walls"]["meshes"]) == 1
+    assert len(batches["building_roofs"]["meshes"]) == 2
+
+    selected_red_meshes = [
+        mesh
+        for mesh in batches["building_roofs"]["meshes"]
+        if mesh.get("source_id") == selected_source_id
+    ]
+
+    assert len(selected_red_meshes) == 1
+    assert selected_red_meshes[0]["type"] == "highlighted_building"
+
+    expected_triangles = [
+        tuple(
+            (
+                x - 50.0,
+                y - 60.0,
+                z,
+            )
+            for x, y, z in triangle
+        )
+        for triangle in (
+            selected_wall,
+            selected_roof,
+        )
+    ]
+
+    assert (
+        selected_red_meshes[0]["triangles"]
+        == expected_triangles
+    )
+
+    assert all(
+        mesh.get("source_id") != selected_source_id
+        for mesh in batches["building_walls"]["meshes"]
+    )

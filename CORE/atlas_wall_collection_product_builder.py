@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from CORE.atlas_label_graduation_cap_mesher import (
+    AtlasLabelGraduationCapMesher,
+)
 from CORE.atlas_label_plate_mesher import AtlasLabelPlateMesher
 from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
 from CORE.atlas_label_text_mesher import AtlasLabelTextMesher
@@ -107,6 +110,7 @@ class AtlasWallCollectionProductBuilder:
 
         label_plate_meshes = []
         label_text_meshes = []
+        label_graduation_cap_meshes = []
 
         if label_text_spec is not None and label_plate_spec is None:
             raise ValueError(
@@ -205,11 +209,36 @@ class AtlasWallCollectionProductBuilder:
                         )
                     )
 
+                if label_text_spec.graduation_cap:
+                    cap_width_mm = 7.0
+                    cap_height_mm = 5.0
+                    cap_right_margin_mm = 3.0
+                    cap_center_x_mm = (
+                        (label_plate_spec.width_mm / 2.0)
+                        - cap_right_margin_mm
+                        - (cap_width_mm / 2.0)
+                    )
+
+                    cap_mesh = AtlasLabelGraduationCapMesher.build(
+                        width_mm=cap_width_mm,
+                        height_mm=cap_height_mm,
+                        depth_mm=label_text_spec.depth_mm,
+                    )
+                    label_graduation_cap_meshes.append(
+                        AtlasWallCollectionProductBuilder._translate_mesh(
+                            cap_mesh,
+                            cap_center_x_mm,
+                            label_center_y_mm,
+                            text_front_z_mm,
+                        )
+                    )
+
         meshes = [
             *frame_meshes,
             *city_meshes,
             *label_plate_meshes,
             *label_text_meshes,
+            *label_graduation_cap_meshes,
         ]
 
         return {
@@ -225,5 +254,8 @@ class AtlasWallCollectionProductBuilder:
             "city_meshes": city_meshes,
             "label_plate_meshes": label_plate_meshes,
             "label_text_meshes": label_text_meshes,
+            "label_graduation_cap_meshes": (
+                label_graduation_cap_meshes
+            ),
             "meshes": meshes,
         }

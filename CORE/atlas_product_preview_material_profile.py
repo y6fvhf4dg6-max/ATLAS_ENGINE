@@ -70,7 +70,7 @@ class AtlasProductPreviewMaterialProfile:
 
         return cls(
             name="KOELN_PREMIUM_V1",
-            frame_rgb=white,
+            frame_rgb=black,
             building_rgb=white,
             building_wall_rgb=white,
             building_roof_rgb=red,
@@ -79,7 +79,7 @@ class AtlasProductPreviewMaterialProfile:
             green_rgb=green,
             tree_rgb=green,
             water_rgb=blue,
-            label_plate_rgb=black,
-            label_text_rgb=white,
+            label_plate_rgb=white,
+            label_text_rgb=black,
         )
 

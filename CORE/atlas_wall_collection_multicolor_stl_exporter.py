@@ -8,10 +8,11 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 class AtlasWallCollectionMulticolorSTLExporter:
     BATCH_TO_COLOR_NAME = {
+        "frame": "black",
         "building_roofs": "red",
         "parks": "green",
         "trees": "green",
-        "label_plate": "black",
+        "label_text": "black",
         "water": "blue",
     }
 

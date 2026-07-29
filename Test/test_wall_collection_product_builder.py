@@ -175,6 +175,7 @@ def test_wall_collection_adds_two_line_label_text_on_front_of_plate():
 
     assert len(product["label_plate_meshes"]) == 1
     assert len(product["label_text_meshes"]) == 2
+    assert product["label_graduation_cap_meshes"] == []
     assert len(product["meshes"]) == 6
 
     primary_mesh, secondary_mesh = product["label_text_meshes"]
@@ -221,3 +222,46 @@ def test_wall_collection_uses_integrated_hidden_hanger_frame_by_default():
     )
     assert frame_mesh["recess_depth_mm"] == pytest.approx(3.0)
     assert frame_mesh["front_wall_thickness_mm"] == pytest.approx(3.0)
+
+
+def test_wall_collection_adds_graduation_cap_at_right_side_of_label():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=14.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="KÖLN ÜNİVERSİTESİ",
+            secondary_text="MEZUNİYET",
+            primary_height_mm=4.2,
+            secondary_height_mm=2.8,
+            depth_mm=0.6,
+            max_width_mm=96.0,
+            graduation_cap=True,
+        ),
+    )
+
+    assert len(product["label_graduation_cap_meshes"]) == 1
+
+    cap_mesh = product["label_graduation_cap_meshes"][0]
+    cap_vertices = _all_vertices(cap_mesh)
+
+    assert cap_mesh["type"] == "label_graduation_cap"
+
+    assert min(x for x, _, _ in cap_vertices) >= 48.0
+    assert max(x for x, _, _ in cap_vertices) <= 56.0
+
+    assert min(y for _, y, _ in cap_vertices) >= -72.0
+    assert max(y for _, y, _ in cap_vertices) <= -58.0
+
+    assert min(z for _, _, z in cap_vertices) == pytest.approx(7.2)
+    assert max(z for _, _, z in cap_vertices) == pytest.approx(7.8)
+
+    assert cap_mesh in product["meshes"]

@@ -76,19 +76,19 @@ def test_koeln_premium_v1_uses_locked_five_color_palette():
 
     assert profile.name == "KOELN_PREMIUM_V1"
 
-    assert profile.frame_rgb == white
+    assert profile.frame_rgb == black
     assert profile.terrain_rgb == white
     assert profile.building_rgb == white
     assert profile.building_wall_rgb == white
     assert profile.road_rgb == white
-    assert profile.label_text_rgb == white
+    assert profile.label_plate_rgb == white
 
     assert profile.building_roof_rgb == red
 
     assert profile.green_rgb == green
     assert profile.tree_rgb == green
 
-    assert profile.label_plate_rgb == black
+    assert profile.label_text_rgb == black
 
     assert profile.water_rgb == blue
 

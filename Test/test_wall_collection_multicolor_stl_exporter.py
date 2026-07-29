@@ -33,7 +33,7 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
         "profile_name": "KOELN_PREMIUM_V1",
         "material_batches": {
             "frame": {
-                "rgb": white,
+                "rgb": black,
                 "meshes": [_mesh(0.0)],
             },
             "terrain": {
@@ -61,11 +61,11 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
                 "meshes": [_mesh(60.0)],
             },
             "label_plate": {
-                "rgb": black,
+                "rgb": white,
                 "meshes": [_mesh(70.0)],
             },
             "label_text": {
-                "rgb": white,
+                "rgb": black,
                 "meshes": [_mesh(80.0)],
             },
             "roads": {
@@ -120,11 +120,15 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
     assert result["parts"]["black"]["rgb"] == black
     assert result["parts"]["blue"]["rgb"] == blue
 
-    assert len(result["parts"]["white"]["source_batches"]) == 4
+    assert len(result["parts"]["white"]["source_batches"]) == 3
     assert set(result["parts"]["white"]["source_batches"]) == {
-        "frame",
         "terrain",
         "building_walls",
+        "label_plate",
+    }
+
+    assert set(result["parts"]["black"]["source_batches"]) == {
+        "frame",
         "label_text",
     }
 
