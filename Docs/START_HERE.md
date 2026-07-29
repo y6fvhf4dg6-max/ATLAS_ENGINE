@@ -68,21 +68,21 @@ Temel fikir:
 - Köln Premium V1 renk paleti:
 
 1. Beyaz:
-   - çerçeve
    - terrain
    - yollar
-   - bina duvarları
-   - plaka yazısı
+   - normal bina duvarları
+   - etiket plakası
 2. Kırmızı:
    - bina çatıları
-   - ileride seçili vurgu binası
+   - seçili Pädagogische Fakultät binasının tamamı
 3. Yeşil:
    - parklar
    - yeşil alanlar
    - ağaçlar
 4. Siyah:
-   - bilgi plakası
-   - ileride plaka simgesi
+   - çerçeve
+   - etiket yazısı
+   - mezuniyet kepi simgesi
 5. Mavi:
    - deniz
    - nehir
@@ -127,6 +127,42 @@ Motor semantik material gruplarını gerçek baskı renklerine birleştirerek ay
 - Aynı renk grubundaki birebir yinelenen üçgenler exporter seviyesinde tekilleştirilir.
 - Kilit commit:
   - `9436dea Fix multicolor wall collection topology`
+
+## İlk gerçek çok renkli üretim eşiği
+
+Köln Pädagogische Fakultät ürünüyle ATLAS_ENGINE ilk kez gerçek çok renkli fiziksel üretime hazır uçtan uca ürün hattına ulaşmıştır.
+
+Tamamlananlar:
+
+- Dört hizalı semantik STL üretildi:
+  - `white`
+  - `red`
+  - `green`
+  - `black`
+- Pädagogische Fakultät hedef binası tamamen kırmızı katmana ayrıldı.
+- Siyah mezuniyet kepi simgesi etikete eklendi.
+- Etiket metni:
+  - `UNIVERSITÄT ZU KÖLN`
+  - `PÄDAGOGISCHE FAKULTÄT`
+- Bambu Studio assembly hizalaması doğrulandı.
+- Filament atamaları yapıldı.
+- Bambu Studio dilimlemesi başarıyla tamamlandı.
+- Dilimleme sonucu:
+  - yaklaşık `5 saat 4 dakika`
+  - `96.36 g` filament
+  - `60` filament değişimi
+- Prime tower plaka sınırları içine taşındı ve G-code sınır hatası giderildi.
+- AMS eşlemesi doğrulandı.
+- Kilit kod commit'i:
+  - `40cdf17 Add Köln graduation label and building highlight`
+
+Nihai dört renkli referans baskı, sipariş edilen filamentler geldikten sonra alınacaktır.
+
+Bambu Studio projesi ayrıca şu adla kaydedilmelidir:
+
+`koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
+
+Bu eşik, ATLAS_ENGINE'in yalnız geometri üreten bir motor olmaktan çıkarak gerçek çok renkli baskı üretim hattına geçtiğini gösterir.
 
 ## Ana belge yapısı
 

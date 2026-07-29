@@ -246,14 +246,46 @@ Son gerçek Köln multicolor STL doğrulaması:
 - red: `9188` triangle, `0 open edge`, `0 non-manifold edge`
 - green: `32588` triangle, `0 open edge`, `0 non-manifold edge`
 
+Tamamlanan son Köln adımları:
+
+- Pädagogische Fakultät hedef binası tamamen kırmızı katmana ayrıldı.
+- Etikete siyah mezuniyet kepi simgesi eklendi.
+- Dört STL tek assembly olarak Bambu Studio'da açıldı ve hizalama doğrulandı.
+- Semantik STL filament atamaları yapıldı.
+- Bambu Studio dilimlemesi başarıyla tamamlandı.
+- Dilimleme sonucu:
+  - yaklaşık `5 saat 4 dakika`
+  - `96.36 g`
+  - `60` filament değişimi
+- Prime tower plaka içine taşındı ve sınır hatası giderildi.
+- AMS eşlemesi doğrulandı:
+  - kırmızı proje filamenti → AMS A2
+  - gri test filamenti → AMS A3
+  - siyah proje filamenti → AMS A4
+- Kod commit'i:
+  - `40cdf17 Add Köln graduation label and building highlight`
+
 Açık işler:
 
-- Pädagogische Fakultät hedef binasını komple kırmızı ayırmak
-- plakaya mezuniyet kepi veya seçilen simgeyi eklemek
-- STL parçalarını Bambu Studio'da tek assembly olarak açıp hizalamayı doğrulamak
-- filament atamalarını yapmak
-- dilimleme süresi ve filament tüketimini ölçmek
-- stringing sorununu baskı profili seviyesinde çözmek
+- Bambu Studio projesini `koeln_paedagogische_fakultaet_150mm_FINAL.3mf` adıyla kaydetmek
+- sipariş edilen nihai filamentler geldikten sonra dört renkli referans baskıyı almak
+- gerçek baskıda renk, yazı, çerçeve, çatı ve küçük detay kalitesini değerlendirmek
+- stringing sorununu baskı profili ve filament kalibrasyonu seviyesinde doğrulamak
+- baskı sonucu uygunsa Köln ürün standardını nihai olarak kilitlemek
+
+## İlk gerçek çok renkli üretim eşiği
+
+2026-07-29 tarihinde Köln Pädagogische Fakultät ürünüyle ATLAS_ENGINE ilk kez:
+
+- gerçek semantik çok renkli STL paketi,
+- Bambu Studio assembly doğrulaması,
+- fiziksel filament ataması,
+- başarılı çok renkli dilimleme,
+- AMS slot eşlemesi
+
+aşamalarını uçtan uca tamamladı.
+
+Bu, ATLAS_ENGINE'in geometri geliştirme aşamasından gerçek çok renkli fiziksel ürün üretim aşamasına geçtiği kalıcı bir proje kilometre taşıdır.
 
 ## Köln tamamlanma kriterleri
 
@@ -302,7 +334,13 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Köln preview üretimini siyah etiket plakası ve beyaz etiket yazısı parametreleriyle çalıştırmak; ardından white, red, green ve black STL dosyalarını Bambu Studio'da tek assembly olarak açarak koordinat hizalamasını ve filament slotlarını doğrulamak.
+Bambu Studio'daki doğrulanmış Köln projesini:
+
+`koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
+
+adıyla kalıcı olarak kaydetmek.
+
+Nihai filamentler geldikten sonra bu proje açılacak, gerçek dört renk ataması kontrol edilecek ve Köln referans ürününün son fiziksel baskısı alınacaktır.
 
 
 ---
