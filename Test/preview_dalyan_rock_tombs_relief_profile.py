@@ -13,6 +13,12 @@ from CORE.atlas_relief_pipeline import AtlasReliefPipeline
 from CORE.atlas_relief_stl_exporter import (
     AtlasReliefSTLExporter,
 )
+from CORE.atlas_relief_production_package_builder import (
+    AtlasReliefProductionPackageBuilder,
+)
+from CORE.atlas_relief_quality_report import (
+    AtlasReliefQualityReport,
+)
 from CORE.atlas_rock_relief_production_preset import (
     DALYAN_ROCK_TOMBS_PRODUCTION_PRESET,
 )
@@ -49,6 +55,13 @@ SHADED_PREVIEW_PATH = (
 STL_OUTPUT_PATH = (
     OUTPUT_DIRECTORY
     / "dalyan_rock_tombs_relief_80x50mm.stl"
+)
+
+PRODUCT_PACKAGE_DIRECTORY = (
+    PROJECT_ROOT
+    / "OUTPUT"
+    / "PRODUCTS"
+    / "dalyan_rock_tombs_80x50mm"
 )
 
 
@@ -274,6 +287,30 @@ def main() -> None:
         pipeline_result=production_result,
         output_path=STL_OUTPUT_PATH,
         solid_name="DALYAN_ROCK_TOMBS_RELIEF",
+    )
+
+    quality_report = AtlasReliefQualityReport.build(
+        production_result["relief_result"]["mesh"]
+    )
+
+    AtlasReliefProductionPackageBuilder.build(
+        package_directory=PRODUCT_PACKAGE_DIRECTORY,
+        product_id="dalyan_rock_tombs_80x50mm",
+        display_name="Dalyan Rock Tombs",
+        width_mm=80.0,
+        depth_mm=50.0,
+        stl_path=STL_OUTPUT_PATH,
+        preview_path=(
+            OUTPUT_DIRECTORY
+            / "illumination-normalized_rock-carved-landmark_shaded.png"
+        ),
+        source_path=(
+            OUTPUT_DIRECTORY
+            / "rock_tombs_illumination_normalized.png"
+        ),
+        profile_name="rock-carved-landmark",
+        production_variant="illumination-normalized",
+        quality_report=quality_report,
     )
 
     print(

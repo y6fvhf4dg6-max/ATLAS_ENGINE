@@ -470,3 +470,20 @@ gereksiz artırdığı için nihai üretimden çıkarıldı.
 Sıradaki teknik işlem:
 
 Üretilen Dalyan fiziksel STL dosyasının topoloji, minimum kalınlık ve baskı uygunluğu doğrulamasını yapmak.
+
+## Dalyan relief üretim paketi
+
+Dalyan Kaya Mezarları 80 × 50 mm relief ürünü kalıcı üretim paketine bağlandı.
+
+- STL: hazır
+- Kalite raporu: hazır
+- Üçgen: 95.036
+- Açık kenar: 0
+- Non-manifold kenar: 0
+- Kapalı mesh: evet
+- Baskıya uygun topoloji: evet
+- Baskı riski: WARN
+- Uyarı nedeni: az miktarda 55° üzeri yüzey eğimi
+- Kritik eğim örneği: 0
+- Nihai `.3mf`: henüz oluşturulmadı
+- Çok renkli parça/renk ayrımı: sıradaki ürün aşaması

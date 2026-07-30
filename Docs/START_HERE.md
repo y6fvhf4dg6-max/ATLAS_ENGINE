@@ -329,3 +329,19 @@ Sıradaki teknik işlem:
 
 Dalyan STL dosyasının topolojisini, minimum kalınlığını ve fiziksel baskı uygunluğunu doğrulamak.
 
+
+## Kalıcı üretim paketleri
+
+ATLAS ürünleri yalnız geçici STL çıktıları olarak tutulmaz. Her tamamlanan lokasyon, daha sonra yeniden hazırlık yapılmadan basılabilecek kalıcı bir üretim paketi olarak saklanır.
+
+Dalyan Kaya Mezarları için ilk relief üretim paketi:
+
+- Paket: `OUTPUT/PRODUCTS/dalyan_rock_tombs_80x50mm/`
+- Nihai STL: `STL/dalyan_rock_tombs_relief_80x50mm_FINAL.stl`
+- Önizleme: `PREVIEW/dalyan_rock_tombs_FINAL_shaded.png`
+- İşlenmiş kaynak: `SOURCE/rock_tombs_illumination_normalized.png`
+- Kalite raporu: `REPORTS/print_quality_report.json`
+- Manifest: `production_manifest.json`
+- Planlanan nihai Bambu dosyası: `dalyan_rock_tombs_80x50mm_FINAL.3mf`
+
+Mevcut Dalyan STL kapalı, manifold ve baskıya uygun topolojiye sahiptir. Çok renkli nihai ürün için renk/parça ayrımı ve Bambu Studio doğrulaması henüz tamamlanmamıştır.
