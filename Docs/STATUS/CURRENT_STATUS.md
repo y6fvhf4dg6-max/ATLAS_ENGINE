@@ -402,7 +402,7 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Original ve illumination-normalized Dalyan preview çıktılarını görsel olarak karşılaştırmak ve nihai üretim varyantını seçmek.
+Seçilen `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` ile Dalyan kaya mezarlarının fiziksel STL preview çıktısını üretmek.
 
 Köln için fiziksel bağımlılık değişmemiştir:
 
@@ -429,3 +429,28 @@ En az aşağıdaki bilgiler güncel olmalıdır:
 Bu belge güncellenmeden geliştirme oturumu tamamlanmış kabul edilmez.
 
 Bu kural, ATLAS_ENGINE geliştirme metodolojisinin zorunlu bir parçasıdır.
+
+## Dalyan kaya mezarları görsel varyant kararı
+
+Dört shaded preview karşılaştırıldı:
+
+- Original / Standard
+- Original / Detail
+- Illumination normalized / Standard
+- Illumination normalized / Detail
+
+Nihai üretim seçimi:
+
+`Illumination normalized / Standard`
+
+Bu seçim mevcut `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` ile doğrudan temsil edilir:
+
+- `ROCK_CARVED_LANDMARK`
+- `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET`
+
+Detail varyantı, kaya yüzeyindeki yüksek frekanslı dokuyu ve baskı gürültüsü riskini
+gereksiz artırdığı için nihai üretimden çıkarıldı.
+
+Sıradaki teknik işlem:
+
+Seçilen production preset ile Dalyan kaya mezarlarının fiziksel STL preview çıktısını üretmek.

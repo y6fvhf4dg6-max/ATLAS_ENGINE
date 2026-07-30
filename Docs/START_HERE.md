@@ -283,3 +283,15 @@ Belge sorumlulukları:
   Projenin kesin güncel durumu ve sıradaki tek teknik adım.
 
 Yeni bir geliştirme oturumunda bu çalışma yöntemi varsayılan kabul edilir.
+
+### Dalyan kaya mezarları nihai rölyef varyantı
+
+Görsel karşılaştırma sonucunda nihai üretim varyantı kilitlendi:
+
+- Kaynak: illumination-normalized
+- Ürün profili: `ROCK_CARVED_LANDMARK`
+- Üretim preset'i: `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET`
+- Reddedilen alternatif: `rock-carved-landmark-detail`
+
+Standart profil; mezar cephelerini ve oyma sınırlarını yeterli açıklıkta korurken,
+detail profilindeki yüksek frekanslı kaya gürültüsünü baskıya taşımadığı için seçildi.
