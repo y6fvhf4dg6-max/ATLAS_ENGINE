@@ -164,6 +164,32 @@ Bambu Studio projesi ayrıca şu adla kaydedilmelidir:
 
 Bu eşik, ATLAS_ENGINE'in yalnız geometri üreten bir motor olmaktan çıkarak gerçek çok renkli baskı üretim hattına geçtiğini gösterir.
 
+## Rölyef motoru preprocessing mimarisi
+
+2.5B fotoğraf ve rölyef hattı artık genel, sıralı ve yeniden kullanılabilir bir preprocessing katmanına sahiptir.
+
+Ana bileşenler:
+
+- `AtlasReliefPreprocessorChain`
+- `AtlasReliefPipeline.build_from_image(..., preprocessors=())`
+- pipeline çıktısında `preprocessed_luminance`
+- metadata içinde `preprocessor_count`
+
+Bu mimariyle ürüne özgü görüntü düzeltmeleri geçici dosya üretmeden doğrudan ana rölyef pipeline'ına bağlanabilir.
+
+İlk gerçek entegrasyon Dalyan kaya mezarları rölyef profilinde yapılmıştır. Kaya yüzeyindeki geniş ölçekli aydınlatma değişimi `AtlasRockReliefIlluminationNormalizer` üzerinden preprocessing zincirine alınmıştır.
+
+Kilit commit'ler:
+
+- `7c1782b Add relief preprocessor chain`
+- `bbddbdd Route Dalyan relief normalization through preprocessors`
+
+İlgili pipeline ve preprocessor doğrulaması:
+
+- `70 passed`
+
+Bu kazanım Dalyan'a özel bir geçici çözüm değil, tüm fotoğraf ve rölyef ürünlerinde kullanılabilecek genel motor mimarisidir.
+
 ## Ana belge yapısı
 
 - `Docs/START_HERE.md`: yeni sohbet giriş belgesi

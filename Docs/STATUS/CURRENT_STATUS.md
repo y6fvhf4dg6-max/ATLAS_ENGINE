@@ -15,7 +15,7 @@ okunmalıdır.
 
 ## Güncelleme tarihi
 
-2026-07-29
+2026-07-30
 
 ---
 
@@ -308,6 +308,54 @@ Köln referans ürünü tamamlanmış sayılması için:
 
 ---
 
+## Aktif teknik rölyef hattı — Dalyan kaya mezarları
+
+Köln Pädagogische Fakultät ticari referans ürün önceliği değişmemiştir.
+
+Buna paralel olarak 2.5B rölyef motorunda Dalyan kaya mezarları profilinden çıkan genel preprocessing ihtiyacı motor seviyesinde çözülmüştür.
+
+Tamamlanan mimari çalışmalar:
+
+- `CORE/atlas_relief_preprocessor_chain.py` eklendi.
+- Preprocessor zinciri sıralı callable bileşenleri uygular.
+- `AtlasReliefPipeline.build_from_image()` yeni `preprocessors=()` parametresini kabul eder.
+- Pipeline preprocess edilmiş luminance verisini `preprocessed_luminance` alanında döndürür.
+- `image_settings["preprocessor_count"]` metadata kaydı eklendi.
+- Zincir ve pipeline entegrasyonu test-first geliştirildi.
+- İlgili test sonucu: `70 passed`.
+- Commit: `7c1782b Add relief preprocessor chain`
+- Push: `origin/main`
+
+Dalyan entegrasyonu:
+
+- `Test/preview_dalyan_rock_tombs_relief_profile.py` artık illumination-normalized varyant için geçici normalize edilmiş kaynak görüntü kullanmaz.
+- Her iki varyant aynı özgün `SOURCE_PATH` üzerinden çalışır.
+- Normalizasyon doğrudan pipeline'ın `preprocessors` parametresinden uygulanır.
+- Kullanılan mevcut normalizer:
+  - `AtlasRockReliefIlluminationNormalizer`
+  - `illumination_sigma=14.0`
+  - `detail_strength=0.80`
+- Original ve illumination-normalized preview varyantları başarıyla yeniden üretildi.
+- Commit: `bbddbdd Route Dalyan relief normalization through preprocessors`
+- Push: `origin/main`
+
+Mimari sonuç:
+
+- Görüntü preprocessing artık ürün preview scriptlerine dağılmış geçici dosya işlemleri değildir.
+- Ürüne özgü preprocessing adımları ana rölyef pipeline'ına sıralı ve yeniden kullanılabilir biçimde bağlanabilir.
+- Aynı yapı gelecekte portre, taş yüzey, düşük kontrastlı fotoğraf ve diğer rölyef kaynaklarında kullanılabilir.
+
+Açık Dalyan rölyef işleri:
+
+1. Preview içindeki anonim `lambda` kullanımını isimli ve test edilebilir bir kaya rölyefi preprocessing preset'ine dönüştürmek.
+2. `ROCK_CARVED_LANDMARK` profilini preprocessing ayarlarıyla tek üretim preset'inde birleştirmek.
+3. Dalyan üretimini profil ve preprocessor parametrelerini elle vermeden tek çağrıya indirmek.
+4. Original ve illumination-normalized preview sonuçlarını görsel olarak karşılaştırmak.
+5. Nihai varyantı seçip kilitlemek.
+6. Seçilen varyanttan gerçek STL üretmek.
+7. STL topolojisi, minimum kalınlık ve baskı uygunluğunu doğrulamak.
+8. Nihai üretim STL'sini ayrı kalıcı dosya adıyla kaydetmek.
+
 ## Dokümantasyon durumu
 
 Tamamlanan:
@@ -338,11 +386,13 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Sipariş edilen nihai filamentler geldikten sonra:
+Dalyan preview içindeki anonim illumination-normalization `lambda` tanımını kaldırarak isimli, tekrar kullanılabilir ve bağımsız test edilen bir kaya rölyefi preprocessing preset'i oluşturmak.
 
-`OUTPUT/3MF/koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
+Köln için fiziksel bağımlılık değişmemiştir:
 
-projesini Bambu Studio'da açmak, gerçek dört renk atamasını kontrol etmek ve Köln referans ürününün son fiziksel baskısını almak.
+- nihai filamentler geldikten sonra `OUTPUT/3MF/koeln_paedagogische_fakultaet_150mm_FINAL.3mf` açılacak
+- gerçek dört renk eşlemesi kontrol edilecek
+- son fiziksel referans baskı alınacak
 
 
 ---
