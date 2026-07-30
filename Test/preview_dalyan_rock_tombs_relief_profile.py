@@ -10,14 +10,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from CORE.atlas_relief_pipeline import AtlasReliefPipeline
-from CORE.atlas_rock_relief_preprocessing_preset import (
-    DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET,
+from CORE.atlas_rock_relief_production_preset import (
+    DALYAN_ROCK_TOMBS_PRODUCTION_PRESET,
 )
 from CORE.atlas_relief_product_profile import (
     AtlasReliefProductProfile,
-)
-from CORE.atlas_relief_product_profile_catalog import (
-    ROCK_CARVED_LANDMARK,
 )
 
 
@@ -142,7 +139,8 @@ def main() -> None:
     )
 
     normalized_values = (
-        DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET(
+        DALYAN_ROCK_TOMBS_PRODUCTION_PRESET
+        .preprocessors[0](
             source_values
         )
     )
@@ -164,7 +162,7 @@ def main() -> None:
     )
 
     profiles = (
-        ROCK_CARVED_LANDMARK,
+        DALYAN_ROCK_TOMBS_PRODUCTION_PRESET.product_profile,
         AtlasReliefProductProfile(
             name="rock-carved-landmark-detail",
             form_sigma=2.4,
@@ -189,9 +187,7 @@ def main() -> None:
         ),
         (
             "illumination-normalized",
-            (
-                DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET,
-            ),
+            DALYAN_ROCK_TOMBS_PRODUCTION_PRESET.preprocessors,
         ),
     )
 

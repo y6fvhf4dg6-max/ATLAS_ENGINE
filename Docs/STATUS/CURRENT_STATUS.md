@@ -347,29 +347,28 @@ Mimari sonuç:
 
 Son tamamlanan Dalyan adımı:
 
-- `CORE/atlas_rock_relief_preprocessing_preset.py` eklendi.
-- `AtlasRockReliefPreprocessingPreset` immutable ve callable bir sözleşme olarak tanımlandı.
-- `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET` eklendi.
-- Kilit parametreler:
-  - `illumination_sigma=14.0`
-  - `detail_strength=0.80`
-- Preview içindeki anonim `lambda` kaldırıldı.
-- Normalize edilmiş kaynak preview çıktısı ve pipeline preprocessing girdisi aynı preset üzerinden çalışır.
-- Preset, illumination normalizer ve preprocessor chain odaklı doğrulama:
-  - `10 passed`
+- `CORE/atlas_rock_relief_production_preset.py` eklendi.
+- `AtlasRockReliefProductionPreset` immutable bir üretim sözleşmesi olarak tanımlandı.
+- `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` eklendi.
+- Üretim preset'i şu bileşenleri tek nesnede birleştirir:
+  - ürün profili: `ROCK_CARVED_LANDMARK`
+  - preprocessing zinciri: `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET`
+- Preview artık profil ve preprocessing bileşenlerini ayrı ayrı bağlamaz.
+- Normalize edilmiş kaynak preview çıktısı ve pipeline üretimi aynı Dalyan üretim preset'inden beslenir.
+- Üretim preset'i, preprocessing preset'i, illumination normalizer ve preprocessor chain odaklı doğrulama:
+  - `13 passed`
 
 Sıradaki tek teknik işlem:
 
-`ROCK_CARVED_LANDMARK` ürün profilini ve `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET` preprocessing ayarını tek, immutable Dalyan üretim preset'inde birleştirmek.
+Dalyan preview üretimini `product_profile` ve `preprocessors` argümanlarını elle açmadan, `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` üzerinden tek üretim çağrısına indirmek.
 
 Daha sonraki Dalyan işleri:
 
-1. Dalyan üretimini profil ve preprocessor parametrelerini elle vermeden tek çağrıya indirmek.
-2. Original ve illumination-normalized preview sonuçlarını görsel olarak karşılaştırmak.
-3. Nihai varyantı seçip kilitlemek.
-4. Seçilen varyanttan gerçek STL üretmek.
-5. STL topolojisi, minimum kalınlık ve baskı uygunluğunu doğrulamak.
-6. Nihai üretim STL'sini ayrı kalıcı dosya adıyla kaydetmek.
+1. Original ve illumination-normalized preview sonuçlarını görsel olarak karşılaştırmak.
+2. Nihai varyantı seçip kilitlemek.
+3. Seçilen varyanttan gerçek STL üretmek.
+4. STL topolojisi, minimum kalınlık ve baskı uygunluğunu doğrulamak.
+5. Nihai üretim STL'sini ayrı kalıcı dosya adıyla kaydetmek.
 
 ## Dokümantasyon durumu
 
@@ -401,7 +400,7 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Dalyan preview içindeki anonim illumination-normalization `lambda` tanımını kaldırarak isimli, tekrar kullanılabilir ve bağımsız test edilen bir kaya rölyefi preprocessing preset'i oluşturmak.
+Dalyan preview üretimini `product_profile` ve `preprocessors` argümanlarını elle açmadan, `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` üzerinden tek üretim çağrısına indirmek.
 
 Köln için fiziksel bağımlılık değişmemiştir:
 
