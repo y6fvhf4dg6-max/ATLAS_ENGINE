@@ -366,3 +366,19 @@ Dalyan Kaya Mezarları için planlanan ilk semantik sınıflar:
 - `tomb_facade`
 
 Bu aşamada gerçek Dalyan maskeleri ve çok renkli STL/3MF üretimi henüz tamamlanmamıştır.
+
+## Relief semantik maske girişi
+
+Semantik malzeme haritasında kullanılacak bölge maskeleri PNG gibi görüntü dosyalarından yüklenebilir.
+
+Yeni giriş sözleşmesi:
+
+- Modül: `CORE/atlas_relief_semantic_mask_input.py`
+- Test: `Test/test_relief_semantic_mask_input.py`
+- `L` ve `RGB` görüntüler gri tona dönüştürülür.
+- Varsayılan eşik değeri `128`'dir.
+- Eşik ve üzerindeki pikseller aktif maske bölgesi kabul edilir.
+- Beklenen çözünürlük verilirse uyumsuz maskeler reddedilir.
+- Eşik değeri `0..255` aralığında olmak zorundadır.
+
+Bu modül yalnız maske dosyasını güvenli ve deterministik biçimde yükler. Gerçek Dalyan `vegetation` ve `tomb_facade` maskelerinin üretimi ayrı aşamadır.

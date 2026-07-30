@@ -503,3 +503,18 @@ Dalyan Kaya Mezarları 80 × 50 mm relief ürünü kalıcı üretim paketine ba�
 - Gerçek Dalyan semantik maskeleri: henüz oluşturulmadı.
 - Çok renkli relief STL parçaları: henüz oluşturulmadı.
 - Nihai Dalyan `.3mf`: henüz oluşturulmadı.
+
+## Relief semantik maske girişi
+
+Semantik malzeme maskelerinin dosyadan yüklenmesi tamamlandı.
+
+- Yeni modül: `CORE/atlas_relief_semantic_mask_input.py`
+- Yeni test: `Test/test_relief_semantic_mask_input.py`
+- Focused test sonucu: 4 passed
+- Gri ton maske desteği: tamamlandı
+- RGB maske desteği: tamamlandı
+- Eşik tabanlı boolean dönüşüm: tamamlandı
+- Beklenen çözünürlük doğrulaması: tamamlandı
+- Geçersiz eşik değerlerinin reddedilmesi: tamamlandı
+- Gerçek Dalyan `vegetation` maskesi: henüz oluşturulmadı
+- Gerçek Dalyan `tomb_facade` maskesi: henüz oluşturulmadı
