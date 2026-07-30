@@ -487,3 +487,19 @@ Dalyan Kaya Mezarları 80 × 50 mm relief ürünü kalıcı üretim paketine ba�
 - Kritik eğim örneği: 0
 - Nihai `.3mf`: henüz oluşturulmadı
 - Çok renkli parça/renk ayrımı: sıradaki ürün aşaması
+
+## Relief semantik malzeme haritası
+
+Çok renkli Dalyan relief üretiminin ilk altyapı adımı tamamlandı.
+
+- Yeni modül: `CORE/atlas_relief_semantic_material_map.py`
+- Yeni test: `Test/test_relief_semantic_material_map.py`
+- Focused test sonucu: 3 passed
+- Varsayılan malzeme bölgesi destekleniyor.
+- Adlandırılmış semantik maskeler malzeme kimliklerine dönüştürülüyor.
+- Yanlış çözünürlüklü maskeler reddediliyor.
+- Üst üste binen maskeler reddediliyor.
+- Gri ton eşiklerine dayalı otomatik ayrım üretim yaklaşımı olarak reddedildi.
+- Gerçek Dalyan semantik maskeleri: henüz oluşturulmadı.
+- Çok renkli relief STL parçaları: henüz oluşturulmadı.
+- Nihai Dalyan `.3mf`: henüz oluşturulmadı.

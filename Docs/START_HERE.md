@@ -345,3 +345,24 @@ Dalyan Kaya Mezarları için ilk relief üretim paketi:
 - Planlanan nihai Bambu dosyası: `dalyan_rock_tombs_80x50mm_FINAL.3mf`
 
 Mevcut Dalyan STL kapalı, manifold ve baskıya uygun topolojiye sahiptir. Çok renkli nihai ürün için renk/parça ayrımı ve Bambu Studio doğrulaması henüz tamamlanmamıştır.
+
+## Relief semantik malzeme ayrımı
+
+Çok renkli relief ürünlerinde yalnız gri ton eşiklerine göre renk ayrımı yapılmaz. Gri tonlar kaya, oyuk, gölge, bitki ve mimari cepheleri güvenilir biçimde ayıramadığı için renk üretimi semantik bölge maskeleri üzerinden yürütülür.
+
+Yeni temel sözleşme:
+
+- Modül: `CORE/atlas_relief_semantic_material_map.py`
+- Test: `Test/test_relief_semantic_material_map.py`
+- Varsayılan bölge bir ana malzemeye atanır.
+- Adlandırılmış maskeler ayrı malzeme kimlikleri alır.
+- Maskelerin relief çözünürlüğüyle aynı olması zorunludur.
+- Üst üste binen maskeler reddedilir.
+
+Dalyan Kaya Mezarları için planlanan ilk semantik sınıflar:
+
+- `rock`
+- `vegetation`
+- `tomb_facade`
+
+Bu aşamada gerçek Dalyan maskeleri ve çok renkli STL/3MF üretimi henüz tamamlanmamıştır.
