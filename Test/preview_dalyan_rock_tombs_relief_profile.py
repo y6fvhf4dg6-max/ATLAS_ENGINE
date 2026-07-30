@@ -193,13 +193,28 @@ def main() -> None:
 
     for source_name, source_preprocessors in preprocessors:
         for profile in profiles:
-            result = AtlasReliefPipeline.build_from_image(
-                SOURCE_PATH,
-                width_mm=80.0,
-                depth_mm=50.0,
-                product_profile=profile,
-                preprocessors=source_preprocessors,
-            )
+            if (
+                profile
+                is DALYAN_ROCK_TOMBS_PRODUCTION_PRESET.product_profile
+                and source_preprocessors
+                == DALYAN_ROCK_TOMBS_PRODUCTION_PRESET.preprocessors
+            ):
+                result = (
+                    DALYAN_ROCK_TOMBS_PRODUCTION_PRESET
+                    .build_from_image(
+                        SOURCE_PATH,
+                        width_mm=80.0,
+                        depth_mm=50.0,
+                    )
+                )
+            else:
+                result = AtlasReliefPipeline.build_from_image(
+                    SOURCE_PATH,
+                    width_mm=80.0,
+                    depth_mm=50.0,
+                    product_profile=profile,
+                    preprocessors=source_preprocessors,
+                )
 
             height_map = result[
                 "relief_result"

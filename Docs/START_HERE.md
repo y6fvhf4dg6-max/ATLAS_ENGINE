@@ -204,8 +204,10 @@ Bu kazanım Dalyan'a özel bir geçici çözüm değil, tüm fotoğraf ve rölye
   - `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET`
 - Preview scriptindeki anonim `lambda` ve dağınık profil/preprocessor bağlantıları kaldırıldı.
 - Ürün profili ile preprocessing zinciri artık tek isimli üretim preset'i üzerinden kullanılır.
+- `AtlasRockReliefProductionPreset.build_from_image(...)` kilitli ürün profili ve preprocessing zincirini ana rölyef pipeline'ına tek çağrıyla aktarır.
+- Dalyan preview içindeki kilitli production varyantı artık `product_profile` ve `preprocessors` argümanlarını elle açmaz.
 - Üretim preset'i, preprocessing preset'i, normalizer ve preprocessor chain odaklı doğrulama:
-  - `13 passed`
+  - `14 passed`
 
 ## Ana belge yapısı
 

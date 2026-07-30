@@ -353,14 +353,16 @@ Son tamamlanan Dalyan adımı:
 - Üretim preset'i şu bileşenleri tek nesnede birleştirir:
   - ürün profili: `ROCK_CARVED_LANDMARK`
   - preprocessing zinciri: `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET`
-- Preview artık profil ve preprocessing bileşenlerini ayrı ayrı bağlamaz.
+- `AtlasRockReliefProductionPreset.build_from_image(...)` eklendi.
+- Bu çağrı kilitli `product_profile` ve `preprocessors` değerlerini `AtlasReliefPipeline.build_from_image(...)` hattına otomatik aktarır.
+- Dalyan preview içindeki kilitli production varyantı artık profil ve preprocessing argümanlarını elle açmaz.
 - Normalize edilmiş kaynak preview çıktısı ve pipeline üretimi aynı Dalyan üretim preset'inden beslenir.
 - Üretim preset'i, preprocessing preset'i, illumination normalizer ve preprocessor chain odaklı doğrulama:
-  - `13 passed`
+  - `14 passed`
 
 Sıradaki tek teknik işlem:
 
-Dalyan preview üretimini `product_profile` ve `preprocessors` argümanlarını elle açmadan, `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` üzerinden tek üretim çağrısına indirmek.
+Original ve illumination-normalized Dalyan preview çıktılarının görsel karşılaştırmasını yapmak ve nihai üretim varyantını seçmek.
 
 Daha sonraki Dalyan işleri:
 
@@ -400,7 +402,7 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Dalyan preview üretimini `product_profile` ve `preprocessors` argümanlarını elle açmadan, `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` üzerinden tek üretim çağrısına indirmek.
+Original ve illumination-normalized Dalyan preview çıktılarını görsel olarak karşılaştırmak ve nihai üretim varyantını seçmek.
 
 Köln için fiziksel bağımlılık değişmemiştir:
 
