@@ -10,8 +10,8 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from CORE.atlas_relief_pipeline import AtlasReliefPipeline
-from CORE.atlas_rock_relief_illumination_normalizer import (
-    AtlasRockReliefIlluminationNormalizer,
+from CORE.atlas_rock_relief_preprocessing_preset import (
+    DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET,
 )
 from CORE.atlas_relief_product_profile import (
     AtlasReliefProductProfile,
@@ -142,10 +142,8 @@ def main() -> None:
     )
 
     normalized_values = (
-        AtlasRockReliefIlluminationNormalizer.normalize(
-            source_values,
-            illumination_sigma=14.0,
-            detail_strength=0.80,
+        DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET(
+            source_values
         )
     )
 
@@ -192,13 +190,7 @@ def main() -> None:
         (
             "illumination-normalized",
             (
-                lambda values: (
-                    AtlasRockReliefIlluminationNormalizer.normalize(
-                        values,
-                        illumination_sigma=14.0,
-                        detail_strength=0.80,
-                    )
-                ),
+                DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET,
             ),
         ),
     )

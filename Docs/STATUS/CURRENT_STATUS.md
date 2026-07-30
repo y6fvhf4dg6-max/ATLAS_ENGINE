@@ -345,16 +345,31 @@ Mimari sonuç:
 - Ürüne özgü preprocessing adımları ana rölyef pipeline'ına sıralı ve yeniden kullanılabilir biçimde bağlanabilir.
 - Aynı yapı gelecekte portre, taş yüzey, düşük kontrastlı fotoğraf ve diğer rölyef kaynaklarında kullanılabilir.
 
-Açık Dalyan rölyef işleri:
+Son tamamlanan Dalyan adımı:
 
-1. Preview içindeki anonim `lambda` kullanımını isimli ve test edilebilir bir kaya rölyefi preprocessing preset'ine dönüştürmek.
-2. `ROCK_CARVED_LANDMARK` profilini preprocessing ayarlarıyla tek üretim preset'inde birleştirmek.
-3. Dalyan üretimini profil ve preprocessor parametrelerini elle vermeden tek çağrıya indirmek.
-4. Original ve illumination-normalized preview sonuçlarını görsel olarak karşılaştırmak.
-5. Nihai varyantı seçip kilitlemek.
-6. Seçilen varyanttan gerçek STL üretmek.
-7. STL topolojisi, minimum kalınlık ve baskı uygunluğunu doğrulamak.
-8. Nihai üretim STL'sini ayrı kalıcı dosya adıyla kaydetmek.
+- `CORE/atlas_rock_relief_preprocessing_preset.py` eklendi.
+- `AtlasRockReliefPreprocessingPreset` immutable ve callable bir sözleşme olarak tanımlandı.
+- `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET` eklendi.
+- Kilit parametreler:
+  - `illumination_sigma=14.0`
+  - `detail_strength=0.80`
+- Preview içindeki anonim `lambda` kaldırıldı.
+- Normalize edilmiş kaynak preview çıktısı ve pipeline preprocessing girdisi aynı preset üzerinden çalışır.
+- Preset, illumination normalizer ve preprocessor chain odaklı doğrulama:
+  - `10 passed`
+
+Sıradaki tek teknik işlem:
+
+`ROCK_CARVED_LANDMARK` ürün profilini ve `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET` preprocessing ayarını tek, immutable Dalyan üretim preset'inde birleştirmek.
+
+Daha sonraki Dalyan işleri:
+
+1. Dalyan üretimini profil ve preprocessor parametrelerini elle vermeden tek çağrıya indirmek.
+2. Original ve illumination-normalized preview sonuçlarını görsel olarak karşılaştırmak.
+3. Nihai varyantı seçip kilitlemek.
+4. Seçilen varyanttan gerçek STL üretmek.
+5. STL topolojisi, minimum kalınlık ve baskı uygunluğunu doğrulamak.
+6. Nihai üretim STL'sini ayrı kalıcı dosya adıyla kaydetmek.
 
 ## Dokümantasyon durumu
 

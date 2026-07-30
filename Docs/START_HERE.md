@@ -190,6 +190,17 @@ Kilit commit'ler:
 
 Bu kazanım Dalyan'a özel bir geçici çözüm değil, tüm fotoğraf ve rölyef ürünlerinde kullanılabilecek genel motor mimarisidir.
 
+İsimli kaya rölyefi preprocessing preset sistemi:
+
+- `AtlasRockReliefPreprocessingPreset` immutable sözleşmesi eklendi.
+- İlk standart preset:
+  - `DALYAN_ROCK_TOMBS_ILLUMINATION_PRESET`
+- Preset, `illumination_sigma=14.0` ve `detail_strength=0.80` değerlerini kalıcı olarak taşır.
+- Preview scriptindeki anonim `lambda` kaldırıldı.
+- Aynı preprocessing parametreleri artık tek isimli ve test edilebilir preset üzerinden kullanılır.
+- Preset, normalizer ve preprocessor zinciri odaklı doğrulama:
+  - `10 passed`
+
 ## Ana belge yapısı
 
 - `Docs/START_HERE.md`: yeni sohbet giriş belgesi
