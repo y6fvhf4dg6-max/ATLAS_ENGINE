@@ -382,3 +382,14 @@ Yeni giriş sözleşmesi:
 - Eşik değeri `0..255` aralığında olmak zorundadır.
 
 Bu modül yalnız maske dosyasını güvenli ve deterministik biçimde yükler. Gerçek Dalyan `vegetation` ve `tomb_facade` maskelerinin üretimi ayrı aşamadır.
+
+## Relief semantik maske seti
+
+- Modül: `CORE/atlas_relief_semantic_mask_set.py`
+- Test: `Test/test_relief_semantic_mask_set.py`
+- Birden fazla adlandırılmış PNG maskesini tek sözleşmede yükler.
+- Her maske `AtlasReliefSemanticMaskInput` üzerinden doğrulanır.
+- Maskeler `AtlasReliefSemanticMaterialMap` ile tek bir `uint8` malzeme kimlik haritasına dönüştürülür.
+- Ortak görüntü boyutu zorunludur.
+- Çakışan semantik bölgeler reddedilir.
+- Varsayılan malzeme maskelenmemiş pikselleri temsil eder.

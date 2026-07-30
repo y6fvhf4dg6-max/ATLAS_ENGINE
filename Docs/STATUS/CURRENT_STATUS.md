@@ -518,3 +518,25 @@ Semantik malzeme maskelerinin dosyadan yüklenmesi tamamlandı.
 - Geçersiz eşik değerlerinin reddedilmesi: tamamlandı
 - Gerçek Dalyan `vegetation` maskesi: henüz oluşturulmadı
 - Gerçek Dalyan `tomb_facade` maskesi: henüz oluşturulmadı
+
+## Relief semantik maske seti
+
+Tamamlandı:
+
+- `CORE/atlas_relief_semantic_mask_set.py`
+- `Test/test_relief_semantic_mask_set.py`
+- Adlandırılmış çoklu maske yükleme
+- Ortak boyut doğrulaması
+- Çakışma kontrolü
+- Varsayılan malzeme desteği
+- Tek `uint8` malzeme kimlik haritası üretimi
+
+Doğrulama:
+
+- Semantik maske paketi: `10 passed`
+
+Dalyan için sıradaki işlem:
+
+- `vegetation` maskesini üretmek
+- `tomb_facade` maskesini üretmek
+- Maskeleri 240 × 99 aktif relief girdisiyle eşlemek
