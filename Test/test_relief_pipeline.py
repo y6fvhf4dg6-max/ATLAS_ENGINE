@@ -2292,3 +2292,66 @@ def test_pipeline_product_profile_applies_layer_ranges(
         0.75,
         0.95,
     )
+
+
+def test_pipeline_build_from_image_applies_preprocessors(
+    tmp_path,
+):
+    import numpy as np
+    from PIL import Image
+
+    path = tmp_path / "preprocessor-chain.png"
+
+    image = Image.new(
+        "L",
+        (3, 3),
+    )
+    image.putdata(
+        [
+            0,
+            32,
+            64,
+            96,
+            128,
+            160,
+            192,
+            224,
+            255,
+        ]
+    )
+    image.save(path)
+
+    seen = {}
+
+    def invert(values):
+        seen["input"] = values.copy()
+        result = 1.0 - values
+        seen["output"] = result.copy()
+        return result
+
+    result = AtlasReliefPipeline.build_from_image(
+        path,
+        width_mm=30.0,
+        depth_mm=30.0,
+        form_sigma=2.0,
+        detail_sigma=0.7,
+        preprocessors=(invert,),
+    )
+
+    assert np.allclose(
+        result["preprocessed_luminance"],
+        seen["output"],
+    )
+    reconstructed_source = (
+        result["multiscale"]["form"]
+        + result["multiscale"]["detail"]
+        + result["multiscale"]["micro_detail"]
+    )
+
+    assert np.allclose(
+        reconstructed_source,
+        seen["output"],
+    )
+    assert result["image_settings"][
+        "preprocessor_count"
+    ] == 1

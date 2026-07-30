@@ -35,6 +35,9 @@ from CORE.atlas_relief_mesh_builder import (
 from CORE.atlas_relief_product_profile import (
     AtlasReliefProductProfile,
 )
+from CORE.atlas_relief_preprocessor_chain import (
+    AtlasReliefPreprocessorChain,
+)
 from CORE.atlas_relief_quality_report import (
     AtlasReliefQualityReport,
 )
@@ -89,6 +92,7 @@ class AtlasReliefPipeline:
         product_profile: (
             AtlasReliefProductProfile | None
         ) = None,
+        preprocessors: Any = (),
         **pipeline_arguments: Any,
     ) -> dict:
         product_profile_name = None
@@ -189,10 +193,23 @@ class AtlasReliefPipeline:
             ),
         )
 
+        preprocessor_sequence = tuple(
+            preprocessors
+        )
+
+        preprocessed_luminance = (
+            AtlasReliefPreprocessorChain.apply(
+                image_input["luminance"],
+                preprocessors=(
+                    preprocessor_sequence
+                ),
+            )
+        )
+
         multiscale = (
             AtlasReliefMultiscaleDecomposer
             .decompose(
-                image_input["luminance"],
+                preprocessed_luminance,
                 form_sigma=form_sigma,
                 detail_sigma=detail_sigma,
             )
@@ -356,6 +373,9 @@ class AtlasReliefPipeline:
         return {
             "type": "relief_image_pipeline_result",
             "image_input": image_input,
+            "preprocessed_luminance": (
+                preprocessed_luminance
+            ),
             "multiscale": multiscale,
             "depth_composition": depth_composition,
             "depth_compression": depth_compression,
@@ -368,6 +388,9 @@ class AtlasReliefPipeline:
             "image_settings": {
                 "product_profile_name": (
                     product_profile_name
+                ),
+                "preprocessor_count": len(
+                    preprocessor_sequence
                 ),
                 "form_sigma": multiscale[
                     "form_sigma"
