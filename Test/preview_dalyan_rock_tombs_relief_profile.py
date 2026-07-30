@@ -184,24 +184,33 @@ def main() -> None:
         ),
     )
 
-    sources = (
+    preprocessors = (
         (
             "original",
-            SOURCE_PATH,
+            (),
         ),
         (
             "illumination-normalized",
-            normalized_source_path,
+            (
+                lambda values: (
+                    AtlasRockReliefIlluminationNormalizer.normalize(
+                        values,
+                        illumination_sigma=14.0,
+                        detail_strength=0.80,
+                    )
+                ),
+            ),
         ),
     )
 
-    for source_name, source_path in sources:
+    for source_name, source_preprocessors in preprocessors:
         for profile in profiles:
             result = AtlasReliefPipeline.build_from_image(
-                source_path,
+                SOURCE_PATH,
                 width_mm=80.0,
                 depth_mm=50.0,
                 product_profile=profile,
+                preprocessors=source_preprocessors,
             )
 
             height_map = result[
