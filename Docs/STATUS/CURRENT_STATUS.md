@@ -360,17 +360,33 @@ Son tamamlanan Dalyan adımı:
 - Üretim preset'i, preprocessing preset'i, illumination normalizer ve preprocessor chain odaklı doğrulama:
   - `14 passed`
 
+Tamamlanan Dalyan fiziksel STL üretimi:
+
+- `CORE/atlas_relief_stl_exporter.py` eklendi.
+- `AtlasReliefSTLExporter.export_pipeline_result(...)` genel rölyef pipeline sonucundan kapalı relief mesh'i çıkarır.
+- Export işlemi mevcut `EXPORT.atlas_stl_writer.AtlasSTLWriter` üzerinden yapılır.
+- Exporter focused test sonucu: `4 passed`.
+- `Test/preview_dalyan_rock_tombs_relief_profile.py` seçilen production sonucunu STL'ye aktarır.
+- Üretilen dosya:
+  - `OUTPUT/RELIEF/dalyan_rock_tombs/dalyan_rock_tombs_relief_80x50mm.stl`
+- Fiziksel ölçü:
+  - `80 × 50 mm`
+- Üçgen sayısı:
+  - `95.036`
+- Solid adı:
+  - `DALYAN_ROCK_TOMBS_RELIEF`
+
 Sıradaki tek teknik işlem:
 
-Original ve illumination-normalized Dalyan preview çıktılarının görsel karşılaştırmasını yapmak ve nihai üretim varyantını seçmek.
+Dalyan STL dosyasının topolojisini, minimum kalınlığını ve fiziksel baskı uygunluğunu doğrulamak.
 
 Daha sonraki Dalyan işleri:
 
-1. Original ve illumination-normalized preview sonuçlarını görsel olarak karşılaştırmak.
-2. Nihai varyantı seçip kilitlemek.
-3. Seçilen varyanttan gerçek STL üretmek.
-4. STL topolojisi, minimum kalınlık ve baskı uygunluğunu doğrulamak.
-5. Nihai üretim STL'sini ayrı kalıcı dosya adıyla kaydetmek.
+1. STL topolojisini ve manifold durumunu doğrulamak.
+2. Minimum taban ve rölyef kalınlıklarını doğrulamak.
+3. Bambu Studio'da açıp dilimleme sonucunu incelemek.
+4. Gerekli fiziksel revizyonları uygulamak.
+5. Nihai üretim STL'sini kalıcı final dosya adıyla kaydetmek.
 
 ## Dokümantasyon durumu
 
@@ -402,7 +418,7 @@ Sıradaki belgeler:
 
 ## Sıradaki tek işlem
 
-Seçilen `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` ile Dalyan kaya mezarlarının fiziksel STL preview çıktısını üretmek.
+Dalyan kaya mezarları için üretilen `80 × 50 mm` fiziksel STL'nin topolojisini, minimum kalınlığını ve baskı uygunluğunu doğrulamak.
 
 Köln için fiziksel bağımlılık değişmemiştir:
 
@@ -453,4 +469,4 @@ gereksiz artırdığı için nihai üretimden çıkarıldı.
 
 Sıradaki teknik işlem:
 
-Seçilen production preset ile Dalyan kaya mezarlarının fiziksel STL preview çıktısını üretmek.
+Üretilen Dalyan fiziksel STL dosyasının topoloji, minimum kalınlık ve baskı uygunluğu doğrulamasını yapmak.

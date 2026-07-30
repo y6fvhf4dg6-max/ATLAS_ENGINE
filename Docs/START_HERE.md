@@ -295,3 +295,37 @@ Görsel karşılaştırma sonucunda nihai üretim varyantı kilitlendi:
 
 Standart profil; mezar cephelerini ve oyma sınırlarını yeterli açıklıkta korurken,
 detail profilindeki yüksek frekanslı kaya gürültüsünü baskıya taşımadığı için seçildi.
+
+### Dalyan kaya mezarları fiziksel STL üretimi
+
+Seçilen `DALYAN_ROCK_TOMBS_PRODUCTION_PRESET` sonucu artık genel rölyef STL export hattına bağlanmıştır.
+
+Eklenen genel motor bileşeni:
+
+- `CORE/atlas_relief_stl_exporter.py`
+- `AtlasReliefSTLExporter.export_pipeline_result(...)`
+
+Exporter:
+
+- `relief_image_pipeline_result`
+- içindeki `relief_result["mesh"]`
+- ve mevcut `EXPORT.atlas_stl_writer.AtlasSTLWriter`
+
+arasında ince, yeniden kullanılabilir bir üretim katmanı oluşturur.
+
+Dalyan preview scripti artık kilitli production sonucunu doğrudan şu fiziksel STL dosyasına aktarır:
+
+- `OUTPUT/RELIEF/dalyan_rock_tombs/dalyan_rock_tombs_relief_80x50mm.stl`
+
+Doğrulanan üretim sonucu:
+
+- fiziksel ölçü: `80 × 50 mm`
+- üçgen sayısı: `95.036`
+- solid adı: `DALYAN_ROCK_TOMBS_RELIEF`
+- üretim varyantı: illumination-normalized + `ROCK_CARVED_LANDMARK`
+- exporter focused test sonucu: `4 passed`
+
+Sıradaki teknik işlem:
+
+Dalyan STL dosyasının topolojisini, minimum kalınlığını ve fiziksel baskı uygunluğunu doğrulamak.
+

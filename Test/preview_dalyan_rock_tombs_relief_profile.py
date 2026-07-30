@@ -10,6 +10,9 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from CORE.atlas_relief_pipeline import AtlasReliefPipeline
+from CORE.atlas_relief_stl_exporter import (
+    AtlasReliefSTLExporter,
+)
 from CORE.atlas_rock_relief_production_preset import (
     DALYAN_ROCK_TOMBS_PRODUCTION_PRESET,
 )
@@ -41,6 +44,11 @@ HEIGHT_MAP_PATH = (
 SHADED_PREVIEW_PATH = (
     OUTPUT_DIRECTORY
     / "rock_carved_landmark_shaded.png"
+)
+
+STL_OUTPUT_PATH = (
+    OUTPUT_DIRECTORY
+    / "dalyan_rock_tombs_relief_80x50mm.stl"
 )
 
 
@@ -191,6 +199,8 @@ def main() -> None:
         ),
     )
 
+    production_result = None
+
     for source_name, source_preprocessors in preprocessors:
         for profile in profiles:
             if (
@@ -207,6 +217,7 @@ def main() -> None:
                         depth_mm=50.0,
                     )
                 )
+                production_result = result
             else:
                 result = AtlasReliefPipeline.build_from_image(
                     SOURCE_PATH,
@@ -254,9 +265,24 @@ def main() -> None:
             print(height_path)
             print(shaded_path)
 
+    if production_result is None:
+        raise RuntimeError(
+            "Dalyan production result was not generated."
+        )
+
+    AtlasReliefSTLExporter.export_pipeline_result(
+        pipeline_result=production_result,
+        output_path=STL_OUTPUT_PATH,
+        solid_name="DALYAN_ROCK_TOMBS_RELIEF",
+    )
+
     print(
         "Normalized source:",
         normalized_source_path,
+    )
+    print(
+        "Production STL:",
+        STL_OUTPUT_PATH,
     )
 
 
