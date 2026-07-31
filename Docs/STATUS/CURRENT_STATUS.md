@@ -540,3 +540,25 @@ Dalyan için sıradaki işlem:
 - `vegetation` maskesini üretmek
 - `tomb_facade` maskesini üretmek
 - Maskeleri 240 × 99 aktif relief girdisiyle eşlemek
+
+## Dalyan relief semantik maske sözleşmesi
+
+Tamamlandı:
+
+- `CORE/atlas_dalyan_relief_semantic_masks.py`
+- `Test/test_dalyan_relief_semantic_masks.py`
+- Aktif relief boyutu: `240 × 99`
+- Varsayılan malzeme: `rock`
+- `vegetation` maske yolu tanımlandı
+- `tomb_facade` maske yolu tanımlandı
+
+Doğrulama:
+
+- Dalyan sözleşme testi: `1 passed`
+- Tüm semantik maske paketi: `11 passed`
+
+Sıradaki işlem:
+
+- Gerçek `vegetation_240x99.png` maskesini üretmek
+- Gerçek `tomb_facade_240x99.png` maskesini üretmek
+- Maskeleri `AtlasReliefSemanticMaskSet` ile yüklemek

@@ -393,3 +393,15 @@ Bu modül yalnız maske dosyasını güvenli ve deterministik biçimde yükler. 
 - Ortak görüntü boyutu zorunludur.
 - Çakışan semantik bölgeler reddedilir.
 - Varsayılan malzeme maskelenmemiş pikselleri temsil eder.
+
+## Dalyan relief semantik maske sözleşmesi
+
+- Modül: `CORE/atlas_dalyan_relief_semantic_masks.py`
+- Test: `Test/test_dalyan_relief_semantic_masks.py`
+- Aktif relief görüntü boyutu: `240 × 99`
+- Varsayılan malzeme: `rock`
+- Semantik maske yolları:
+  - `Data/RELIEF/dalyan_rock_tombs/MASKS/vegetation_240x99.png`
+  - `Data/RELIEF/dalyan_rock_tombs/MASKS/tomb_facade_240x99.png`
+- Bu modül yalnız Dalyan sahnesine ait deterministik dosya ve boyut sözleşmesini tanımlar.
+- Gerçek PNG maskelerinin üretilmesi ve pipeline entegrasyonu sonraki aşamadır.
