@@ -144,3 +144,72 @@ def test_builder_rejects_non_church_landmark_type():
         raise AssertionError(
             "Expected non-church landmark type to be rejected"
         )
+
+
+def test_builder_resolves_window_and_buttress_physical_actions():
+    result = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            scale_ratio=5500.0,
+            nozzle_diameter_mm=0.4,
+        ),
+    )
+
+    window_system = next(
+        component
+        for component in result.components
+        if component.component_type == "window_bay_system"
+    )
+    buttress_system = next(
+        component
+        for component in result.components
+        if component.component_type == "buttress_system"
+    )
+
+    assert window_system.physical_action in {
+        "preserve",
+        "enlarge",
+        "omit",
+    }
+    assert buttress_system.physical_action in {
+        "preserve",
+        "enlarge",
+        "omit",
+    }
+
+    assert window_system.resolved_size_mm > 0.0
+    assert buttress_system.resolved_size_mm > 0.0
+
+
+def test_builder_uses_finer_nozzle_to_preserve_more_detail():
+    coarse = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            scale_ratio=5500.0,
+            nozzle_diameter_mm=0.4,
+        ),
+    )
+
+    fine = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            scale_ratio=5500.0,
+            nozzle_diameter_mm=0.2,
+        ),
+    )
+
+    coarse_window = next(
+        component
+        for component in coarse.components
+        if component.component_type == "window_bay_system"
+    )
+    fine_window = next(
+        component
+        for component in fine.components
+        if component.component_type == "window_bay_system"
+    )
+
+    assert (
+        fine_window.resolved_size_mm
+        <= coarse_window.resolved_size_mm
+    )

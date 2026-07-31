@@ -6,6 +6,9 @@ from CORE.atlas_church_landmark_profile import (
     AtlasChurchLandmarkProfile,
 )
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_physical_detail_resolver import (
+    AtlasPhysicalDetailResolver,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -13,6 +16,8 @@ class AtlasChurchLandmarkComponent:
     component_type: str
     index: int = 0
     section_name: str | None = None
+    physical_action: str | None = None
+    resolved_size_mm: float | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,6 +111,28 @@ class AtlasChurchLandmarkBuilder:
     ):
         components = []
 
+        window_decision = (
+            AtlasPhysicalDetailResolver.resolve(
+                real_size_m=1.80,
+                scale_ratio=profile.scale_ratio,
+                nozzle_diameter_mm=(
+                    profile.nozzle_diameter_mm
+                ),
+                detail_type="window",
+            )
+        )
+
+        buttress_decision = (
+            AtlasPhysicalDetailResolver.resolve(
+                real_size_m=1.20,
+                scale_ratio=profile.scale_ratio,
+                nozzle_diameter_mm=(
+                    profile.nozzle_diameter_mm
+                ),
+                detail_type="buttress",
+            )
+        )
+
         if profile.has_nave:
             components.append(
                 AtlasChurchLandmarkComponent(
@@ -152,6 +179,13 @@ class AtlasChurchLandmarkBuilder:
             components.append(
                 AtlasChurchLandmarkComponent(
                     component_type="buttress_system",
+                    physical_action=(
+                        buttress_decision.action
+                    ),
+                    resolved_size_mm=(
+                        buttress_decision
+                        .resolved_size_mm
+                    ),
                 )
             )
 
@@ -159,6 +193,13 @@ class AtlasChurchLandmarkBuilder:
             components.append(
                 AtlasChurchLandmarkComponent(
                     component_type="window_bay_system",
+                    physical_action=(
+                        window_decision.action
+                    ),
+                    resolved_size_mm=(
+                        window_decision
+                        .resolved_size_mm
+                    ),
                 )
             )
 
