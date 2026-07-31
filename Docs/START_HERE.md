@@ -412,3 +412,75 @@ Bu modül yalnız maske dosyasını güvenli ve deterministik biçimde yükler. 
   - `Data/RELIEF/dalyan_rock_tombs/MASKS/tomb_facade_240x99.png`
 - Bu modül yalnız Dalyan sahnesine ait deterministik dosya ve boyut sözleşmesini tanımlar.
 - Gerçek PNG maskelerinin üretilmesi ve pipeline entegrasyonu sonraki aşamadır.
+
+## 31 Temmuz 2026 — Teknik paketlerin kalıcılaştırılması
+
+Çalışma ağacında uzun süredir izlenmeyen durumda bulunan geliştirmeler incelendi. Körlemesine silme yapılmadı; her paket focused testlerle doğrulandı, ayrı commit edildi ve GitHub'a push edildi.
+
+Kalıcılaştırılan paketler:
+
+- `7585a68 Add MediaPipe relief landmark adapter`
+  - Python 3.12 MediaPipe/OpenCV ortamı doğrulandı.
+  - Yeniden kurulum listesi:
+    `Docs/ENVIRONMENTS/requirements-landmarks-python312.txt`
+  - Adapter testi: `17 passed`
+
+- `056ab94 Add terrain contour generation system`
+  - contour band, mesh, terrace ve orchestration katmanları
+  - Focused test: `41 passed`
+
+- `8952793 Add terrain-following landcover builder`
+  - Terrain yüzeyini izleyen kapalı landcover geometrisi
+  - Focused test: `9 passed`
+
+- `798542e Add green area sampling and WorldCover aggregation`
+  - Deterministik yeşil alan ağaç örnekleme
+  - WorldCover hücrelerini yüzey gruplarına toplama
+  - Focused test: `20 passed`
+
+- `4ff45f1 Add relief normal processing pipeline`
+  - normal height integrator
+  - screened normal integrator
+  - normal gradient limiter
+  - structure/detail decomposition
+  - confidence applier
+  - Focused test: `101 passed`
+
+- `0253fb2 Add relief face semantic calibration layers`
+  - landmark regions
+  - semantic detail weighting
+  - structure confidence
+  - anchor enhancement
+  - interior calibration mask
+  - detail composition
+  - Focused test: `191 passed`
+
+- `bff4629 Add relief semantic height adjustment`
+  - Semantik maskelere göre kontrollü yükseklik ayarı
+  - Focused test: `2 passed`
+
+- `17f4f10 Improve ancient theatre and building relation handling`
+  - Arkeolojik/harabe bağlamıyla antik tiyatro sınıflandırması
+  - OSM building relation okuma iyileştirmeleri
+  - Focused test: `16 passed`
+
+- `34265d1 Refine Wall Collection label and material standards`
+  - Etiket plakası ve çerçeve bandı uyumu
+  - Malzeme profili ve landmark renk grubu
+  - Askı ve ürün yerleşim standardı
+  - Focused test: `52 passed`
+
+Temizlik kararı:
+
+- Eski Galata `end_taper` prototipi, daha genel ve doğrulanmış
+  `road_approaches` hattı tarafından geçersiz kılındığı için silindi.
+- Boş artık dosyalar `0:`, `255` ve `main` silindi.
+- Eski `.bak` dosyaları güncel sürümlerle karşılaştırıldıktan sonra silindi.
+- `.venv-landmarks` korunuyor; Relief/MediaPipe hattı için gerekli Python 3.12 ortamıdır.
+- `Data/` klasörü üretim girdileri içerdiği için topluca silinmeyecektir.
+
+Güncel teknik yön:
+
+- Relief ve terrain altyapısındaki eski izlenmeyen çekirdek paketler artık ana dalda kalıcıdır.
+- Yeni lokasyon geliştirmesine geçmeden önce preview, doküman, yardımcı test ve veri klasörleri son kez sınıflandırılacaktır.
+

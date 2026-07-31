@@ -568,3 +568,73 @@ Sıradaki işlem:
 - Gerçek `vegetation_240x99.png` maskesini üretmek
 - Gerçek `tomb_facade_240x99.png` maskesini üretmek
 - Maskeleri `AtlasReliefSemanticMaskSet` ile yüklemek
+
+## 31 Temmuz 2026 — Çalışma ağacı temizliği ve kalıcılaştırma
+
+Tamamlananlar:
+
+- Eski ve izlenmeyen çekirdek geliştirmeler test edilerek iş paketlerine ayrıldı.
+- Toplu ilk doğrulamada `382 passed` sonucu alındı.
+- Başarısız kalan eski Galata `end_taper` prototipi incelendi.
+- Bunun yerine kullanılan genel `road_approaches` hattı `29 passed` ile doğrulandı.
+- Eski `end_taper` mesher ve testi silindi.
+- Kalan izlenmeyen test paketi yeniden çalıştırıldı:
+  - `382 passed in 1.26s`
+
+Kalıcılaştırılan commitler:
+
+- `7585a68 Add MediaPipe relief landmark adapter`
+- `056ab94 Add terrain contour generation system`
+- `8952793 Add terrain-following landcover builder`
+- `798542e Add green area sampling and WorldCover aggregation`
+- `4ff45f1 Add relief normal processing pipeline`
+- `0253fb2 Add relief face semantic calibration layers`
+- `bff4629 Add relief semantic height adjustment`
+- `17f4f10 Improve ancient theatre and building relation handling`
+- `34265d1 Refine Wall Collection label and material standards`
+
+Focused doğrulamalar:
+
+- MediaPipe adapter: `17 passed`
+- Terrain contour: `41 passed`
+- Terrain-following landcover: `9 passed`
+- Green area + WorldCover: `20 passed`
+- Relief normal pipeline: `101 passed`
+- Relief face semantic calibration: `191 passed`
+- Relief semantic height adjustment: `2 passed`
+- Ancient theatre + OSM relation: `16 passed`
+- Wall Collection standardları: `52 passed`
+
+Ortam kararı:
+
+- Ana ortam: `.venv`, Python `3.14.6`
+- MediaPipe ortamı: `.venv-landmarks`, Python `3.12.13`
+- MediaPipe ortamı çalışır durumda ve korunuyor.
+- Yeniden kurulum listesi:
+  `Docs/ENVIRONMENTS/requirements-landmarks-python312.txt`
+
+Wall Collection güncel standart sinyali:
+
+- Bonn referans ürünü: `170 × 170 mm`
+- Harita açıklığı: `150 × 150 mm`
+- Ölçek: `1:3000`
+- Çerçeve bandı: `10 mm`
+- Etiket:
+  - birinci satır `BONN`
+  - ikinci satır `GEBURTSORT`
+  - sağda doğum günü pastası simgesi
+- Etiketli ve etiketsiz STL paketleri ayrı korunuyor.
+
+Bilinen açık işler:
+
+- Untracked preview dosyalarının sınıflandırılması
+- Eski devir/status belgelerinin arşiv veya commit kararı
+- `CORE/__init__.py` ve `CORE/atlas_tower_geometry.py` değerlendirmesi
+- `Test/test_galata_real_bridge_base_topology.py` değerlendirmesi
+- `Data/`, `Tools/`, `Test/atakule/` ve yardımcı preview girdilerinin kontrollü incelemesi
+- Gereksiz preview/yardımcı dosyaların silinmesi veya kalıcı paketlere alınması
+
+Sıradaki tek teknik işlem:
+
+Kalan untracked preview, yardımcı test, belge ve veri klasörlerini sınıflandırmak; yalnız üretim veya regresyon değeri olanları ayrı commitlerle korumak.
+
