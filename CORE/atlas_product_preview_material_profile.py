@@ -12,6 +12,7 @@ class AtlasProductPreviewMaterialProfile:
     building_rgb: RGB
     building_wall_rgb: RGB
     building_roof_rgb: RGB
+    landmark_rgb: RGB
     terrain_rgb: RGB
     road_rgb: RGB
     green_rgb: RGB
@@ -51,6 +52,7 @@ class AtlasProductPreviewMaterialProfile:
             building_rgb=(232, 228, 216),
             building_wall_rgb=(232, 228, 216),
             building_roof_rgb=(156, 48, 42),
+            landmark_rgb=(232, 228, 216),
             terrain_rgb=(205, 190, 160),
             road_rgb=(190, 184, 170),
             green_rgb=(105, 137, 78),
@@ -74,6 +76,7 @@ class AtlasProductPreviewMaterialProfile:
             building_rgb=white,
             building_wall_rgb=white,
             building_roof_rgb=red,
+            landmark_rgb=white,
             terrain_rgb=white,
             road_rgb=white,
             green_rgb=green,
@@ -81,5 +84,29 @@ class AtlasProductPreviewMaterialProfile:
             water_rgb=blue,
             label_plate_rgb=white,
             label_text_rgb=black,
+        )
+
+    @classmethod
+    def dalyan_kaunos_premium_v1(cls):
+        ivory = (242, 235, 218)
+        sandstone = (190, 145, 92)
+        olive = (91, 112, 63)
+        charcoal = (26, 25, 23)
+        mediterranean_blue = (66, 126, 151)
+
+        return cls(
+            name="DALYAN_KAUNOS_PREMIUM_V1",
+            frame_rgb=charcoal,
+            building_rgb=ivory,
+            building_wall_rgb=ivory,
+            building_roof_rgb=ivory,
+            landmark_rgb=sandstone,
+            terrain_rgb=ivory,
+            road_rgb=ivory,
+            green_rgb=olive,
+            tree_rgb=olive,
+            water_rgb=mediterranean_blue,
+            label_plate_rgb=ivory,
+            label_text_rgb=charcoal,
         )
 

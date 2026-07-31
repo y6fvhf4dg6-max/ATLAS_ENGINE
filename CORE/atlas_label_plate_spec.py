@@ -6,7 +6,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class AtlasLabelPlateSpec:
     width_mm: float = 118.0
-    height_mm: float = 11.0
+    height_mm: float = 9.0
     depth_mm: float = 1.2
 
     def __post_init__(self) -> None:

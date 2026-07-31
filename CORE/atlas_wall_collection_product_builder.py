@@ -127,11 +127,17 @@ class AtlasWallCollectionProductBuilder:
                     "label plate width exceeds frame inner width"
                 )
 
+            if (
+                label_plate_spec.height_mm
+                > frame_spec.frame_width_mm
+            ):
+                raise ValueError(
+                    "label plate height exceeds frame band"
+                )
+
             label_center_y_mm = (
                 -(frame_spec.outer_height_mm / 2.0)
-                + frame_spec.frame_width_mm
-                + (label_plate_spec.height_mm / 2.0)
-                - AtlasWallCollectionProductBuilder.LABEL_FRAME_EMBED_MM
+                + (frame_spec.frame_width_mm / 2.0)
             )
 
             label_plate_mesh = AtlasLabelPlateMesher.build(

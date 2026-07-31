@@ -176,7 +176,9 @@ def test_renderer_adds_optional_label_plate_and_text_material_batches():
         frame_spec=AtlasWallFrameSpec(),
         frame_depth_mm=6.0,
         material_profile=profile,
-        label_plate_spec=AtlasLabelPlateSpec(),
+        label_plate_spec=AtlasLabelPlateSpec(
+            height_mm=8.0,
+        ),
         label_text_spec=AtlasLabelTextSpec(
             primary_text="KÖLN",
             secondary_text="2001",
@@ -1193,3 +1195,26 @@ def test_renderer_highlights_selected_building_entirely_in_red():
         mesh.get("source_id") != selected_source_id
         for mesh in batches["building_walls"]["meshes"]
     )
+
+
+def test_renderer_maps_landmarks_to_separate_material_batch():
+    city_result = _city_result()
+    city_result["mesh_groups"]["landmarks"] = [
+        _mesh("ancient_theatre", 25.0, 35.0, 1.2),
+    ]
+
+    profile = AtlasProductPreviewMaterialProfile.competitor_comparison_v1()
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    landmarks = scene["material_batches"]["landmarks"]
+
+    assert landmarks["rgb"] == profile.landmark_rgb
+    assert len(landmarks["meshes"]) == 1
+    assert landmarks["meshes"][0]["type"] == "ancient_theatre"
+

@@ -124,7 +124,7 @@ def test_wall_collection_adds_optional_integrated_label_plate_without_moving_cit
         frame_depth_mm=6.0,
         label_plate_spec=AtlasLabelPlateSpec(
             width_mm=118.0,
-            height_mm=14.0,
+            height_mm=8.0,
             depth_mm=1.2,
         ),
     )
@@ -141,8 +141,8 @@ def test_wall_collection_adds_optional_integrated_label_plate_without_moving_cit
     assert label_mesh["type"] == "label_plate"
     assert min(x for x, _, _ in vertices) == pytest.approx(-59.0)
     assert max(x for x, _, _ in vertices) == pytest.approx(59.0)
-    assert min(y for _, y, _ in vertices) == pytest.approx(-72.0)
-    assert max(y for _, y, _ in vertices) == pytest.approx(-58.0)
+    assert min(y for _, y, _ in vertices) == pytest.approx(-75.0)
+    assert max(y for _, y, _ in vertices) == pytest.approx(-67.0)
     assert min(z for _, _, z in vertices) == pytest.approx(6.0)
     assert max(z for _, _, z in vertices) == pytest.approx(7.2)
 
@@ -157,7 +157,7 @@ def test_wall_collection_adds_two_line_label_text_on_front_of_plate():
         frame_depth_mm=6.0,
         label_plate_spec=AtlasLabelPlateSpec(
             width_mm=118.0,
-            height_mm=14.0,
+            height_mm=8.0,
             depth_mm=1.2,
         ),
         label_text_spec=AtlasLabelTextSpec(
@@ -200,7 +200,7 @@ def test_wall_collection_adds_two_line_label_text_on_front_of_plate():
     for vertices in (primary_vertices, secondary_vertices):
         assert min(x for x, _, _ in vertices) >= -54.0 - 1e-6
         assert max(x for x, _, _ in vertices) <= 54.0 + 1e-6
-        assert min(y for _, y, _ in vertices) >= -72.0 - 1e-6
+        assert min(y for _, y, _ in vertices) >= -75.0 - 1e-6
         assert max(y for _, y, _ in vertices) <= -53.0 + 1e-6
 
 
@@ -234,7 +234,7 @@ def test_wall_collection_adds_graduation_cap_at_right_side_of_label():
         frame_depth_mm=6.0,
         label_plate_spec=AtlasLabelPlateSpec(
             width_mm=118.0,
-            height_mm=14.0,
+            height_mm=8.0,
             depth_mm=1.2,
         ),
         label_text_spec=AtlasLabelTextSpec(
@@ -258,13 +258,49 @@ def test_wall_collection_adds_graduation_cap_at_right_side_of_label():
     assert min(x for x, _, _ in cap_vertices) >= 48.0
     assert max(x for x, _, _ in cap_vertices) <= 56.0
 
-    assert min(y for _, y, _ in cap_vertices) >= -72.0
-    assert max(y for _, y, _ in cap_vertices) <= -58.0
+    assert min(y for _, y, _ in cap_vertices) >= -75.0
+    assert max(y for _, y, _ in cap_vertices) <= -67.0
 
     assert min(z for _, _, z in cap_vertices) == pytest.approx(7.2)
     assert max(z for _, _, z in cap_vertices) == pytest.approx(7.8)
 
     assert cap_mesh in product["meshes"]
+
+
+def test_wall_collection_keeps_default_label_fully_inside_ten_mm_frame_band():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+
+    city_result = _city_result()
+    city_result["terrain_size_x_mm"] = 150.0
+    city_result["terrain_size_y_mm"] = 150.0
+
+    frame_spec = AtlasWallFrameSpec(
+        outer_width_mm=170.0,
+        outer_height_mm=170.0,
+        frame_width_mm=10.0,
+    )
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=city_result,
+        frame_spec=frame_spec,
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(),
+    )
+
+    label_vertices = _all_vertices(
+        product["label_plate_meshes"][0]
+    )
+
+    outer_bottom_y_mm = -(frame_spec.outer_height_mm / 2.0)
+    opening_bottom_y_mm = -(frame_spec.inner_height_mm / 2.0)
+
+    assert min(
+        y for _, y, _ in label_vertices
+    ) >= outer_bottom_y_mm - 1e-9
+
+    assert max(
+        y for _, y, _ in label_vertices
+    ) <= opening_bottom_y_mm + 1e-9
 
 
 def test_wall_collection_adds_birthday_cake_at_right_side_of_label():
@@ -277,7 +313,7 @@ def test_wall_collection_adds_birthday_cake_at_right_side_of_label():
         frame_depth_mm=6.0,
         label_plate_spec=AtlasLabelPlateSpec(
             width_mm=118.0,
-            height_mm=14.0,
+            height_mm=8.0,
             depth_mm=1.2,
         ),
         label_text_spec=AtlasLabelTextSpec(
@@ -297,9 +333,14 @@ def test_wall_collection_adds_birthday_cake_at_right_side_of_label():
     cake_vertices = _all_vertices(cake_mesh)
 
     assert cake_mesh["type"] == "label_birthday_cake"
+
     assert min(x for x, _, _ in cake_vertices) >= 47.0
     assert max(x for x, _, _ in cake_vertices) <= 56.0
+
+    assert min(y for _, y, _ in cake_vertices) >= -75.0
+    assert max(y for _, y, _ in cake_vertices) <= -67.0
+
     assert min(z for _, _, z in cake_vertices) == pytest.approx(7.2)
     assert max(z for _, _, z in cake_vertices) == pytest.approx(7.8)
-    assert cake_mesh in product["meshes"]
 
+    assert cake_mesh in product["meshes"]

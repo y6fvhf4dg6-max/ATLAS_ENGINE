@@ -19,7 +19,7 @@ def test_label_plate_mesher_builds_closed_centered_rectangular_prism():
 
     assert mesh["type"] == "label_plate"
     assert mesh["width_mm"] == pytest.approx(118.0)
-    assert mesh["height_mm"] == pytest.approx(11.0)
+    assert mesh["height_mm"] == pytest.approx(9.0)
     assert mesh["depth_mm"] == pytest.approx(1.2)
     assert len(mesh["triangles"]) == 12
 
@@ -27,7 +27,7 @@ def test_label_plate_mesher_builds_closed_centered_rectangular_prism():
 
     assert min(x for x, _, _ in vertices) == pytest.approx(-59.0)
     assert max(x for x, _, _ in vertices) == pytest.approx(59.0)
-    assert min(y for _, y, _ in vertices) == pytest.approx(-5.5)
-    assert max(y for _, y, _ in vertices) == pytest.approx(5.5)
+    assert min(y for _, y, _ in vertices) == pytest.approx(-4.5)
+    assert max(y for _, y, _ in vertices) == pytest.approx(4.5)
     assert min(z for _, _, z in vertices) == pytest.approx(0.0)
     assert max(z for _, _, z in vertices) == pytest.approx(1.2)

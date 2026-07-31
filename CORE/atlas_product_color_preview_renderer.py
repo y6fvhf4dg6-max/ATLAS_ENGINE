@@ -28,6 +28,7 @@ class AtlasProductColorPreviewRenderer:
     GROUP_TO_BATCH = {
         "terrain": "terrain",
         "buildings": "buildings",
+        "landmarks": "landmarks",
         "roads": "roads",
         "parks": "parks",
         "trees": "trees",
@@ -1051,6 +1052,10 @@ class AtlasProductColorPreviewRenderer:
             },
             "buildings": {
                 "rgb": material_profile.building_rgb,
+                "meshes": [],
+            },
+            "landmarks": {
+                "rgb": material_profile.landmark_rgb,
                 "meshes": [],
             },
             "building_walls": {
