@@ -26,6 +26,10 @@ class AtlasLandmarkProviderOsm(AtlasLandmarkProvider):
             and tags.get("tomb") == "rock-cut"
         ):
             landmark_type = AtlasLandmarkType.ROCK_CUT_TOMB
+        elif tags.get("building") == "cathedral":
+            landmark_type = AtlasLandmarkType.CATHEDRAL
+        elif tags.get("building") == "church":
+            landmark_type = AtlasLandmarkType.CHURCH
         else:
             landmark_type = AtlasLandmarkType.UNKNOWN
 
