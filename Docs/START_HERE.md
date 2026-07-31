@@ -88,6 +88,13 @@ Temel fikir:
    - nehir
    - göl
    - kanal
+
+## Genel bina çatı geometrisi
+
+- `roof:shape=pyramidal` olarak sınıflandırılan normal bina ve `building:part` kuleleri artık düz üst kapakla bırakılmaz.
+- `AtlasBuildingPyramidalRoofBuilder`, mevcut düz üst yüzeyi kaldırır ve footprint sınırını merkez tepe noktasına bağlayan piramidal çatı üretir.
+- Geçerli `roof:height` değeri ürün ölçeğine çevrilerek fiziksel çatı yüksekliği olarak korunur.
+- Bu hat özellikle kilise, katedral ve bağımsız kule parçalarının gerçek siluetini korumak için kullanılır.
    - havuz
 
 Köln sahnesinde mevcut su mesh'i bulunmadığı için ilk gerçek paket dört aktif renk üretmektedir: beyaz, kırmızı, yeşil ve siyah. Su içeren sahnelerde mavi STL otomatik olarak üretilir.

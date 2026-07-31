@@ -11,6 +11,9 @@ from CORE.atlas_building_gable_roof_builder import (
 from CORE.atlas_building_hipped_roof_builder import (
     AtlasBuildingHippedRoofBuilder,
 )
+from CORE.atlas_building_pyramidal_roof_builder import (
+    AtlasBuildingPyramidalRoofBuilder,
+)
 from CORE.atlas_foundation_first_pipeline import (
     AtlasFoundationFirstPipeline,
 )
@@ -905,6 +908,12 @@ class AtlasFoundationSceneBuilder:
 
             mesh = AtlasBuildingHippedRoofBuilder.apply(
                 mesh
+            )
+
+            mesh = AtlasBuildingPyramidalRoofBuilder.apply(
+                mesh=mesh,
+                roof_height_m=tags.get("roof:height"),
+                coordinate_engine=coordinate_engine,
             )
 
             if not mesh["is_castle_building"]:

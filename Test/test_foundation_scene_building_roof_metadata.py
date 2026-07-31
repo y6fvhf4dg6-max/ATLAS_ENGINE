@@ -1,3 +1,4 @@
+import pytest
 from types import SimpleNamespace
 
 from CORE.atlas_foundation_scene_builder import (
@@ -786,3 +787,154 @@ def test_all_parents_with_parts_require_shared_foundation_cache():
     )
 
     assert result == {100, 200}
+
+
+def test_foundation_scene_applies_pyramidal_roof_geometry(
+    monkeypatch,
+):
+    bottom = [
+        (0.0, 0.0, 0.0),
+        (6.0, 0.0, 0.0),
+        (6.0, 6.0, 0.0),
+        (0.0, 6.0, 0.0),
+    ]
+
+    top = [
+        (0.0, 0.0, 14.0),
+        (6.0, 0.0, 14.0),
+        (6.0, 6.0, 14.0),
+        (0.0, 6.0, 14.0),
+    ]
+
+    original_triangles = [
+        (bottom[0], bottom[2], bottom[1]),
+        (bottom[0], bottom[3], bottom[2]),
+        (top[0], top[1], top[2]),
+        (top[0], top[2], top[3]),
+        (bottom[0], bottom[1], top[1]),
+        (bottom[0], top[1], top[0]),
+        (bottom[1], bottom[2], top[2]),
+        (bottom[1], top[2], top[1]),
+        (bottom[2], bottom[3], top[3]),
+        (bottom[2], top[3], top[2]),
+        (bottom[3], bottom[0], top[0]),
+        (bottom[3], top[0], top[3]),
+    ]
+
+    mesh = {
+        "bottom": bottom,
+        "top": top,
+        "walls": [
+            (bottom[0], bottom[1], top[1], top[0]),
+            (bottom[1], bottom[2], top[2], top[1]),
+            (bottom[2], bottom[3], top[3], top[2]),
+            (bottom[3], bottom[0], top[0], top[3]),
+        ],
+        "triangles": list(original_triangles),
+        "foundation_z": 0.0,
+        "bottom_z": 0.0,
+        "top_z": 14.0,
+    }
+
+    tags = {
+        "building:part": "yes",
+        "height": "82",
+        "roof:shape": "pyramidal",
+        "roof:height": "40",
+    }
+
+    atlas_building = SimpleNamespace(
+        geometry=[
+            (50.73340, 7.09960),
+            (50.73340, 7.09980),
+            (50.73360, 7.09980),
+            (50.73360, 7.09960),
+        ],
+        tags=tags,
+        roof_type="pyramidal",
+        is_castle_building=False,
+        castle_profile=None,
+        castle_roof_profile=None,
+        estimated_height=82.0,
+    )
+
+    raw_building = {
+        "id": 321760769,
+        "geometry": atlas_building.geometry,
+        "tags": tags,
+    }
+
+    coordinate_engine = SimpleNamespace(
+        scale_ratio=3000.0,
+    )
+
+    monkeypatch.setattr(
+        AtlasSceneBuilder,
+        "_is_raw_building_usable",
+        staticmethod(lambda *args, **kwargs: True),
+    )
+
+    monkeypatch.setattr(
+        AtlasSceneBuilder,
+        "_to_atlas_building",
+        staticmethod(lambda raw: atlas_building),
+    )
+
+    monkeypatch.setattr(
+        AtlasCastleFootprintRegularizer,
+        "prepare",
+        staticmethod(
+            lambda raw_building, castles: raw_building
+        ),
+    )
+
+    monkeypatch.setattr(
+        AtlasCastleBuildingProfiler,
+        "apply_to_building",
+        staticmethod(
+            lambda atlas_building, raw_building, castles: (
+                atlas_building
+            )
+        ),
+    )
+
+    monkeypatch.setattr(
+        AtlasFoundationFirstPipeline,
+        "build_building_mesh",
+        staticmethod(
+            lambda *args, **kwargs: mesh
+        ),
+    )
+
+    scene = AtlasFoundationSceneBuilder.build_scene(
+        raw_buildings=[raw_building],
+        coordinate_engine=coordinate_engine,
+        terrain_mesh=object(),
+        castles=[],
+        debug=False,
+    )
+
+    result_mesh = scene.layers["buildings"][0]
+
+    assert result_mesh["building_roof_profile"] == "pyramidal"
+    assert result_mesh["building_pyramidal_roof_applied"] is True
+    assert result_mesh["roof_geometry"] == "pyramidal"
+    assert result_mesh["roof_height_mm"] == pytest.approx(
+        40_000.0 / 3000.0
+    )
+    assert result_mesh["body_top_z"] == pytest.approx(14.0)
+    assert result_mesh["roof_top_z"] == pytest.approx(
+        14.0 + 40_000.0 / 3000.0
+    )
+    assert (
+        result_mesh[
+            "building_pyramidal_removed_top_triangles"
+        ]
+        == 2
+    )
+    assert len(
+        result_mesh[
+            "building_pyramidal_roof_triangles"
+        ]
+    ) == 4
+    assert len(result_mesh["triangles"]) == 14

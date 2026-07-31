@@ -229,6 +229,12 @@ Tamamlanan:
 - yalnız tek noktada temas eden park katılarını baskı toleransının altında ayrıştırma
 - farklı yükseklikteki komşu bina renk katılarını silmeden ayrıştırma
 - semantik bina üçgenleri, `bottom`, `top` ve çatı metadata geometrisini birlikte taşıma
+- genel `roof:shape=pyramidal` bina çatı üreticisi:
+  - düz üst kapak kaldırılır
+  - footprint merkezli tepe noktası oluşturulur
+  - `roof:height` ürün ölçeğine çevrilir
+  - Bonner Münster ve Kreuzkirche gibi kule parçaları artık düz kolon yerine piramidal siluet alır
+- focused çatı doğrulaması: `55 passed`
 - gerçek Köln white, red ve green STL üretimi
 - renderer ve multicolor exporter paketi: `20 passed`
 - commit: `9436dea Fix multicolor wall collection topology`
