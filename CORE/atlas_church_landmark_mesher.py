@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+from shapely.geometry import Polygon
+
 from CORE.atlas_church_footprint_resolver import (
     AtlasChurchFootprintResolver,
+)
+from CORE.atlas_polygon_triangulator import (
+    AtlasPolygonTriangulator,
 )
 from CORE.atlas_church_landmark_builder import (
     AtlasChurchLandmarkGeometry,
@@ -110,6 +115,225 @@ class AtlasChurchLandmarkMesher:
         return {
             "type": mesh_type,
             "triangles": triangles,
+            **metadata,
+        }
+
+    @staticmethod
+    def _signed_area(
+        footprint,
+    ):
+        return sum(
+            (
+                footprint[index][0]
+                * footprint[(index + 1) % len(footprint)][1]
+                - footprint[(index + 1) % len(footprint)][0]
+                * footprint[index][1]
+            )
+            for index in range(len(footprint))
+        ) / 2.0
+
+    @classmethod
+    def _extrude_real_footprint(
+        cls,
+        *,
+        footprint,
+        min_z,
+        max_z,
+        mesh_type,
+        **metadata,
+    ):
+        footprint = tuple(
+            (
+                float(x),
+                float(y),
+            )
+            for x, y in footprint
+        )
+
+        if (
+            len(footprint) > 1
+            and footprint[0] == footprint[-1]
+        ):
+            footprint = footprint[:-1]
+
+        polygon = Polygon(footprint)
+
+        if (
+            polygon.is_empty
+            or not polygon.is_valid
+            or polygon.area <= 1e-12
+        ):
+            raise ValueError(
+                "Church footprint must define a valid polygon"
+            )
+
+        minimum_x = min(
+            x
+            for x, _ in footprint
+        )
+        minimum_y = min(
+            y
+            for _, y in footprint
+        )
+
+        span_x = (
+            max(x for x, _ in footprint)
+            - minimum_x
+        )
+        span_y = (
+            max(y for _, y in footprint)
+            - minimum_y
+        )
+
+        normalization_scale = max(
+            span_x,
+            span_y,
+        )
+
+        if normalization_scale <= 1e-15:
+            raise ValueError(
+                "Church footprint has no triangulatable span"
+            )
+
+        normalized_footprint = tuple(
+            (
+                (x - minimum_x)
+                / normalization_scale,
+                (y - minimum_y)
+                / normalization_scale,
+            )
+            for x, y in footprint
+        )
+
+        normalized_triangles = (
+            AtlasPolygonTriangulator.triangulate(
+                normalized_footprint
+            )
+        )
+
+        surface_triangles = tuple(
+            tuple(
+                (
+                    minimum_x
+                    + normalized_x
+                    * normalization_scale,
+                    minimum_y
+                    + normalized_y
+                    * normalization_scale,
+                )
+                for normalized_x, normalized_y
+                in triangle
+            )
+            for triangle in normalized_triangles
+        )
+
+        if not surface_triangles:
+            raise ValueError(
+                "Church footprint triangulation produced no surface"
+            )
+
+        triangles = []
+
+        for coordinates in surface_triangles:
+            bottom = tuple(
+                (
+                    float(x),
+                    float(y),
+                    float(min_z),
+                )
+                for x, y in coordinates
+            )
+            top = tuple(
+                (
+                    float(x),
+                    float(y),
+                    float(max_z),
+                )
+                for x, y in coordinates
+            )
+
+            triangles.append(
+                (
+                    bottom[0],
+                    bottom[2],
+                    bottom[1],
+                )
+            )
+            triangles.append(
+                (
+                    top[0],
+                    top[1],
+                    top[2],
+                )
+            )
+
+        counterclockwise = (
+            cls._signed_area(footprint) > 0.0
+        )
+
+        for index in range(len(footprint)):
+            first = footprint[index]
+            second = footprint[
+                (index + 1) % len(footprint)
+            ]
+
+            first_bottom = (
+                first[0],
+                first[1],
+                float(min_z),
+            )
+            second_bottom = (
+                second[0],
+                second[1],
+                float(min_z),
+            )
+            first_top = (
+                first[0],
+                first[1],
+                float(max_z),
+            )
+            second_top = (
+                second[0],
+                second[1],
+                float(max_z),
+            )
+
+            if counterclockwise:
+                triangles.extend(
+                    (
+                        (
+                            first_bottom,
+                            second_bottom,
+                            second_top,
+                        ),
+                        (
+                            first_bottom,
+                            second_top,
+                            first_top,
+                        ),
+                    )
+                )
+            else:
+                triangles.extend(
+                    (
+                        (
+                            first_bottom,
+                            second_top,
+                            second_bottom,
+                        ),
+                        (
+                            first_bottom,
+                            first_top,
+                            second_top,
+                        ),
+                    )
+                )
+
+        return {
+            "type": mesh_type,
+            "triangles": triangles,
+            "uses_real_footprint": True,
+            "footprint": footprint,
             **metadata,
         }
 
@@ -234,12 +458,8 @@ class AtlasChurchLandmarkMesher:
         nave_depth = depth * 0.78
 
         nave_meshes = [
-            cls._oriented_box(
-                frame=frame,
-                min_longitudinal=-nave_depth / 2.0,
-                max_longitudinal=nave_depth / 2.0,
-                min_lateral=-nave_width / 2.0,
-                max_lateral=nave_width / 2.0,
+            cls._extrude_real_footprint(
+                footprint=geometry.footprint,
                 min_z=0.0,
                 max_z=body_height,
                 mesh_type="church_nave",

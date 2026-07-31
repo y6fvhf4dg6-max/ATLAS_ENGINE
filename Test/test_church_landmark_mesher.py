@@ -1,5 +1,7 @@
 from collections import Counter
 
+import pytest
+
 from CORE.atlas_church_landmark_builder import (
     AtlasChurchLandmarkBuilder,
 )
@@ -222,3 +224,116 @@ def test_mesher_reports_resolved_footprint_frame():
     assert frame.longitudinal_span > frame.lateral_span
     assert abs(frame.axis_x) > 0.0
     assert abs(frame.axis_y) > 0.0
+
+
+def _triangle_xy_area(triangle):
+    (ax, ay, _), (bx, by, _), (cx, cy, _) = triangle
+
+    return abs(
+        (
+            ax * (by - cy)
+            + bx * (cy - ay)
+            + cx * (ay - by)
+        )
+        / 2.0
+    )
+
+
+def test_nave_base_uses_real_irregular_footprint_area():
+    landmark = AtlasLandmark(
+        id=605,
+        landmark_type=AtlasLandmarkType.CHURCH,
+        geometry=(
+            (0.0, 0.0),
+            (8.0, 0.0),
+            (8.0, 8.0),
+            (14.0, 8.0),
+            (14.0, 18.0),
+            (8.0, 18.0),
+            (8.0, 30.0),
+            (0.0, 30.0),
+            (0.0, 18.0),
+            (-6.0, 18.0),
+            (-6.0, 8.0),
+            (0.0, 8.0),
+        ),
+        tags={},
+        source="OSM",
+    )
+
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    nave = mesh["nave_meshes"][0]
+
+    assert nave["uses_real_footprint"] is True
+    assert nave["footprint"] == geometry.footprint
+
+    base_triangles = tuple(
+        triangle
+        for triangle in nave["triangles"]
+        if all(
+            point[2] == 0.0
+            for point in triangle
+        )
+    )
+
+    base_area = sum(
+        _triangle_xy_area(triangle)
+        for triangle in base_triangles
+    )
+
+    assert base_area == pytest.approx(
+        360.0,
+        abs=1e-8,
+    )
+
+
+def test_real_footprint_nave_preserves_concave_outline_vertices():
+    landmark = AtlasLandmark(
+        id=606,
+        landmark_type=AtlasLandmarkType.CHURCH,
+        geometry=(
+            (0.0, 0.0),
+            (10.0, 0.0),
+            (10.0, 10.0),
+            (6.0, 10.0),
+            (6.0, 20.0),
+            (0.0, 20.0),
+        ),
+        tags={},
+        source="OSM",
+    )
+
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    nave = mesh["nave_meshes"][0]
+
+    base_vertices = {
+        (round(x, 8), round(y, 8))
+        for triangle in nave["triangles"]
+        for x, y, z in triangle
+        if z == 0.0
+    }
+
+    expected_vertices = {
+        (round(x, 8), round(y, 8))
+        for x, y in geometry.footprint
+    }
+
+    assert expected_vertices.issubset(
+        base_vertices
+    )
