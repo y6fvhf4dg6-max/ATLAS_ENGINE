@@ -101,3 +101,22 @@ def test_apply_to_building_sets_atlas_metadata():
         ]
         == "yes"
     )
+
+def test_named_ancient_theatre_ruin_is_classified():
+    profile = AtlasAncientTheatreProfiler.profile(
+        {
+            "id": 512288944,
+            "tags": {
+                "building": "yes",
+                "historic": "ruins",
+                "name": "Ancient Theater",
+                "ruins": "building",
+                "source": "bing",
+            },
+        }
+    )
+
+    assert profile["is_ancient_theatre"] is True
+    assert profile["replace_standard_building_mesh"] is True
+    assert profile["matched_by"] == ("name",)
+

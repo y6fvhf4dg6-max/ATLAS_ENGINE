@@ -218,3 +218,54 @@ def test_real_ayasofya_sultanahmet_hierarchy_is_complete():
         ["should_create_residual"]
         is True
     )
+
+
+def test_building_relation_geometries_are_clipped_to_bbox():
+    outer_geometries = [
+        [
+            (41.0000, 28.0000),
+            (41.0000, 28.0030),
+            (41.0030, 28.0030),
+            (41.0030, 28.0000),
+        ],
+    ]
+    inner_geometries = [
+        [
+            (41.0020, 28.0020),
+            (41.0020, 28.0025),
+            (41.0025, 28.0025),
+            (41.0025, 28.0020),
+        ],
+    ]
+
+    clipped_outer, clipped_inner = (
+        AtlasLocalOSMReader
+        ._clip_relation_geometries_to_bbox(
+            outer_geometries=outer_geometries,
+            inner_geometries=inner_geometries,
+            bbox=(
+                41.0005,
+                28.0005,
+                41.0015,
+                28.0015,
+            ),
+        )
+    )
+
+    assert len(clipped_outer) == 1
+    assert clipped_inner == []
+
+    points = clipped_outer[0]
+
+    assert len(points) >= 4
+    assert all(
+        41.0005 <= lat <= 41.0015
+        and 28.0005 <= lon <= 28.0015
+        for lat, lon in points
+    )
+
+    assert min(lat for lat, _ in points) == 41.0005
+    assert max(lat for lat, _ in points) == 41.0015
+    assert min(lon for _, lon in points) == 28.0005
+    assert max(lon for _, lon in points) == 28.0015
+

@@ -23,6 +23,13 @@ class AtlasAncientTheatreProfiler:
         "roman",
     }
 
+    THEATRE_NAME_TERMS = {
+        "theatre",
+        "theater",
+        "amphitheatre",
+        "amphitheater",
+    }
+
     @staticmethod
     def profile(raw_building):
         tags = raw_building.get(
@@ -46,6 +53,10 @@ class AtlasAncientTheatreProfiler:
             tags.get("ruins")
         )
 
+        name = AtlasAncientTheatreProfiler._normalize(
+            tags.get("name")
+        )
+
         matched_by = []
 
         if historic in AtlasAncientTheatreProfiler.THEATRE_VALUES:
@@ -57,6 +68,22 @@ class AtlasAncientTheatreProfiler:
         ):
             matched_by.append("archaeological_site")
 
+        has_theatre_name = any(
+            term in name
+            for term in AtlasAncientTheatreProfiler.THEATRE_NAME_TERMS
+        )
+
+        has_archaeological_context = (
+            historic == "ruins"
+            or archaeological_site != ""
+            or civilization
+            in AtlasAncientTheatreProfiler.ANCIENT_CIVILIZATIONS
+            or ruins
+        )
+
+        if has_theatre_name and has_archaeological_context:
+            matched_by.append("name")
+
         is_ancient_theatre = bool(matched_by)
 
         return {
@@ -66,6 +93,7 @@ class AtlasAncientTheatreProfiler:
             "historic": historic or None,
             "archaeological_site": archaeological_site or None,
             "civilization": civilization or None,
+            "name": name or None,
             "is_ancient_civilization": (
                 civilization
                 in AtlasAncientTheatreProfiler.ANCIENT_CIVILIZATIONS

@@ -702,6 +702,110 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         )
 
     @staticmethod
+    def _clip_relation_geometries_to_bbox(
+        outer_geometries,
+        inner_geometries,
+        bbox,
+    ):
+        from shapely.geometry import (
+            GeometryCollection,
+            MultiPolygon,
+            Polygon,
+            box,
+        )
+
+        min_lat, min_lon, max_lat, max_lon = (
+            float(value)
+            for value in bbox
+        )
+
+        clip_box = box(
+            min_lon,
+            min_lat,
+            max_lon,
+            max_lat,
+        )
+
+        def extract_polygons(geometry):
+            if geometry is None or geometry.is_empty:
+                return []
+
+            if isinstance(geometry, Polygon):
+                return [geometry]
+
+            if isinstance(geometry, MultiPolygon):
+                return list(geometry.geoms)
+
+            if isinstance(geometry, GeometryCollection):
+                polygons = []
+
+                for item in geometry.geoms:
+                    polygons.extend(
+                        extract_polygons(item)
+                    )
+
+                return polygons
+
+            return []
+
+        def clip_rings(geometries):
+            clipped_rings = []
+
+            for geometry in geometries:
+                if len(geometry) < 3:
+                    continue
+
+                polygon = Polygon(
+                    [
+                        (lon, lat)
+                        for lat, lon in geometry
+                    ]
+                )
+
+                if not polygon.is_valid:
+                    polygon = polygon.buffer(0)
+
+                if polygon.is_empty:
+                    continue
+
+                intersection = polygon.intersection(
+                    clip_box
+                )
+
+                for clipped_polygon in extract_polygons(
+                    intersection
+                ):
+                    if clipped_polygon.area <= 0.0:
+                        continue
+
+                    coordinates = list(
+                        clipped_polygon.exterior.coords
+                    )
+
+                    if (
+                        len(coordinates) >= 2
+                        and coordinates[0] == coordinates[-1]
+                    ):
+                        coordinates.pop()
+
+                    if len(coordinates) < 3:
+                        continue
+
+                    clipped_rings.append(
+                        [
+                            (float(lat), float(lon))
+                            for lon, lat in coordinates
+                        ]
+                    )
+
+            return clipped_rings
+
+        return (
+            clip_rings(outer_geometries),
+            clip_rings(inner_geometries),
+        )
+
+    @staticmethod
     def _create_building_relation_record(
         relation_id,
         tags,
@@ -917,10 +1021,16 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                 if not outer_geometries:
                     continue
 
-                if not any(
-                    reader._any_point_inside_bbox(geometry)
-                    for geometry in outer_geometries
-                ):
+                outer_geometries, inner_geometries = (
+                    AtlasLocalOSMReader
+                    ._clip_relation_geometries_to_bbox(
+                        outer_geometries=outer_geometries,
+                        inner_geometries=inner_geometries,
+                        bbox=bbox,
+                    )
+                )
+
+                if not outer_geometries:
                     continue
 
                 record = AtlasLocalOSMReader._create_building_relation_record(
@@ -998,10 +1108,16 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                 if not outer_geometries:
                     continue
 
-                if not any(
-                    reader._any_point_inside_bbox(geometry)
-                    for geometry in outer_geometries
-                ):
+                outer_geometries, inner_geometries = (
+                    AtlasLocalOSMReader
+                    ._clip_relation_geometries_to_bbox(
+                        outer_geometries=outer_geometries,
+                        inner_geometries=inner_geometries,
+                        bbox=bbox,
+                    )
+                )
+
+                if not outer_geometries:
                     continue
 
                 tags = relation["tags"]
