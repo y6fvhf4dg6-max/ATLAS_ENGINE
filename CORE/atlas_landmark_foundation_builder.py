@@ -1,6 +1,15 @@
 from dataclasses import replace
 
 from CORE.atlas_bridge_builder import AtlasBridgeGeometry
+from CORE.atlas_church_landmark_builder import (
+    AtlasChurchLandmarkBuilder,
+)
+from CORE.atlas_church_landmark_mesher import (
+    AtlasChurchLandmarkMesher,
+)
+from CORE.atlas_church_landmark_profile import (
+    AtlasChurchLandmarkProfile,
+)
 from CORE.atlas_bridge_longitudinal_profile import (
     AtlasBridgeLongitudinalProfile,
 )
@@ -30,6 +39,7 @@ from CORE.atlas_landmark_geometry_mesher import (
 )
 from CORE.atlas_landmark_mesh_builder import AtlasLandmarkMeshBuilder
 from CORE.atlas_landmark_provider_osm import AtlasLandmarkProviderOsm
+from CORE.atlas_landmark_type import AtlasLandmarkType
 
 
 class AtlasLandmarkFoundationBuilder:
@@ -209,51 +219,100 @@ class AtlasLandmarkFoundationBuilder:
                 for lat, lon in geometry
             )
 
-            builder = AtlasLandmarkMeshBuilder._BUILDERS.get(
-                landmark.landmark_type
-            )
-
-            if builder is None:
-                return None
-
             metric_landmark = replace(
                 landmark,
                 geometry=local_meter_geometry,
             )
 
-            resolved_geometry = builder.build(metric_landmark)
-
-            scaled_height = (
-                coordinate_engine.height_to_stl_mm(
-                    resolved_geometry.height_m
+            if landmark.landmark_type in {
+                AtlasLandmarkType.CHURCH,
+                AtlasLandmarkType.CATHEDRAL,
+            }:
+                landmark_class = (
+                    "cathedral"
+                    if landmark.landmark_type
+                    is AtlasLandmarkType.CATHEDRAL
+                    else "church"
                 )
-            )
 
-            if isinstance(
-                resolved_geometry,
-                AtlasBridgeGeometry,
-            ):
-                metadata = cls._scale_bridge_metadata(
-                    metadata=resolved_geometry.metadata,
-                    coordinate_engine=coordinate_engine,
+                profile = AtlasChurchLandmarkProfile(
+                    landmark_class=landmark_class,
+                    tower_count=(
+                        2
+                        if landmark_class == "cathedral"
+                        else 1
+                    ),
+                    scale_ratio=coordinate_engine.xy_scale,
+                )
+
+                resolved_geometry = (
+                    AtlasChurchLandmarkBuilder.build(
+                        landmark=metric_landmark,
+                        profile=profile,
+                    )
+                )
+
+                scaled_height = (
+                    coordinate_engine.height_to_stl_mm(
+                        resolved_geometry.height_m
+                    )
                 )
 
                 scaled_geometry = replace(
                     resolved_geometry,
                     footprint=stl_footprint,
                     height_m=scaled_height,
-                    metadata=metadata,
+                )
+
+                mesh = AtlasChurchLandmarkMesher.build(
+                    scaled_geometry
                 )
             else:
-                scaled_geometry = replace(
-                    resolved_geometry,
-                    footprint=stl_footprint,
-                    height_m=scaled_height,
+                builder = (
+                    AtlasLandmarkMeshBuilder
+                    ._BUILDERS.get(
+                        landmark.landmark_type
+                    )
                 )
 
-            mesh = AtlasLandmarkGeometryMesher.build(
-                scaled_geometry
-            )
+                if builder is None:
+                    return None
+
+                resolved_geometry = builder.build(
+                    metric_landmark
+                )
+
+                scaled_height = (
+                    coordinate_engine.height_to_stl_mm(
+                        resolved_geometry.height_m
+                    )
+                )
+
+                if isinstance(
+                    resolved_geometry,
+                    AtlasBridgeGeometry,
+                ):
+                    metadata = cls._scale_bridge_metadata(
+                        metadata=resolved_geometry.metadata,
+                        coordinate_engine=coordinate_engine,
+                    )
+
+                    scaled_geometry = replace(
+                        resolved_geometry,
+                        footprint=stl_footprint,
+                        height_m=scaled_height,
+                        metadata=metadata,
+                    )
+                else:
+                    scaled_geometry = replace(
+                        resolved_geometry,
+                        footprint=stl_footprint,
+                        height_m=scaled_height,
+                    )
+
+                mesh = AtlasLandmarkGeometryMesher.build(
+                    scaled_geometry
+                )
 
             foundation_z = (
                 AtlasLandmarkMeshBuilder
