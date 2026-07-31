@@ -1,4 +1,13 @@
 from CORE.atlas_bridge_builder import AtlasBridgeBuilder
+from CORE.atlas_church_landmark_builder import (
+    AtlasChurchLandmarkBuilder,
+)
+from CORE.atlas_church_landmark_mesher import (
+    AtlasChurchLandmarkMesher,
+)
+from CORE.atlas_church_landmark_profile import (
+    AtlasChurchLandmarkProfile,
+)
 from CORE.atlas_foundation_sampler import AtlasFoundationSampler
 from CORE.atlas_foundation_surface_builder import (
     AtlasFoundationSurfaceBuilder,
@@ -22,15 +31,48 @@ class AtlasLandmarkMeshBuilder:
 
     @classmethod
     def build(cls, landmark, *, terrain_mesh=None):
-        builder = cls._BUILDERS.get(landmark.landmark_type)
-
-        if builder is None:
-            raise ValueError(
-                f"Unsupported landmark type: {landmark.landmark_type}"
+        if landmark.landmark_type in {
+            AtlasLandmarkType.CHURCH,
+            AtlasLandmarkType.CATHEDRAL,
+        }:
+            landmark_class = (
+                "cathedral"
+                if landmark.landmark_type
+                is AtlasLandmarkType.CATHEDRAL
+                else "church"
             )
 
-        geometry = builder.build(landmark)
-        mesh = AtlasLandmarkGeometryMesher.build(geometry)
+            profile = AtlasChurchLandmarkProfile(
+                landmark_class=landmark_class,
+                tower_count=(
+                    2
+                    if landmark_class == "cathedral"
+                    else 1
+                ),
+            )
+
+            geometry = AtlasChurchLandmarkBuilder.build(
+                landmark=landmark,
+                profile=profile,
+            )
+            mesh = AtlasChurchLandmarkMesher.build(
+                geometry
+            )
+        else:
+            builder = cls._BUILDERS.get(
+                landmark.landmark_type
+            )
+
+            if builder is None:
+                raise ValueError(
+                    f"Unsupported landmark type: "
+                    f"{landmark.landmark_type}"
+                )
+
+            geometry = builder.build(landmark)
+            mesh = AtlasLandmarkGeometryMesher.build(
+                geometry
+            )
 
         if terrain_mesh is None:
             return mesh
