@@ -113,3 +113,9 @@ Data/MODELS/FLAME/
 
 # Python 3.12 MediaPipe environment
 .venv-landmarks/
+
+# Large regional OSM source datasets
+Data/Europe/**/*.osm.pbf
+
+# Downloaded SRTM archives
+Data/TERRAIN/SRTM/*.zip
