@@ -129,3 +129,96 @@ def test_mesher_rejects_wrong_geometry_type():
         raise AssertionError(
             "Expected invalid geometry type to be rejected"
         )
+
+
+def test_mesher_follows_rotated_church_footprint_axis():
+    import math
+
+    angle = math.radians(32.0)
+    center_x = 15.0
+    center_y = -8.0
+    half_lateral = 10.0
+    half_longitudinal = 25.0
+
+    def world(longitudinal, lateral):
+        axis_x = -math.sin(angle)
+        axis_y = math.cos(angle)
+        normal_x = -axis_y
+        normal_y = axis_x
+
+        return (
+            center_x
+            + longitudinal * axis_x
+            + lateral * normal_x,
+            center_y
+            + longitudinal * axis_y
+            + lateral * normal_y,
+        )
+
+    footprint = (
+        world(-half_longitudinal, -half_lateral),
+        world(-half_longitudinal, half_lateral),
+        world(half_longitudinal, half_lateral),
+        world(half_longitudinal, -half_lateral),
+    )
+
+    landmark = AtlasLandmark(
+        id=603,
+        landmark_type=AtlasLandmarkType.CHURCH,
+        geometry=footprint,
+        tags={},
+        source="OSM",
+    )
+
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    nave_points = tuple(
+        point
+        for triangle in mesh["nave_meshes"][0]["triangles"]
+        for point in triangle
+    )
+
+    xs = tuple(point[0] for point in nave_points)
+    ys = tuple(point[1] for point in nave_points)
+
+    world_x_span = max(xs) - min(xs)
+    world_y_span = max(ys) - min(ys)
+
+    assert world_y_span > world_x_span
+
+
+def test_mesher_reports_resolved_footprint_frame():
+    landmark = AtlasLandmark(
+        id=604,
+        landmark_type=AtlasLandmarkType.CHURCH,
+        geometry=(
+            (0.0, 0.0),
+            (20.0, 10.0),
+            (0.0, 50.0),
+            (-20.0, 40.0),
+        ),
+        tags={},
+        source="OSM",
+    )
+
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    frame = mesh["footprint_frame"]
+
+    assert frame.longitudinal_span > frame.lateral_span
+    assert abs(frame.axis_x) > 0.0
+    assert abs(frame.axis_y) > 0.0

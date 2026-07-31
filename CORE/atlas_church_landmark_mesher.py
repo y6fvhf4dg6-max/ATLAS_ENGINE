@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from math import sqrt
-
+from CORE.atlas_church_footprint_resolver import (
+    AtlasChurchFootprintResolver,
+)
 from CORE.atlas_church_landmark_builder import (
     AtlasChurchLandmarkGeometry,
 )
@@ -9,38 +10,87 @@ from CORE.atlas_church_landmark_builder import (
 
 class AtlasChurchLandmarkMesher:
     @staticmethod
-    def _bounds(footprint):
-        xs = tuple(point[0] for point in footprint)
-        ys = tuple(point[1] for point in footprint)
-
-        return {
-            "min_x": min(xs),
-            "max_x": max(xs),
-            "min_y": min(ys),
-            "max_y": max(ys),
-        }
-
-    @staticmethod
-    def _box(
+    def _world_vertex(
         *,
-        min_x,
-        max_x,
-        min_y,
-        max_y,
+        frame,
+        longitudinal,
+        lateral,
+        z,
+    ):
+        x, y = frame.to_world(
+            longitudinal=longitudinal,
+            lateral=lateral,
+        )
+
+        return (
+            float(x),
+            float(y),
+            float(z),
+        )
+
+    @classmethod
+    def _oriented_box(
+        cls,
+        *,
+        frame,
+        min_longitudinal,
+        max_longitudinal,
+        min_lateral,
+        max_lateral,
         min_z,
         max_z,
         mesh_type,
         **metadata,
     ):
-        v000 = (min_x, min_y, min_z)
-        v100 = (max_x, min_y, min_z)
-        v110 = (max_x, max_y, min_z)
-        v010 = (min_x, max_y, min_z)
+        v000 = cls._world_vertex(
+            frame=frame,
+            longitudinal=min_longitudinal,
+            lateral=min_lateral,
+            z=min_z,
+        )
+        v100 = cls._world_vertex(
+            frame=frame,
+            longitudinal=max_longitudinal,
+            lateral=min_lateral,
+            z=min_z,
+        )
+        v110 = cls._world_vertex(
+            frame=frame,
+            longitudinal=max_longitudinal,
+            lateral=max_lateral,
+            z=min_z,
+        )
+        v010 = cls._world_vertex(
+            frame=frame,
+            longitudinal=min_longitudinal,
+            lateral=max_lateral,
+            z=min_z,
+        )
 
-        v001 = (min_x, min_y, max_z)
-        v101 = (max_x, min_y, max_z)
-        v111 = (max_x, max_y, max_z)
-        v011 = (min_x, max_y, max_z)
+        v001 = cls._world_vertex(
+            frame=frame,
+            longitudinal=min_longitudinal,
+            lateral=min_lateral,
+            z=max_z,
+        )
+        v101 = cls._world_vertex(
+            frame=frame,
+            longitudinal=max_longitudinal,
+            lateral=min_lateral,
+            z=max_z,
+        )
+        v111 = cls._world_vertex(
+            frame=frame,
+            longitudinal=max_longitudinal,
+            lateral=max_lateral,
+            z=max_z,
+        )
+        v011 = cls._world_vertex(
+            frame=frame,
+            longitudinal=min_longitudinal,
+            lateral=max_lateral,
+            z=max_z,
+        )
 
         triangles = [
             (v000, v110, v100),
@@ -63,23 +113,75 @@ class AtlasChurchLandmarkMesher:
             **metadata,
         }
 
-    @staticmethod
-    def _spire(
+    @classmethod
+    def _oriented_spire(
+        cls,
         *,
-        center_x,
-        center_y,
+        frame,
+        center_longitudinal,
+        center_lateral,
         half_width,
         base_z,
         top_z,
         index,
     ):
         base = (
-            (center_x - half_width, center_y - half_width, base_z),
-            (center_x + half_width, center_y - half_width, base_z),
-            (center_x + half_width, center_y + half_width, base_z),
-            (center_x - half_width, center_y + half_width, base_z),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=(
+                    center_longitudinal
+                    - half_width
+                ),
+                lateral=(
+                    center_lateral
+                    - half_width
+                ),
+                z=base_z,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=(
+                    center_longitudinal
+                    + half_width
+                ),
+                lateral=(
+                    center_lateral
+                    - half_width
+                ),
+                z=base_z,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=(
+                    center_longitudinal
+                    + half_width
+                ),
+                lateral=(
+                    center_lateral
+                    + half_width
+                ),
+                z=base_z,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=(
+                    center_longitudinal
+                    - half_width
+                ),
+                lateral=(
+                    center_lateral
+                    + half_width
+                ),
+                z=base_z,
+            ),
         )
-        apex = (center_x, center_y, top_z)
+
+        apex = cls._world_vertex(
+            frame=frame,
+            longitudinal=center_longitudinal,
+            lateral=center_lateral,
+            z=top_z,
+        )
 
         triangles = [
             (base[0], base[2], base[1]),
@@ -109,46 +211,35 @@ class AtlasChurchLandmarkMesher:
                 "geometry must be AtlasChurchLandmarkGeometry"
             )
 
-        bounds = cls._bounds(
+        frame = AtlasChurchFootprintResolver.resolve(
             geometry.footprint
         )
 
-        width = (
-            bounds["max_x"]
-            - bounds["min_x"]
-        )
-        depth = (
-            bounds["max_y"]
-            - bounds["min_y"]
-        )
+        depth = frame.longitudinal_span
+        width = frame.lateral_span
 
         if width <= 0.0 or depth <= 0.0:
             raise ValueError(
                 "Church footprint must have positive area"
             )
 
-        center_x = (
-            bounds["min_x"]
-            + bounds["max_x"]
-        ) / 2.0
-        center_y = (
-            bounds["min_y"]
-            + bounds["max_y"]
-        ) / 2.0
-
         body_height = geometry.height_m * 0.62
         tower_height = geometry.height_m * 0.82
         spire_top = geometry.height_m
+
+        half_depth = depth / 2.0
+        half_width = width / 2.0
 
         nave_width = width * 0.52
         nave_depth = depth * 0.78
 
         nave_meshes = [
-            cls._box(
-                min_x=center_x - nave_width / 2.0,
-                max_x=center_x + nave_width / 2.0,
-                min_y=center_y - nave_depth / 2.0,
-                max_y=center_y + nave_depth / 2.0,
+            cls._oriented_box(
+                frame=frame,
+                min_longitudinal=-nave_depth / 2.0,
+                max_longitudinal=nave_depth / 2.0,
+                min_lateral=-nave_width / 2.0,
+                max_lateral=nave_width / 2.0,
                 min_z=0.0,
                 max_z=body_height,
                 mesh_type="church_nave",
@@ -156,12 +247,15 @@ class AtlasChurchLandmarkMesher:
         ]
 
         transept_depth = depth * 0.22
+        transept_width = width * 0.84
+
         transept_meshes = [
-            cls._box(
-                min_x=bounds["min_x"] + width * 0.08,
-                max_x=bounds["max_x"] - width * 0.08,
-                min_y=center_y - transept_depth / 2.0,
-                max_y=center_y + transept_depth / 2.0,
+            cls._oriented_box(
+                frame=frame,
+                min_longitudinal=-transept_depth / 2.0,
+                max_longitudinal=transept_depth / 2.0,
+                min_lateral=-transept_width / 2.0,
+                max_lateral=transept_width / 2.0,
                 min_z=0.0,
                 max_z=body_height * 0.92,
                 mesh_type="church_transept",
@@ -170,12 +264,24 @@ class AtlasChurchLandmarkMesher:
 
         apse_depth = depth * 0.14
         apse_width = nave_width * 0.78
+        apse_center_longitudinal = (
+            half_depth
+            - apse_depth / 2.0
+        )
+
         apse_meshes = [
-            cls._box(
-                min_x=center_x - apse_width / 2.0,
-                max_x=center_x + apse_width / 2.0,
-                min_y=bounds["max_y"] - apse_depth,
-                max_y=bounds["max_y"],
+            cls._oriented_box(
+                frame=frame,
+                min_longitudinal=(
+                    apse_center_longitudinal
+                    - apse_depth / 2.0
+                ),
+                max_longitudinal=(
+                    apse_center_longitudinal
+                    + apse_depth / 2.0
+                ),
+                min_lateral=-apse_width / 2.0,
+                max_lateral=apse_width / 2.0,
                 min_z=0.0,
                 max_z=body_height * 0.82,
                 mesh_type="church_apse",
@@ -191,31 +297,44 @@ class AtlasChurchLandmarkMesher:
             min(width, depth) * 0.12,
         )
         tower_depth = depth * 0.16
-        tower_center_y = (
-            bounds["min_y"]
+        tower_center_longitudinal = (
+            -half_depth
             + tower_depth / 2.0
         )
 
         if tower_count == 1:
-            tower_centers = (center_x,)
+            tower_centers_lateral = (0.0,)
         elif tower_count == 2:
             offset = width * 0.24
-            tower_centers = (
-                center_x - offset,
-                center_x + offset,
+            tower_centers_lateral = (
+                -offset,
+                offset,
             )
         else:
-            tower_centers = ()
+            tower_centers_lateral = ()
 
-        for index, tower_center_x in enumerate(
-            tower_centers
+        for index, tower_center_lateral in enumerate(
+            tower_centers_lateral
         ):
             tower_meshes.append(
-                cls._box(
-                    min_x=tower_center_x - tower_width / 2.0,
-                    max_x=tower_center_x + tower_width / 2.0,
-                    min_y=tower_center_y - tower_depth / 2.0,
-                    max_y=tower_center_y + tower_depth / 2.0,
+                cls._oriented_box(
+                    frame=frame,
+                    min_longitudinal=(
+                        tower_center_longitudinal
+                        - tower_depth / 2.0
+                    ),
+                    max_longitudinal=(
+                        tower_center_longitudinal
+                        + tower_depth / 2.0
+                    ),
+                    min_lateral=(
+                        tower_center_lateral
+                        - tower_width / 2.0
+                    ),
+                    max_lateral=(
+                        tower_center_lateral
+                        + tower_width / 2.0
+                    ),
                     min_z=0.0,
                     max_z=tower_height,
                     mesh_type="church_tower",
@@ -225,10 +344,17 @@ class AtlasChurchLandmarkMesher:
 
             if geometry.profile.has_spires:
                 spire_meshes.append(
-                    cls._spire(
-                        center_x=tower_center_x,
-                        center_y=tower_center_y,
-                        half_width=tower_width * 0.52,
+                    cls._oriented_spire(
+                        frame=frame,
+                        center_longitudinal=(
+                            tower_center_longitudinal
+                        ),
+                        center_lateral=(
+                            tower_center_lateral
+                        ),
+                        half_width=(
+                            tower_width * 0.52
+                        ),
                         base_z=tower_height,
                         top_z=spire_top,
                         index=index,
@@ -242,64 +368,97 @@ class AtlasChurchLandmarkMesher:
         ):
             if section_name == "nave":
                 roof_bounds = (
-                    center_x - nave_width / 2.0,
-                    center_x + nave_width / 2.0,
-                    center_y - nave_depth / 2.0,
-                    center_y + nave_depth / 2.0,
+                    -nave_depth / 2.0,
+                    nave_depth / 2.0,
+                    -nave_width / 2.0,
+                    nave_width / 2.0,
                     body_height,
-                    body_height + geometry.height_m * 0.08,
+                    (
+                        body_height
+                        + geometry.height_m * 0.08
+                    ),
                 )
             elif section_name == "transept":
                 roof_bounds = (
-                    bounds["min_x"] + width * 0.08,
-                    bounds["max_x"] - width * 0.08,
-                    center_y - transept_depth / 2.0,
-                    center_y + transept_depth / 2.0,
+                    -transept_depth / 2.0,
+                    transept_depth / 2.0,
+                    -transept_width / 2.0,
+                    transept_width / 2.0,
                     body_height * 0.92,
                     body_height,
                 )
             elif section_name == "apse":
                 roof_bounds = (
-                    center_x - apse_width / 2.0,
-                    center_x + apse_width / 2.0,
-                    bounds["max_y"] - apse_depth,
-                    bounds["max_y"],
+                    (
+                        apse_center_longitudinal
+                        - apse_depth / 2.0
+                    ),
+                    (
+                        apse_center_longitudinal
+                        + apse_depth / 2.0
+                    ),
+                    -apse_width / 2.0,
+                    apse_width / 2.0,
                     body_height * 0.82,
                     body_height * 0.90,
                 )
             else:
                 roof_bounds = (
-                    center_x - tower_width / 2.0,
-                    center_x + tower_width / 2.0,
-                    bounds["min_y"],
-                    bounds["min_y"] + tower_depth,
+                    (
+                        tower_center_longitudinal
+                        - tower_depth / 2.0
+                    ),
+                    (
+                        tower_center_longitudinal
+                        + tower_depth / 2.0
+                    ),
+                    -tower_width / 2.0,
+                    tower_width / 2.0,
                     tower_height,
-                    tower_height + geometry.height_m * 0.04,
+                    (
+                        tower_height
+                        + geometry.height_m * 0.04
+                    ),
                 )
 
-            roof_width = (
+            roof_depth = (
                 roof_bounds[1]
                 - roof_bounds[0]
             )
-            roof_depth = (
+            roof_width = (
                 roof_bounds[3]
                 - roof_bounds[2]
             )
 
             roof_inset = min(
-                roof_width,
                 roof_depth,
+                roof_width,
             ) * 0.02
 
             roof_meshes.append(
-                cls._box(
-                    min_x=roof_bounds[0] + roof_inset,
-                    max_x=roof_bounds[1] - roof_inset,
-                    min_y=roof_bounds[2] + roof_inset,
-                    max_y=roof_bounds[3] - roof_inset,
+                cls._oriented_box(
+                    frame=frame,
+                    min_longitudinal=(
+                        roof_bounds[0]
+                        + roof_inset
+                    ),
+                    max_longitudinal=(
+                        roof_bounds[1]
+                        - roof_inset
+                    ),
+                    min_lateral=(
+                        roof_bounds[2]
+                        + roof_inset
+                    ),
+                    max_lateral=(
+                        roof_bounds[3]
+                        - roof_inset
+                    ),
                     min_z=roof_bounds[4],
                     max_z=roof_bounds[5],
-                    mesh_type="church_roof_section",
+                    mesh_type=(
+                        "church_roof_section"
+                    ),
                     index=index,
                     section_name=section_name,
                 )
@@ -324,6 +483,7 @@ class AtlasChurchLandmarkMesher:
             "type": "church_landmark",
             "landmark_id": geometry.landmark_id,
             "landmark_class": geometry.landmark_class,
+            "footprint_frame": frame,
             "triangles": triangles,
             "nave_meshes": nave_meshes,
             "transept_meshes": transept_meshes,

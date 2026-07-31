@@ -96,71 +96,139 @@ class AtlasChurchFootprintResolver:
                 "Church footprint must define a valid area"
             )
 
-        return points, polygon
+        return points
+
+    @staticmethod
+    def _resolve_principal_axis(
+        points,
+    ):
+        mean_x = sum(
+            x
+            for x, _ in points
+        ) / len(points)
+        mean_y = sum(
+            y
+            for _, y in points
+        ) / len(points)
+
+        covariance_xx = sum(
+            (x - mean_x) ** 2
+            for x, _ in points
+        )
+        covariance_yy = sum(
+            (y - mean_y) ** 2
+            for _, y in points
+        )
+        covariance_xy = sum(
+            (x - mean_x)
+            * (y - mean_y)
+            for x, y in points
+        )
+
+        if (
+            covariance_xx <= 1e-24
+            and covariance_yy <= 1e-24
+        ):
+            raise ValueError(
+                "Church footprint has no measurable span"
+            )
+
+        angle = 0.5 * math.atan2(
+            2.0 * covariance_xy,
+            covariance_xx - covariance_yy,
+        )
+
+        first_axis = (
+            math.cos(angle),
+            math.sin(angle),
+        )
+        second_axis = (
+            -first_axis[1],
+            first_axis[0],
+        )
+
+        def span(axis):
+            projections = tuple(
+                x * axis[0]
+                + y * axis[1]
+                for x, y in points
+            )
+
+            return (
+                max(projections)
+                - min(projections)
+            )
+
+        first_span = span(first_axis)
+        second_span = span(second_axis)
+
+        if second_span > first_span:
+            return second_axis
+
+        return first_axis
 
     @classmethod
     def resolve(
         cls,
         footprint,
     ) -> AtlasChurchFootprintFrame:
-        _, polygon = cls._normalize_footprint(
+        points = cls._normalize_footprint(
             footprint
         )
 
-        rectangle = (
-            polygon.minimum_rotated_rectangle
-        )
-
-        rectangle_points = tuple(
-            (
-                float(x),
-                float(y),
+        axis_x, axis_y = (
+            cls._resolve_principal_axis(
+                points
             )
-            for x, y in tuple(
-                rectangle.exterior.coords
-            )[:-1]
         )
 
-        if len(rectangle_points) != 4:
+        axis_length = math.hypot(
+            axis_x,
+            axis_y,
+        )
+
+        if axis_length <= 1e-12:
             raise ValueError(
-                "Could not resolve oriented church rectangle"
+                "Church footprint has no longitudinal axis"
             )
 
-        center = rectangle.centroid
-        center_x = float(center.x)
-        center_y = float(center.y)
+        axis_x /= axis_length
+        axis_y /= axis_length
 
-        edges = []
+        normal_x = -axis_y
+        normal_y = axis_x
 
-        for index in range(4):
-            first = rectangle_points[index]
-            second = rectangle_points[
-                (index + 1) % 4
-            ]
-
-            delta_x = second[0] - first[0]
-            delta_y = second[1] - first[1]
-
-            length = math.hypot(
-                delta_x,
-                delta_y,
-            )
-
-            edges.append(
-                {
-                    "delta_x": delta_x,
-                    "delta_y": delta_y,
-                    "length": length,
-                }
-            )
-
-        longitudinal_edge = max(
-            edges,
-            key=lambda edge: edge["length"],
+        longitudinal_values = tuple(
+            x * axis_x
+            + y * axis_y
+            for x, y in points
+        )
+        lateral_values = tuple(
+            x * normal_x
+            + y * normal_y
+            for x, y in points
         )
 
-        longitudinal_span = float(
-            longitudinal_edge["length"]
+        minimum_longitudinal = min(
+            longitudinal_values
+        )
+        maximum_longitudinal = max(
+            longitudinal_values
+        )
+        minimum_lateral = min(
+            lateral_values
+        )
+        maximum_lateral = max(
+            lateral_values
+        )
+
+        longitudinal_span = (
+            maximum_longitudinal
+            - minimum_longitudinal
+        )
+        lateral_span = (
+            maximum_lateral
+            - minimum_lateral
         )
 
         if longitudinal_span <= 1e-12:
@@ -168,67 +236,86 @@ class AtlasChurchFootprintResolver:
                 "Church footprint has no longitudinal span"
             )
 
-        axis_x = (
-            longitudinal_edge["delta_x"]
-            / longitudinal_span
-        )
-        axis_y = (
-            longitudinal_edge["delta_y"]
-            / longitudinal_span
-        )
-
-        normal_x = -axis_y
-        normal_y = axis_x
-
-        local_points = tuple(
-            (
-                (
-                    (x - center_x) * axis_x
-                    + (y - center_y) * axis_y
-                ),
-                (
-                    (x - center_x) * normal_x
-                    + (y - center_y) * normal_y
-                ),
-            )
-            for x, y in rectangle_points
-        )
-
-        longitudinal_values = tuple(
-            point[0]
-            for point in local_points
-        )
-        lateral_values = tuple(
-            point[1]
-            for point in local_points
-        )
-
-        resolved_longitudinal_span = (
-            max(longitudinal_values)
-            - min(longitudinal_values)
-        )
-        lateral_span = (
-            max(lateral_values)
-            - min(lateral_values)
-        )
-
         if lateral_span <= 1e-12:
             raise ValueError(
                 "Church footprint has no lateral span"
             )
 
+        center_longitudinal = (
+            minimum_longitudinal
+            + maximum_longitudinal
+        ) / 2.0
+        center_lateral = (
+            minimum_lateral
+            + maximum_lateral
+        ) / 2.0
+
+        center_x = (
+            center_longitudinal * axis_x
+            + center_lateral * normal_x
+        )
+        center_y = (
+            center_longitudinal * axis_y
+            + center_lateral * normal_y
+        )
+
+        half_longitudinal = (
+            longitudinal_span / 2.0
+        )
+        half_lateral = (
+            lateral_span / 2.0
+        )
+
+        def world(
+            longitudinal,
+            lateral,
+        ):
+            return (
+                center_x
+                + longitudinal * axis_x
+                + lateral * normal_x,
+                center_y
+                + longitudinal * axis_y
+                + lateral * normal_y,
+            )
+
+        oriented_rectangle = (
+            world(
+                -half_longitudinal,
+                -half_lateral,
+            ),
+            world(
+                half_longitudinal,
+                -half_lateral,
+            ),
+            world(
+                half_longitudinal,
+                half_lateral,
+            ),
+            world(
+                -half_longitudinal,
+                half_lateral,
+            ),
+        )
+
         return AtlasChurchFootprintFrame(
-            center_x=center_x,
-            center_y=center_y,
-            axis_x=axis_x,
-            axis_y=axis_y,
-            normal_x=normal_x,
-            normal_y=normal_y,
+            center_x=float(center_x),
+            center_y=float(center_y),
+            axis_x=float(axis_x),
+            axis_y=float(axis_y),
+            normal_x=float(normal_x),
+            normal_y=float(normal_y),
             longitudinal_span=float(
-                resolved_longitudinal_span
+                longitudinal_span
             ),
             lateral_span=float(
                 lateral_span
             ),
-            oriented_rectangle=rectangle_points,
+            oriented_rectangle=tuple(
+                (
+                    float(x),
+                    float(y),
+                )
+                for x, y in oriented_rectangle
+            ),
         )
