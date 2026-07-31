@@ -484,3 +484,10 @@ Güncel teknik yön:
 - Relief ve terrain altyapısındaki eski izlenmeyen çekirdek paketler artık ana dalda kalıcıdır.
 - Yeni lokasyon geliştirmesine geçmeden önce preview, doküman, yardımcı test ve veri klasörleri son kez sınıflandırılacaktır.
 
+## Yapılacaklar Listesi
+
+### AtlasPhysicalDetailResolver v0.1
+
+### Church Landmark Profile v0.1 Pilot
+
+

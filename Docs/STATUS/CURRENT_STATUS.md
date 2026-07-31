@@ -638,3 +638,10 @@ Sıradaki tek teknik işlem:
 
 Kalan untracked preview, yardımcı test, belge ve veri klasörlerini sınıflandırmak; yalnız üretim veya regresyon değeri olanları ayrı commitlerle korumak.
 
+## Yapılacaklar Listesi
+
+### AtlasPhysicalDetailResolver v0.1
+
+### Church Landmark Profile v0.1 Pilot
+
+
