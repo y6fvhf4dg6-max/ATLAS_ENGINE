@@ -119,3 +119,10 @@ Data/Europe/**/*.osm.pbf
 
 # Downloaded SRTM archives
 Data/TERRAIN/SRTM/*.zip
+
+# Dalyan relief local source and intermediate images
+Data/RELIEF/dalyan_rock_tombs/reference_01.png
+Data/RELIEF/dalyan_rock_tombs/rock_tombs_crop_v1.png
+Data/RELIEF/dalyan_rock_tombs/rock_tombs_relief_input_v2.png
+Data/RELIEF/dalyan_rock_tombs/rock_tombs_relief_input_v3.png
+Data/RELIEF/dalyan_rock_tombs/rock_tombs_relief_input_v4.png
