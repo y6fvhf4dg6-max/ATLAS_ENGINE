@@ -141,6 +141,15 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         ):
             return True
 
+        if (
+            tags.get("building") in {
+                "church",
+                "cathedral",
+            }
+            and tags.get("religion") == "christian"
+        ):
+            return True
+
         if tags.get("bridge") != "yes":
             return False
 
