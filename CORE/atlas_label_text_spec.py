@@ -13,6 +13,7 @@ class AtlasLabelTextSpec:
     depth_mm: float = 0.6
     max_width_mm: float = 108.0
     graduation_cap: bool = False
+    birthday_cake: bool = False
 
     def __post_init__(self) -> None:
         primary_text = str(self.primary_text).strip()
@@ -23,6 +24,7 @@ class AtlasLabelTextSpec:
         depth_mm = float(self.depth_mm)
         max_width_mm = float(self.max_width_mm)
         graduation_cap = bool(self.graduation_cap)
+        birthday_cake = bool(self.birthday_cake)
 
         if not primary_text:
             raise ValueError("primary_text must not be empty")
@@ -57,4 +59,9 @@ class AtlasLabelTextSpec:
             self,
             "graduation_cap",
             graduation_cap,
+        )
+        object.__setattr__(
+            self,
+            "birthday_cake",
+            birthday_cake,
         )

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from CORE.atlas_label_birthday_cake_mesher import (
+    AtlasLabelBirthdayCakeMesher,
+)
 from CORE.atlas_label_graduation_cap_mesher import (
     AtlasLabelGraduationCapMesher,
 )
@@ -111,6 +114,7 @@ class AtlasWallCollectionProductBuilder:
         label_plate_meshes = []
         label_text_meshes = []
         label_graduation_cap_meshes = []
+        label_birthday_cake_meshes = []
 
         if label_text_spec is not None and label_plate_spec is None:
             raise ValueError(
@@ -209,6 +213,30 @@ class AtlasWallCollectionProductBuilder:
                         )
                     )
 
+                if label_text_spec.birthday_cake:
+                    cake_width_mm = 8.0
+                    cake_height_mm = 7.0
+                    cake_right_margin_mm = 3.0
+                    cake_center_x_mm = (
+                        (label_plate_spec.width_mm / 2.0)
+                        - cake_right_margin_mm
+                        - (cake_width_mm / 2.0)
+                    )
+
+                    cake_mesh = AtlasLabelBirthdayCakeMesher.build(
+                        width_mm=cake_width_mm,
+                        height_mm=cake_height_mm,
+                        depth_mm=label_text_spec.depth_mm,
+                    )
+                    label_birthday_cake_meshes.append(
+                        AtlasWallCollectionProductBuilder._translate_mesh(
+                            cake_mesh,
+                            cake_center_x_mm,
+                            label_center_y_mm,
+                            text_front_z_mm,
+                        )
+                    )
+
                 if label_text_spec.graduation_cap:
                     cap_width_mm = 7.0
                     cap_height_mm = 5.0
@@ -239,6 +267,7 @@ class AtlasWallCollectionProductBuilder:
             *label_plate_meshes,
             *label_text_meshes,
             *label_graduation_cap_meshes,
+            *label_birthday_cake_meshes,
         ]
 
         return {
@@ -256,6 +285,9 @@ class AtlasWallCollectionProductBuilder:
             "label_text_meshes": label_text_meshes,
             "label_graduation_cap_meshes": (
                 label_graduation_cap_meshes
+            ),
+            "label_birthday_cake_meshes": (
+                label_birthday_cake_meshes
             ),
             "meshes": meshes,
         }

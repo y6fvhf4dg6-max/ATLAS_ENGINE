@@ -265,3 +265,41 @@ def test_wall_collection_adds_graduation_cap_at_right_side_of_label():
     assert max(z for _, _, z in cap_vertices) == pytest.approx(7.8)
 
     assert cap_mesh in product["meshes"]
+
+
+def test_wall_collection_adds_birthday_cake_at_right_side_of_label():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=14.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="BONN",
+            secondary_text="GEBURTSORT",
+            primary_height_mm=4.2,
+            secondary_height_mm=2.8,
+            depth_mm=0.6,
+            max_width_mm=96.0,
+            birthday_cake=True,
+        ),
+    )
+
+    assert len(product["label_birthday_cake_meshes"]) == 1
+
+    cake_mesh = product["label_birthday_cake_meshes"][0]
+    cake_vertices = _all_vertices(cake_mesh)
+
+    assert cake_mesh["type"] == "label_birthday_cake"
+    assert min(x for x, _, _ in cake_vertices) >= 47.0
+    assert max(x for x, _, _ in cake_vertices) <= 56.0
+    assert min(z for _, _, z in cake_vertices) == pytest.approx(7.2)
+    assert max(z for _, _, z in cake_vertices) == pytest.approx(7.8)
+    assert cake_mesh in product["meshes"]
+

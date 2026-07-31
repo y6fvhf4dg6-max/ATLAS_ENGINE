@@ -67,3 +67,21 @@ def test_label_text_spec_can_enable_graduation_cap():
     )
 
     assert spec.graduation_cap is True
+
+
+def test_label_text_spec_disables_birthday_cake_by_default():
+    spec = AtlasLabelTextSpec(
+        primary_text="BONN",
+    )
+
+    assert spec.birthday_cake is False
+
+
+def test_label_text_spec_can_enable_birthday_cake():
+    spec = AtlasLabelTextSpec(
+        primary_text="BONN",
+        secondary_text="GEBURTSORT",
+        birthday_cake=True,
+    )
+
+    assert spec.birthday_cake is True
