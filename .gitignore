@@ -110,3 +110,6 @@ Data/RELIEF/real_portrait_01/
 .venv-mediapipe/
 Data/MODELS/MEDIAPIPE/
 Data/MODELS/FLAME/
+
+# Python 3.12 MediaPipe environment
+.venv-landmarks/
