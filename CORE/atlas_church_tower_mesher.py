@@ -568,6 +568,7 @@ class AtlasChurchTowerMesher:
             roof_transition_upper_ring = None
             roof_transition_upper_z = None
             roof_transition_triangles = []
+            roof_height_basis = "profile_ratio"
 
             roof_base_ring = body["body_top_ring"]
 
@@ -619,6 +620,41 @@ class AtlasChurchTowerMesher:
                     roof_transition_upper_ring
                 )
 
+                transition_x_values = [
+                    point[0]
+                    for point in roof_transition_upper_ring
+                ]
+                transition_y_values = [
+                    point[1]
+                    for point in roof_transition_upper_ring
+                ]
+
+                transition_span = max(
+                    max(transition_x_values)
+                    - min(transition_x_values),
+                    max(transition_y_values)
+                    - min(transition_y_values),
+                )
+
+                roof_pitch_degrees = 30.0
+                roof_height = (
+                    transition_span
+                    / 2.0
+                    * math.tan(
+                        math.radians(
+                            roof_pitch_degrees
+                        )
+                    )
+                )
+
+                roof_top_z = (
+                    roof_transition_upper_z
+                    + roof_height
+                )
+                roof_height_basis = (
+                    "upper_transition_ring_span_30_degree_pitch"
+                )
+
             roof = cls._polygon_spire(
                 frame=frame,
                 center_longitudinal=center_longitudinal,
@@ -664,6 +700,15 @@ class AtlasChurchTowerMesher:
                     ),
                     "roof_transition_triangles": (
                         roof_transition_triangles
+                    ),
+                    "roof_height_basis": (
+                        roof_height_basis
+                    ),
+                    "roof_pitch_degrees": (
+                        30.0
+                        if tower_profile.tower_type
+                        == "crossing_tower"
+                        else None
                     ),
                     "roof_base_ring": (
                         roof["roof_base_ring"]

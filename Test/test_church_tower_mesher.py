@@ -1,5 +1,7 @@
 from collections import Counter
 
+import math
+
 import pytest
 
 from CORE.atlas_church_footprint_resolver import (
@@ -294,3 +296,76 @@ def test_crossing_tower_two_stage_roof_remains_closed_and_manifold():
 
     assert topology["open_edges"] == 0
     assert topology["non_manifold_edges"] == 0
+
+
+def test_crossing_tower_spire_height_is_derived_from_upper_ring_span():
+    mesh = AtlasChurchTowerMesher.build(
+        frame=_frame(),
+        profile=_profile(),
+        building_height=42.0,
+    )
+
+    crossing = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "crossing_tower"
+    )
+
+    upper_ring = crossing[
+        "roof_transition_upper_ring"
+    ]
+
+    xs = [point[0] for point in upper_ring]
+    ys = [point[1] for point in upper_ring]
+
+    upper_span = max(
+        max(xs) - min(xs),
+        max(ys) - min(ys),
+    )
+
+    spire_height = (
+        crossing["roof_top_z"]
+        - crossing["roof_transition_upper_z"]
+    )
+
+    assert crossing["roof_height_basis"] == (
+        "upper_transition_ring_span_30_degree_pitch"
+    )
+    assert crossing["roof_pitch_degrees"] == pytest.approx(
+        30.0,
+    )
+    assert spire_height == pytest.approx(
+        upper_span
+        / 2.0
+        * math.tan(
+            math.radians(30.0)
+        ),
+        rel=1e-8,
+        abs=1e-8,
+    )
+
+
+def test_crossing_tower_geometry_derived_spire_is_shorter_than_profile_cap():
+    profile = _profile()
+
+    mesh = AtlasChurchTowerMesher.build(
+        frame=_frame(),
+        profile=profile,
+        building_height=42.0,
+    )
+
+    crossing_profile = profile.tower(
+        "crossing_tower"
+    )
+    crossing = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "crossing_tower"
+    )
+
+    profile_cap_z = (
+        42.0
+        * crossing_profile.roof_top_ratio
+    )
+
+    assert crossing["roof_top_z"] < profile_cap_z
