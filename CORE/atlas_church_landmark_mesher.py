@@ -23,9 +23,6 @@ from CORE.atlas_church_tower_mesher import (
 from CORE.atlas_church_tower_profile_system import (
     AtlasChurchTowerProfileSystem,
 )
-from CORE.atlas_church_tower_window_mesher import (
-    AtlasChurchTowerWindowMesher,
-)
 
 
 class AtlasChurchLandmarkMesher:
@@ -584,15 +581,6 @@ class AtlasChurchLandmarkMesher:
                 building_height=geometry.height_m,
             )
         )
-
-        architectural_tower_system = (
-            AtlasChurchTowerWindowMesher.apply(
-                architectural_tower_system
-            )
-        )
-        architectural_tower_system[
-            "window_system_applied"
-        ] = True
 
         tower_meshes = list(
             architectural_tower_system["towers"]
