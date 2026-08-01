@@ -233,3 +233,44 @@ def test_outer_polygon_tower_has_broad_body_and_compact_multifaceted_roof():
         outer.roof_top_ratio
         - outer.body_top_ratio
     ) <= 0.12
+
+
+def test_bonner_outer_tower_is_positioned_toward_eastern_outer_edge():
+    profile = _profile()
+
+    outer = profile.tower(
+        "outer_polygon_tower"
+    )
+
+    assert outer.center_longitudinal_ratio >= 0.30
+    assert abs(outer.center_lateral_ratio) >= 0.40
+
+
+def test_bonner_outer_tower_is_shorter_than_west_towers():
+    profile = _profile()
+
+    outer = profile.tower(
+        "outer_polygon_tower"
+    )
+    west = profile.tower(
+        "west_tower_right"
+    )
+
+    assert outer.body_top_ratio < west.body_top_ratio
+    assert outer.roof_top_ratio < west.roof_top_ratio
+
+    assert outer.body_top_ratio <= 0.56
+    assert outer.roof_top_ratio <= 0.67
+
+
+def test_bonner_outer_tower_has_broad_octagonal_silhouette():
+    profile = _profile()
+
+    outer = profile.tower(
+        "outer_polygon_tower"
+    )
+
+    assert outer.polygon_sides == 8
+    assert outer.roof_sides == 8
+    assert outer.lateral_ratio >= 0.32
+    assert outer.longitudinal_ratio >= 0.20
