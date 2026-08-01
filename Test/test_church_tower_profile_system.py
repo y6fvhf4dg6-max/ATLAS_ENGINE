@@ -121,3 +121,52 @@ def test_rejects_non_positive_dimensions(
             building_height=building_height,
             landmark_class="cathedral",
         )
+
+
+def test_bonner_muenster_crossing_tower_has_broad_body_and_compact_spire():
+    profile = _profile()
+
+    crossing = profile.tower(
+        "crossing_tower"
+    )
+
+    assert crossing.lateral_ratio >= 0.40
+    assert crossing.longitudinal_ratio >= 0.26
+
+    assert (
+        crossing.roof_top_ratio
+        - crossing.body_top_ratio
+    ) <= 0.14
+
+
+def test_bonner_muenster_front_polygon_tower_is_broad_with_compact_roof():
+    profile = _profile()
+
+    front = profile.tower(
+        "front_polygon_tower"
+    )
+
+    assert front.lateral_ratio >= 0.28
+    assert front.longitudinal_ratio >= 0.18
+
+    assert (
+        front.roof_top_ratio
+        - front.body_top_ratio
+    ) <= 0.12
+
+
+def test_crossing_tower_remains_wider_than_front_polygon_tower():
+    profile = _profile()
+
+    crossing = profile.tower(
+        "crossing_tower"
+    )
+    front = profile.tower(
+        "front_polygon_tower"
+    )
+
+    assert crossing.lateral_ratio > front.lateral_ratio
+    assert (
+        crossing.longitudinal_ratio
+        > front.longitudinal_ratio
+    )
