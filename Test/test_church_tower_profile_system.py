@@ -274,3 +274,14 @@ def test_bonner_outer_tower_has_broad_octagonal_silhouette():
     assert outer.roof_sides == 8
     assert outer.lateral_ratio >= 0.32
     assert outer.longitudinal_ratio >= 0.20
+
+
+def test_cathedral_crossing_tower_is_centered_on_nave_transept_intersection():
+    profile = _profile()
+
+    crossing = profile.tower(
+        "crossing_tower"
+    )
+
+    assert crossing.center_longitudinal_ratio == 0.0
+    assert crossing.center_lateral_ratio == 0.0

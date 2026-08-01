@@ -92,7 +92,7 @@ class AtlasChurchTowerProfileSystem:
                     polygon_sides=8,
                     roof_shape="polygon_spire",
                     roof_sides=8,
-                    center_longitudinal_ratio=0.02,
+                    center_longitudinal_ratio=0.0,
                     center_lateral_ratio=0.0,
                     longitudinal_ratio=0.28,
                     lateral_ratio=0.42,
