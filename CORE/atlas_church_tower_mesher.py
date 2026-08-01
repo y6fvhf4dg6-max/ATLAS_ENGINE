@@ -271,6 +271,83 @@ class AtlasChurchTowerMesher:
         }
 
     @classmethod
+    def _scaled_polygon_ring(
+        cls,
+        *,
+        frame,
+        center_longitudinal,
+        center_lateral,
+        source_ring,
+        scale,
+        z,
+    ):
+        center_x, center_y = frame.to_world(
+            longitudinal=center_longitudinal,
+            lateral=center_lateral,
+        )
+
+        return tuple(
+            (
+                float(center_x)
+                + (
+                    float(point[0])
+                    - float(center_x)
+                )
+                * float(scale),
+                float(center_y)
+                + (
+                    float(point[1])
+                    - float(center_y)
+                )
+                * float(scale),
+                float(z),
+            )
+            for point in source_ring
+        )
+
+    @staticmethod
+    def _connect_polygon_rings(
+        lower_ring,
+        upper_ring,
+    ):
+        lower_ring = tuple(lower_ring)
+        upper_ring = tuple(upper_ring)
+
+        if len(lower_ring) != len(upper_ring):
+            raise ValueError(
+                "Transition rings must have matching point counts"
+            )
+
+        if len(lower_ring) < 3:
+            raise ValueError(
+                "Transition rings require at least three points"
+            )
+
+        triangles = []
+
+        for index in range(len(lower_ring)):
+            next_index = (
+                index + 1
+            ) % len(lower_ring)
+
+            triangles.extend(
+                (
+                    (
+                        lower_ring[index],
+                        lower_ring[next_index],
+                        upper_ring[next_index],
+                    ),
+                    (
+                        lower_ring[index],
+                        upper_ring[next_index],
+                        upper_ring[index],
+                    ),
+                )
+            )
+
+        return triangles
+
+    @classmethod
     def _polygon_spire(
         cls,
         *,
@@ -486,16 +563,73 @@ class AtlasChurchTowerMesher:
                     f"{tower_profile.body_shape}"
                 )
 
+            roof_transition_type = None
+            roof_transition_lower_ring = None
+            roof_transition_upper_ring = None
+            roof_transition_upper_z = None
+            roof_transition_triangles = []
+
+            roof_base_ring = body["body_top_ring"]
+
+            if (
+                tower_profile.tower_type
+                == "crossing_tower"
+            ):
+                roof_transition_type = (
+                    "two_stage_octagonal_taper"
+                )
+                roof_transition_lower_ring = tuple(
+                    body["body_top_ring"]
+                )
+
+                roof_transition_upper_z = (
+                    body_top_z
+                    + (
+                        roof_top_z
+                        - body_top_z
+                    )
+                    * 0.30
+                )
+
+                roof_transition_upper_ring = (
+                    cls._scaled_polygon_ring(
+                        frame=frame,
+                        center_longitudinal=(
+                            center_longitudinal
+                        ),
+                        center_lateral=(
+                            center_lateral
+                        ),
+                        source_ring=(
+                            roof_transition_lower_ring
+                        ),
+                        scale=0.72,
+                        z=roof_transition_upper_z,
+                    )
+                )
+
+                roof_transition_triangles = (
+                    cls._connect_polygon_rings(
+                        roof_transition_lower_ring,
+                        roof_transition_upper_ring,
+                    )
+                )
+
+                roof_base_ring = (
+                    roof_transition_upper_ring
+                )
+
             roof = cls._polygon_spire(
                 frame=frame,
                 center_longitudinal=center_longitudinal,
                 center_lateral=center_lateral,
                 top_z=roof_top_z,
-                base_ring=body["body_top_ring"],
+                base_ring=roof_base_ring,
             )
 
             triangles = [
                 *body["body_triangles"],
+                *roof_transition_triangles,
                 *roof["roof_triangles"],
             ]
 
@@ -515,6 +649,21 @@ class AtlasChurchTowerMesher:
                     ),
                     "body_top_ring": (
                         body["body_top_ring"]
+                    ),
+                    "roof_transition_type": (
+                        roof_transition_type
+                    ),
+                    "roof_transition_lower_ring": (
+                        roof_transition_lower_ring
+                    ),
+                    "roof_transition_upper_ring": (
+                        roof_transition_upper_ring
+                    ),
+                    "roof_transition_upper_z": (
+                        roof_transition_upper_z
+                    ),
+                    "roof_transition_triangles": (
+                        roof_transition_triangles
                     ),
                     "roof_base_ring": (
                         roof["roof_base_ring"]

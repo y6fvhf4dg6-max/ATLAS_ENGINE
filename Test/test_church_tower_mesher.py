@@ -1,5 +1,7 @@
 from collections import Counter
 
+import pytest
+
 from CORE.atlas_church_footprint_resolver import (
     AtlasChurchFootprintResolver,
 )
@@ -173,3 +175,122 @@ def test_each_tower_is_closed_and_manifold():
 
         assert topology["open_edges"] == 0
         assert topology["non_manifold_edges"] == 0
+
+
+def test_crossing_tower_uses_two_stage_octagonal_roof_transition():
+    mesh = AtlasChurchTowerMesher.build(
+        frame=_frame(),
+        profile=_profile(),
+        building_height=42.0,
+    )
+
+    crossing = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "crossing_tower"
+    )
+
+    assert crossing["roof_transition_type"] == (
+        "two_stage_octagonal_taper"
+    )
+
+    assert len(
+        crossing["roof_transition_lower_ring"]
+    ) == 8
+    assert len(
+        crossing["roof_transition_upper_ring"]
+    ) == 8
+
+
+def test_crossing_tower_transition_narrows_above_preserved_body_top():
+    mesh = AtlasChurchTowerMesher.build(
+        frame=_frame(),
+        profile=_profile(),
+        building_height=42.0,
+    )
+
+    crossing = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "crossing_tower"
+    )
+
+    body_ring = crossing["body_top_ring"]
+    lower_ring = crossing[
+        "roof_transition_lower_ring"
+    ]
+    upper_ring = crossing[
+        "roof_transition_upper_ring"
+    ]
+
+    def span(ring):
+        xs = [point[0] for point in ring]
+        ys = [point[1] for point in ring]
+        return (
+            max(xs) - min(xs),
+            max(ys) - min(ys),
+        )
+
+    body_x, body_y = span(body_ring)
+    lower_x, lower_y = span(lower_ring)
+    upper_x, upper_y = span(upper_ring)
+
+    assert lower_x == pytest.approx(
+        body_x,
+        abs=1e-8,
+    )
+    assert lower_y == pytest.approx(
+        body_y,
+        abs=1e-8,
+    )
+
+    assert upper_x < lower_x
+    assert upper_y < lower_y
+
+
+def test_crossing_tower_spire_starts_from_narrow_upper_transition_ring():
+    mesh = AtlasChurchTowerMesher.build(
+        frame=_frame(),
+        profile=_profile(),
+        building_height=42.0,
+    )
+
+    crossing = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "crossing_tower"
+    )
+
+    assert crossing["roof_base_ring"] == (
+        crossing["roof_transition_upper_ring"]
+    )
+
+    assert (
+        crossing["roof_transition_upper_z"]
+        > crossing["body_top_z"]
+    )
+    assert (
+        crossing["roof_top_z"]
+        > crossing["roof_transition_upper_z"]
+    )
+
+
+def test_crossing_tower_two_stage_roof_remains_closed_and_manifold():
+    mesh = AtlasChurchTowerMesher.build(
+        frame=_frame(),
+        profile=_profile(),
+        building_height=42.0,
+    )
+
+    crossing = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "crossing_tower"
+    )
+
+    topology = _topology(
+        crossing["triangles"]
+    )
+
+    assert topology["open_edges"] == 0
+    assert topology["non_manifold_edges"] == 0
