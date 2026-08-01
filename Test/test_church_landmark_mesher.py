@@ -607,3 +607,84 @@ def test_old_generic_spire_batches_are_replaced():
         tower.get("type") == "church_tower"
         for tower in mesh["tower_meshes"]
     )
+
+
+def test_landmark_mesher_integrates_tower_window_system():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    tower_system = mesh[
+        "architectural_tower_system"
+    ]
+
+    assert (
+        tower_system["window_system_applied"]
+        is True
+    )
+
+    towers = {
+        tower["tower_type"]: tower
+        for tower in mesh["tower_meshes"]
+    }
+
+    assert len(
+        towers["crossing_tower"][
+            "window_meshes"
+        ]
+    ) == 8
+
+    assert len(
+        towers["outer_polygon_tower"][
+            "window_meshes"
+        ]
+    ) == 8
+
+    assert len(
+        towers["west_tower_left"][
+            "window_meshes"
+        ]
+    ) == 4
+
+    assert len(
+        towers["west_tower_right"][
+            "window_meshes"
+        ]
+    ) == 4
+
+
+def test_tower_window_triangles_are_in_final_church_mesh():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    window_triangles = mesh[
+        "architectural_tower_system"
+    ]["window_triangles"]
+
+    assert window_triangles
+
+    assert all(
+        triangle in mesh["triangles"]
+        for triangle in window_triangles
+    )
