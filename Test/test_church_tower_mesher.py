@@ -369,3 +369,31 @@ def test_crossing_tower_geometry_derived_spire_is_shorter_than_profile_cap():
     )
 
     assert crossing["roof_top_z"] < profile_cap_z
+
+
+def test_crossing_tower_uses_resolved_outer_octagonal_tower_center():
+    mesh = AtlasChurchTowerMesher.build(
+        frame=_frame(),
+        profile=_profile(),
+        building_height=42.0,
+    )
+
+    crossing = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "crossing_tower"
+    )
+    outer_octagon = next(
+        tower
+        for tower in mesh["towers"]
+        if tower["tower_type"] == "outer_polygon_tower"
+    )
+
+    assert crossing["center_longitudinal"] == pytest.approx(
+        outer_octagon["center_longitudinal"],
+        abs=1e-12,
+    )
+    assert crossing["center_lateral"] == pytest.approx(
+        outer_octagon["center_lateral"],
+        abs=1e-12,
+    )

@@ -485,6 +485,47 @@ class AtlasChurchTowerMesher:
 
         towers = []
 
+        resolved_outer_center = None
+
+        for candidate_profile in profile.towers:
+            if (
+                candidate_profile.tower_type
+                != "outer_polygon_tower"
+            ):
+                continue
+
+            candidate_longitudinal_span = (
+                frame.longitudinal_span
+                * candidate_profile.longitudinal_ratio
+            )
+            candidate_lateral_span = (
+                frame.lateral_span
+                * candidate_profile.lateral_ratio
+            )
+
+            resolved_outer_center = (
+                cls._resolve_footprint_safe_center(
+                    frame=frame,
+                    desired_longitudinal=(
+                        frame.longitudinal_span
+                        * candidate_profile
+                        .center_longitudinal_ratio
+                    ),
+                    desired_lateral=(
+                        frame.lateral_span
+                        * candidate_profile
+                        .center_lateral_ratio
+                    ),
+                    longitudinal_span=(
+                        candidate_longitudinal_span
+                    ),
+                    lateral_span=(
+                        candidate_lateral_span
+                    ),
+                )
+            )
+            break
+
         for tower_profile in profile.towers:
             center_longitudinal = (
                 frame.longitudinal_span
@@ -496,6 +537,16 @@ class AtlasChurchTowerMesher:
                 * tower_profile
                 .center_lateral_ratio
             )
+
+            if (
+                tower_profile.tower_type
+                == "crossing_tower"
+                and resolved_outer_center is not None
+            ):
+                (
+                    center_longitudinal,
+                    center_lateral,
+                ) = resolved_outer_center
 
             longitudinal_span = (
                 frame.longitudinal_span
