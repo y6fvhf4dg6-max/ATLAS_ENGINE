@@ -11,6 +11,12 @@ from CORE.atlas_polygon_triangulator import (
 from CORE.atlas_church_landmark_builder import (
     AtlasChurchLandmarkGeometry,
 )
+from CORE.atlas_church_roof_mesher import (
+    AtlasChurchRoofMesher,
+)
+from CORE.atlas_church_roof_profile_system import (
+    AtlasChurchRoofProfileSystem,
+)
 
 
 class AtlasChurchLandmarkMesher:
@@ -581,108 +587,24 @@ class AtlasChurchLandmarkMesher:
                     )
                 )
 
-        roof_meshes = []
-
-        for index, section_name in enumerate(
-            geometry.profile.roof_sections
-        ):
-            if section_name == "nave":
-                roof_bounds = (
-                    -nave_depth / 2.0,
-                    nave_depth / 2.0,
-                    -nave_width / 2.0,
-                    nave_width / 2.0,
-                    body_height,
-                    (
-                        body_height
-                        + geometry.height_m * 0.08
-                    ),
-                )
-            elif section_name == "transept":
-                roof_bounds = (
-                    -transept_depth / 2.0,
-                    transept_depth / 2.0,
-                    -transept_width / 2.0,
-                    transept_width / 2.0,
-                    body_height * 0.92,
-                    body_height,
-                )
-            elif section_name == "apse":
-                roof_bounds = (
-                    (
-                        apse_center_longitudinal
-                        - apse_depth / 2.0
-                    ),
-                    (
-                        apse_center_longitudinal
-                        + apse_depth / 2.0
-                    ),
-                    -apse_width / 2.0,
-                    apse_width / 2.0,
-                    body_height * 0.82,
-                    body_height * 0.90,
-                )
-            else:
-                roof_bounds = (
-                    (
-                        tower_center_longitudinal
-                        - tower_depth / 2.0
-                    ),
-                    (
-                        tower_center_longitudinal
-                        + tower_depth / 2.0
-                    ),
-                    -tower_width / 2.0,
-                    tower_width / 2.0,
-                    tower_height,
-                    (
-                        tower_height
-                        + geometry.height_m * 0.04
-                    ),
-                )
-
-            roof_depth = (
-                roof_bounds[1]
-                - roof_bounds[0]
+        roof_profile = (
+            AtlasChurchRoofProfileSystem.resolve(
+                longitudinal_span=depth,
+                lateral_span=width,
+                wall_height=body_height,
             )
-            roof_width = (
-                roof_bounds[3]
-                - roof_bounds[2]
-            )
+        )
 
-            roof_inset = min(
-                roof_depth,
-                roof_width,
-            ) * 0.02
-
-            roof_meshes.append(
-                cls._oriented_box(
-                    frame=frame,
-                    min_longitudinal=(
-                        roof_bounds[0]
-                        + roof_inset
-                    ),
-                    max_longitudinal=(
-                        roof_bounds[1]
-                        - roof_inset
-                    ),
-                    min_lateral=(
-                        roof_bounds[2]
-                        + roof_inset
-                    ),
-                    max_lateral=(
-                        roof_bounds[3]
-                        - roof_inset
-                    ),
-                    min_z=roof_bounds[4],
-                    max_z=roof_bounds[5],
-                    mesh_type=(
-                        "church_roof_section"
-                    ),
-                    index=index,
-                    section_name=section_name,
-                )
+        architectural_roof_system = (
+            AtlasChurchRoofMesher.build(
+                frame=frame,
+                profile=roof_profile,
             )
+        )
+
+        roof_meshes = list(
+            architectural_roof_system["sections"]
+        )
 
         component_meshes = (
             nave_meshes
@@ -711,4 +633,7 @@ class AtlasChurchLandmarkMesher:
             "tower_meshes": tower_meshes,
             "spire_meshes": spire_meshes,
             "roof_meshes": roof_meshes,
+            "architectural_roof_system": (
+                architectural_roof_system
+            ),
         }

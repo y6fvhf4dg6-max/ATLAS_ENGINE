@@ -117,7 +117,7 @@ def test_mesher_preserves_component_batches():
     assert len(mesh["apse_meshes"]) == 1
     assert len(mesh["tower_meshes"]) == 1
     assert len(mesh["spire_meshes"]) == 1
-    assert len(mesh["roof_meshes"]) == 4
+    assert len(mesh["roof_meshes"]) == 5
 
 
 def test_mesher_rejects_wrong_geometry_type():
@@ -337,3 +337,89 @@ def test_real_footprint_nave_preserves_concave_outline_vertices():
     assert expected_vertices.issubset(
         base_vertices
     )
+
+
+def test_landmark_mesher_integrates_architectural_roof_system():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    roof_system = mesh["architectural_roof_system"]
+
+    assert roof_system["type"] == "church_roof_system"
+
+    assert tuple(
+        section["section_type"]
+        for section in roof_system["sections"]
+    ) == (
+        "outer_aisle_left",
+        "outer_aisle_right",
+        "main_nave",
+        "transept",
+        "apse",
+    )
+
+    assert mesh["roof_meshes"] == roof_system["sections"]
+
+    assert all(
+        triangle in mesh["triangles"]
+        for triangle in roof_system["triangles"]
+    )
+
+
+def test_architectural_roofs_replace_flat_box_roof_sections():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    assert all(
+        roof["roof_shape"] in {
+            "gable",
+            "polygon_pyramid",
+        }
+        for roof in mesh["roof_meshes"]
+    )
+
+    assert not any(
+        roof.get("type") == "church_roof_section"
+        for roof in mesh["roof_meshes"]
+    )
+
+
+def test_main_and_outer_aisle_roofs_have_distinct_height_levels():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    sections = {
+        roof["section_type"]: roof
+        for roof in mesh["roof_meshes"]
+    }
+
+    left_aisle = sections["outer_aisle_left"]
+    right_aisle = sections["outer_aisle_right"]
+    main_nave = sections["main_nave"]
+
+    assert left_aisle["ridge_z"] < main_nave["eave_z"]
+    assert right_aisle["ridge_z"] < main_nave["eave_z"]
+    assert main_nave["ridge_z"] > main_nave["eave_z"]
