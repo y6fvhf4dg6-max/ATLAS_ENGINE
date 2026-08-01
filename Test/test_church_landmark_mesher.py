@@ -520,7 +520,7 @@ def test_landmark_mesher_integrates_architectural_tower_system():
         for tower in tower_system["towers"]
     ) == (
         "crossing_tower",
-        "front_polygon_tower",
+        "outer_polygon_tower",
         "west_tower_left",
         "west_tower_right",
     )
@@ -528,7 +528,7 @@ def test_landmark_mesher_integrates_architectural_tower_system():
     assert mesh["tower_meshes"] == tower_system["towers"]
 
 
-def test_crossing_and_front_towers_use_polygon_geometry():
+def test_crossing_and_outer_towers_use_polygon_geometry():
     geometry = AtlasChurchLandmarkBuilder.build(
         landmark=_landmark(
             landmark_type=AtlasLandmarkType.CATHEDRAL,
@@ -549,7 +549,7 @@ def test_crossing_and_front_towers_use_polygon_geometry():
     }
 
     crossing = towers["crossing_tower"]
-    front = towers["front_polygon_tower"]
+    front = towers["outer_polygon_tower"]
 
     assert crossing["body_shape"] == "polygon"
     assert len(crossing["body_top_ring"]) == 8
@@ -560,7 +560,7 @@ def test_crossing_and_front_towers_use_polygon_geometry():
     assert crossing["lateral_span"] > front["lateral_span"]
 
 
-def test_front_polygon_tower_uses_polygon_spire():
+def test_outer_polygon_tower_uses_polygon_spire():
     geometry = AtlasChurchLandmarkBuilder.build(
         landmark=_landmark(
             landmark_type=AtlasLandmarkType.CATHEDRAL,
@@ -579,7 +579,7 @@ def test_front_polygon_tower_uses_polygon_spire():
         tower
         for tower in mesh["tower_meshes"]
         if tower["tower_type"]
-        == "front_polygon_tower"
+        == "outer_polygon_tower"
     )
 
     assert front["roof_shape"] == "polygon_spire"

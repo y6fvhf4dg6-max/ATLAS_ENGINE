@@ -22,7 +22,7 @@ def test_cathedral_tower_system_defines_crossing_and_front_polygon_towers():
         for tower in profile.towers
     ) == (
         "crossing_tower",
-        "front_polygon_tower",
+        "outer_polygon_tower",
         "west_tower_left",
         "west_tower_right",
     )
@@ -41,11 +41,11 @@ def test_crossing_tower_is_wider_than_old_generic_tower_ratio():
     assert crossing.longitudinal_ratio >= 0.18
 
 
-def test_front_polygon_tower_is_wider_and_polygonal():
+def test_outer_polygon_tower_is_wider_and_polygonal():
     profile = _profile()
 
     front = profile.tower(
-        "front_polygon_tower"
+        "outer_polygon_tower"
     )
 
     assert front.body_shape == "polygon"
@@ -54,11 +54,11 @@ def test_front_polygon_tower_is_wider_and_polygonal():
     assert front.longitudinal_ratio >= 0.14
 
 
-def test_front_polygon_tower_uses_polygon_spire():
+def test_outer_polygon_tower_uses_polygon_spire():
     profile = _profile()
 
     front = profile.tower(
-        "front_polygon_tower"
+        "outer_polygon_tower"
     )
 
     assert front.roof_shape == "polygon_spire"
@@ -66,35 +66,35 @@ def test_front_polygon_tower_uses_polygon_spire():
     assert front.roof_top_ratio > front.body_top_ratio
 
 
-def test_crossing_tower_is_taller_than_front_polygon_tower():
+def test_crossing_tower_is_taller_than_outer_polygon_tower():
     profile = _profile()
 
     crossing = profile.tower(
         "crossing_tower"
     )
     front = profile.tower(
-        "front_polygon_tower"
+        "outer_polygon_tower"
     )
 
     assert crossing.body_top_ratio > front.body_top_ratio
     assert crossing.roof_top_ratio > front.roof_top_ratio
 
 
-def test_crossing_and_front_towers_are_centered_on_longitudinal_axis():
+def test_crossing_and_outer_towers_have_distinct_placement():
     profile = _profile()
 
     crossing = profile.tower(
         "crossing_tower"
     )
     front = profile.tower(
-        "front_polygon_tower"
+        "outer_polygon_tower"
     )
 
     assert crossing.center_lateral_ratio == 0.0
-    assert front.center_lateral_ratio == 0.0
+    assert abs(front.center_lateral_ratio) >= 0.28
     assert (
         front.center_longitudinal_ratio
-        < crossing.center_longitudinal_ratio
+        > crossing.center_longitudinal_ratio
     )
 
 
@@ -139,11 +139,11 @@ def test_bonner_muenster_crossing_tower_has_broad_body_and_compact_spire():
     ) <= 0.14
 
 
-def test_bonner_muenster_front_polygon_tower_is_broad_with_compact_roof():
+def test_bonner_muenster_outer_polygon_tower_is_broad_with_compact_roof():
     profile = _profile()
 
     front = profile.tower(
-        "front_polygon_tower"
+        "outer_polygon_tower"
     )
 
     assert front.lateral_ratio >= 0.28
@@ -155,14 +155,14 @@ def test_bonner_muenster_front_polygon_tower_is_broad_with_compact_roof():
     ) <= 0.12
 
 
-def test_crossing_tower_remains_wider_than_front_polygon_tower():
+def test_crossing_tower_remains_wider_than_outer_polygon_tower():
     profile = _profile()
 
     crossing = profile.tower(
         "crossing_tower"
     )
     front = profile.tower(
-        "front_polygon_tower"
+        "outer_polygon_tower"
     )
 
     assert crossing.lateral_ratio > front.lateral_ratio
@@ -170,3 +170,66 @@ def test_crossing_tower_remains_wider_than_front_polygon_tower():
         crossing.longitudinal_ratio
         > front.longitudinal_ratio
     )
+
+
+def test_bonner_muenster_has_no_centered_front_polygon_tower():
+    profile = _profile()
+
+    tower_types = tuple(
+        tower.tower_type
+        for tower in profile.towers
+    )
+
+    assert "front_polygon_tower" not in tower_types
+
+
+def test_bonner_muenster_uses_offset_outer_polygon_tower():
+    profile = _profile()
+
+    outer = profile.tower(
+        "outer_polygon_tower"
+    )
+
+    assert outer.body_shape == "polygon"
+    assert outer.polygon_sides == 8
+    assert outer.roof_shape == "polygon_spire"
+    assert outer.roof_sides == 8
+
+    assert abs(
+        outer.center_lateral_ratio
+    ) >= 0.28
+
+    assert outer.center_longitudinal_ratio > 0.0
+
+
+def test_outer_polygon_tower_is_not_on_crossing_tower_axis():
+    profile = _profile()
+
+    crossing = profile.tower(
+        "crossing_tower"
+    )
+    outer = profile.tower(
+        "outer_polygon_tower"
+    )
+
+    assert crossing.center_lateral_ratio == 0.0
+    assert (
+        outer.center_lateral_ratio
+        != crossing.center_lateral_ratio
+    )
+
+
+def test_outer_polygon_tower_has_broad_body_and_compact_multifaceted_roof():
+    profile = _profile()
+
+    outer = profile.tower(
+        "outer_polygon_tower"
+    )
+
+    assert outer.lateral_ratio >= 0.20
+    assert outer.longitudinal_ratio >= 0.14
+
+    assert (
+        outer.roof_top_ratio
+        - outer.body_top_ratio
+    ) <= 0.12

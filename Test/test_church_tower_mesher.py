@@ -82,7 +82,7 @@ def test_tower_mesher_builds_all_profile_towers():
         for tower in mesh["towers"]
     ) == (
         "crossing_tower",
-        "front_polygon_tower",
+        "outer_polygon_tower",
         "west_tower_left",
         "west_tower_right",
     )
@@ -108,7 +108,7 @@ def test_crossing_tower_has_octagonal_body_and_roof():
     assert crossing["roof_shape"] == "polygon_spire"
 
 
-def test_front_polygon_tower_is_wider_than_generic_west_tower():
+def test_outer_polygon_tower_is_wider_than_generic_west_tower():
     mesh = AtlasChurchTowerMesher.build(
         frame=_frame(),
         profile=_profile(),
@@ -119,7 +119,7 @@ def test_front_polygon_tower_is_wider_than_generic_west_tower():
         tower
         for tower in mesh["towers"]
         if tower["tower_type"]
-        == "front_polygon_tower"
+        == "outer_polygon_tower"
     )
     west = next(
         tower
@@ -133,7 +133,7 @@ def test_front_polygon_tower_is_wider_than_generic_west_tower():
     assert len(front["roof_base_ring"]) >= 6
 
 
-def test_crossing_tower_is_wider_than_front_polygon_tower():
+def test_crossing_tower_is_wider_than_outer_polygon_tower():
     mesh = AtlasChurchTowerMesher.build(
         frame=_frame(),
         profile=_profile(),
@@ -149,7 +149,7 @@ def test_crossing_tower_is_wider_than_front_polygon_tower():
         tower
         for tower in mesh["towers"]
         if tower["tower_type"]
-        == "front_polygon_tower"
+        == "outer_polygon_tower"
     )
 
     assert crossing["lateral_span"] > front["lateral_span"]
