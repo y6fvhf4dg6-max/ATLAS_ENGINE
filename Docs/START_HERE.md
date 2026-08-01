@@ -490,4 +490,101 @@ Güncel teknik yön:
 
 ### Church Landmark Profile v0.1 Pilot
 
+## 1 Ağustos 2026 — Bonn Church Landmark mimarisi
+
+Bonn Münsterplatz Wall Collection ürünü aktif Church Landmark Profile v0.1 pilotudur.
+
+Ürün ölçüleri:
+
+- Dış ürün: `170 × 170 mm`
+- Harita açıklığı: `150 × 150 mm`
+- Çerçeve genişliği: `10 mm`
+- Ölçek: `1:3000`
+- Resmî yapı: Bonner Münster
+- Etiket:
+  - `BONN`
+  - `GEBURTSORT`
+  - doğum günü pastası simgesi
+
+Kalıcılaştırılan kilise mimarisi:
+
+- gerçek OSM footprint yönelimi
+- gerçek footprint tabanlı kilise gövdesi
+- kademeli dış nef ve ana nef gövdesi
+- mimari çatı profil sistemi
+- gable ve polygon-pyramid çatı geometrileri
+- kilise kule profil sistemi
+- polygon ve box kule gövdeleri
+- polygon spire çatıları
+- dış kulelerin gerçek footprint içine güvenli yerleştirilmesi
+- merkez kule için iki kademeli sekizgen üst geçiş
+- merkez kule külah yüksekliğinin fiziksel üst halka açıklığından türetilmesi
+
+İlgili commit zinciri:
+
+- `4930663 Orient church geometry to real footprint`
+- `fe6027c Extrude church body from real footprint`
+- `6aa954d Add church roof profile system`
+- `26d4a38 Add church roof mesher`
+- `168ab85 Integrate architectural church roofs`
+- `e99fe7e Add stepped church body levels`
+- `3601e5e Add church tower profile system`
+- `a2f30f9 Add church tower mesher`
+- `bff4d6f Integrate architectural church towers`
+- `baa2cc2 Calibrate Bonner Münster tower proportions`
+- `31d73ef Correct Bonner Münster outer tower placement`
+- `5ddb18f Refine Bonner Münster outer tower proportions`
+- `2d4f5d6 Place church outer towers from real footprint`
+- `919f857 Refine crossing tower roof transition`
+- `6ecdc41 Derive crossing tower spire height from roof span`
+- `006aa15 Center cathedral crossing tower on transept`
+- `c5f1266 Align crossing tower with resolved octagonal tower center`
+
+Kule penceresi denemesi:
+
+- Standalone pencere mesheri korunmaktadır:
+  - `CORE/atlas_church_tower_window_mesher.py`
+  - `Test/test_church_tower_window_mesher.py`
+- İlk üretim entegrasyonu kapalı prizma çakışmaları ve görsel artefaktlar oluşturduğu için geri alınmıştır.
+- Revert commit:
+  - `d5df3a7 Revert "Integrate church tower windows"`
+- Pencere sistemi daha sonra recessed/inlay ve yüzeye bağlı geometri olarak yeniden tasarlanmalıdır.
+
+Bonn güncel STL üretimi:
+
+- `OUTPUT/STL/bonn_muensterplatz_city_150mm.stl`
+- `OUTPUT/STL/bonn_muensterplatz_wall_collection_170mm.stl`
+- `OUTPUT/STL/bonn_muensterplatz_multicolor/bonn_muensterplatz_170mm__white.stl`
+- `OUTPUT/STL/bonn_muensterplatz_multicolor/bonn_muensterplatz_170mm__red.stl`
+- `OUTPUT/STL/bonn_muensterplatz_multicolor/bonn_muensterplatz_170mm__green.stl`
+- `OUTPUT/STL/bonn_muensterplatz_multicolor/bonn_muensterplatz_170mm__black.stl`
+
+Son üretim:
+
+- şehir STL: `57.056` triangle
+- final Wall Collection STL: `57.204` triangle
+- white: `20.338`
+- red: `9.982`
+- green: `33.868`
+- black: `148`
+
+### Bonn için açık kritik sorun
+
+Uzun külahlı merkez kule, görsel Bambu Studio doğrulamasında büyük sekizgen yapının tam merkezine oturmuş kabul edilmemiştir.
+
+Önemli ayrım:
+
+- `crossing_tower`: uzun külahlı kule
+- `outer_polygon_tower`: büyük sekizgen yapı
+- Profil oranlarını doğrudan eşitlemek yeterli değildir.
+- `outer_polygon_tower` merkezi footprint-safe resolver tarafından üretim sırasında değiştirilmektedir.
+- Son commit `c5f1266`, iki yapının çözümlenmiş yerel merkezlerini eşitlemeyi amaçlamaktadır.
+- Buna rağmen kullanıcı görsel doğrulaması merkezlemenin hâlâ doğru olmadığını göstermiştir.
+- Bu nedenle merkezleme işi **tamamlanmış veya kilitlenmiş değildir**.
+- Yeni tahminî oran verilmemelidir.
+- Bir sonraki adım, üretilen gerçek Bonn mesh halkalarının geometrik merkezlerini ve görsel olarak kastedilen sekizgen yapıyı yeniden doğrulamaktır.
+
+Bonn için sıradaki tek teknik işlem:
+
+Gerçek Bonn üretim meshinde uzun kulenin taban halkası ile kullanıcının kastettiği büyük sekizgen gövdenin gerçek taban/üst halka merkezlerini aynı koordinat sisteminde ölçmek; hedef gövde kesinleşmeden yeni yerleşim değişikliği yapmamak.
 

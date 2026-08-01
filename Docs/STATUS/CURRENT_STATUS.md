@@ -15,7 +15,7 @@ okunmalıdır.
 
 ## Güncelleme tarihi
 
-2026-07-30
+2026-08-01
 
 ---
 
@@ -644,4 +644,122 @@ Kalan untracked preview, yardımcı test, belge ve veri klasörlerini sınıflan
 
 ### Church Landmark Profile v0.1 Pilot
 
+# 1 Ağustos 2026 — Güncel kesin çalışma noktası
+
+## Aktif geliştirme
+
+Bonn Münsterplatz — Church Landmark Profile v0.1 pilotu.
+
+Köln fiziksel referans ürünü ticari ana referans olarak korunmaktadır; ancak güncel teknik geliştirme Bonn Bonner Münster kilise geometrisi üzerindedir.
+
+## Bonn ürün standardı
+
+- Dış ürün: `170 × 170 mm`
+- Harita açıklığı: `150 × 150 mm`
+- Ölçek: `1:3000`
+- Çerçeve genişliği: `10 mm`
+- Çerçeve derinliği: `6 mm`
+- Etiket:
+  - `BONN`
+  - `GEBURTSORT`
+  - doğum günü pastası simgesi
+
+## Tamamlanan Church Landmark yapısal paketleri
+
+- Gerçek footprint yönelimi ve ekstrüzyonu
+- Kademeli kilise gövde seviyeleri
+- Mimari çatı profil sistemi
+- Mimari çatı mesheri
+- Kule profil sistemi
+- Kule mesheri
+- Polygon crossing/outer tower geometrileri
+- Box batı kuleleri
+- Polygon spire çatıları
+- Dış kulelerin gerçek footprint içine taşınması
+- Merkez kule iki kademeli sekizgen çatı geçişi
+- Merkez kule külah yüksekliğinin fiziksel üst halka açıklığından ve 30° eğimden türetilmesi
+
+Son ilgili doğrulama:
+
+- Church tower/profile/landmark/Bonn gerçek fixture paketi: `56 passed`
+
+## Kule penceresi durumu
+
+- Standalone pencere mesheri ve testleri korunuyor.
+- Üretim entegrasyonu geometrik çakışma ve küçük kama artefaktları nedeniyle geri alındı.
+- Revert:
+  - `d5df3a7 Revert "Integrate church tower windows"`
+- Yeniden entegrasyon yapılmadan önce recessed/inlay geometri sözleşmesi geliştirilmelidir.
+
+## Son commit zinciri
+
+- `919f857 Refine crossing tower roof transition`
+- `6ecdc41 Derive crossing tower spire height from roof span`
+- `006aa15 Center cathedral crossing tower on transept`
+- `c5f1266 Align crossing tower with resolved octagonal tower center`
+
+Son push:
+
+- `006aa15..c5f1266 main -> main`
+
+## Son Bonn üretimi
+
+- `OUTPUT/STL/bonn_muensterplatz_city_150mm.stl`
+  - `57.056` triangle
+- `OUTPUT/STL/bonn_muensterplatz_wall_collection_170mm.stl`
+  - `57.204` triangle
+- white:
+  - `20.338`
+- red:
+  - `9.982`
+- green:
+  - `33.868`
+- black:
+  - `148`
+
+## Kritik açık sorun — merkez kule yerleşimi
+
+Uzun külahlı `crossing_tower`, Bambu Studio görsel doğrulamasında büyük sekizgen yapının tam merkezine oturmuş görünmemektedir.
+
+Son yapılanlar:
+
+1. Katedral profilindeki `0.02` boyuna kayma kaldırıldı.
+2. Kule nef–transept kesişim merkezine taşındı.
+3. Bunun yanlış hedef olduğu görüldü.
+4. Büyük sekizgen yapı `outer_polygon_tower` olarak tanımlandı.
+5. `crossing_tower`, footprint-safe resolver tarafından çözümlenen `outer_polygon_tower` merkezine bağlandı.
+6. Otomatik testte iki yerel merkez eşit doğrulandı.
+7. Buna rağmen Bambu Studio görseli, kullanıcının kastettiği sekizgen yapı ile uzun kulenin hâlâ merkezlenmediğini gösterdi.
+
+Teknik sonuç:
+
+- Otomatik test yanlış veya eksik geometrik nesneyi karşılaştırıyor olabilir.
+- `outer_polygon_tower` olarak adlandırılan nesne, görselde hedeflenen büyük sekizgen gövde olmayabilir.
+- Yeni oran veya manuel ofset uygulanmamalıdır.
+- Z yerleşimi tartışmasına geçilmemelidir.
+- Önce doğru hedef gövde kesin olarak tanımlanmalıdır.
+
+## Sıradaki tek teknik işlem
+
+Gerçek Bonn mesh çıktısında:
+
+1. Görseldeki büyük sekizgen yapıyı oluşturan kesin mesh bileşenini belirlemek.
+2. Bu bileşenin gerçek alt ve üst halka merkezlerini hesaplamak.
+3. Uzun külahlı kulenin taban halkası merkezini hesaplamak.
+4. İki merkezi dünya ve yerel koordinatlarda karşılaştırmak.
+5. Hedef bileşen kesinleşmeden kod değişikliği yapmamak.
+
+## Çalışma ağacı notu
+
+Son kontrolde çalışma ağacında izlenmeyen bir dosya görülmüştür:
+
+- `main`
+
+Bu dosya incelenmeden silinmemeli veya commit edilmemelidir.
+
+## Dokümantasyon kararı
+
+Bu bölüm, eski Dalyan merkezli “sıradaki tek işlem” kayıtlarının yerine güncel aktif teknik çalışma noktasını tanımlar.
+
+Çelişki halinde bu `1 Ağustos 2026 — Güncel kesin çalışma noktası` bölümü esas alınmalıdır.
 
