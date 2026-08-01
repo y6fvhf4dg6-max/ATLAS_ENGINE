@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import math
 
+from shapely.geometry import Point, Polygon
+from shapely.ops import nearest_points
+
 from CORE.atlas_church_footprint_resolver import (
     AtlasChurchFootprintFrame,
 )
@@ -311,6 +314,66 @@ class AtlasChurchTowerMesher:
         }
 
     @classmethod
+    def _resolve_footprint_safe_center(
+        cls,
+        *,
+        frame,
+        desired_longitudinal,
+        desired_lateral,
+        longitudinal_span,
+        lateral_span,
+    ):
+        footprint = Polygon(frame.footprint)
+
+        desired_x, desired_y = frame.to_world(
+            longitudinal=desired_longitudinal,
+            lateral=desired_lateral,
+        )
+        desired_point = Point(
+            desired_x,
+            desired_y,
+        )
+
+        half_longitudinal = (
+            float(longitudinal_span) / 2.0
+        )
+        half_lateral = (
+            float(lateral_span) / 2.0
+        )
+
+        clearance = math.hypot(
+            half_longitudinal,
+            half_lateral,
+        ) * 0.72
+
+        safe_area = footprint.buffer(
+            -clearance
+        )
+
+        if safe_area.is_empty:
+            safe_area = footprint.buffer(
+                -clearance * 0.40
+            )
+
+        if safe_area.is_empty:
+            safe_area = footprint
+
+        if safe_area.covers(desired_point):
+            resolved_point = desired_point
+        else:
+            resolved_point = nearest_points(
+                safe_area,
+                desired_point,
+            )[0]
+
+        return frame.to_local(
+            (
+                resolved_point.x,
+                resolved_point.y,
+            )
+        )
+
+    @classmethod
     def build(
         cls,
         *,
@@ -365,6 +428,27 @@ class AtlasChurchTowerMesher:
                 frame.lateral_span
                 * tower_profile.lateral_ratio
             )
+
+            if (
+                tower_profile.tower_type
+                == "outer_polygon_tower"
+            ):
+                (
+                    center_longitudinal,
+                    center_lateral,
+                ) = cls._resolve_footprint_safe_center(
+                    frame=frame,
+                    desired_longitudinal=(
+                        center_longitudinal
+                    ),
+                    desired_lateral=(
+                        center_lateral
+                    ),
+                    longitudinal_span=(
+                        longitudinal_span
+                    ),
+                    lateral_span=lateral_span,
+                )
 
             body_top_z = (
                 building_height

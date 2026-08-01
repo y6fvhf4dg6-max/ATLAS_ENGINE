@@ -127,3 +127,37 @@ def test_bonner_muenster_uses_cathedral_twin_tower_profile():
     assert landmark.landmark_type.name == "CATHEDRAL"
     assert len(mesh["tower_meshes"]) == 4
     assert mesh["spire_meshes"] == []
+
+
+def test_bonner_muenster_outer_polygon_tower_center_stays_inside_real_footprint():
+    from shapely.geometry import Point, Polygon
+
+    from CORE.atlas_church_footprint_resolver import (
+        AtlasChurchFootprintResolver,
+    )
+
+    meshes = _build_real_church_meshes()
+    landmark, mesh = meshes["Bonner Münster"]
+
+    frame = AtlasChurchFootprintResolver.resolve(
+        landmark.geometry
+    )
+    footprint = Polygon(
+        landmark.geometry
+    )
+
+    outer = next(
+        tower
+        for tower in mesh["tower_meshes"]
+        if tower["tower_type"]
+        == "outer_polygon_tower"
+    )
+
+    world_x, world_y = frame.to_world(
+        longitudinal=outer["center_longitudinal"],
+        lateral=outer["center_lateral"],
+    )
+
+    assert footprint.covers(
+        Point(world_x, world_y)
+    )

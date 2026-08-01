@@ -25,6 +25,11 @@ class AtlasChurchFootprintFrame:
         ...,
     ]
 
+    footprint: tuple[
+        tuple[float, float],
+        ...,
+    ]
+
     def to_world(
         self,
         *,
@@ -317,5 +322,12 @@ class AtlasChurchFootprintResolver:
                     float(y),
                 )
                 for x, y in oriented_rectangle
+            ),
+            footprint=tuple(
+                (
+                    float(x),
+                    float(y),
+                )
+                for x, y in points
             ),
         )

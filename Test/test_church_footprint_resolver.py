@@ -182,3 +182,26 @@ def test_resolver_rejects_invalid_or_degenerate_footprint(
         AtlasChurchFootprintResolver.resolve(
             footprint
         )
+
+
+def test_resolver_preserves_normalized_real_footprint():
+    footprint = (
+        (0.0, 0.0),
+        (8.0, 0.0),
+        (8.0, 4.0),
+        (5.0, 7.0),
+        (0.0, 7.0),
+        (0.0, 0.0),
+    )
+
+    frame = AtlasChurchFootprintResolver.resolve(
+        footprint
+    )
+
+    assert frame.footprint == (
+        (0.0, 0.0),
+        (8.0, 0.0),
+        (8.0, 4.0),
+        (5.0, 7.0),
+        (0.0, 7.0),
+    )
