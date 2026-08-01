@@ -98,8 +98,8 @@ def test_cathedral_mesh_contains_twin_tower_components():
     )
 
     assert mesh["landmark_class"] == "cathedral"
-    assert len(mesh["tower_meshes"]) == 2
-    assert len(mesh["spire_meshes"]) == 2
+    assert len(mesh["tower_meshes"]) == 4
+    assert mesh["spire_meshes"] == []
 
 
 def test_mesher_preserves_component_batches():
@@ -115,8 +115,8 @@ def test_mesher_preserves_component_batches():
     assert len(mesh["nave_meshes"]) == 1
     assert len(mesh["transept_meshes"]) == 1
     assert len(mesh["apse_meshes"]) == 1
-    assert len(mesh["tower_meshes"]) == 1
-    assert len(mesh["spire_meshes"]) == 1
+    assert len(mesh["tower_meshes"]) == 3
+    assert mesh["spire_meshes"] == []
     assert len(mesh["roof_meshes"]) == 5
 
 
@@ -493,4 +493,117 @@ def test_lower_roofs_are_not_buried_inside_full_height_footprint_body():
     assert (
         mesh["nave_meshes"][0]["max_z"]
         <= roof_sections["outer_aisle_left"]["eave_z"]
+    )
+
+
+def test_landmark_mesher_integrates_architectural_tower_system():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    tower_system = mesh["architectural_tower_system"]
+
+    assert tower_system["type"] == "church_tower_system"
+
+    assert tuple(
+        tower["tower_type"]
+        for tower in tower_system["towers"]
+    ) == (
+        "crossing_tower",
+        "front_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
+    )
+
+    assert mesh["tower_meshes"] == tower_system["towers"]
+
+
+def test_crossing_and_front_towers_use_polygon_geometry():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    towers = {
+        tower["tower_type"]: tower
+        for tower in mesh["tower_meshes"]
+    }
+
+    crossing = towers["crossing_tower"]
+    front = towers["front_polygon_tower"]
+
+    assert crossing["body_shape"] == "polygon"
+    assert len(crossing["body_top_ring"]) == 8
+
+    assert front["body_shape"] == "polygon"
+    assert len(front["body_top_ring"]) >= 6
+
+    assert crossing["lateral_span"] > front["lateral_span"]
+
+
+def test_front_polygon_tower_uses_polygon_spire():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    front = next(
+        tower
+        for tower in mesh["tower_meshes"]
+        if tower["tower_type"]
+        == "front_polygon_tower"
+    )
+
+    assert front["roof_shape"] == "polygon_spire"
+    assert len(front["roof_base_ring"]) >= 6
+    assert front["roof_top_z"] > front["body_top_z"]
+
+
+def test_old_generic_spire_batches_are_replaced():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    assert mesh["spire_meshes"] == []
+    assert not any(
+        tower.get("type") == "church_tower"
+        for tower in mesh["tower_meshes"]
     )

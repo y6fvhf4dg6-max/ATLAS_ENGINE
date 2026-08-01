@@ -96,5 +96,5 @@ def test_foundation_builder_accepts_cathedral_landmark():
 
     assert mesh is not None
     assert mesh["landmark_class"] == "cathedral"
-    assert len(mesh["tower_meshes"]) == 2
-    assert len(mesh["spire_meshes"]) == 2
+    assert len(mesh["tower_meshes"]) == 4
+    assert mesh["spire_meshes"] == []

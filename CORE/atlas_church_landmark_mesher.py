@@ -17,6 +17,12 @@ from CORE.atlas_church_roof_mesher import (
 from CORE.atlas_church_roof_profile_system import (
     AtlasChurchRoofProfileSystem,
 )
+from CORE.atlas_church_tower_mesher import (
+    AtlasChurchTowerMesher,
+)
+from CORE.atlas_church_tower_profile_system import (
+    AtlasChurchTowerProfileSystem,
+)
 
 
 class AtlasChurchLandmarkMesher:
@@ -557,78 +563,29 @@ class AtlasChurchLandmarkMesher:
             )
         ]
 
-        tower_meshes = []
+        tower_profile = (
+            AtlasChurchTowerProfileSystem.resolve(
+                longitudinal_span=depth,
+                lateral_span=width,
+                building_height=geometry.height_m,
+                landmark_class=(
+                    geometry.profile.landmark_class
+                ),
+            )
+        )
+
+        architectural_tower_system = (
+            AtlasChurchTowerMesher.build(
+                frame=frame,
+                profile=tower_profile,
+                building_height=geometry.height_m,
+            )
+        )
+
+        tower_meshes = list(
+            architectural_tower_system["towers"]
+        )
         spire_meshes = []
-
-        tower_count = geometry.profile.tower_count
-        tower_width = max(
-            width * 0.18,
-            min(width, depth) * 0.12,
-        )
-        tower_depth = depth * 0.16
-        tower_center_longitudinal = (
-            -half_depth
-            + tower_depth / 2.0
-        )
-
-        if tower_count == 1:
-            tower_centers_lateral = (0.0,)
-        elif tower_count == 2:
-            offset = width * 0.24
-            tower_centers_lateral = (
-                -offset,
-                offset,
-            )
-        else:
-            tower_centers_lateral = ()
-
-        for index, tower_center_lateral in enumerate(
-            tower_centers_lateral
-        ):
-            tower_meshes.append(
-                cls._oriented_box(
-                    frame=frame,
-                    min_longitudinal=(
-                        tower_center_longitudinal
-                        - tower_depth / 2.0
-                    ),
-                    max_longitudinal=(
-                        tower_center_longitudinal
-                        + tower_depth / 2.0
-                    ),
-                    min_lateral=(
-                        tower_center_lateral
-                        - tower_width / 2.0
-                    ),
-                    max_lateral=(
-                        tower_center_lateral
-                        + tower_width / 2.0
-                    ),
-                    min_z=0.0,
-                    max_z=tower_height,
-                    mesh_type="church_tower",
-                    index=index,
-                )
-            )
-
-            if geometry.profile.has_spires:
-                spire_meshes.append(
-                    cls._oriented_spire(
-                        frame=frame,
-                        center_longitudinal=(
-                            tower_center_longitudinal
-                        ),
-                        center_lateral=(
-                            tower_center_lateral
-                        ),
-                        half_width=(
-                            tower_width * 0.52
-                        ),
-                        base_z=tower_height,
-                        top_z=spire_top,
-                        index=index,
-                    )
-                )
 
         roof_profile = (
             AtlasChurchRoofProfileSystem.resolve(
@@ -680,6 +637,9 @@ class AtlasChurchLandmarkMesher:
             "apse_meshes": apse_meshes,
             "tower_meshes": tower_meshes,
             "spire_meshes": spire_meshes,
+            "architectural_tower_system": (
+                architectural_tower_system
+            ),
             "roof_meshes": roof_meshes,
             "architectural_roof_system": (
                 architectural_roof_system

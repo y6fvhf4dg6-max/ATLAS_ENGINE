@@ -125,5 +125,5 @@ def test_bonner_muenster_uses_cathedral_twin_tower_profile():
     landmark, mesh = meshes["Bonner Münster"]
 
     assert landmark.landmark_type.name == "CATHEDRAL"
-    assert len(mesh["tower_meshes"]) == 2
-    assert len(mesh["spire_meshes"]) == 2
+    assert len(mesh["tower_meshes"]) == 4
+    assert mesh["spire_meshes"] == []
