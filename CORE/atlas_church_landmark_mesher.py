@@ -340,6 +340,9 @@ class AtlasChurchLandmarkMesher:
             "triangles": triangles,
             "uses_real_footprint": True,
             "footprint": footprint,
+            "min_z": float(min_z),
+            "max_z": float(max_z),
+            "top_z": float(max_z),
             **metadata,
         }
 
@@ -463,14 +466,54 @@ class AtlasChurchLandmarkMesher:
         nave_width = width * 0.52
         nave_depth = depth * 0.78
 
+        outer_aisle_height = body_height * 0.72
+        main_nave_height = body_height
+
         nave_meshes = [
             cls._extrude_real_footprint(
                 footprint=geometry.footprint,
                 min_z=0.0,
-                max_z=body_height,
-                mesh_type="church_nave",
+                max_z=outer_aisle_height,
+                mesh_type="church_outer_body",
+                section_type="outer_aisle_shell",
             )
         ]
+
+        main_nave_body_meshes = [
+            cls._oriented_box(
+                frame=frame,
+                min_longitudinal=-nave_depth / 2.0,
+                max_longitudinal=nave_depth / 2.0,
+                min_lateral=-nave_width / 2.0,
+                max_lateral=nave_width / 2.0,
+                min_z=0.0,
+                max_z=main_nave_height,
+                mesh_type="church_main_nave_body",
+                section_type="main_nave",
+                top_z=main_nave_height,
+            )
+        ]
+
+        architectural_body_system = {
+            "type": "church_stepped_body",
+            "sections": (
+                {
+                    "section_type": "outer_aisle_left",
+                    "top_z": outer_aisle_height,
+                    "mesh": nave_meshes[0],
+                },
+                {
+                    "section_type": "outer_aisle_right",
+                    "top_z": outer_aisle_height,
+                    "mesh": nave_meshes[0],
+                },
+                {
+                    "section_type": "main_nave",
+                    "top_z": main_nave_height,
+                    "mesh": main_nave_body_meshes[0],
+                },
+            ),
+        }
 
         transept_depth = depth * 0.22
         transept_width = width * 0.84
@@ -608,6 +651,7 @@ class AtlasChurchLandmarkMesher:
 
         component_meshes = (
             nave_meshes
+            + main_nave_body_meshes
             + transept_meshes
             + apse_meshes
             + tower_meshes
@@ -628,6 +672,10 @@ class AtlasChurchLandmarkMesher:
             "footprint_frame": frame,
             "triangles": triangles,
             "nave_meshes": nave_meshes,
+            "main_nave_body_meshes": main_nave_body_meshes,
+            "architectural_body_system": (
+                architectural_body_system
+            ),
             "transept_meshes": transept_meshes,
             "apse_meshes": apse_meshes,
             "tower_meshes": tower_meshes,

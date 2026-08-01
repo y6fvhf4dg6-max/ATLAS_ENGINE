@@ -423,3 +423,74 @@ def test_main_and_outer_aisle_roofs_have_distinct_height_levels():
     assert left_aisle["ridge_z"] < main_nave["eave_z"]
     assert right_aisle["ridge_z"] < main_nave["eave_z"]
     assert main_nave["ridge_z"] > main_nave["eave_z"]
+
+
+def test_church_body_has_stepped_outer_aisle_and_main_nave_levels():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    body_system = mesh["architectural_body_system"]
+
+    assert body_system["type"] == "church_stepped_body"
+
+    sections = {
+        section["section_type"]: section
+        for section in body_system["sections"]
+    }
+
+    left_aisle = sections["outer_aisle_left"]
+    right_aisle = sections["outer_aisle_right"]
+    main_nave = sections["main_nave"]
+
+    assert left_aisle["top_z"] < main_nave["top_z"]
+    assert right_aisle["top_z"] < main_nave["top_z"]
+
+    roof_sections = {
+        section["section_type"]: section
+        for section in mesh["roof_meshes"]
+    }
+
+    assert (
+        roof_sections["outer_aisle_left"]["eave_z"]
+        >= left_aisle["top_z"]
+    )
+    assert (
+        roof_sections["outer_aisle_right"]["eave_z"]
+        >= right_aisle["top_z"]
+    )
+    assert (
+        roof_sections["main_nave"]["eave_z"]
+        >= main_nave["top_z"]
+    )
+
+
+def test_lower_roofs_are_not_buried_inside_full_height_footprint_body():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    roof_sections = {
+        section["section_type"]: section
+        for section in mesh["roof_meshes"]
+    }
+
+    assert (
+        mesh["nave_meshes"][0]["max_z"]
+        <= roof_sections["outer_aisle_left"]["eave_z"]
+    )
