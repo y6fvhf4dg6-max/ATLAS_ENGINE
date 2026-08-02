@@ -1218,3 +1218,81 @@ def test_renderer_maps_landmarks_to_separate_material_batch():
     assert len(landmarks["meshes"]) == 1
     assert landmarks["meshes"][0]["type"] == "ancient_theatre"
 
+
+
+def test_renderer_routes_highlighted_building_components_to_roof_batch():
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [
+        {
+            "type": "liedberg_gate_tower",
+            "source_id": 143975871,
+            "architectural_role": "gate_tower_body",
+            "triangles": [
+                (
+                    (10.0, 20.0, 1.0),
+                    (11.0, 20.0, 1.0),
+                    (10.0, 21.0, 2.0),
+                ),
+            ],
+        },
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+        highlighted_building_source_ids={
+            143975871,
+        },
+    )
+
+    batches = scene["material_batches"]
+
+    assert batches["buildings"]["meshes"] == []
+    assert len(batches["building_roofs"]["meshes"]) == 1
+    assert (
+        batches["building_roofs"]["meshes"][0]["source_id"]
+        == 143975871
+    )
+
+
+def test_renderer_routes_selected_landmark_to_roof_batch():
+    city_result = _city_result()
+    city_result["mesh_groups"]["landmarks"] = [
+        {
+            "type": "tower",
+            "landmark_id": 143975860,
+            "architectural_role": "muehlenturm_ruin_body",
+            "triangles": [
+                (
+                    (10.0, 20.0, 1.0),
+                    (11.0, 20.0, 1.0),
+                    (10.0, 21.0, 2.0),
+                ),
+            ],
+        },
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+        highlighted_landmark_ids={
+            143975860,
+        },
+    )
+
+    batches = scene["material_batches"]
+
+    assert batches["landmarks"]["meshes"] == []
+    assert len(batches["building_roofs"]["meshes"]) == 1
+    assert (
+        batches["building_roofs"]["meshes"][0]["landmark_id"]
+        == 143975860
+    )

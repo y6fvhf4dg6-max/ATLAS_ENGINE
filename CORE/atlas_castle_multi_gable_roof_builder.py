@@ -23,6 +23,10 @@ from shapely.geometry import LineString
 from shapely.geometry import Polygon
 from shapely.ops import split
 
+from CORE.atlas_castle_multi_gable_piece_profile import (
+    AtlasCastleMultiGablePieceProfile,
+)
+
 
 class AtlasCastleMultiGableRoofBuilder:
     SUPPORTED_PROFILES = {
@@ -111,11 +115,20 @@ class AtlasCastleMultiGableRoofBuilder:
         maximum_roof_z = float(top_z)
 
         for piece_index, piece in enumerate(pieces):
+            roof_height_multiplier = (
+                AtlasCastleMultiGablePieceProfile
+                .roof_height_multiplier(
+                    source_id=mesh.get("source_id"),
+                    piece_index=piece_index,
+                )
+            )
+
             roof = AtlasCastleMultiGableRoofBuilder._build_piece_roof(
                 polygon=piece,
                 top_z=float(top_z),
                 body_height_mm=body_height_mm,
                 castle_profile=castle_profile,
+                roof_height_multiplier=roof_height_multiplier,
             )
 
             if roof is None:
@@ -136,6 +149,7 @@ class AtlasCastleMultiGableRoofBuilder:
                     "long_side_mm": roof["long_side_mm"],
                     "short_side_mm": roof["short_side_mm"],
                     "roof_height_mm": roof["roof_height_mm"],
+                    "roof_height_multiplier": roof_height_multiplier,
                     "ridge_start": roof["ridge_start"],
                     "ridge_end": roof["ridge_end"],
                 }
@@ -393,6 +407,7 @@ class AtlasCastleMultiGableRoofBuilder:
         top_z,
         body_height_mm,
         castle_profile,
+        roof_height_multiplier=1.0,
     ):
         outer_rectangle = AtlasCastleMultiGableRoofBuilder._minimum_rotated_rectangle(
             polygon
@@ -474,6 +489,11 @@ class AtlasCastleMultiGableRoofBuilder:
         roof_height_mm = max(
             roof_height_mm,
             minimum_roof_height_mm,
+        )
+
+        roof_height_mm *= max(
+            0.10,
+            float(roof_height_multiplier),
         )
 
         roof_height_mm = min(

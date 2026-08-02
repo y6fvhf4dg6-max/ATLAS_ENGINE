@@ -26,6 +26,12 @@ from CORE.atlas_castle_gable_roof_builder import (
 from CORE.atlas_castle_multi_gable_roof_builder import (
     AtlasCastleMultiGableRoofBuilder,
 )
+from CORE.atlas_liedberg_gate_tower_builder import (
+    AtlasLiedbergGateTowerBuilder,
+)
+from CORE.atlas_liedberg_gate_tower_cap_builder import (
+    AtlasLiedbergGateTowerCapBuilder,
+)
 from CORE.atlas_monument_dome_roof_builder import (
     AtlasMonumentDomeRoofBuilder,
 )
@@ -1072,6 +1078,30 @@ class AtlasFoundationSceneBuilder:
                     )
 
             scene.add_building_mesh(mesh)
+
+            liedberg_gate_tower_mesh = (
+                AtlasLiedbergGateTowerBuilder.build(
+                    castle_mesh=mesh,
+                )
+            )
+
+            if liedberg_gate_tower_mesh is not None:
+                scene.add_building_mesh(
+                    liedberg_gate_tower_mesh
+                )
+
+                liedberg_gate_tower_cap_mesh = (
+                    AtlasLiedbergGateTowerCapBuilder.build(
+                        gate_tower_mesh=(
+                            liedberg_gate_tower_mesh
+                        ),
+                    )
+                )
+
+                if liedberg_gate_tower_cap_mesh is not None:
+                    scene.add_building_mesh(
+                        liedberg_gate_tower_cap_mesh
+                    )
 
             accepted_buildings += 1
 

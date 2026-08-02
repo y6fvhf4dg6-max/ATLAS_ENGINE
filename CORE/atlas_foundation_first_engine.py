@@ -2,6 +2,9 @@
 
 from CORE.atlas_local_osm_reader import AtlasLocalOSMReader
 from CORE.atlas_landmark_foundation_builder import AtlasLandmarkFoundationBuilder
+from CORE.atlas_liedberg_muehlenturm_ruin_top_builder import (
+    AtlasLiedbergMuehlenturmRuinTopBuilder,
+)
 from CORE.atlas_bridge_landmark_deduplicator import (
     AtlasBridgeLandmarkDeduplicator,
 )
@@ -480,6 +483,13 @@ class AtlasFoundationFirstEngine:
             road_meshes=road_meshes,
             debug=debug,
         )
+
+        landmark_meshes = [
+            AtlasLiedbergMuehlenturmRuinTopBuilder.apply(
+                tower_mesh=mesh,
+            )
+            for mesh in landmark_meshes
+        ]
 
         artwork_meshes = AtlasArtworkFoundationBuilder.build_artworks(
             artworks=(

@@ -1014,11 +1014,18 @@ class AtlasProductColorPreviewRenderer:
         label_plate_spec: AtlasLabelPlateSpec | None = None,
         label_text_spec: AtlasLabelTextSpec | None = None,
         highlighted_building_source_ids=None,
+        highlighted_landmark_ids=None,
     ) -> dict:
         highlighted_building_source_ids = {
             str(source_id)
             for source_id in (
                 highlighted_building_source_ids or ()
+            )
+        }
+        highlighted_landmark_ids = {
+            str(landmark_id)
+            for landmark_id in (
+                highlighted_landmark_ids or ()
             )
         }
 
@@ -1219,6 +1226,44 @@ class AtlasProductColorPreviewRenderer:
                         "building_roofs"
                     ]["meshes"].append(
                         translated_roof_mesh
+                    )
+                    continue
+
+                source_id = mesh.get("source_id")
+                landmark_id = mesh.get("landmark_id")
+
+                is_highlighted_building_component = (
+                    group_name == "buildings"
+                    and source_id is not None
+                    and str(source_id)
+                    in highlighted_building_source_ids
+                )
+                is_highlighted_landmark = (
+                    group_name == "landmarks"
+                    and landmark_id is not None
+                    and str(landmark_id)
+                    in highlighted_landmark_ids
+                )
+
+                if (
+                    is_highlighted_building_component
+                    or is_highlighted_landmark
+                ):
+                    highlighted_mesh = dict(mesh)
+                    highlighted_mesh["type"] = (
+                        "highlighted_building_component"
+                        if is_highlighted_building_component
+                        else "highlighted_landmark"
+                    )
+
+                    material_batches[
+                        "building_roofs"
+                    ]["meshes"].append(
+                        cls._translate_mesh(
+                            highlighted_mesh,
+                            city_offset_x_mm,
+                            city_offset_y_mm,
+                        )
                     )
                     continue
 
