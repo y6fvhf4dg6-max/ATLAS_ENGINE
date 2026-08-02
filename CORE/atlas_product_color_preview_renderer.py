@@ -146,6 +146,211 @@ class AtlasProductColorPreviewRenderer:
         return triangles
 
     @classmethod
+    def _build_skillion_roof_color_solids(
+        cls,
+        *,
+        mesh: dict,
+    ) -> tuple[dict, dict] | None:
+        if mesh.get("roof_geometry") != "skillion":
+            return None
+
+        wall_triangles = list(
+            mesh.get("building_wall_triangles", [])
+        )
+        roof_triangles = list(
+            mesh.get("building_roof_triangles", [])
+        )
+        body_top_points = list(mesh.get("top", []))
+        skillion_top_points = list(
+            mesh.get(
+                "building_skillion_roof_points",
+                [],
+            )
+        )
+
+        if (
+            not wall_triangles
+            or not roof_triangles
+            or len(body_top_points) < 3
+            or len(skillion_top_points)
+            != len(body_top_points)
+        ):
+            return None
+
+        body_top_z = mesh.get("body_top_z")
+
+        if body_top_z is None:
+            body_top_z = max(
+                float(point[2])
+                for triangle in wall_triangles
+                for point in triangle
+            )
+
+        bottom_points = list(mesh.get("bottom", []))
+
+        if bottom_points:
+            bottom_z = min(
+                float(point[2])
+                for point in bottom_points
+            )
+        else:
+            bottom_z = min(
+                float(point[2])
+                for triangle in wall_triangles
+                for point in triangle
+            )
+
+        body_top_triangles = cls._triangulate_ring_at_z(
+            body_top_points,
+            z_level=float(body_top_z),
+            reverse=False,
+        )
+        roof_bottom_triangles = cls._triangulate_ring_at_z(
+            body_top_points,
+            z_level=float(body_top_z),
+            reverse=True,
+        )
+
+        if (
+            not body_top_triangles
+            or not roof_bottom_triangles
+        ):
+            return None
+
+        bottom_triangles = [
+            triangle
+            for triangle in mesh.get("triangles", [])
+            if all(
+                abs(float(point[2]) - bottom_z) <= 1e-6
+                for point in triangle
+            )
+        ]
+
+        if not bottom_triangles:
+            bottom_triangles = cls._triangulate_ring_at_z(
+                bottom_points or body_top_points,
+                z_level=bottom_z,
+                reverse=True,
+            )
+
+        boundary_edges = {}
+
+        for triangle in roof_triangles:
+            for first, second in (
+                (triangle[0], triangle[1]),
+                (triangle[1], triangle[2]),
+                (triangle[2], triangle[0]),
+            ):
+                first_key = tuple(
+                    round(float(value), 6)
+                    for value in first
+                )
+                second_key = tuple(
+                    round(float(value), 6)
+                    for value in second
+                )
+                edge_key = tuple(
+                    sorted(
+                        (
+                            first_key,
+                            second_key,
+                        )
+                    )
+                )
+
+                if edge_key in boundary_edges:
+                    boundary_edges[edge_key]["count"] += 1
+                else:
+                    boundary_edges[edge_key] = {
+                        "count": 1,
+                        "first": first,
+                        "second": second,
+                    }
+
+        open_boundary_edges = [
+            edge
+            for edge in boundary_edges.values()
+            if edge["count"] == 1
+        ]
+
+        source_roof_already_has_sides = (
+            bool(open_boundary_edges)
+            and all(
+                abs(
+                    float(point[2])
+                    - float(body_top_z)
+                )
+                <= 1e-6
+                for edge in open_boundary_edges
+                for point in (
+                    edge["first"],
+                    edge["second"],
+                )
+            )
+        )
+
+        roof_side_triangles = []
+
+        if not source_roof_already_has_sides:
+            point_count = len(body_top_points)
+
+            for index in range(point_count):
+                next_index = (index + 1) % point_count
+
+                bottom_first = (
+                    float(body_top_points[index][0]),
+                    float(body_top_points[index][1]),
+                    float(body_top_z),
+                )
+                bottom_second = (
+                    float(body_top_points[next_index][0]),
+                    float(body_top_points[next_index][1]),
+                    float(body_top_z),
+                )
+                top_first = tuple(
+                    float(value)
+                    for value in skillion_top_points[index]
+                )
+                top_second = tuple(
+                    float(value)
+                    for value in skillion_top_points[next_index]
+                )
+
+                roof_side_triangles.extend(
+                    [
+                        (
+                            bottom_first,
+                            bottom_second,
+                            top_second,
+                        ),
+                        (
+                            bottom_first,
+                            top_second,
+                            top_first,
+                        ),
+                    ]
+                )
+
+        wall_mesh = {
+            "type": "building_wall_color_solid",
+            "triangles": [
+                *bottom_triangles,
+                *wall_triangles,
+                *body_top_triangles,
+            ],
+        }
+        roof_mesh = {
+            "type": "building_roof_color_solid",
+            "triangles": [
+                *roof_triangles,
+                *roof_bottom_triangles,
+                *roof_side_triangles,
+            ],
+        }
+
+        return wall_mesh, roof_mesh
+
+    @classmethod
     def _build_pitched_roof_color_solids(
         cls,
         *,
@@ -693,8 +898,17 @@ class AtlasProductColorPreviewRenderer:
 
         retained = []
 
+        covered_subarea_types = {
+            "landuse:grass",
+            "leisure:playground",
+            "leisure:garden",
+        }
+
         for candidate in prepared:
-            if candidate["park_type"] != "landuse:grass":
+            if (
+                candidate["park_type"]
+                not in covered_subarea_types
+            ):
                 retained.append(candidate["mesh"])
                 continue
 
@@ -1144,6 +1358,13 @@ class AtlasProductColorPreviewRenderer:
                             mesh=mesh,
                         )
                     )
+
+                    if color_solids is None:
+                        color_solids = (
+                            cls._build_skillion_roof_color_solids(
+                                mesh=mesh,
+                            )
+                        )
 
                     if color_solids is None:
                         color_solids = (

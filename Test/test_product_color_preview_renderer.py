@@ -406,6 +406,97 @@ def test_renderer_builds_closed_print_solids_for_gable_roof_colors():
     assert _open_edge_count(roof_mesh["triangles"]) == 0
 
 
+def test_renderer_builds_closed_print_solids_for_skillion_roof_colors():
+    bottom = [
+        (10.0, 20.0, 0.8),
+        (12.0, 20.0, 0.8),
+        (12.0, 22.0, 0.8),
+        (10.0, 22.0, 0.8),
+    ]
+    body_top = [
+        (10.0, 20.0, 5.0),
+        (12.0, 20.0, 5.0),
+        (12.0, 22.0, 5.0),
+        (10.0, 22.0, 5.0),
+    ]
+    skillion_top = [
+        (10.0, 20.0, 5.0),
+        (12.0, 20.0, 5.0),
+        (12.0, 22.0, 6.0),
+        (10.0, 22.0, 6.0),
+    ]
+
+    bottom_triangles = [
+        (bottom[0], bottom[2], bottom[1]),
+        (bottom[0], bottom[3], bottom[2]),
+    ]
+    wall_triangles = [
+        (bottom[0], bottom[1], body_top[1]),
+        (bottom[0], body_top[1], body_top[0]),
+        (bottom[1], bottom[2], body_top[2]),
+        (bottom[1], body_top[2], body_top[1]),
+        (bottom[2], bottom[3], body_top[3]),
+        (bottom[2], body_top[3], body_top[2]),
+        (bottom[3], bottom[0], body_top[0]),
+        (bottom[3], body_top[0], body_top[3]),
+    ]
+    roof_triangles = [
+        (
+            skillion_top[0],
+            skillion_top[1],
+            skillion_top[2],
+        ),
+        (
+            skillion_top[0],
+            skillion_top[2],
+            skillion_top[3],
+        ),
+    ]
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [
+        {
+            "type": "building",
+            "bottom": bottom,
+            "top": body_top,
+            "triangles": [
+                *bottom_triangles,
+                *wall_triangles,
+                *roof_triangles,
+            ],
+            "building_wall_triangles": wall_triangles,
+            "building_roof_triangles": roof_triangles,
+            "building_skillion_roof_triangles": roof_triangles,
+            "building_skillion_roof_points": skillion_top,
+            "building_flat_roof_triangles": [],
+            "foundation_z": 0.8,
+            "body_top_z": 5.0,
+            "roof_top_z": 6.0,
+            "roof_geometry": "skillion",
+        },
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    wall_mesh = scene["material_batches"][
+        "building_walls"
+    ]["meshes"][0]
+    roof_mesh = scene["material_batches"][
+        "building_roofs"
+    ]["meshes"][0]
+
+    assert _open_edge_count(wall_mesh["triangles"]) == 0
+    assert _open_edge_count(roof_mesh["triangles"]) == 0
+
+
+
 def test_renderer_builds_closed_print_solids_for_hipped_roof_colors():
     bottom = [
         (10.0, 20.0, 0.8),
@@ -818,6 +909,45 @@ def test_renderer_excludes_landuse_grass_fully_covered_by_leisure_park():
     assert len(
         scene["material_batches"]["parks"]["meshes"]
     ) == 1
+
+
+def test_renderer_excludes_playground_fully_covered_by_leisure_park():
+    city_result = _city_result()
+    city_result["mesh_groups"]["parks"] = [
+        _park_mesh(
+            x0=10.0,
+            y0=10.0,
+            x1=30.0,
+            y1=30.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="leisure:park",
+        ),
+        _park_mesh(
+            x0=15.0,
+            y0=15.0,
+            x1=25.0,
+            y1=25.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="leisure:playground",
+        ),
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    park_meshes = scene["material_batches"]["parks"]["meshes"]
+
+    assert len(park_meshes) == 1
+    assert park_meshes[0]["park_type"] == "leisure:park"
+
 
 
 def test_renderer_keeps_leisure_parks_that_only_share_boundary_edge():

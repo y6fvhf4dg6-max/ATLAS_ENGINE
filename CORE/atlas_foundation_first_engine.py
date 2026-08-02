@@ -17,9 +17,6 @@ from CORE.atlas_terrain_pipeline import AtlasTerrainPipeline
 from CORE.atlas_foundation_scene_builder import (
     AtlasFoundationSceneBuilder,
 )
-from CORE.atlas_foundation_scene_xy_mesh_clipper import (
-    AtlasFoundationSceneXYMeshClipper,
-)
 from CORE.atlas_foundation_scene_xy_bounds_filter import (
     AtlasFoundationSceneXYBoundsFilter,
 )
@@ -98,6 +95,21 @@ class AtlasFoundationFirstEngine:
             *coastline_polygons,
             *inland_polygons,
         ]
+
+    @staticmethod
+    def _keep_landmark_meshes_inside_product_bounds(
+        landmark_meshes,
+        product_max_x,
+        product_max_y,
+    ):
+        return AtlasFoundationSceneXYBoundsFilter.keep_fully_inside(
+            meshes=landmark_meshes,
+            min_x=0.0,
+            max_x=float(product_max_x),
+            min_y=0.0,
+            max_y=float(product_max_y),
+            tolerance=1e-9,
+        )
 
     @staticmethod
     def _keep_road_meshes_inside_product_bounds(
@@ -562,13 +574,11 @@ class AtlasFoundationFirstEngine:
         )
 
         landmark_meshes = (
-            AtlasFoundationSceneXYMeshClipper
-            .clip_meshes(
-                meshes=landmark_meshes,
-                min_x=0.0,
-                max_x=product_max_x,
-                min_y=0.0,
-                max_y=product_max_y,
+            AtlasFoundationFirstEngine
+            ._keep_landmark_meshes_inside_product_bounds(
+                landmark_meshes=landmark_meshes,
+                product_max_x=product_max_x,
+                product_max_y=product_max_y,
             )
         )
 
