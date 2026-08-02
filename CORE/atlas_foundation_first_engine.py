@@ -58,6 +58,9 @@ from CORE.atlas_castle_focus_engine import (
 from CORE.atlas_coastline_water_builder import (
     AtlasCoastlineWaterBuilder,
 )
+from CORE.atlas_inland_water_polygon_builder import (
+    AtlasInlandWaterPolygonBuilder,
+)
 from CORE.atlas_water_foundation_builder import (
     AtlasWaterFoundationBuilder,
 )
@@ -68,6 +71,34 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
+    @staticmethod
+    def _build_water_polygons(
+        waters,
+        coastlines,
+        bbox,
+        debug=True,
+    ):
+        coastline_polygons = (
+            AtlasCoastlineWaterBuilder.build_water_polygons(
+                coastlines=coastlines,
+                bbox=bbox,
+                debug=debug,
+            )
+        )
+
+        inland_polygons = (
+            AtlasInlandWaterPolygonBuilder.build_polygons(
+                waters=waters,
+                bbox=bbox,
+                debug=debug,
+            )
+        )
+
+        return [
+            *coastline_polygons,
+            *inland_polygons,
+        ]
+
     @staticmethod
     def _keep_road_meshes_inside_product_bounds(
         road_meshes,
@@ -402,8 +433,9 @@ class AtlasFoundationFirstEngine:
             strict=strict_input_quality,
         )
 
-        coastline_water_polygons = (
-            AtlasCoastlineWaterBuilder.build_water_polygons(
+        water_polygons = (
+            AtlasFoundationFirstEngine._build_water_polygons(
+                waters=waters,
                 coastlines=coastlines,
                 bbox=working_bbox,
                 debug=debug,
@@ -412,7 +444,7 @@ class AtlasFoundationFirstEngine:
 
         water_meshes = (
             AtlasWaterFoundationBuilder.build_coastline_water_meshes(
-                water_polygons=coastline_water_polygons,
+                water_polygons=water_polygons,
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_slab,
                 debug=debug,
