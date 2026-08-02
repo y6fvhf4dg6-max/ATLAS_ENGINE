@@ -98,3 +98,42 @@ def test_preserves_unrelated_normal_buildings():
     )
 
     assert result == [building]
+
+
+def test_removes_parent_cathedral_landmark_when_detailed_building_parts_exist():
+    cathedral = _record(
+        112526702,
+        building="cathedral",
+        amenity="place_of_worship",
+        name="Bonner Münster",
+    )
+
+    cathedral_parts = [
+        {
+            **_record(
+                321760756 + index,
+                building="yes",
+                **{"building:part": "yes"},
+            ),
+            "parent_building_id": 112526702,
+        }
+        for index in range(12)
+    ]
+
+    unrelated_landmark = _record(
+        304078323,
+        building="bridge",
+    )
+
+    result = AtlasLandmarkBuildingDeduplicator.filter_landmarks(
+        landmarks=[
+            cathedral,
+            unrelated_landmark,
+        ],
+        raw_buildings=[
+            cathedral,
+            *cathedral_parts,
+        ],
+    )
+
+    assert result == [unrelated_landmark]

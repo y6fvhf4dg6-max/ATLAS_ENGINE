@@ -328,3 +328,27 @@ def test_gable_roof_updates_semantic_surface_metadata():
         result["building_gable_roof_triangles"]
     )
     assert result["building_wall_triangles"] == wall_triangles
+
+
+class DummyScaleCoordinateEngine:
+    scale_ratio = 3000.0
+
+    @staticmethod
+    def height_to_stl_mm(height_m):
+        return float(height_m) * 1000.0 / 3000.0
+
+
+def test_gable_roof_uses_explicit_osm_roof_height():
+    mesh = build_rectangular_building_mesh()
+
+    result = AtlasBuildingGableRoofBuilder.apply(
+        mesh=mesh,
+        roof_height_m="6",
+        coordinate_engine=DummyScaleCoordinateEngine(),
+    )
+
+    assert result["building_gable_roof_applied"] is True
+    assert result["body_top_z"] == 4.0
+    assert result["roof_height_mm"] == 2.0
+    assert result["roof_top_z"] == 6.0
+    assert result["top_z"] == 6.0

@@ -31,7 +31,11 @@ class AtlasBuildingGableRoofBuilder:
     MAX_RECTANGLE_AREA_RATIO = 1.34
 
     @staticmethod
-    def apply(mesh):
+    def apply(
+        mesh,
+        roof_height_m=None,
+        coordinate_engine=None,
+    ):
         if not mesh:
             return mesh
 
@@ -112,22 +116,33 @@ class AtlasBuildingGableRoofBuilder:
             float(top_z) - float(bottom_z),
         )
 
-        roof_height_mm = max(
-            short_side_mm
-            * AtlasBuildingGableRoofBuilder
-            .ROOF_SHORT_SPAN_RATIO,
-            body_height_mm
-            * AtlasBuildingGableRoofBuilder
-            .ROOF_BODY_HEIGHT_RATIO,
+        explicit_roof_height_mm = (
             AtlasBuildingGableRoofBuilder
-            .MIN_ROOF_HEIGHT_MM,
+            ._resolve_explicit_roof_height_mm(
+                roof_height_m=roof_height_m,
+                coordinate_engine=coordinate_engine,
+            )
         )
 
-        roof_height_mm = min(
-            roof_height_mm,
-            AtlasBuildingGableRoofBuilder
-            .MAX_ROOF_HEIGHT_MM,
-        )
+        if explicit_roof_height_mm is not None:
+            roof_height_mm = explicit_roof_height_mm
+        else:
+            roof_height_mm = max(
+                short_side_mm
+                * AtlasBuildingGableRoofBuilder
+                .ROOF_SHORT_SPAN_RATIO,
+                body_height_mm
+                * AtlasBuildingGableRoofBuilder
+                .ROOF_BODY_HEIGHT_RATIO,
+                AtlasBuildingGableRoofBuilder
+                .MIN_ROOF_HEIGHT_MM,
+            )
+
+            roof_height_mm = min(
+                roof_height_mm,
+                AtlasBuildingGableRoofBuilder
+                .MAX_ROOF_HEIGHT_MM,
+            )
 
         base_z = (
             float(top_z)
@@ -261,6 +276,54 @@ class AtlasBuildingGableRoofBuilder:
         mesh["building_gable_roof_applied"] = True
 
         return mesh
+
+    @staticmethod
+    def _resolve_explicit_roof_height_mm(
+        roof_height_m,
+        coordinate_engine,
+    ):
+        if roof_height_m is None or coordinate_engine is None:
+            return None
+
+        try:
+            parsed_height_m = float(
+                str(roof_height_m)
+                .strip()
+                .lower()
+                .replace("meters", "")
+                .replace("meter", "")
+                .replace("metres", "")
+                .replace("metre", "")
+                .replace("m", "")
+                .strip()
+            )
+        except (TypeError, ValueError):
+            return None
+
+        if parsed_height_m <= 0.0:
+            return None
+
+        try:
+            resolved_height_mm = (
+                coordinate_engine.height_to_stl_mm(
+                    parsed_height_m
+                )
+            )
+        except (AttributeError, TypeError, ValueError):
+            return None
+
+        try:
+            resolved_height_mm = float(resolved_height_mm)
+        except (TypeError, ValueError):
+            return None
+
+        if (
+            not math.isfinite(resolved_height_mm)
+            or resolved_height_mm <= 0.0
+        ):
+            return None
+
+        return resolved_height_mm
 
     @staticmethod
     def _derive_z_level(points, mode):

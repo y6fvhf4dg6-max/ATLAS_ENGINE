@@ -148,3 +148,27 @@ def test_special_architectural_building_preserves_explicit_osm_roof():
 
     assert result["roof_profile"] == "gable"
     assert result["decision_source"] == "osm"
+
+
+def test_explicit_skillion_roof_shape_is_preserved():
+    result = AtlasBuildingRoofProfiler.classify(
+        roof_shape="skillion",
+        aspect_ratio=1.80,
+        rectangularity=0.94,
+        is_building_part=True,
+    )
+
+    assert result["roof_profile"] == "skillion"
+    assert result["decision_source"] == "osm"
+
+
+def test_explicit_apse_gabled_roof_shape_is_preserved():
+    result = AtlasBuildingRoofProfiler.classify(
+        roof_shape="apse_gabled",
+        aspect_ratio=1.55,
+        rectangularity=0.72,
+        is_building_part=True,
+    )
+
+    assert result["roof_profile"] == "apse_gabled"
+    assert result["decision_source"] == "osm"

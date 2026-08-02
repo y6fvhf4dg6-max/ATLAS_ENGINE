@@ -12,6 +12,8 @@ class AtlasBuildingRoofProfiler:
         "gabled": "gable",
         "hipped": "hipped",
         "pyramidal": "pyramidal",
+        "skillion": "skillion",
+        "apse_gabled": "apse_gabled",
     }
 
     MIN_RECTANGULARITY = 0.75

@@ -83,7 +83,20 @@ class AtlasFoundationMeshExtruder:
             )
         )
 
-        if base_offset_mm >= height_mm:
+        tags = getattr(building, "tags", {}) or {}
+
+        is_elevated_roof_only_pyramidal_part = (
+            tags.get("building:part") is not None
+            and tags.get("roof:shape") == "pyramidal"
+            and base_offset_mm > 0.0
+            and abs(base_offset_mm - height_mm)
+            <= AtlasFoundationMeshExtruder.DIMENSION_EPSILON_MM
+        )
+
+        if (
+            base_offset_mm >= height_mm
+            and not is_elevated_roof_only_pyramidal_part
+        ):
             return AtlasFoundationMeshExtruder._reject(
                 diagnostics,
                 "invalid_vertical_range",
@@ -105,7 +118,19 @@ class AtlasFoundationMeshExtruder:
         vertical_part_thickness_mm = top_z - bottom_z
         vertical_part_thickness_adjusted = False
 
-        if (
+        if is_elevated_roof_only_pyramidal_part:
+            top_z = foundation_z + height_mm
+            bottom_z = max(
+                foundation_z,
+                top_z
+                - AtlasFoundationMeshExtruder
+                .MIN_VERTICAL_PART_THICKNESS_MM,
+            )
+            base_offset_mm = bottom_z - foundation_z
+            vertical_part_thickness_mm = top_z - bottom_z
+            vertical_part_thickness_adjusted = True
+
+        elif (
             base_offset_mm > 0.0
             and vertical_part_thickness_mm
             < AtlasFoundationMeshExtruder.MIN_VERTICAL_PART_THICKNESS_MM
@@ -257,8 +282,31 @@ class AtlasFoundationMeshExtruder:
 
     @staticmethod
     def _calculate_height(building, coordinate_engine):
+        resolved_height_m = float(building.estimated_height)
+
+        tags = getattr(building, "tags", {}) or {}
+
+        explicit_total_height_m = (
+            AtlasFoundationMeshExtruder
+            ._parse_positive_float(tags.get("height"))
+        )
+        explicit_roof_height_m = (
+            AtlasFoundationMeshExtruder
+            ._parse_positive_float(tags.get("roof:height"))
+        )
+
+        if (
+            explicit_total_height_m is not None
+            and explicit_roof_height_m is not None
+            and explicit_roof_height_m < explicit_total_height_m
+        ):
+            resolved_height_m = (
+                explicit_total_height_m
+                - explicit_roof_height_m
+            )
+
         height_mm = coordinate_engine.height_to_stl_mm(
-            building.estimated_height
+            resolved_height_m
         )
 
         if getattr(building, "is_castle_building", False):
@@ -290,10 +338,51 @@ class AtlasFoundationMeshExtruder:
         if height_mm < AtlasFoundationMeshExtruder.MIN_HEIGHT_MM:
             return AtlasFoundationMeshExtruder.MIN_HEIGHT_MM
 
-        if height_mm > AtlasFoundationMeshExtruder.MAX_HEIGHT_MM:
+        min_height_m = (
+            AtlasFoundationMeshExtruder
+            ._parse_positive_float(
+                tags.get("min_height")
+            )
+        )
+
+        is_elevated_part = (
+            tags.get("building:part") is not None
+            and min_height_m is not None
+        )
+
+        if (
+            height_mm
+            > AtlasFoundationMeshExtruder.MAX_HEIGHT_MM
+            and not is_elevated_part
+        ):
             return AtlasFoundationMeshExtruder.MAX_HEIGHT_MM
 
         return height_mm
+
+    @staticmethod
+    def _parse_positive_float(value):
+        if value is None:
+            return None
+
+        try:
+            parsed = float(
+                str(value)
+                .strip()
+                .lower()
+                .replace("meters", "")
+                .replace("meter", "")
+                .replace("metres", "")
+                .replace("metre", "")
+                .replace("m", "")
+                .strip()
+            )
+        except (TypeError, ValueError):
+            return None
+
+        if parsed <= 0.0:
+            return None
+
+        return parsed
 
     @staticmethod
     def _prepare_geometry(

@@ -171,22 +171,47 @@ class AtlasBuildingPyramidalRoofBuilder:
             ._parse_positive_float(roof_height_m)
         )
 
-        scale_ratio = getattr(
-            coordinate_engine,
-            "scale_ratio",
-            None,
-        )
-
         if (
             parsed_roof_height_m is not None
-            and scale_ratio is not None
-            and float(scale_ratio) > 0.0
+            and coordinate_engine is not None
         ):
-            return (
-                parsed_roof_height_m
-                * 1000.0
-                / float(scale_ratio)
+            try:
+                explicit_height_mm = (
+                    coordinate_engine.height_to_stl_mm(
+                        parsed_roof_height_m
+                    )
+                )
+                explicit_height_mm = float(
+                    explicit_height_mm
+                )
+            except (
+                AttributeError,
+                TypeError,
+                ValueError,
+            ):
+                explicit_height_mm = None
+
+            if (
+                explicit_height_mm is not None
+                and explicit_height_mm > 0.0
+            ):
+                return explicit_height_mm
+
+            scale_ratio = getattr(
+                coordinate_engine,
+                "scale_ratio",
+                None,
             )
+
+            if (
+                scale_ratio is not None
+                and float(scale_ratio) > 0.0
+            ):
+                return (
+                    parsed_roof_height_m
+                    * 1000.0
+                    / float(scale_ratio)
+                )
 
         xs = [float(point[0]) for point in top_points]
         ys = [float(point[1]) for point in top_points]

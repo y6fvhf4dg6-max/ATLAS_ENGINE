@@ -109,8 +109,8 @@ class AtlasChurchTowerProfileSystem:
                     center_lateral_ratio=0.42,
                     longitudinal_ratio=0.22,
                     lateral_ratio=0.34,
-                    body_top_ratio=0.54,
-                    roof_top_ratio=0.65,
+                    body_top_ratio=0.4464,
+                    roof_top_ratio=0.5208,
                 ),
                 AtlasChurchTowerProfile(
                     tower_type="west_tower_left",

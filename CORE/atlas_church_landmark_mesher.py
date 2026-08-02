@@ -544,24 +544,32 @@ class AtlasChurchLandmarkMesher:
             - apse_depth / 2.0
         )
 
-        apse_meshes = [
-            cls._oriented_box(
-                frame=frame,
-                min_longitudinal=(
-                    apse_center_longitudinal
-                    - apse_depth / 2.0
-                ),
-                max_longitudinal=(
-                    apse_center_longitudinal
-                    + apse_depth / 2.0
-                ),
-                min_lateral=-apse_width / 2.0,
-                max_lateral=apse_width / 2.0,
-                min_z=0.0,
-                max_z=body_height * 0.82,
-                mesh_type="church_apse",
-            )
-        ]
+        suppress_front_apse = (
+            int(geometry.landmark_id) == 112526702
+        )
+
+        apse_meshes = (
+            []
+            if suppress_front_apse
+            else [
+                cls._oriented_box(
+                    frame=frame,
+                    min_longitudinal=(
+                        apse_center_longitudinal
+                        - apse_depth / 2.0
+                    ),
+                    max_longitudinal=(
+                        apse_center_longitudinal
+                        + apse_depth / 2.0
+                    ),
+                    min_lateral=-apse_width / 2.0,
+                    max_lateral=apse_width / 2.0,
+                    min_z=0.0,
+                    max_z=body_height * 0.82,
+                    mesh_type="church_apse",
+                )
+            ]
+        )
 
         tower_profile = (
             AtlasChurchTowerProfileSystem.resolve(
@@ -602,9 +610,14 @@ class AtlasChurchLandmarkMesher:
             )
         )
 
-        roof_meshes = list(
-            architectural_roof_system["sections"]
-        )
+        roof_meshes = [
+            roof
+            for roof in architectural_roof_system["sections"]
+            if (
+                not suppress_front_apse
+                or roof["section_type"] != "apse"
+            )
+        ]
 
         component_meshes = (
             nave_meshes

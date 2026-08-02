@@ -259,8 +259,8 @@ def test_bonner_outer_tower_is_shorter_than_west_towers():
     assert outer.body_top_ratio < west.body_top_ratio
     assert outer.roof_top_ratio < west.roof_top_ratio
 
-    assert outer.body_top_ratio <= 0.56
-    assert outer.roof_top_ratio <= 0.67
+    assert outer.body_top_ratio == pytest.approx(0.4464)
+    assert outer.roof_top_ratio == pytest.approx(0.5208)
 
 
 def test_bonner_outer_tower_has_broad_octagonal_silhouette():

@@ -176,6 +176,10 @@ class AtlasFoundationFirstEngine:
             [],
         )
 
+        hierarchy_raw_buildings = list(
+            raw_buildings
+        )
+
         landmarks = data.get(
             "landmarks",
             [],
@@ -417,6 +421,9 @@ class AtlasFoundationFirstEngine:
 
         scene = AtlasFoundationSceneBuilder.build_scene(
             raw_buildings=raw_buildings,
+            hierarchy_raw_buildings=(
+                hierarchy_raw_buildings
+            ),
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             castles=castles,

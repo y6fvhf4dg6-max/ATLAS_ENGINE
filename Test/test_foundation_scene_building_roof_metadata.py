@@ -865,7 +865,11 @@ def test_foundation_scene_applies_pyramidal_roof_geometry(
     }
 
     coordinate_engine = SimpleNamespace(
-        scale_ratio=3000.0,
+        xy_scale=3000.0,
+        z_scale=3000.0,
+        height_to_stl_mm=lambda height_m: (
+            float(height_m) * 1000.0 / 3000.0
+        ),
     )
 
     monkeypatch.setattr(
@@ -938,3 +942,55 @@ def test_foundation_scene_applies_pyramidal_roof_geometry(
         ]
     ) == 4
     assert len(result_mesh["triangles"]) == 14
+
+
+
+def test_bonn_crossing_tower_uses_explicit_pyramidal_roof_height():
+    from CORE.atlas_building_pyramidal_roof_builder import (
+        AtlasBuildingPyramidalRoofBuilder,
+    )
+
+    class CoordinateEngine:
+        z_scale = 3000.0
+
+        def height_to_stl_mm(self, height_m):
+            return float(height_m) * 1000.0 / self.z_scale
+
+    mesh = {
+        "building_roof_profile": "pyramidal",
+        "is_castle_building": False,
+        "bottom_z": 3.0,
+        "top_z": 17.0,
+        "bottom": [
+            (0.0, 0.0, 3.0),
+            (6.0, 0.0, 3.0),
+            (6.0, 6.0, 3.0),
+            (0.0, 6.0, 3.0),
+        ],
+        "top": [
+            (0.0, 0.0, 17.0),
+            (6.0, 0.0, 17.0),
+            (6.0, 6.0, 17.0),
+            (0.0, 6.0, 17.0),
+        ],
+        "triangles": [
+            ((0.0, 0.0, 17.0), (6.0, 0.0, 17.0), (6.0, 6.0, 17.0)),
+            ((0.0, 0.0, 17.0), (6.0, 6.0, 17.0), (0.0, 6.0, 17.0)),
+        ],
+    }
+
+    result = AtlasBuildingPyramidalRoofBuilder.apply(
+        mesh=mesh,
+        roof_height_m="40",
+        coordinate_engine=CoordinateEngine(),
+    )
+
+    assert result["roof_height_mm"] == pytest.approx(
+        13.333333333333334
+    )
+    assert result["roof_top_z"] == pytest.approx(
+        30.333333333333336
+    )
+    assert result[
+        "building_pyramidal_roof_applied"
+    ] is True

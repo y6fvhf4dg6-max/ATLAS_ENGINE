@@ -14,6 +14,12 @@ from CORE.atlas_building_hipped_roof_builder import (
 from CORE.atlas_building_pyramidal_roof_builder import (
     AtlasBuildingPyramidalRoofBuilder,
 )
+from CORE.atlas_building_skillion_roof_builder import (
+    AtlasBuildingSkillionRoofBuilder,
+)
+from CORE.atlas_building_apse_gabled_roof_builder import (
+    AtlasBuildingApseGabledRoofBuilder,
+)
 from CORE.atlas_foundation_first_pipeline import (
     AtlasFoundationFirstPipeline,
 )
@@ -97,6 +103,65 @@ class AtlasFoundationSceneBuilder:
             if parent_data
             and parent_data.get("part_ids")
         }
+
+    @staticmethod
+    def _building_part_adjacent_footprints(
+        raw_building,
+        parent_data,
+        coordinate_engine,
+    ):
+        if not raw_building or not parent_data:
+            return []
+
+        if coordinate_engine is None:
+            return []
+
+        target_id = raw_building.get("id")
+        adjacent_footprints = []
+
+        for sibling_record in (
+            parent_data.get("parts", [])
+            or []
+        ):
+            if sibling_record.get("id") == target_id:
+                continue
+
+            geometry = sibling_record.get(
+                "geometry",
+                [],
+            )
+
+            if not geometry or len(geometry) < 3:
+                continue
+
+            try:
+                footprint = (
+                    coordinate_engine
+                    .geometry_to_stl_mm(
+                        geometry
+                    )
+                )
+            except (
+                AttributeError,
+                TypeError,
+                ValueError,
+            ):
+                continue
+
+            if not footprint or len(footprint) < 3:
+                continue
+
+            adjacent_footprints.append(
+                [
+                    (
+                        float(point[0]),
+                        float(point[1]),
+                    )
+                    for point in footprint
+                ]
+            )
+
+        return adjacent_footprints
 
     @staticmethod
     def _mark_monument_column_part(
@@ -411,6 +476,7 @@ class AtlasFoundationSceneBuilder:
         coordinate_engine,
         terrain_mesh,
         castles=None,
+        hierarchy_raw_buildings=None,
         bbox=None,
         target_size_mm=None,
         bed_width_mm=None,
@@ -431,14 +497,34 @@ class AtlasFoundationSceneBuilder:
         if castles is None:
             castles = []
 
+        hierarchy_source_buildings = (
+            raw_buildings
+            if hierarchy_raw_buildings is None
+            else hierarchy_raw_buildings
+        )
+
         building_part_hierarchy = (
             AtlasBuildingPartHierarchyProfiler.analyze(
-                raw_buildings
+                hierarchy_source_buildings
             )
         )
 
-        mesh_buildings = building_part_hierarchy[
-            "mesh_buildings"
+        meshable_record_ids = {
+            record.get("id")
+            for record in raw_buildings
+        }
+
+        mesh_buildings = [
+            record
+            for record in building_part_hierarchy[
+                "mesh_buildings"
+            ]
+            if (
+                record.get("id") in meshable_record_ids
+                or record.get(
+                    "atlas_residual_parent_id"
+                ) is not None
+            )
         ]
 
         if debug:
@@ -599,6 +685,7 @@ class AtlasFoundationSceneBuilder:
             )
 
             containing_parent_record = None
+            parent_data = None
 
             if not is_building_part:
                 def positive_number(value):
@@ -909,7 +996,9 @@ class AtlasFoundationSceneBuilder:
             )
 
             mesh = AtlasBuildingGableRoofBuilder.apply(
-                mesh
+                mesh=mesh,
+                roof_height_m=tags.get("roof:height"),
+                coordinate_engine=coordinate_engine,
             )
 
             mesh = AtlasBuildingHippedRoofBuilder.apply(
@@ -920,6 +1009,32 @@ class AtlasFoundationSceneBuilder:
                 mesh=mesh,
                 roof_height_m=tags.get("roof:height"),
                 coordinate_engine=coordinate_engine,
+            )
+
+            mesh = AtlasBuildingSkillionRoofBuilder.apply(
+                mesh=mesh,
+                roof_height_m=tags.get("roof:height"),
+                roof_direction=tags.get("roof:direction"),
+                coordinate_engine=coordinate_engine,
+            )
+
+            adjacent_footprints = []
+
+            if is_building_part and parent_data is not None:
+                adjacent_footprints = (
+                    AtlasFoundationSceneBuilder
+                    ._building_part_adjacent_footprints(
+                        raw_building=raw_building,
+                        parent_data=parent_data,
+                        coordinate_engine=coordinate_engine,
+                    )
+                )
+
+            mesh = AtlasBuildingApseGabledRoofBuilder.apply(
+                mesh=mesh,
+                roof_height_m=tags.get("roof:height"),
+                coordinate_engine=coordinate_engine,
+                adjacent_footprints=adjacent_footprints,
             )
 
             if not mesh["is_castle_building"]:

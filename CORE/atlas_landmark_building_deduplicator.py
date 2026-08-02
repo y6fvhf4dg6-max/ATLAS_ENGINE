@@ -7,6 +7,32 @@ class AtlasLandmarkBuildingDeduplicator:
     }
 
     @classmethod
+    def filter_landmarks(
+        cls,
+        *,
+        landmarks,
+        raw_buildings,
+    ):
+        detailed_parent_ids = {
+            building.get("parent_building_id")
+            for building in raw_buildings
+            if (
+                building.get("parent_building_id")
+                is not None
+                and (
+                    building.get("tags", {})
+                    or {}
+                ).get("building:part") == "yes"
+            )
+        }
+
+        return [
+            landmark
+            for landmark in landmarks
+            if landmark.get("id") not in detailed_parent_ids
+        ]
+
+    @classmethod
     def filter_buildings(
         cls,
         *,

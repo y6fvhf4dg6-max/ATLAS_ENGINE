@@ -161,3 +161,37 @@ def test_bonner_muenster_outer_polygon_tower_center_stays_inside_real_footprint(
     assert footprint.covers(
         Point(world_x, world_y)
     )
+
+def test_bonner_muenster_side_octagon_roof_top_aligns_with_adjacent_aisle_roof():
+    import pytest
+
+    meshes = _build_real_church_meshes()
+    _, mesh = meshes["Bonner Münster"]
+
+    adjacent_roof = next(
+        roof
+        for roof in mesh["roof_meshes"]
+        if roof["section_type"] == "outer_aisle_right"
+    )
+
+    side_octagon = next(
+        tower
+        for tower in mesh["tower_meshes"]
+        if tower["tower_type"] == "outer_polygon_tower"
+    )
+
+    assert side_octagon["roof_top_z"] == pytest.approx(
+        adjacent_roof["ridge_z"],
+        abs=1e-8,
+    )
+
+
+def test_bonner_muenster_has_no_front_apse_addition():
+    meshes = _build_real_church_meshes()
+    _, mesh = meshes["Bonner Münster"]
+
+    assert mesh["apse_meshes"] == []
+    assert all(
+        roof["section_type"] != "apse"
+        for roof in mesh["roof_meshes"]
+    )

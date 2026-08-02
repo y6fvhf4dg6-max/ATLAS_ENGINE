@@ -848,3 +848,76 @@ def test_foundation_extruder_preserves_flat_roof_and_wall_triangles():
         for triangle in wall_triangles
     )
 
+
+
+def test_explicit_total_height_excludes_roof_height_from_building_body():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=12.0,
+        is_building_part=True,
+        tags={
+            "building:part": "yes",
+            "height": "12",
+            "roof:height": "3",
+            "roof:shape": "pyramidal",
+        },
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+    )
+
+    assert mesh is not None
+    assert mesh["bottom_z"] == pytest.approx(0.0)
+    assert mesh["top_z"] == pytest.approx(9.0)
+
+
+def test_elevated_roof_only_pyramidal_part_keeps_printable_support_slab():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 5.8),
+            (5.8, 5.8),
+            (5.8, 0.0),
+        ],
+        estimated_height=72.5,
+        is_building_part=True,
+        tags={
+            "building:part": "yes",
+            "height": "72.5",
+            "min_height": "52",
+            "roof:shape": "pyramidal",
+            "roof:height": "20.5",
+        },
+        min_height=52.0,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is not None
+    assert diagnostics["accepted"] is True
+    assert mesh["top_z"] == pytest.approx(52.0)
+    assert mesh["bottom_z"] == pytest.approx(
+        52.0
+        - AtlasFoundationMeshExtruder
+        .MIN_VERTICAL_PART_THICKNESS_MM
+    )
+    assert mesh["vertical_part_thickness_mm"] == pytest.approx(
+        AtlasFoundationMeshExtruder
+        .MIN_VERTICAL_PART_THICKNESS_MM
+    )
+    assert mesh["vertical_part_thickness_adjusted"] is True
