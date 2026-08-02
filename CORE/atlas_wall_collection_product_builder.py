@@ -8,6 +8,7 @@ from CORE.atlas_label_birthday_cake_mesher import (
 from CORE.atlas_label_graduation_cap_mesher import (
     AtlasLabelGraduationCapMesher,
 )
+from CORE.atlas_label_home_mesher import AtlasLabelHomeMesher
 from CORE.atlas_label_plate_mesher import AtlasLabelPlateMesher
 from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
 from CORE.atlas_label_text_mesher import AtlasLabelTextMesher
@@ -115,6 +116,7 @@ class AtlasWallCollectionProductBuilder:
         label_text_meshes = []
         label_graduation_cap_meshes = []
         label_birthday_cake_meshes = []
+        label_home_meshes = []
 
         if label_text_spec is not None and label_plate_spec is None:
             raise ValueError(
@@ -243,6 +245,55 @@ class AtlasWallCollectionProductBuilder:
                         )
                     )
 
+                if label_text_spec.home:
+                    home_width_mm = 7.0
+                    home_height_mm = 6.0
+                    home_text_gap_mm = 3.0
+
+                    text_meshes_for_symbol = [
+                        primary_mesh,
+                    ]
+
+                    if label_text_spec.secondary_text:
+                        text_meshes_for_symbol.append(
+                            secondary_mesh
+                        )
+
+                    text_right_x_mm = max(
+                        float(point[0])
+                        for text_mesh in text_meshes_for_symbol
+                        for triangle in text_mesh["triangles"]
+                        for point in triangle
+                    )
+
+                    home_center_x_mm = (
+                        text_right_x_mm
+                        + home_text_gap_mm
+                        + (home_width_mm / 2.0)
+                    )
+
+                    maximum_home_center_x_mm = (
+                        (label_plate_spec.width_mm / 2.0)
+                        - 3.0
+                        - (home_width_mm / 2.0)
+                    )
+
+                    home_center_x_mm = maximum_home_center_x_mm
+
+                    home_mesh = AtlasLabelHomeMesher.build(
+                        width_mm=home_width_mm,
+                        height_mm=home_height_mm,
+                        depth_mm=label_text_spec.depth_mm,
+                    )
+                    label_home_meshes.append(
+                        AtlasWallCollectionProductBuilder._translate_mesh(
+                            home_mesh,
+                            home_center_x_mm,
+                            label_center_y_mm,
+                            text_front_z_mm,
+                        )
+                    )
+
                 if label_text_spec.graduation_cap:
                     cap_width_mm = 7.0
                     cap_height_mm = 5.0
@@ -274,6 +325,7 @@ class AtlasWallCollectionProductBuilder:
             *label_text_meshes,
             *label_graduation_cap_meshes,
             *label_birthday_cake_meshes,
+            *label_home_meshes,
         ]
 
         return {

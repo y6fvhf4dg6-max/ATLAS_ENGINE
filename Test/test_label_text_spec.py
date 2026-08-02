@@ -85,3 +85,15 @@ def test_label_text_spec_can_enable_birthday_cake():
     )
 
     assert spec.birthday_cake is True
+
+
+def test_label_text_spec_can_enable_home_symbol():
+    spec = AtlasLabelTextSpec(
+        primary_text="ERKELENZ",
+        secondary_text="ZUHAUSE",
+        home=True,
+    )
+
+    assert spec.home is True
+    assert spec.graduation_cap is False
+    assert spec.birthday_cake is False
