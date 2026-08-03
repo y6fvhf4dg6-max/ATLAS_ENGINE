@@ -1,4 +1,5 @@
-from dataclasses import replace
+from dataclasses import dataclass, replace
+
 
 from CORE.atlas_bridge_builder import AtlasBridgeGeometry
 from CORE.atlas_church_landmark_builder import (
@@ -40,6 +41,15 @@ from CORE.atlas_landmark_geometry_mesher import (
 from CORE.atlas_landmark_mesh_builder import AtlasLandmarkMeshBuilder
 from CORE.atlas_landmark_provider_osm import AtlasLandmarkProviderOsm
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_worship_landmark_fallback_mesher import (
+    AtlasWorshipLandmarkFallbackMesher,
+)
+
+
+@dataclass(frozen=True, slots=True)
+class AtlasWorshipFallbackScaledGeometry:
+    footprint: tuple
+    height_m: float
 
 
 class AtlasLandmarkFoundationBuilder:
@@ -267,6 +277,94 @@ class AtlasLandmarkFoundationBuilder:
                 mesh = AtlasChurchLandmarkMesher.build(
                     scaled_geometry
                 )
+            elif landmark.landmark_type in {
+                AtlasLandmarkType.MOSQUE,
+                AtlasLandmarkType.SYNAGOGUE,
+            }:
+                metric_mesh = (
+                    AtlasWorshipLandmarkFallbackMesher.build(
+                        metric_landmark
+                    )
+                )
+
+                scaled_height = (
+                    coordinate_engine.height_to_stl_mm(
+                        metric_mesh["height_m"]
+                    )
+                )
+
+                bottom = tuple(
+                    (
+                        float(x),
+                        float(y),
+                        0.0,
+                    )
+                    for x, y in stl_footprint
+                )
+                top = tuple(
+                    (
+                        float(x),
+                        float(y),
+                        float(scaled_height),
+                    )
+                    for x, y in stl_footprint
+                )
+
+                scaled_landmark = replace(
+                    landmark,
+                    geometry=stl_footprint,
+                )
+
+                mesh = (
+                    AtlasWorshipLandmarkFallbackMesher.build(
+                        scaled_landmark
+                    )
+                )
+
+                mesh["height_m"] = (
+                    metric_mesh["height_m"]
+                )
+                mesh["height_mm"] = (
+                    scaled_height
+                )
+                mesh["bottom"] = bottom
+                mesh["top"] = top
+
+                # Fallback mesher STL footprint üzerinde
+                # çalıştığı için Z yüksekliğini yeniden ölçekle.
+                rescaled_triangles = []
+
+                for triangle in mesh["triangles"]:
+                    rescaled_triangles.append(
+                        tuple(
+                            (
+                                float(point[0]),
+                                float(point[1]),
+                                (
+                                    float(point[2])
+                                    * scaled_height
+                                    / mesh["max_z"]
+                                    if mesh["max_z"] > 0.0
+                                    else 0.0
+                                ),
+                            )
+                            for point in triangle
+                        )
+                    )
+
+                mesh["triangles"] = (
+                    rescaled_triangles
+                )
+                mesh["max_z"] = scaled_height
+                mesh["top_z"] = scaled_height
+
+                scaled_geometry = (
+                    AtlasWorshipFallbackScaledGeometry(
+                        footprint=tuple(stl_footprint),
+                        height_m=scaled_height,
+                    )
+                )
+                resolved_geometry = scaled_geometry
             else:
                 builder = (
                     AtlasLandmarkMeshBuilder

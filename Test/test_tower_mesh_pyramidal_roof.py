@@ -9,6 +9,7 @@ from CORE.atlas_tower_builder import (
     AtlasTowerBuilder,
     AtlasTowerGeometry,
 )
+from CORE.atlas_mesh_validator import AtlasMeshValidator
 
 
 class Landmark:
@@ -305,3 +306,278 @@ def test_clock_tower_side_turrets_are_external_and_tangent_to_main_tower():
         assert turret["cap_apex"][2] == pytest.approx(
             18.0 * 0.62
         )
+
+
+def test_galata_tower_builds_four_part_landmark_profile():
+    geometry = AtlasTowerGeometry(
+        footprint=(
+            (0.0, 0.0),
+            (7.0, 0.0),
+            (7.0, 7.0),
+            (0.0, 7.0),
+        ),
+        height_m=27.0,
+        profile="galata",
+        roof_shape="pyramidal",
+        roof_height_m=8.0,
+    )
+
+    mesh = AtlasLandmarkGeometryMesher._build_tower_mesh(
+        geometry
+    )
+
+    assert mesh["profile"] == "galata"
+    assert mesh["roof_shape"] == "conical"
+
+    components = mesh["galata_components"]
+
+    assert tuple(components) == (
+        "main_body",
+        "arched_gallery",
+        "balcony_and_upper_drum",
+        "conical_roof",
+    )
+
+    assert len(mesh["rings"]) >= 6
+
+    main_body = mesh["galata_main_body"]
+    gallery = mesh["galata_arched_gallery"]
+    upper = mesh["galata_balcony_and_upper_drum"]
+    roof = mesh["galata_conical_roof"]
+
+    assert main_body["bottom_z"] == pytest.approx(0.0)
+    assert main_body["top_z"] < gallery["top_z"]
+    assert gallery["top_z"] < upper["top_z"]
+    assert upper["top_z"] < roof["top_z"]
+
+    assert roof["top_z"] == pytest.approx(27.0)
+
+    assert main_body["diameter_mm"] == pytest.approx(
+        7.0,
+        abs=0.15,
+    )
+    assert upper["balcony_diameter_mm"] > main_body["diameter_mm"]
+    assert roof["base_diameter_mm"] >= upper["drum_diameter_mm"]
+
+    assert len(mesh["galata_arch_openings"]) >= 8
+
+    report = AtlasMeshValidator.report(mesh)
+
+    assert report["valid"] is True
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0
+
+
+
+def test_galata_tower_builds_recessed_arched_gallery_niches():
+    geometry = AtlasTowerGeometry(
+        footprint=(
+            (0.0, 0.0),
+            (7.0, 0.0),
+            (7.0, 7.0),
+            (0.0, 7.0),
+        ),
+        height_m=27.0,
+        profile="galata",
+        roof_shape="pyramidal",
+        roof_height_m=8.0,
+    )
+
+    mesh = AtlasLandmarkGeometryMesher._build_tower_mesh(
+        geometry
+    )
+
+    assert "galata_arch_panels" not in mesh
+
+    niches = mesh["galata_arch_niches"]
+
+    assert len(niches) == 6
+
+    for niche in niches:
+        assert niche["bottom_z"] >= 10.0 - 1e-6
+        assert niche["top_z"] <= 15.0 + 1e-6
+        assert niche["width_mm"] >= 0.45
+        assert niche["height_mm"] >= 2.20
+        assert niche["recess_depth_mm"] >= 0.30
+        assert niche["recess_depth_mm"] <= 0.45
+        assert niche["arch_radius_mm"] > 0.0
+        assert len(niche["triangles"]) > 0
+
+    assert mesh["galata_arch_niche_triangle_count"] > 0
+
+    report = AtlasMeshValidator.report(mesh)
+
+    assert report["valid"] is True
+
+
+def test_galata_arch_niches_are_broad_and_rounded_not_pointed():
+    geometry = AtlasTowerGeometry(
+        footprint=(
+            (0.0, 0.0),
+            (7.0, 0.0),
+            (7.0, 7.0),
+            (0.0, 7.0),
+        ),
+        height_m=27.0,
+        profile="galata",
+        roof_shape="pyramidal",
+        roof_height_m=8.0,
+    )
+
+    mesh = AtlasLandmarkGeometryMesher._build_tower_mesh(
+        geometry
+    )
+
+    niches = mesh["galata_arch_niches"]
+
+    assert len(niches) == 6
+
+    for niche in niches:
+        assert niche["width_mm"] >= 0.65
+        assert niche["height_mm"] <= 3.30
+        assert niche["arch_profile"] == "rounded"
+        assert len(niche["front_profile"]) >= 7
+
+        top_points = [
+            point
+            for point in niche["front_profile"]
+            if point[2] > niche["spring_z"]
+        ]
+
+        assert len(top_points) >= 3
+
+
+def test_galata_arch_niches_use_short_broad_round_proportions():
+    geometry = AtlasTowerGeometry(
+        footprint=(
+            (0.0, 0.0),
+            (7.0, 0.0),
+            (7.0, 7.0),
+            (0.0, 7.0),
+        ),
+        height_m=27.0,
+        profile="galata",
+        roof_shape="pyramidal",
+        roof_height_m=8.0,
+    )
+
+    mesh = AtlasLandmarkGeometryMesher._build_tower_mesh(
+        geometry
+    )
+
+    niches = mesh["galata_arch_niches"]
+
+    assert len(niches) == 6
+
+    for niche in niches:
+        assert niche["width_mm"] >= 0.80
+        assert niche["height_mm"] <= 2.50
+        assert niche["height_mm"] / niche["width_mm"] <= 3.0
+        assert niche["arch_profile"] == "rounded"
+        assert niche["arch_segment_count"] >= 5
+
+        arch_height = (
+            niche["top_z"]
+            - niche["spring_z"]
+        )
+
+        assert arch_height >= 0.55
+        assert arch_height <= 0.75
+
+
+def test_galata_gallery_uses_six_wide_arches_with_stone_between():
+    geometry = AtlasTowerGeometry(
+        footprint=(
+            (0.0, 0.0),
+            (7.0, 0.0),
+            (7.0, 7.0),
+            (0.0, 7.0),
+        ),
+        height_m=27.0,
+        profile="galata",
+        roof_shape="pyramidal",
+        roof_height_m=8.0,
+    )
+
+    mesh = AtlasLandmarkGeometryMesher._build_tower_mesh(
+        geometry
+    )
+
+    niches = mesh["galata_arch_niches"]
+
+    assert mesh["galata_segment_count"] == 24
+    assert len(niches) == 6
+
+    assert {
+        niche["face_index"]
+        for niche in niches
+    } == {0, 4, 8, 12, 16, 20}
+
+
+def test_galata_six_arches_span_multiple_gallery_faces():
+    geometry = AtlasTowerGeometry(
+        footprint=(
+            (0.0, 0.0),
+            (7.0, 0.0),
+            (7.0, 7.0),
+            (0.0, 7.0),
+        ),
+        height_m=27.0,
+        profile="galata",
+        roof_shape="pyramidal",
+        roof_height_m=8.0,
+    )
+
+    mesh = AtlasLandmarkGeometryMesher._build_tower_mesh(
+        geometry
+    )
+
+    niches = mesh["galata_arch_niches"]
+
+    assert len(niches) == 6
+
+    for niche in niches:
+        assert niche["spanned_face_count"] == 3
+        assert niche["width_mm"] >= 2.20
+        assert niche["width_mm"] <= 2.70
+        assert niche["stone_pier_face_count"] == 1
+
+
+def test_galata_wide_arches_follow_cylindrical_gallery_surface():
+    geometry = AtlasTowerGeometry(
+        footprint=(
+            (0.0, 0.0),
+            (7.0, 0.0),
+            (7.0, 7.0),
+            (0.0, 7.0),
+        ),
+        height_m=27.0,
+        profile="galata",
+        roof_shape="pyramidal",
+        roof_height_m=8.0,
+    )
+
+    mesh = AtlasLandmarkGeometryMesher._build_tower_mesh(
+        geometry
+    )
+
+    niches = mesh["galata_arch_niches"]
+
+    assert len(niches) == 6
+
+    for niche in niches:
+        assert niche["spanned_face_count"] == 3
+        assert niche["surface_profile"] == "cylindrical"
+        assert len(niche["face_sections"]) == 3
+
+        assert {
+            section["face_index"]
+            for section in niche["face_sections"]
+        } == {
+            niche["face_index"],
+            (niche["face_index"] + 1) % 24,
+            (niche["face_index"] + 2) % 24,
+        }
+
+        for section in niche["face_sections"]:
+            assert len(section["triangles"]) > 0

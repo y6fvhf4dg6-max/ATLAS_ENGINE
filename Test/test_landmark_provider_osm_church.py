@@ -61,3 +61,61 @@ def test_osm_provider_does_not_promote_generic_place_of_worship():
     landmark = AtlasLandmarkProviderOsm.from_osm(osm)
 
     assert landmark.landmark_type is AtlasLandmarkType.UNKNOWN
+
+
+def test_osm_provider_classifies_mosque_building():
+    osm = {
+        "id": 404,
+        "geometry": (
+            (50.0, 7.0),
+            (50.0, 7.001),
+            (50.001, 7.001),
+            (50.001, 7.0),
+        ),
+        "tags": {
+            "building": "mosque",
+            "amenity": "place_of_worship",
+            "religion": "muslim",
+        },
+    }
+
+    landmark = AtlasLandmarkProviderOsm.from_osm(osm)
+
+    assert landmark.landmark_type is AtlasLandmarkType.MOSQUE
+
+
+def test_osm_provider_classifies_synagogue_building():
+    osm = {
+        "id": 405,
+        "geometry": (
+            (50.0, 7.0),
+            (50.0, 7.001),
+            (50.001, 7.001),
+            (50.001, 7.0),
+        ),
+        "tags": {
+            "building": "synagogue",
+            "amenity": "place_of_worship",
+            "religion": "jewish",
+        },
+    }
+
+    landmark = AtlasLandmarkProviderOsm.from_osm(osm)
+
+    assert landmark.landmark_type is AtlasLandmarkType.SYNAGOGUE
+
+
+def test_osm_provider_derives_synagogue_from_generic_building():
+    osm = {
+        "id": 406,
+        "geometry": (),
+        "tags": {
+            "building": "yes",
+            "amenity": "place_of_worship",
+            "religion": "jewish",
+        },
+    }
+
+    landmark = AtlasLandmarkProviderOsm.from_osm(osm)
+
+    assert landmark.landmark_type is AtlasLandmarkType.SYNAGOGUE

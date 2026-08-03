@@ -16,6 +16,9 @@ from CORE.atlas_landmark_geometry_mesher import (
     AtlasLandmarkGeometryMesher,
 )
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_worship_landmark_fallback_mesher import (
+    AtlasWorshipLandmarkFallbackMesher,
+)
 from CORE.atlas_lighthouse_builder import AtlasLighthouseBuilder
 from CORE.atlas_rock_cut_tomb_builder import AtlasRockCutTombBuilder
 from CORE.atlas_tower_builder import AtlasTowerBuilder
@@ -57,6 +60,15 @@ class AtlasLandmarkMeshBuilder:
             )
             mesh = AtlasChurchLandmarkMesher.build(
                 geometry
+            )
+        elif landmark.landmark_type in {
+            AtlasLandmarkType.MOSQUE,
+            AtlasLandmarkType.SYNAGOGUE,
+        }:
+            mesh = (
+                AtlasWorshipLandmarkFallbackMesher.build(
+                    landmark
+                )
             )
         else:
             builder = cls._BUILDERS.get(

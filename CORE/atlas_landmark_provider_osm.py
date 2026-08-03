@@ -1,6 +1,9 @@
 from CORE.atlas_landmark import AtlasLandmark
 from CORE.atlas_landmark_provider import AtlasLandmarkProvider
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_place_of_worship_profile_resolver import (
+    AtlasPlaceOfWorshipProfileResolver,
+)
 
 
 class AtlasLandmarkProviderOsm(AtlasLandmarkProvider):
@@ -26,12 +29,24 @@ class AtlasLandmarkProviderOsm(AtlasLandmarkProvider):
             and tags.get("tomb") == "rock-cut"
         ):
             landmark_type = AtlasLandmarkType.ROCK_CUT_TOMB
-        elif tags.get("building") == "cathedral":
-            landmark_type = AtlasLandmarkType.CATHEDRAL
-        elif tags.get("building") == "church":
-            landmark_type = AtlasLandmarkType.CHURCH
         else:
-            landmark_type = AtlasLandmarkType.UNKNOWN
+            worship_profile = (
+                AtlasPlaceOfWorshipProfileResolver.resolve(
+                    tags
+                )
+            )
+
+            worship_types = {
+                "cathedral": AtlasLandmarkType.CATHEDRAL,
+                "church": AtlasLandmarkType.CHURCH,
+                "mosque": AtlasLandmarkType.MOSQUE,
+                "synagogue": AtlasLandmarkType.SYNAGOGUE,
+            }
+
+            landmark_type = worship_types.get(
+                worship_profile,
+                AtlasLandmarkType.UNKNOWN,
+            )
 
         return AtlasLandmark(
             id=osm["id"],

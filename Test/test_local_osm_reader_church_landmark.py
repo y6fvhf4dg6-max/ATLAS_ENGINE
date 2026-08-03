@@ -38,3 +38,33 @@ def test_non_christian_religious_building_is_not_promoted_by_church_rule():
     }
 
     assert AtlasLocalOSMReader._is_landmark(tags) is False
+
+
+def test_explicit_mosque_building_is_landmark():
+    tags = {
+        "building": "mosque",
+        "amenity": "place_of_worship",
+        "religion": "muslim",
+    }
+
+    assert AtlasLocalOSMReader._is_landmark(tags) is True
+
+
+def test_explicit_synagogue_building_is_landmark():
+    tags = {
+        "building": "synagogue",
+        "amenity": "place_of_worship",
+        "religion": "jewish",
+    }
+
+    assert AtlasLocalOSMReader._is_landmark(tags) is True
+
+
+def test_generic_building_with_supported_religion_is_landmark():
+    tags = {
+        "building": "yes",
+        "amenity": "place_of_worship",
+        "religion": "jewish",
+    }
+
+    assert AtlasLocalOSMReader._is_landmark(tags) is True

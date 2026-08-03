@@ -30,3 +30,32 @@ def test_clock_tower_uses_clock_profile():
     )
 
     assert profile == "clock"
+
+
+def test_galata_tower_uses_galata_profile():
+    profile = AtlasTowerProfileResolver.resolve(
+        {
+            "wikidata": "Q91274",
+            "name": "Galata Kulesi",
+            "historic": "tower",
+            "man_made": "tower",
+            "tower:type": (
+                "observation;"
+                "museum_and_observation"
+            ),
+        }
+    )
+
+    assert profile == "galata"
+
+
+def test_generic_observation_tower_does_not_use_galata_profile():
+    profile = AtlasTowerProfileResolver.resolve(
+        {
+            "historic": "tower",
+            "man_made": "tower",
+            "tower:type": "observation",
+        }
+    )
+
+    assert profile == "observation"

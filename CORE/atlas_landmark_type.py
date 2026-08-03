@@ -25,5 +25,6 @@ class AtlasLandmarkType(Enum):
     MOSQUE = auto()
     CHURCH = auto()
     CATHEDRAL = auto()
+    SYNAGOGUE = auto()
 
     STADIUM = auto()

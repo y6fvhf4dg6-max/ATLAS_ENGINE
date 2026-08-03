@@ -1113,6 +1113,9 @@ class AtlasLandmarkGeometryMesher:
         if geometry.profile == "clock":
             return cls._build_clock_tower_mesh(geometry)
 
+        if geometry.profile == "galata":
+            return cls._build_galata_tower_mesh(geometry)
+
         total_height = float(geometry.height_m)
         roof_shape = getattr(
             geometry,
@@ -1236,6 +1239,756 @@ class AtlasLandmarkGeometryMesher:
             "roof_triangles": roof_triangles,
             "walls": walls,
             "triangles": triangles,
+        }
+
+    @classmethod
+    def _build_galata_tower_mesh(cls, geometry):
+        footprint = tuple(
+            (float(x), float(y))
+            for x, y in geometry.footprint
+        )
+
+        if len(footprint) < 3:
+            raise ValueError(
+                "Galata tower footprint requires at least 3 points"
+            )
+
+        total_height = float(
+            geometry.height_m
+        )
+
+        if total_height <= 0.0:
+            raise ValueError(
+                "Galata tower height must be positive"
+            )
+
+        min_x = min(x for x, _ in footprint)
+        max_x = max(x for x, _ in footprint)
+        min_y = min(y for _, y in footprint)
+        max_y = max(y for _, y in footprint)
+
+        center_x = (min_x + max_x) / 2.0
+        center_y = (min_y + max_y) / 2.0
+
+        footprint_width = max_x - min_x
+        footprint_depth = max_y - min_y
+
+        body_diameter = min(
+            footprint_width,
+            footprint_depth,
+        )
+
+        if body_diameter <= 0.0:
+            raise ValueError(
+                "Galata tower footprint must have positive dimensions"
+            )
+
+        requested_roof_height = float(
+            getattr(
+                geometry,
+                "roof_height_m",
+                0.0,
+            )
+        )
+
+        if (
+            requested_roof_height <= 0.0
+            or requested_roof_height >= total_height
+        ):
+            roof_height = total_height * 0.295
+        else:
+            roof_height = requested_roof_height
+
+        lower_structure_height = (
+            total_height - roof_height
+        )
+
+        # 27 mm hedefte yaklaşık:
+        # body 10 mm, gallery 5 mm, upper drum 4 mm.
+        main_body_height = (
+            lower_structure_height
+            * (10.0 / 19.0)
+        )
+        gallery_height = (
+            lower_structure_height
+            * (5.0 / 19.0)
+        )
+        upper_height = (
+            lower_structure_height
+            - main_body_height
+            - gallery_height
+        )
+
+        main_body_top_z = main_body_height
+        gallery_top_z = (
+            main_body_top_z
+            + gallery_height
+        )
+        upper_top_z = (
+            gallery_top_z
+            + upper_height
+        )
+
+        segment_count = max(
+            24,
+            len(footprint),
+        )
+
+        body_radius = body_diameter / 2.0
+        gallery_radius = body_radius * 1.04
+        balcony_radius = body_radius * (8.2 / 7.0)
+        drum_radius = body_radius * (6.8 / 7.0)
+        roof_base_radius = body_radius * (7.4 / 7.0)
+
+        balcony_lip_height = min(
+            0.70,
+            upper_height * 0.22,
+        )
+
+        def circular_ring(radius, z_level):
+            return tuple(
+                (
+                    center_x
+                    + radius
+                    * math.cos(
+                        2.0
+                        * math.pi
+                        * index
+                        / segment_count
+                    ),
+                    center_y
+                    + radius
+                    * math.sin(
+                        2.0
+                        * math.pi
+                        * index
+                        / segment_count
+                    ),
+                    float(z_level),
+                )
+                for index in range(segment_count)
+            )
+
+        rings = (
+            circular_ring(
+                body_radius,
+                0.0,
+            ),
+            circular_ring(
+                body_radius,
+                main_body_top_z,
+            ),
+            circular_ring(
+                gallery_radius,
+                main_body_top_z,
+            ),
+            circular_ring(
+                gallery_radius,
+                gallery_top_z,
+            ),
+            circular_ring(
+                balcony_radius,
+                gallery_top_z,
+            ),
+            circular_ring(
+                balcony_radius,
+                gallery_top_z
+                + balcony_lip_height,
+            ),
+            circular_ring(
+                drum_radius,
+                gallery_top_z
+                + balcony_lip_height,
+            ),
+            circular_ring(
+                drum_radius,
+                upper_top_z,
+            ),
+            circular_ring(
+                roof_base_radius,
+                upper_top_z,
+            ),
+        )
+
+        triangles = []
+        stage_walls = []
+
+        triangles.extend(
+            cls._fan_triangulate(
+                rings[0],
+                reverse=True,
+            )
+        )
+
+        for transition_index, (
+            lower_ring,
+            upper_ring,
+        ) in enumerate(
+            zip(
+                rings,
+                rings[1:],
+            )
+        ):
+            # Ring 02 -> Ring 03, kemerli galeri yüzeyidir.
+            # Bu yüzey aşağıda nişlerle birlikte yeniden kurulur.
+            if transition_index != 2:
+                triangles.extend(
+                    cls._connect_rings(
+                        lower_ring,
+                        upper_ring,
+                    )
+                )
+
+            for index in range(segment_count):
+                next_index = (
+                    index + 1
+                ) % segment_count
+
+                stage_walls.append(
+                    (
+                        lower_ring[index],
+                        lower_ring[next_index],
+                        upper_ring[next_index],
+                        upper_ring[index],
+                    )
+                )
+
+        apex = (
+            center_x,
+            center_y,
+            total_height,
+        )
+
+        roof_triangles = []
+
+        roof_base_ring = rings[-1]
+
+        for index in range(segment_count):
+            next_index = (
+                index + 1
+            ) % segment_count
+
+            roof_triangles.append(
+                (
+                    roof_base_ring[index],
+                    roof_base_ring[next_index],
+                    apex,
+                )
+            )
+
+        triangles.extend(
+            roof_triangles
+        )
+
+        arch_openings = []
+
+        arch_count = 12
+
+        for index in range(arch_count):
+            angle = (
+                2.0
+                * math.pi
+                * index
+                / arch_count
+            )
+
+            arch_openings.append(
+                {
+                    "index": index,
+                    "angle_radians": angle,
+                    "center_z": (
+                        main_body_top_z
+                        + gallery_height * 0.52
+                    ),
+                    "width_mm": max(
+                        0.45,
+                        body_diameter * 0.11,
+                    ),
+                    "height_mm": max(
+                        0.80,
+                        gallery_height * 0.58,
+                    ),
+                }
+            )
+
+        arch_niches = []
+
+        gallery_lower_ring = rings[2]
+        gallery_upper_ring = rings[3]
+
+        niche_bottom_z = (
+            main_body_top_z
+            + gallery_height * 0.38
+        )
+        niche_spring_z = (
+            main_body_top_z
+            + gallery_height * 0.74
+        )
+        niche_top_z = (
+            main_body_top_z
+            + gallery_height * 0.86
+        )
+
+        niche_width = max(
+            2.40,
+            body_diameter * 0.34,
+        )
+        niche_depth = min(
+            0.40,
+            max(
+                0.32,
+                body_diameter * 0.05,
+            ),
+        )
+
+        for group_start in range(
+            0,
+            segment_count,
+            4,
+        ):
+            face_sections = []
+            grouped_triangles = []
+
+            # İlk üç yüz, aynı geniş kemerin silindirik
+            # yüzeyi takip eden üç ayrı kesitidir.
+            for local_offset in range(3):
+                face_index = (
+                    group_start + local_offset
+                ) % segment_count
+
+                next_index = (
+                    face_index + 1
+                ) % segment_count
+
+                lower_left = (
+                    gallery_lower_ring[face_index]
+                )
+                lower_right = (
+                    gallery_lower_ring[next_index]
+                )
+                upper_left = (
+                    gallery_upper_ring[face_index]
+                )
+                upper_right = (
+                    gallery_upper_ring[next_index]
+                )
+
+                face_center_x = (
+                    lower_left[0]
+                    + lower_right[0]
+                ) / 2.0
+                face_center_y = (
+                    lower_left[1]
+                    + lower_right[1]
+                ) / 2.0
+
+                radial_length = math.hypot(
+                    face_center_x - center_x,
+                    face_center_y - center_y,
+                )
+
+                radial_x = (
+                    face_center_x - center_x
+                ) / radial_length
+                radial_y = (
+                    face_center_y - center_y
+                ) / radial_length
+
+                tangent_x = -radial_y
+                tangent_y = radial_x
+
+                half_face_width = math.hypot(
+                    lower_right[0] - lower_left[0],
+                    lower_right[1] - lower_left[1],
+                ) / 2.0
+
+                section_half_width = (
+                    half_face_width * 0.88
+                )
+
+                front_radius = radial_length
+                back_radius = (
+                    front_radius - niche_depth
+                )
+
+                def point(
+                    *,
+                    radius,
+                    tangent_offset,
+                    z_level,
+                ):
+                    return (
+                        center_x
+                        + radial_x * radius
+                        + tangent_x * tangent_offset,
+                        center_y
+                        + radial_y * radius
+                        + tangent_y * tangent_offset,
+                        float(z_level),
+                    )
+
+                arch_mid_width = (
+                    section_half_width * 0.58
+                )
+                arch_mid_z = (
+                    niche_spring_z
+                    + (
+                        niche_top_z
+                        - niche_spring_z
+                    )
+                    * 0.72
+                )
+
+                tangent_offsets = (
+                    -section_half_width,
+                    section_half_width,
+                    section_half_width,
+                    arch_mid_width,
+                    0.0,
+                    -arch_mid_width,
+                    -section_half_width,
+                )
+
+                z_levels = (
+                    niche_bottom_z,
+                    niche_bottom_z,
+                    niche_spring_z,
+                    arch_mid_z,
+                    niche_top_z,
+                    arch_mid_z,
+                    niche_spring_z,
+                )
+
+                front_arch = tuple(
+                    point(
+                        radius=front_radius,
+                        tangent_offset=tangent_offset,
+                        z_level=z_level,
+                    )
+                    for tangent_offset, z_level in zip(
+                        tangent_offsets,
+                        z_levels,
+                    )
+                )
+
+                back_arch = tuple(
+                    point(
+                        radius=back_radius,
+                        tangent_offset=tangent_offset,
+                        z_level=z_level,
+                    )
+                    for tangent_offset, z_level in zip(
+                        tangent_offsets,
+                        z_levels,
+                    )
+                )
+
+                front_bottom_left = point(
+                    radius=front_radius,
+                    tangent_offset=-half_face_width,
+                    z_level=main_body_top_z,
+                )
+                front_bottom_right = point(
+                    radius=front_radius,
+                    tangent_offset=half_face_width,
+                    z_level=main_body_top_z,
+                )
+                front_top_left = point(
+                    radius=front_radius,
+                    tangent_offset=-half_face_width,
+                    z_level=gallery_top_z,
+                )
+                front_top_right = point(
+                    radius=front_radius,
+                    tangent_offset=half_face_width,
+                    z_level=gallery_top_z,
+                )
+
+                section_triangles = []
+
+                # Niş altındaki taş yüzey.
+                section_triangles.extend(
+                    (
+                        (
+                            front_bottom_left,
+                            front_bottom_right,
+                            front_arch[1],
+                        ),
+                        (
+                            front_bottom_left,
+                            front_arch[1],
+                            front_arch[0],
+                        ),
+                    )
+                )
+
+                # Sol taş kenar.
+                section_triangles.extend(
+                    (
+                        (
+                            front_bottom_left,
+                            front_arch[0],
+                            front_arch[6],
+                        ),
+                        (
+                            front_bottom_left,
+                            front_arch[6],
+                            front_top_left,
+                        ),
+                    )
+                )
+
+                # Sağ taş kenar.
+                section_triangles.extend(
+                    (
+                        (
+                            front_arch[1],
+                            front_bottom_right,
+                            front_top_right,
+                        ),
+                        (
+                            front_arch[1],
+                            front_top_right,
+                            front_arch[2],
+                        ),
+                    )
+                )
+
+                # Kemer üstündeki taş yüzey.
+                section_triangles.extend(
+                    (
+                        (
+                            front_top_left,
+                            front_arch[6],
+                            front_arch[5],
+                        ),
+                        (
+                            front_top_left,
+                            front_arch[5],
+                            front_arch[4],
+                        ),
+                        (
+                            front_top_left,
+                            front_arch[4],
+                            front_top_right,
+                        ),
+                        (
+                            front_top_right,
+                            front_arch[4],
+                            front_arch[3],
+                        ),
+                        (
+                            front_top_right,
+                            front_arch[3],
+                            front_arch[2],
+                        ),
+                    )
+                )
+
+                # Niş arka yüzü ve iç duvarları.
+                section_triangles.extend(
+                    cls._fan_triangulate(
+                        back_arch,
+                        reverse=True,
+                    )
+                )
+                section_triangles.extend(
+                    cls._connect_rings(
+                        front_arch,
+                        back_arch,
+                    )
+                )
+
+                triangles.extend(
+                    section_triangles
+                )
+                grouped_triangles.extend(
+                    section_triangles
+                )
+
+                face_sections.append(
+                    {
+                        "face_index": face_index,
+                        "front_profile": front_arch,
+                        "back_profile": back_arch,
+                        "triangles": section_triangles,
+                    }
+                )
+
+            # Dördüncü yüz kemerler arasındaki taş payedir.
+            pier_face_index = (
+                group_start + 3
+            ) % segment_count
+            pier_next_index = (
+                pier_face_index + 1
+            ) % segment_count
+
+            pier_lower_left = (
+                gallery_lower_ring[pier_face_index]
+            )
+            pier_lower_right = (
+                gallery_lower_ring[pier_next_index]
+            )
+            pier_upper_left = (
+                gallery_upper_ring[pier_face_index]
+            )
+            pier_upper_right = (
+                gallery_upper_ring[pier_next_index]
+            )
+
+            triangles.extend(
+                (
+                    (
+                        pier_lower_left,
+                        pier_lower_right,
+                        pier_upper_right,
+                    ),
+                    (
+                        pier_lower_left,
+                        pier_upper_right,
+                        pier_upper_left,
+                    ),
+                )
+            )
+
+            first_face = face_sections[0]
+            last_face = face_sections[-1]
+
+            aggregate_width = math.hypot(
+                (
+                    last_face["front_profile"][1][0]
+                    - first_face["front_profile"][0][0]
+                ),
+                (
+                    last_face["front_profile"][1][1]
+                    - first_face["front_profile"][0][1]
+                ),
+            )
+
+            arch_niches.append(
+                {
+                    "type": "galata_arch_niche",
+                    "index": len(arch_niches),
+                    "face_index": group_start,
+                    "spanned_face_count": 3,
+                    "stone_pier_face_count": 1,
+                    "surface_profile": "cylindrical",
+                    "face_sections": face_sections,
+                    "bottom_z": niche_bottom_z,
+                    "spring_z": niche_spring_z,
+                    "top_z": niche_top_z,
+                    "width_mm": aggregate_width,
+                    "height_mm": (
+                        niche_top_z
+                        - niche_bottom_z
+                    ),
+                    "arch_radius_mm": (
+                        niche_top_z
+                        - niche_spring_z
+                    ),
+                    "arch_profile": "rounded",
+                    "arch_segment_count": 5,
+                    "recess_depth_mm": niche_depth,
+                    "front_profile": tuple(
+                        point
+                        for face_section in face_sections
+                        for point in face_section[
+                            "front_profile"
+                        ]
+                    ),
+                    "back_profile": tuple(
+                        point
+                        for face_section in face_sections
+                        for point in face_section[
+                            "back_profile"
+                        ]
+                    ),
+                    "triangles": grouped_triangles,
+                }
+            )
+
+        main_body_walls = list(
+            stage_walls[:segment_count]
+        )
+
+        main_body = {
+            "bottom_z": 0.0,
+            "top_z": main_body_top_z,
+            "diameter_mm": body_diameter,
+        }
+
+        arched_gallery = {
+            "bottom_z": main_body_top_z,
+            "top_z": gallery_top_z,
+            "diameter_mm": (
+                gallery_radius * 2.0
+            ),
+            "opening_count": len(
+                arch_openings
+            ),
+        }
+
+        balcony_and_upper_drum = {
+            "bottom_z": gallery_top_z,
+            "top_z": upper_top_z,
+            "balcony_diameter_mm": (
+                balcony_radius * 2.0
+            ),
+            "drum_diameter_mm": (
+                drum_radius * 2.0
+            ),
+        }
+
+        conical_roof = {
+            "bottom_z": upper_top_z,
+            "top_z": total_height,
+            "base_diameter_mm": (
+                roof_base_radius * 2.0
+            ),
+            "height_mm": roof_height,
+        }
+
+        return {
+            "type": "tower",
+            "profile": "galata",
+            "roof_shape": "conical",
+            "bottom": rings[0],
+            "top": roof_base_ring,
+            "roof_apex": apex,
+            "rings": rings,
+            "body_top": rings[-2],
+            "body_top_z": upper_top_z,
+            "roof_top_z": total_height,
+            "roof_triangles": roof_triangles,
+            "walls": main_body_walls,
+            "galata_stage_walls": stage_walls,
+            "galata_stage_wall_count": len(
+                stage_walls
+            ),
+            "triangles": triangles,
+            "galata_components": {
+                "main_body": main_body,
+                "arched_gallery": arched_gallery,
+                "balcony_and_upper_drum": (
+                    balcony_and_upper_drum
+                ),
+                "conical_roof": conical_roof,
+            },
+            "galata_main_body": main_body,
+            "galata_arched_gallery": (
+                arched_gallery
+            ),
+            "galata_balcony_and_upper_drum": (
+                balcony_and_upper_drum
+            ),
+            "galata_conical_roof": conical_roof,
+            "galata_arch_openings": arch_openings,
+            "galata_arch_niches": arch_niches,
+            "galata_arch_niche_triangle_count": sum(
+                len(niche["triangles"])
+                for niche in arch_niches
+            ),
+            "galata_segment_count": segment_count,
         }
 
     @classmethod

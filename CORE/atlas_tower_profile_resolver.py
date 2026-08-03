@@ -3,6 +3,9 @@ class AtlasTowerProfileResolver:
     def resolve(tags):
         tags = tags or {}
 
+        if tags.get("wikidata") == "Q91274":
+            return "galata"
+
         if tags.get("tower:type") == "observation":
             return "observation"
 

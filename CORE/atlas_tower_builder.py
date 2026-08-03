@@ -10,6 +10,7 @@ Yükseklik zinciri:
 """
 
 from dataclasses import dataclass
+import re
 
 from CORE.atlas_tower_profile_resolver import AtlasTowerProfileResolver
 
@@ -30,8 +31,35 @@ class AtlasTowerBuilder:
 
     @staticmethod
     def _try_float(value):
-        try:
+        if value is None:
+            return None
+
+        if isinstance(
+            value,
+            (int, float),
+        ):
             return float(value)
+
+        normalized = str(value).strip()
+
+        metre_match = re.fullmatch(
+            r"""
+            ([+-]?
+            (?:\d+(?:\.\d*)?|\.\d+)
+            (?:[eE][+-]?\d+)?)
+            \s*m
+            """,
+            normalized,
+            flags=re.VERBOSE | re.IGNORECASE,
+        )
+
+        if metre_match is not None:
+            return float(
+                metre_match.group(1)
+            )
+
+        try:
+            return float(normalized)
         except (TypeError, ValueError):
             return None
 

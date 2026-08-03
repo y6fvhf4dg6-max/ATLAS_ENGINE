@@ -16,6 +16,10 @@ Supported objects:
 
 import osmium
 
+from CORE.atlas_place_of_worship_profile_resolver import (
+    AtlasPlaceOfWorshipProfileResolver,
+)
+
 
 class AtlasLocalOSMReader(osmium.SimpleHandler):
     def __init__(self, bbox):
@@ -141,13 +145,18 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         ):
             return True
 
-        if (
-            tags.get("building") in {
-                "church",
-                "cathedral",
-            }
-            and tags.get("religion") == "christian"
-        ):
+        worship_profile = (
+            AtlasPlaceOfWorshipProfileResolver.resolve(
+                tags
+            )
+        )
+
+        if worship_profile in {
+            "church",
+            "cathedral",
+            "mosque",
+            "synagogue",
+        }:
             return True
 
         if tags.get("bridge") != "yes":
