@@ -352,3 +352,51 @@ def test_gable_roof_uses_explicit_osm_roof_height():
     assert result["roof_height_mm"] == 2.0
     assert result["roof_top_z"] == 6.0
     assert result["top_z"] == 6.0
+
+
+def test_gable_roof_is_not_applied_over_building_inner_courtyard():
+    mesh = {
+        "type": "building",
+        "building_roof_profile": "gable",
+        "is_castle_building": False,
+        "bottom_z": 1.0,
+        "top_z": 5.0,
+        "bottom": [
+            (0.0, 0.0, 1.0),
+            (20.0, 0.0, 1.0),
+            (20.0, 20.0, 1.0),
+            (0.0, 20.0, 1.0),
+        ],
+        "top": [
+            (0.0, 0.0, 5.0),
+            (20.0, 0.0, 5.0),
+            (20.0, 20.0, 5.0),
+            (0.0, 20.0, 5.0),
+        ],
+        "inner_ring_count": 1,
+        "inner_top_rings": [
+            [
+                (6.0, 6.0, 5.0),
+                (14.0, 6.0, 5.0),
+                (14.0, 14.0, 5.0),
+                (6.0, 14.0, 5.0),
+            ],
+        ],
+        "triangles": [
+            (
+                (0.0, 0.0, 1.0),
+                (20.0, 0.0, 1.0),
+                (20.0, 20.0, 1.0),
+            ),
+        ],
+    }
+
+    original_triangles = list(mesh["triangles"])
+
+    result = AtlasBuildingGableRoofBuilder.apply(
+        mesh=mesh,
+    )
+
+    assert result["triangles"] == original_triangles
+    assert result.get("building_gable_roof_applied") is not True
+    assert result.get("roof_geometry") != "gable"

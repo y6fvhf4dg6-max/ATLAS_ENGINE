@@ -1110,12 +1110,41 @@ class AtlasLandmarkGeometryMesher:
         if geometry.profile == "observation":
             return cls._build_observation_tower_mesh(geometry)
 
+        if geometry.profile == "clock":
+            return cls._build_clock_tower_mesh(geometry)
+
+        total_height = float(geometry.height_m)
+        roof_shape = getattr(
+            geometry,
+            "roof_shape",
+            None,
+        )
+        roof_height = float(
+            getattr(
+                geometry,
+                "roof_height_m",
+                0.0,
+            )
+        )
+
+        use_pyramidal_roof = (
+            roof_shape == "pyramidal"
+            and roof_height > 0.0
+            and roof_height < total_height
+        )
+
+        body_top_z = (
+            total_height - roof_height
+            if use_pyramidal_roof
+            else total_height
+        )
+
         bottom = tuple(
             (x, y, 0.0)
             for x, y in footprint
         )
-        top = tuple(
-            (x, y, float(geometry.height_m))
+        body_top = tuple(
+            (x, y, body_top_z)
             for x, y in footprint
         )
 
@@ -1125,9 +1154,6 @@ class AtlasLandmarkGeometryMesher:
         triangles.extend(
             cls._fan_triangulate(bottom, reverse=True)
         )
-        triangles.extend(
-            cls._fan_triangulate(top)
-        )
 
         for index in range(len(bottom)):
             next_index = (index + 1) % len(bottom)
@@ -1135,8 +1161,8 @@ class AtlasLandmarkGeometryMesher:
             wall = (
                 bottom[index],
                 bottom[next_index],
-                top[next_index],
-                top[index],
+                body_top[next_index],
+                body_top[index],
             )
             walls.append(wall)
 
@@ -1144,24 +1170,437 @@ class AtlasLandmarkGeometryMesher:
                 (
                     bottom[index],
                     bottom[next_index],
-                    top[next_index],
+                    body_top[next_index],
                 )
             )
             triangles.append(
                 (
                     bottom[index],
-                    top[next_index],
-                    top[index],
+                    body_top[next_index],
+                    body_top[index],
                 )
             )
+
+        roof_triangles = []
+
+        if use_pyramidal_roof:
+            center_x = sum(
+                x
+                for x, _ in footprint
+            ) / len(footprint)
+            center_y = sum(
+                y
+                for _, y in footprint
+            ) / len(footprint)
+
+            apex = (
+                center_x,
+                center_y,
+                total_height,
+            )
+
+            for index in range(len(body_top)):
+                next_index = (
+                    index + 1
+                ) % len(body_top)
+
+                roof_triangles.append(
+                    (
+                        body_top[index],
+                        body_top[next_index],
+                        apex,
+                    )
+                )
+
+            triangles.extend(roof_triangles)
+            top = (apex,)
+        else:
+            triangles.extend(
+                cls._fan_triangulate(body_top)
+            )
+            top = body_top
 
         return {
             "type": "tower",
             "profile": geometry.profile,
+            "roof_shape": (
+                "pyramidal"
+                if use_pyramidal_roof
+                else None
+            ),
             "bottom": bottom,
             "top": top,
+            "body_top": body_top,
+            "body_top_z": body_top_z,
+            "roof_top_z": total_height,
+            "roof_triangles": roof_triangles,
             "walls": walls,
             "triangles": triangles,
+        }
+
+    @classmethod
+    def _build_clock_tower_mesh(cls, geometry):
+        footprint = tuple(
+            (float(x), float(y))
+            for x, y in geometry.footprint
+        )
+
+        if len(footprint) < 3:
+            raise ValueError(
+                "Clock tower footprint requires at least 3 points"
+            )
+
+        total_height = float(geometry.height_m)
+        roof_shape = getattr(
+            geometry,
+            "roof_shape",
+            None,
+        )
+        roof_height = float(
+            getattr(
+                geometry,
+                "roof_height_m",
+                0.0,
+            )
+        )
+
+        use_pyramidal_roof = (
+            roof_shape == "pyramidal"
+            and roof_height > 0.0
+            and roof_height < total_height
+        )
+
+        body_top_z = (
+            total_height - roof_height
+            if use_pyramidal_roof
+            else total_height
+        )
+
+        center_x = (
+            sum(x for x, _ in footprint)
+            / len(footprint)
+        )
+        center_y = (
+            sum(y for _, y in footprint)
+            / len(footprint)
+        )
+
+        def scaled_ring(
+            *,
+            scale,
+            z_level,
+        ):
+            return tuple(
+                (
+                    center_x
+                    + (x - center_x) * scale,
+                    center_y
+                    + (y - center_y) * scale,
+                    float(z_level),
+                )
+                for x, y in footprint
+            )
+
+        rings = (
+            scaled_ring(
+                scale=1.00,
+                z_level=0.0,
+            ),
+            scaled_ring(
+                scale=1.00,
+                z_level=body_top_z * 0.70,
+            ),
+            scaled_ring(
+                scale=1.10,
+                z_level=body_top_z * 0.72,
+            ),
+            scaled_ring(
+                scale=1.10,
+                z_level=body_top_z * 0.86,
+            ),
+            scaled_ring(
+                scale=0.72,
+                z_level=body_top_z,
+            ),
+        )
+
+        triangles = []
+        walls = []
+
+        triangles.extend(
+            cls._fan_triangulate(
+                rings[0],
+                reverse=True,
+            )
+        )
+
+        for lower_ring, upper_ring in zip(
+            rings,
+            rings[1:],
+        ):
+            triangles.extend(
+                cls._connect_rings(
+                    lower_ring,
+                    upper_ring,
+                )
+            )
+
+            point_count = len(lower_ring)
+
+            for index in range(point_count):
+                next_index = (
+                    index + 1
+                ) % point_count
+
+                walls.append(
+                    (
+                        lower_ring[index],
+                        lower_ring[next_index],
+                        upper_ring[next_index],
+                        upper_ring[index],
+                    )
+                )
+
+        roof_base = rings[-1]
+        roof_triangles = []
+
+        if use_pyramidal_roof:
+            apex = (
+                center_x,
+                center_y,
+                total_height,
+            )
+
+            for index in range(len(roof_base)):
+                next_index = (
+                    index + 1
+                ) % len(roof_base)
+
+                roof_triangles.append(
+                    (
+                        roof_base[index],
+                        roof_base[next_index],
+                        apex,
+                    )
+                )
+
+            triangles.extend(roof_triangles)
+            top = (apex,)
+        else:
+            triangles.extend(
+                cls._fan_triangulate(
+                    roof_base
+                )
+            )
+            top = roof_base
+
+        min_x = min(x for x, _ in footprint)
+        max_x = max(x for x, _ in footprint)
+        min_y = min(y for _, y in footprint)
+        max_y = max(y for _, y in footprint)
+
+        footprint_width = max_x - min_x
+        footprint_depth = max_y - min_y
+        short_span = min(
+            footprint_width,
+            footprint_depth,
+        )
+
+        # Merkez konumları sabit tutulur.
+        # Fiziksel yarıçap, merkez ile ana kule arasındaki gerçek
+        # geometrik mesafeye göre büyütülür.
+        placement_radius = max(
+            short_span * 0.22,
+            0.20,
+        )
+
+        turret_body_top_z = total_height * 0.48
+        turret_cap_top_z = total_height * 0.62
+        turret_segments = 12
+
+        # Rathaus Köpenick:
+        # Yan kuleler ana kulenin iki yanında bulunur.
+        # Ana kule footprint'ine gömülmez; yalnızca teğet temas eder.
+        # max_y yönü Rathaus dış cephesidir.
+        # Üç kule merkezinin aynı cephe doğrusu üzerinde
+        # bulunması gerekir. Ana kuleyi içeride bırakmamak için
+        # yan kulelerin Y merkezi ana kule merkeziyle aynıdır.
+        exterior_y = center_y
+
+        turret_specs = (
+            {
+                "side": "left",
+                "center": (
+                    min_x - placement_radius,
+                    exterior_y,
+                ),
+            },
+            {
+                "side": "right",
+                "center": (
+                    max_x + placement_radius,
+                    exterior_y,
+                ),
+            },
+        )
+
+        from shapely.geometry import Point, Polygon
+
+        main_tower_polygon = Polygon(footprint)
+
+        if not main_tower_polygon.is_valid:
+            main_tower_polygon = (
+                main_tower_polygon.buffer(0)
+            )
+
+        # 12-gen gövdenin herhangi bir açıdaki radyal kaybını da
+        # karşılayarak 0.08 mm fiziksel bindirme oluşturur.
+        polygon_support_factor = math.cos(
+            math.pi / turret_segments
+        )
+        contact_overlap_mm = 0.08
+
+        fixed_centers = tuple(
+            turret_spec["center"]
+            for turret_spec in turret_specs
+        )
+
+        required_radii = tuple(
+            (
+                Point(center).distance(
+                    main_tower_polygon
+                )
+                + contact_overlap_mm
+            )
+            / polygon_support_factor
+            for center in fixed_centers
+        )
+
+        turret_radius = max(
+            placement_radius * 1.18,
+            *required_radii,
+        )
+
+        side_turrets = []
+
+        for turret_spec in turret_specs:
+            turret_center_x, turret_center_y = (
+                turret_spec["center"]
+            )
+
+            body_bottom = tuple(
+                (
+                    turret_center_x
+                    + turret_radius
+                    * math.cos(
+                        2.0
+                        * math.pi
+                        * index
+                        / turret_segments
+                    ),
+                    turret_center_y
+                    + turret_radius
+                    * math.sin(
+                        2.0
+                        * math.pi
+                        * index
+                        / turret_segments
+                    ),
+                    0.0,
+                )
+                for index in range(turret_segments)
+            )
+
+            body_top = tuple(
+                (
+                    x,
+                    y,
+                    turret_body_top_z,
+                )
+                for x, y, _ in body_bottom
+            )
+
+            cap_apex = (
+                turret_center_x,
+                turret_center_y,
+                turret_cap_top_z,
+            )
+
+            body_triangles = [
+                *cls._fan_triangulate(
+                    body_bottom,
+                    reverse=True,
+                ),
+                *cls._connect_rings(
+                    body_bottom,
+                    body_top,
+                ),
+            ]
+
+            cap_triangles = []
+
+            for index in range(turret_segments):
+                next_index = (
+                    index + 1
+                ) % turret_segments
+
+                cap_triangles.append(
+                    (
+                        body_top[index],
+                        body_top[next_index],
+                        cap_apex,
+                    )
+                )
+
+            turret_triangles = [
+                *body_triangles,
+                *cap_triangles,
+            ]
+
+            side_turrets.append(
+                {
+                    "type": "clock_tower_side_turret",
+                    "side": turret_spec["side"],
+                    "center": turret_spec["center"],
+                    "radius": turret_radius,
+                    "placement_radius": placement_radius,
+                    "contact_overlap_mm": contact_overlap_mm,
+                    "body_rings": (
+                        body_bottom,
+                        body_top,
+                    ),
+                    "cap_apex": cap_apex,
+                    "cap_triangles": cap_triangles,
+                    "triangles": turret_triangles,
+                }
+            )
+
+            triangles.extend(
+                turret_triangles
+            )
+
+        return {
+            "type": "tower",
+            "profile": "clock",
+            "roof_shape": (
+                "pyramidal"
+                if use_pyramidal_roof
+                else None
+            ),
+            "bottom": rings[0],
+            "top": top,
+            "rings": rings,
+            "body_top": roof_base,
+            "body_top_z": body_top_z,
+            "roof_top_z": total_height,
+            "roof_triangles": roof_triangles,
+            "walls": walls,
+            "triangles": triangles,
+            "clock_tower_stage_count": len(rings) - 1,
+            "clock_tower_side_turrets": side_turrets,
+            "clock_tower_side_turret_count": len(
+                side_turrets
+            ),
         }
 
     @classmethod

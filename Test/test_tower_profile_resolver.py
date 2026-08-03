@@ -17,3 +17,16 @@ def test_generic_tower_uses_generic_profile():
     profile = AtlasTowerProfileResolver.resolve({})
 
     assert profile == "generic"
+
+
+def test_clock_tower_uses_clock_profile():
+    profile = AtlasTowerProfileResolver.resolve(
+        {
+            "amenity": "clock",
+            "man_made": "tower",
+            "building:part": "yes",
+            "roof:shape": "pyramidal",
+        }
+    )
+
+    assert profile == "clock"

@@ -304,10 +304,24 @@ class AtlasLandmarkFoundationBuilder:
                         metadata=metadata,
                     )
                 else:
+                    replace_arguments = {
+                        "footprint": stl_footprint,
+                        "height_m": scaled_height,
+                    }
+
+                    if hasattr(
+                        resolved_geometry,
+                        "roof_height_m",
+                    ):
+                        replace_arguments["roof_height_m"] = (
+                            coordinate_engine.height_to_stl_mm(
+                                resolved_geometry.roof_height_m
+                            )
+                        )
+
                     scaled_geometry = replace(
                         resolved_geometry,
-                        footprint=stl_footprint,
-                        height_m=scaled_height,
+                        **replace_arguments,
                     )
 
                 mesh = AtlasLandmarkGeometryMesher.build(

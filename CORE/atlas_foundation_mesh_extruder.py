@@ -6,6 +6,9 @@ from CORE.atlas_polygon_validator import AtlasPolygonValidator
 from CORE.atlas_polygon_triangulator import AtlasPolygonTriangulator
 from CORE.atlas_mesh_validator import AtlasMeshValidator
 from CORE.atlas_geometry_inspector import AtlasGeometryInspector
+from CORE.atlas_castle_shell_triangulator import (
+    AtlasCastleShellTriangulator,
+)
 
 
 class AtlasFoundationMeshExtruder:
@@ -104,7 +107,77 @@ class AtlasFoundationMeshExtruder:
                 top_offset_mm=height_mm,
             )
 
-        flat_triangles = AtlasPolygonTriangulator.triangulate(scaled_points)
+        inner_scaled_rings = []
+
+        for inner_geometry in getattr(
+            building,
+            "inner_geometries",
+            [],
+        ) or []:
+            cleaned_inner = AtlasPolygonCleaner.clean(
+                inner_geometry
+            )
+
+            if len(cleaned_inner) < 3:
+                continue
+
+            simplified_inner = (
+                AtlasGeometrySimplifier.simplify(
+                    cleaned_inner
+                )
+            )
+
+            if len(simplified_inner) < 3:
+                continue
+
+            scaled_inner = (
+                coordinate_engine.geometry_to_stl_mm(
+                    simplified_inner
+                )
+            )
+
+            if len(scaled_inner) < 3:
+                continue
+
+            inner_scaled_rings.append(
+                [
+                    (
+                        float(point[0]),
+                        float(point[1]),
+                    )
+                    for point in scaled_inner
+                ]
+            )
+
+        normalized_rings = (
+            AtlasCastleShellTriangulator
+            .normalize_rings(
+                outer_ring=scaled_points,
+                inner_rings=inner_scaled_rings,
+            )
+        )
+
+        scaled_points = normalized_rings[
+            "outer_ring"
+        ]
+        inner_scaled_rings = normalized_rings[
+            "inner_rings"
+        ]
+
+        if inner_scaled_rings:
+            flat_triangles = (
+                AtlasCastleShellTriangulator
+                .triangulate(
+                    outer_ring=scaled_points,
+                    inner_rings=inner_scaled_rings,
+                )
+            )
+        else:
+            flat_triangles = (
+                AtlasPolygonTriangulator.triangulate(
+                    scaled_points
+                )
+            )
 
         if not flat_triangles:
             return AtlasFoundationMeshExtruder._reject(
@@ -151,6 +224,10 @@ class AtlasFoundationMeshExtruder:
         triangles = []
         flat_roof_triangles = []
         wall_triangles = []
+        inner_bottom_rings = []
+        inner_top_rings = []
+        inner_wall_quads = []
+        inner_wall_triangles = []
 
         for x, y in scaled_points:
             bottom_points.append((x, y, bottom_z))
@@ -196,6 +273,67 @@ class AtlasFoundationMeshExtruder:
             triangles.extend(edge_wall_triangles)
             wall_triangles.extend(edge_wall_triangles)
 
+        for inner_ring in inner_scaled_rings:
+            inner_bottom = [
+                (
+                    float(x),
+                    float(y),
+                    bottom_z,
+                )
+                for x, y in inner_ring
+            ]
+            inner_top = [
+                (
+                    float(x),
+                    float(y),
+                    top_z,
+                )
+                for x, y in inner_ring
+            ]
+
+            inner_bottom_rings.append(inner_bottom)
+            inner_top_rings.append(inner_top)
+
+            inner_point_count = len(inner_ring)
+
+            for index in range(inner_point_count):
+                bottom_1 = inner_bottom[index]
+                bottom_2 = inner_bottom[
+                    (index + 1)
+                    % inner_point_count
+                ]
+                top_1 = inner_top[index]
+                top_2 = inner_top[
+                    (index + 1)
+                    % inner_point_count
+                ]
+
+                quad = (
+                    bottom_1,
+                    bottom_2,
+                    top_2,
+                    top_1,
+                )
+
+                edge_triangles = (
+                    AtlasFoundationMeshExtruder
+                    ._make_wall_triangles(
+                        bottom_1,
+                        bottom_2,
+                        top_1,
+                        top_2,
+                    )
+                )
+
+                inner_wall_quads.append(quad)
+                inner_wall_triangles.extend(
+                    edge_triangles
+                )
+                triangles.extend(edge_triangles)
+                wall_triangles.extend(
+                    edge_triangles
+                )
+
         mesh = {
             "type": "building",
             "bottom": bottom_points,
@@ -205,6 +343,17 @@ class AtlasFoundationMeshExtruder:
             "building_flat_roof_triangles": flat_roof_triangles,
             "building_roof_triangles": flat_roof_triangles,
             "building_wall_triangles": wall_triangles,
+            "inner_ring_count": len(
+                inner_scaled_rings
+            ),
+            "inner_bottom_rings": (
+                inner_bottom_rings
+            ),
+            "inner_top_rings": inner_top_rings,
+            "inner_wall_quads": inner_wall_quads,
+            "inner_wall_triangles": (
+                inner_wall_triangles
+            ),
             "foundation_z": foundation_z,
             "base_offset_mm": base_offset_mm,
             "bottom_z": bottom_z,

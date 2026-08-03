@@ -45,6 +45,9 @@ class AtlasBuildingGableRoofBuilder:
         if mesh.get("is_castle_building") is True:
             return mesh
 
+        if int(mesh.get("inner_ring_count", 0) or 0) > 0:
+            return mesh
+
         top_points = mesh.get("top", [])
         bottom_points = mesh.get("bottom", [])
 

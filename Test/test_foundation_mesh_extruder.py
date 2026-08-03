@@ -921,3 +921,78 @@ def test_elevated_roof_only_pyramidal_part_keeps_printable_support_slab():
         .MIN_VERTICAL_PART_THICKNESS_MM
     )
     assert mesh["vertical_part_thickness_adjusted"] is True
+
+
+def test_relation_building_extrusion_preserves_inner_courtyard():
+    from shapely.geometry import Point
+    from shapely.geometry import Polygon
+
+    from CORE.atlas_building import AtlasBuilding
+    from CORE.atlas_mesh_validator import AtlasMeshValidator
+
+    outer = [
+        (0.0, 0.0),
+        (0.0, 20.0),
+        (20.0, 20.0),
+        (20.0, 0.0),
+    ]
+    inner = [
+        (6.0, 6.0),
+        (6.0, 14.0),
+        (14.0, 14.0),
+        (14.0, 6.0),
+    ]
+
+    building = AtlasBuilding(
+        building_id=57493,
+        source="local_pbf",
+        geometry=outer,
+        tags={
+            "type": "multipolygon",
+            "building": "yes",
+            "building:levels": "4",
+        },
+        geometry_type="relation",
+        outer_geometries=[outer],
+        inner_geometries=[inner],
+    )
+
+    coordinate_engine = DummyCoordinateEngine()
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=coordinate_engine,
+        foundation_z=2.0,
+        debug=False,
+    )
+
+    assert mesh is not None
+    assert mesh["inner_ring_count"] == 1
+    assert len(mesh["inner_wall_triangles"]) == 8
+
+    inner_mm = coordinate_engine.geometry_to_stl_mm(
+        inner
+    )
+    courtyard = Polygon(inner_mm)
+    courtyard_center = courtyard.centroid
+
+    for triangle in mesh["building_roof_triangles"]:
+        triangle_polygon = Polygon(
+            [
+                (point[0], point[1])
+                for point in triangle
+            ]
+        )
+
+        assert not triangle_polygon.covers(
+            Point(
+                courtyard_center.x,
+                courtyard_center.y,
+            )
+        )
+
+    report = AtlasMeshValidator.report(mesh)
+
+    assert report["valid"]
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0

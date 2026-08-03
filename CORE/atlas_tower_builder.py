@@ -19,6 +19,8 @@ class AtlasTowerGeometry:
     footprint: tuple
     height_m: float
     profile: str = "generic"
+    roof_shape: str | None = None
+    roof_height_m: float = 0.0
 
 
 class AtlasTowerBuilder:
@@ -89,8 +91,29 @@ class AtlasTowerBuilder:
         if height_m is None:
             height_m = AtlasTowerBuilder.DEFAULT_HEIGHT_M
 
+        roof_shape = str(
+            tags.get("roof:shape", "")
+        ).strip().lower()
+
+        if roof_shape != "pyramidal":
+            roof_shape = None
+
+        roof_height_m = AtlasTowerBuilder._try_float(
+            tags.get("roof:height")
+        )
+
+        if (
+            roof_height_m is None
+            or roof_height_m <= 0.0
+            or roof_height_m >= height_m
+        ):
+            roof_height_m = 0.0
+            roof_shape = None
+
         return AtlasTowerGeometry(
             footprint=footprint,
             height_m=height_m,
             profile=AtlasTowerProfileResolver.resolve(tags),
+            roof_shape=roof_shape,
+            roof_height_m=roof_height_m,
         )

@@ -11,11 +11,35 @@ from CORE.atlas_height_engine import AtlasHeightEngine
 
 
 class AtlasBuilding:
-    def __init__(self, building_id, source, geometry, tags):
+    def __init__(
+        self,
+        building_id,
+        source,
+        geometry,
+        tags,
+        geometry_type="way",
+        outer_geometries=None,
+        inner_geometries=None,
+    ):
         self.building_id = building_id
         self.source = source
         self.geometry = geometry
         self.tags = tags
+        self.geometry_type = geometry_type
+        self.outer_geometries = [
+            list(item)
+            for item in (
+                outer_geometries
+                if outer_geometries is not None
+                else [geometry]
+            )
+            if item
+        ]
+        self.inner_geometries = [
+            list(item)
+            for item in (inner_geometries or [])
+            if item
+        ]
 
         self.building_type = self.tags.get("building")
         self.building_part_type = self.tags.get(

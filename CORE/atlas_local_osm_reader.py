@@ -711,11 +711,96 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         )
 
     @staticmethod
+    def _assemble_relation_ring_geometries(
+        geometries,
+    ):
+        from shapely.geometry import LineString
+        from shapely.geometry import MultiLineString
+        from shapely.ops import linemerge
+        from shapely.ops import polygonize
+        from shapely.ops import unary_union
+
+        valid_geometries = [
+            list(geometry)
+            for geometry in geometries
+            if len(geometry) >= 3
+        ]
+
+        if len(valid_geometries) <= 1:
+            return valid_geometries
+
+        lines = [
+            LineString(
+                [
+                    (float(lon), float(lat))
+                    for lat, lon in geometry
+                ]
+            )
+            for geometry in valid_geometries
+        ]
+
+        merged = linemerge(
+            unary_union(lines)
+        )
+
+        if isinstance(merged, LineString):
+            merged_lines = [merged]
+        elif isinstance(merged, MultiLineString):
+            merged_lines = list(merged.geoms)
+        else:
+            merged_lines = lines
+
+        polygons = list(
+            polygonize(merged_lines)
+        )
+
+        if not polygons:
+            return valid_geometries
+
+        assembled = []
+
+        for polygon in polygons:
+            coordinates = list(
+                polygon.exterior.coords
+            )
+
+            if (
+                len(coordinates) >= 2
+                and coordinates[0] == coordinates[-1]
+            ):
+                coordinates.pop()
+
+            if len(coordinates) < 3:
+                continue
+
+            assembled.append(
+                [
+                    (float(lat), float(lon))
+                    for lon, lat in coordinates
+                ]
+            )
+
+        return assembled or valid_geometries
+
+    @staticmethod
     def _clip_relation_geometries_to_bbox(
         outer_geometries,
         inner_geometries,
         bbox,
     ):
+        outer_geometries = (
+            AtlasLocalOSMReader
+            ._assemble_relation_ring_geometries(
+                outer_geometries
+            )
+        )
+        inner_geometries = (
+            AtlasLocalOSMReader
+            ._assemble_relation_ring_geometries(
+                inner_geometries
+            )
+        )
+
         from shapely.geometry import (
             GeometryCollection,
             MultiPolygon,
@@ -821,6 +906,19 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         outer_geometries,
         inner_geometries,
     ):
+        outer_geometries = (
+            AtlasLocalOSMReader
+            ._assemble_relation_ring_geometries(
+                outer_geometries
+            )
+        )
+        inner_geometries = (
+            AtlasLocalOSMReader
+            ._assemble_relation_ring_geometries(
+                inner_geometries
+            )
+        )
+
         valid_outer_geometries = [
             list(geometry)
             for geometry in outer_geometries

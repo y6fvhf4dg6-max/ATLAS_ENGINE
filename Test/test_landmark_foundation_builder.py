@@ -380,3 +380,65 @@ def test_rock_cut_tomb_node_builds_landmark_mesh():
     assert len(meshes) == 1
     assert meshes[0]["landmark_id"] == 5825276872
     assert meshes[0]["type"] == "rock_cut_tomb"
+
+
+def test_tower_roof_height_is_scaled_with_total_height():
+    source = {
+        "id": 180315073,
+        "geometry": (
+            (52.4457375, 13.5747550),
+            (52.4456777, 13.5748117),
+            (52.4457139, 13.5749146),
+            (52.4457737, 13.5748579),
+        ),
+        "tags": {
+            "amenity": "clock",
+            "building:part": "yes",
+            "height": "54",
+            "man_made": "tower",
+            "roof:height": "10",
+            "roof:shape": "pyramidal",
+        },
+    }
+
+    coordinate_engine = FakeCoordinateEngine()
+
+    terrain_mesh = {
+        "top_points": [
+            [
+                (0.0, 0.0, 0.0),
+                (200.0, 0.0, 0.0),
+            ],
+            [
+                (0.0, 200.0, 0.0),
+                (200.0, 200.0, 0.0),
+            ],
+        ],
+        "metadata": {
+            "size_x_mm": 200.0,
+            "size_y_mm": 200.0,
+            "size_mm": 200.0,
+        },
+    }
+
+    mesh = (
+        AtlasLandmarkFoundationBuilder
+        ._build_landmark_mesh(
+            source=source,
+            coordinate_engine=coordinate_engine,
+            terrain_mesh=terrain_mesh,
+        )
+    )
+
+    assert mesh is not None
+    assert mesh["profile"] == "clock"
+    assert mesh["roof_shape"] == "pyramidal"
+
+    assert mesh["roof_top_z"] - mesh["body_top_z"] == pytest.approx(
+        10.0 / 5.0
+    )
+
+    assert mesh["body_top_z"] == pytest.approx(
+        (54.0 / 5.0)
+        - (10.0 / 5.0)
+    )

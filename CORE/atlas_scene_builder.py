@@ -240,4 +240,15 @@ class AtlasSceneBuilder:
             source="local_pbf",
             geometry=raw_building.get("geometry", []),
             tags=raw_building.get("tags", {}),
+            geometry_type=raw_building.get(
+                "geometry_type",
+                "way",
+            ),
+            outer_geometries=raw_building.get(
+                "outer_geometries",
+            ),
+            inner_geometries=raw_building.get(
+                "inner_geometries",
+                [],
+            ),
         )

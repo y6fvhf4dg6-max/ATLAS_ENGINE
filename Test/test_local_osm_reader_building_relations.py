@@ -269,3 +269,110 @@ def test_building_relation_geometries_are_clipped_to_bbox():
     assert min(lon for _, lon in points) == 28.0005
     assert max(lon for _, lon in points) == 28.0015
 
+
+
+def test_building_relation_open_outer_segments_are_assembled():
+    first_outer_segment = [
+        (52.4450, 13.5740),
+        (52.4450, 13.5750),
+        (52.4460, 13.5750),
+    ]
+    second_outer_segment = [
+        (52.4460, 13.5750),
+        (52.4460, 13.5740),
+        (52.4450, 13.5740),
+    ]
+
+    assembled = (
+        AtlasLocalOSMReader
+        ._assemble_relation_ring_geometries(
+            geometries=[
+                first_outer_segment,
+                second_outer_segment,
+            ]
+        )
+    )
+
+    assert len(assembled) == 1
+    assert len(assembled[0]) == 4
+    assert set(assembled[0]) == {
+        (52.4450, 13.5740),
+        (52.4450, 13.5750),
+        (52.4460, 13.5750),
+        (52.4460, 13.5740),
+    }
+
+
+def test_building_relation_record_uses_assembled_outer_geometry():
+    first_outer_segment = [
+        (52.4450, 13.5740),
+        (52.4450, 13.5750),
+        (52.4460, 13.5750),
+    ]
+    second_outer_segment = [
+        (52.4460, 13.5750),
+        (52.4460, 13.5740),
+        (52.4450, 13.5740),
+    ]
+
+    record = AtlasLocalOSMReader._create_building_relation_record(
+        relation_id=57493,
+        tags={
+            "type": "multipolygon",
+            "building": "yes",
+            "name": "Rathaus Köpenick",
+        },
+        outer_geometries=[
+            first_outer_segment,
+            second_outer_segment,
+        ],
+        inner_geometries=[],
+    )
+
+    assert record is not None
+    assert len(record["outer_geometries"]) == 1
+    assert record["geometry"] == record["outer_geometries"][0]
+    assert set(record["geometry"]) == {
+        (52.4450, 13.5740),
+        (52.4450, 13.5750),
+        (52.4460, 13.5750),
+        (52.4460, 13.5740),
+    }
+
+
+def test_scene_builder_preserves_building_relation_inner_geometries():
+    from CORE.atlas_scene_builder import AtlasSceneBuilder
+
+    inner_geometry = [
+        (52.4453, 13.5743),
+        (52.4453, 13.5747),
+        (52.4457, 13.5747),
+        (52.4457, 13.5743),
+    ]
+
+    atlas_building = AtlasSceneBuilder._to_atlas_building(
+        {
+            "id": 57493,
+            "geometry": _outer_geometry(),
+            "outer_geometries": [
+                _outer_geometry(),
+            ],
+            "inner_geometries": [
+                inner_geometry,
+            ],
+            "geometry_type": "relation",
+            "tags": {
+                "type": "multipolygon",
+                "building": "yes",
+                "name": "Rathaus Köpenick",
+            },
+        }
+    )
+
+    assert atlas_building.geometry_type == "relation"
+    assert atlas_building.outer_geometries == [
+        _outer_geometry(),
+    ]
+    assert atlas_building.inner_geometries == [
+        inner_geometry,
+    ]
