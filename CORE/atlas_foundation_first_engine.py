@@ -1,5 +1,8 @@
 # CORE/atlas_foundation_first_engine.py
 
+from shapely.geometry import Point
+from shapely.geometry import Polygon
+
 from CORE.atlas_local_osm_reader import AtlasLocalOSMReader
 from CORE.atlas_landmark_foundation_builder import AtlasLandmarkFoundationBuilder
 from CORE.atlas_liedberg_muehlenturm_ruin_top_builder import (
@@ -69,32 +72,200 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 class AtlasFoundationFirstEngine:
     @staticmethod
+    def _build_water_polygon_groups(
+        waters,
+        coastlines,
+        bbox,
+        debug=True,
+    ):
+        return {
+            "coastline": (
+                AtlasCoastlineWaterBuilder.build_water_polygons(
+                    coastlines=coastlines,
+                    bbox=bbox,
+                    debug=debug,
+                )
+            ),
+            "inland": (
+                AtlasInlandWaterPolygonBuilder.build_polygons(
+                    waters=waters,
+                    bbox=bbox,
+                    debug=debug,
+                )
+            ),
+        }
+
+    @staticmethod
     def _build_water_polygons(
         waters,
         coastlines,
         bbox,
         debug=True,
     ):
-        coastline_polygons = (
-            AtlasCoastlineWaterBuilder.build_water_polygons(
+        groups = (
+            AtlasFoundationFirstEngine
+            ._build_water_polygon_groups(
+                waters=waters,
                 coastlines=coastlines,
                 bbox=bbox,
                 debug=debug,
             )
         )
 
-        inland_polygons = (
-            AtlasInlandWaterPolygonBuilder.build_polygons(
-                waters=waters,
-                bbox=bbox,
-                debug=debug,
+        return [
+            *groups["coastline"],
+            *groups["inland"],
+        ]
+
+    @staticmethod
+    def _water_polygons_to_stl_mm(
+        water_polygons,
+        coordinate_engine,
+    ):
+        converted = []
+
+        for polygon in water_polygons or []:
+            if (
+                polygon is None
+                or polygon.is_empty
+                or polygon.geom_type != "Polygon"
+            ):
+                continue
+
+            geographic_points = [
+                (
+                    float(lat),
+                    float(lon),
+                )
+                for lon, lat in list(
+                    polygon.exterior.coords
+                )
+            ]
+
+            points_mm = (
+                coordinate_engine.geometry_to_stl_mm(
+                    geographic_points
+                )
             )
+
+            if len(points_mm) < 3:
+                continue
+
+            converted_polygon = Polygon(points_mm)
+
+            if not converted_polygon.is_valid:
+                converted_polygon = (
+                    converted_polygon.buffer(0)
+                )
+
+            if (
+                converted_polygon.is_empty
+                or not converted_polygon.is_valid
+                or converted_polygon.geom_type
+                != "Polygon"
+                or converted_polygon.area <= 0.0
+            ):
+                continue
+
+            converted.append(converted_polygon)
+
+        return converted
+
+    @staticmethod
+    def _tree_mesh_base_center(tree_mesh):
+        points = [
+            point
+            for triangle in tree_mesh.get(
+                "triangles",
+                (),
+            )
+            for point in triangle
+        ]
+
+        if not points:
+            return None
+
+        minimum_z = min(
+            float(point[2])
+            for point in points
         )
 
-        return [
-            *coastline_polygons,
-            *inland_polygons,
+        base_points = [
+            point
+            for point in points
+            if abs(
+                float(point[2]) - minimum_z
+            )
+            <= 1e-6
         ]
+
+        if not base_points:
+            return None
+
+        return (
+            sum(
+                float(point[0])
+                for point in base_points
+            )
+            / len(base_points),
+            sum(
+                float(point[1])
+                for point in base_points
+            )
+            / len(base_points),
+        )
+
+    @classmethod
+    def _remove_tree_meshes_inside_water_polygons(
+        cls,
+        tree_meshes,
+        water_polygons_mm,
+    ):
+        water_polygons_mm = list(
+            water_polygons_mm or []
+        )
+
+        if not water_polygons_mm:
+            return list(tree_meshes or [])
+
+        retained = []
+
+        for tree_mesh in tree_meshes or []:
+            source = str(
+                tree_mesh.get("source")
+                or tree_mesh.get(
+                    "tags",
+                    {},
+                ).get("source")
+                or ""
+            ).strip().lower()
+
+            if source != "worldcover":
+                retained.append(tree_mesh)
+                continue
+
+            center = cls._tree_mesh_base_center(
+                tree_mesh
+            )
+
+            if center is None:
+                retained.append(tree_mesh)
+                continue
+
+            point = Point(
+                float(center[0]),
+                float(center[1]),
+            )
+
+            inside_water = any(
+                polygon.covers(point)
+                for polygon in water_polygons_mm
+            )
+
+            if not inside_water:
+                retained.append(tree_mesh)
+
+        return retained
 
     @staticmethod
     def _keep_landmark_meshes_inside_product_bounds(
@@ -445,8 +616,9 @@ class AtlasFoundationFirstEngine:
             strict=strict_input_quality,
         )
 
-        water_polygons = (
-            AtlasFoundationFirstEngine._build_water_polygons(
+        water_polygon_groups = (
+            AtlasFoundationFirstEngine
+            ._build_water_polygon_groups(
                 waters=waters,
                 coastlines=coastlines,
                 bbox=working_bbox,
@@ -454,14 +626,34 @@ class AtlasFoundationFirstEngine:
             )
         )
 
-        water_meshes = (
-            AtlasWaterFoundationBuilder.build_coastline_water_meshes(
-                water_polygons=water_polygons,
+        coastline_water_meshes = (
+            AtlasWaterFoundationBuilder
+            .build_coastline_water_meshes(
+                water_polygons=(
+                    water_polygon_groups["coastline"]
+                ),
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_slab,
                 debug=debug,
             )
         )
+
+        inland_water_meshes = (
+            AtlasWaterFoundationBuilder
+            .build_inland_water_meshes(
+                water_polygons=(
+                    water_polygon_groups["inland"]
+                ),
+                coordinate_engine=coordinate_engine,
+                terrain_mesh=terrain_slab,
+                debug=debug,
+            )
+        )
+
+        water_meshes = [
+            *coastline_water_meshes,
+            *inland_water_meshes,
+        ]
 
         scene = AtlasFoundationSceneBuilder.build_scene(
             raw_buildings=raw_buildings,
@@ -587,6 +779,25 @@ class AtlasFoundationFirstEngine:
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
+        )
+
+        water_polygons_mm = (
+            AtlasFoundationFirstEngine
+            ._water_polygons_to_stl_mm(
+                water_polygons=[
+                    *water_polygon_groups["coastline"],
+                    *water_polygon_groups["inland"],
+                ],
+                coordinate_engine=coordinate_engine,
+            )
+        )
+
+        tree_meshes = (
+            AtlasFoundationFirstEngine
+            ._remove_tree_meshes_inside_water_polygons(
+                tree_meshes=tree_meshes,
+                water_polygons_mm=water_polygons_mm,
+            )
         )
 
         castle_wall_meshes = AtlasCastleWallBuilder.build_walls(
