@@ -239,6 +239,7 @@ class AtlasMosqueLandmarkMesher:
         footprint,
         target_x,
         target_y,
+        clearance_radius,
     ):
         polygon = Polygon(
             footprint
@@ -254,7 +255,28 @@ class AtlasMosqueLandmarkMesher:
                 "a valid polygon"
             )
 
-        safe_point = polygon.representative_point()
+        clearance_radius = float(
+            clearance_radius
+        )
+
+        if clearance_radius <= 0.0:
+            raise ValueError(
+                "clearance_radius must be positive"
+            )
+
+        safe_polygon = polygon.buffer(
+            -clearance_radius
+        )
+
+        if (
+            safe_polygon.is_empty
+            or safe_polygon.area <= 1e-12
+        ):
+            safe_polygon = polygon
+
+        safe_point = (
+            safe_polygon.representative_point()
+        )
 
         safe_x = float(
             safe_point.x
@@ -288,7 +310,7 @@ class AtlasMosqueLandmarkMesher:
                 * progress
             )
 
-            if polygon.covers(
+            if safe_polygon.covers(
                 Point(
                     candidate_x,
                     candidate_y,
@@ -763,6 +785,7 @@ class AtlasMosqueLandmarkMesher:
             footprint=footprint,
             target_x=target_minaret_x,
             target_y=target_minaret_y,
+            clearance_radius=balcony_radius,
         )
 
         balcony_center_z = (

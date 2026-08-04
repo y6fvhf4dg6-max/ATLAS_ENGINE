@@ -318,3 +318,67 @@ def test_minaret_center_stays_inside_rotated_real_footprint():
             minaret["center_y"],
         )
     )
+
+
+def test_minaret_body_ring_stays_inside_rotated_real_footprint():
+    import math
+
+    from shapely.geometry import Point, Polygon
+
+    angle = math.radians(31.0)
+    center_x = 20.0
+    center_y = 15.0
+    half_width = 8.0
+    half_depth = 14.0
+
+    footprint = tuple(
+        (
+            center_x
+            + longitudinal * math.cos(angle)
+            - lateral * math.sin(angle),
+            center_y
+            + longitudinal * math.sin(angle)
+            + lateral * math.cos(angle),
+        )
+        for longitudinal, lateral in (
+            (-half_depth, -half_width),
+            (half_depth, -half_width),
+            (half_depth, half_width),
+            (-half_depth, half_width),
+        )
+    )
+
+    landmark = AtlasLandmark(
+        id=1204,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=footprint,
+        tags={
+            "building": "mosque",
+            "religion": "muslim",
+            "height": "27",
+            "atlas:worship_grammar": (
+                "single_dome_single_minaret"
+            ),
+        },
+        source="OSM",
+    )
+
+    geometry = AtlasMosqueLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasMosqueLandmarkProfile(
+            scale_ratio=3000.0,
+            nozzle_diameter_mm=0.4,
+        ),
+    )
+
+    mesh = AtlasMosqueLandmarkMesher.build(
+        geometry
+    )
+
+    polygon = Polygon(footprint)
+    minaret = mesh["minaret_meshes"][0]
+
+    for x, y, _ in minaret["bottom"]:
+        assert polygon.covers(
+            Point(x, y)
+        )
