@@ -15,7 +15,7 @@ okunmalıdır.
 
 ## Güncelleme tarihi
 
-2026-08-01
+2026-08-04
 
 ---
 
@@ -762,4 +762,95 @@ Bu dosya incelenmeden silinmemeli veya commit edilmemelidir.
 Bu bölüm, eski Dalyan merkezli “sıradaki tek işlem” kayıtlarının yerine güncel aktif teknik çalışma noktasını tanımlar.
 
 Çelişki halinde bu `1 Ağustos 2026 — Güncel kesin çalışma noktası` bölümü esas alınmalıdır.
+
+# 4 Ağustos 2026 — Master Landmark Catalog V1 tamamlandı
+
+## Güncel kesin çalışma noktası
+
+Son temiz ve push edilmiş commit:
+
+- `afbf46f Drive bridge foundation components from catalog flags`
+
+Git durumu:
+
+- `HEAD == origin/main`
+- tracked çalışma ağacı temiz
+- yalnız aşağıdaki devir belgeleri untracked:
+  - `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-01.md`
+  - `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-04.md`
+
+Son tam regresyon:
+
+- `2162 passed in 9.27s`
+
+## Tamamlanan Master Landmark Catalog V1
+
+Yeni merkezi landmark kataloğu:
+
+- `CORE/atlas_master_landmark_catalog.py`
+- `Test/test_master_landmark_catalog.py`
+
+İlk katalog kayıtları:
+
+- Bonn Münster
+- Kreuzkirche Bonn
+- Galata Tower
+- Galata Bridge
+
+Katalog tarafından yönetilen karar alanları:
+
+- `landmark_family`
+- `grammar_name`
+- `profile_name`
+- `component_flags`
+- `geometry_overrides`
+
+Üretim kodunda kataloğa bağlanan sistemler:
+
+- Church grammar resolver
+- Church geometry override resolver
+- Tower profile resolver
+- Bridge profile resolver
+- Bridge foundation support/parapet component activation
+
+Kimlik çözümleme:
+
+- Wikidata kimlikleri normalize edilir.
+- OSM kimlikleri güvenli biçimde normalize edilir.
+- Wikidata eşleşmesi varsa OSM kimliğine göre önceliklidir.
+- Bilinmeyen veya geçersiz kimlik güvenli biçimde `None` döndürür.
+
+## Teknik sonuç
+
+`CORE/` altında Bonn Münster, Kreuzkirche, Galata Tower veya
+Galata Bridge için doğrudan sabit `Q...` Wikidata kararı kalmamıştır.
+
+Test ve preview dosyalarındaki sabit kimlikler fixture, assertion veya
+sahne tanımıdır; üretim karar mantığı değildir.
+
+Bridge foundation hattında:
+
+- `supports`
+- `parapets`
+
+artık birbirinden bağımsız olarak, katalogdaki ilgili
+`component_flags` değerleriyle etkinleştirilir.
+
+Galata Bridge yol yaklaşımı ve profil davranışı korunmuştur.
+
+## Sıradaki tek teknik işlem
+
+Master Landmark Catalog V1 için yeni soyutlama eklenmeyecektir.
+
+Aktif geliştirme tekrar ürün doğrulama önceliğine döner:
+
+1. Köln Premium V1 nihai filamentlerle fiziksel olarak basılır.
+2. Renk dengesi, yazı okunabilirliği, çerçeve, çatılar, vurgu binası,
+   stringing ve askı sistemi değerlendirilir.
+3. Yalnız fiziksel baskı veya Bambu Studio doğrulamasından çıkan somut
+   probleme göre revizyon yapılır.
+4. Köln kabul edilmeden Bonn yeni premium standart olarak kilitlenmez.
+
+Bu bölüm, daha eski Bonn merkez-kule veya Dalyan merkezli
+“sıradaki tek işlem” kayıtlarına göre önceliklidir.
 

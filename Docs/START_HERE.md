@@ -588,3 +588,42 @@ Bonn için sıradaki tek teknik işlem:
 
 Gerçek Bonn üretim meshinde uzun kulenin taban halkası ile kullanıcının kastettiği büyük sekizgen gövdenin gerçek taban/üst halka merkezlerini aynı koordinat sisteminde ölçmek; hedef gövde kesinleşmeden yeni yerleşim değişikliği yapmamak.
 
+## 4 Ağustos 2026 — Master Landmark Catalog V1
+
+Master Landmark Catalog V1 tamamlanmış ve ana branch'e push edilmiştir.
+
+Son temiz commit:
+
+- `afbf46f Drive bridge foundation components from catalog flags`
+
+Son tam regresyon:
+
+- `2162 passed in 9.27s`
+
+Merkezi katalog şu landmark kararlarını yönetir:
+
+- Bonn Münster kilise grameri ve geometri override'ı
+- Kreuzkirche Bonn kilise grameri
+- Galata Tower özel kule profili
+- Galata Bridge özel köprü profili
+- Galata Bridge support ve parapet bileşenleri
+
+Kullanılan katalog alanları:
+
+- `landmark_family`
+- `grammar_name`
+- `profile_name`
+- `component_flags`
+- `geometry_overrides`
+
+`CORE/` üretim kodunda bu dört landmark için doğrudan sabit Wikidata
+kararı kalmamıştır.
+
+Güncel aktif öncelik yeniden Köln Premium V1 fiziksel baskı
+doğrulamasıdır. Nihai filamentlerle baskı alınmalı; yalnız gerçek baskı
+veya Bambu Studio sonucundan çıkan somut probleme göre revizyon
+yapılmalıdır.
+
+Bu bölüm, belgenin daha eski Bonn merkez-kule “bir sonraki adım”
+kayıtlarına göre önceliklidir.
+
