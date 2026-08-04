@@ -278,38 +278,38 @@ class AtlasLandmarkFoundationBuilder:
                 AtlasLandmarkType.MOSQUE,
                 AtlasLandmarkType.SYNAGOGUE,
             }:
-                metric_mesh = (
-                    AtlasWorshipLandmarkFallbackMesher.build(
-                        metric_landmark
+                real_height_m = (
+                    AtlasWorshipLandmarkFallbackMesher
+                    ._read_positive_metres(
+                        metric_landmark.tags.get("height")
                     )
                 )
+
+                if real_height_m is None:
+                    real_height_m = (
+                        AtlasWorshipLandmarkFallbackMesher
+                        .DEFAULT_HEIGHTS_M[
+                            landmark.landmark_type
+                        ]
+                    )
 
                 scaled_height = (
                     coordinate_engine.height_to_stl_mm(
-                        metric_mesh["height_m"]
+                        real_height_m
                     )
                 )
 
-                bottom = tuple(
-                    (
-                        float(x),
-                        float(y),
-                        0.0,
-                    )
-                    for x, y in stl_footprint
+                scaled_tags = dict(
+                    landmark.tags
                 )
-                top = tuple(
-                    (
-                        float(x),
-                        float(y),
-                        float(scaled_height),
-                    )
-                    for x, y in stl_footprint
+                scaled_tags["height"] = str(
+                    scaled_height
                 )
 
                 scaled_landmark = replace(
                     landmark,
                     geometry=stl_footprint,
+                    tags=scaled_tags,
                 )
 
                 mesh = (
@@ -318,42 +318,12 @@ class AtlasLandmarkFoundationBuilder:
                     )
                 )
 
-                mesh["height_m"] = (
-                    metric_mesh["height_m"]
+                mesh["height_m"] = float(
+                    real_height_m
                 )
-                mesh["height_mm"] = (
+                mesh["height_mm"] = float(
                     scaled_height
                 )
-                mesh["bottom"] = bottom
-                mesh["top"] = top
-
-                # Fallback mesher STL footprint üzerinde
-                # çalıştığı için Z yüksekliğini yeniden ölçekle.
-                rescaled_triangles = []
-
-                for triangle in mesh["triangles"]:
-                    rescaled_triangles.append(
-                        tuple(
-                            (
-                                float(point[0]),
-                                float(point[1]),
-                                (
-                                    float(point[2])
-                                    * scaled_height
-                                    / mesh["max_z"]
-                                    if mesh["max_z"] > 0.0
-                                    else 0.0
-                                ),
-                            )
-                            for point in triangle
-                        )
-                    )
-
-                mesh["triangles"] = (
-                    rescaled_triangles
-                )
-                mesh["max_z"] = scaled_height
-                mesh["top_z"] = scaled_height
 
                 scaled_geometry = (
                     AtlasWorshipFallbackScaledGeometry(

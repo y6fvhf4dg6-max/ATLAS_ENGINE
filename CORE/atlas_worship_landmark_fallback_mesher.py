@@ -6,6 +6,9 @@ from CORE.atlas_landmark_type import AtlasLandmarkType
 from CORE.atlas_polygon_triangulator import (
     AtlasPolygonTriangulator,
 )
+from CORE.atlas_worship_grammar_resolver import (
+    AtlasWorshipGrammarResolver,
+)
 
 
 class AtlasWorshipLandmarkFallbackMesher:
@@ -295,12 +298,25 @@ class AtlasWorshipLandmarkFallbackMesher:
                     )
                 )
 
+        worship_grammar = (
+            AtlasWorshipGrammarResolver.resolve(
+                landmark
+            )
+        )
+
+        if worship_grammar != "footprint_fallback":
+            raise ValueError(
+                f"worship grammar {worship_grammar!r} "
+                "is not implemented"
+            )
+
         return {
             "type": "worship_landmark_fallback",
             "landmark_id": int(landmark.id),
             "worship_profile": cls.PROFILE_NAMES[
                 landmark_type
             ],
+            "worship_grammar": worship_grammar,
             "uses_real_footprint": True,
             "special_architecture_applied": False,
             "height_m": height_m,

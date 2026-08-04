@@ -118,3 +118,71 @@ def test_foundation_builder_places_synagogue_fallback_on_terrain():
     assert mesh["worship_profile"] == "synagogue"
     assert mesh["special_architecture_applied"] is False
     assert mesh["landmark_id"] == 902
+
+
+def test_foundation_builder_builds_worship_fallback_in_single_pass(
+    monkeypatch,
+):
+    calls = []
+
+    from CORE.atlas_worship_landmark_fallback_mesher import (
+        AtlasWorshipLandmarkFallbackMesher,
+    )
+
+    original_build = AtlasWorshipLandmarkFallbackMesher.build
+
+    def counting_build(landmark):
+        calls.append(
+            {
+                "id": landmark.id,
+                "geometry": tuple(landmark.geometry),
+                "tags": dict(landmark.tags),
+            }
+        )
+        return original_build(landmark)
+
+    monkeypatch.setattr(
+        AtlasWorshipLandmarkFallbackMesher,
+        "build",
+        counting_build,
+    )
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[
+            {
+                **_source(
+                    source_id=903,
+                    building="mosque",
+                    religion="muslim",
+                ),
+                "tags": {
+                    "building": "mosque",
+                    "amenity": "place_of_worship",
+                    "religion": "muslim",
+                    "height": "18",
+                },
+            }
+        ],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert len(calls) == 1
+
+    mesh = meshes[0]
+
+    assert mesh["height_m"] == 18.0
+    assert mesh["height_mm"] == 6.0
+    assert mesh["foundation_z"] == 0.7
+    assert mesh["max_z"] == 6.0
+    assert mesh["top_z"] == 6.0
+    assert {
+        round(point[2], 8)
+        for triangle in mesh["triangles"]
+        for point in triangle
+    } == {
+        0.7,
+        6.7,
+    }

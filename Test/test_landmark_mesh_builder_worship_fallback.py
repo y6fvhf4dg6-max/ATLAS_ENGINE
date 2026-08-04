@@ -1,3 +1,5 @@
+import pytest
+
 from CORE.atlas_landmark import AtlasLandmark
 from CORE.atlas_landmark_mesh_builder import (
     AtlasLandmarkMeshBuilder,
@@ -111,3 +113,95 @@ def test_mosque_fallback_can_be_embedded_into_terrain():
         for triangle in mesh["triangles"]
         for point in triangle
     ) == 2.5
+
+
+def test_mosque_fallback_reports_resolved_worship_grammar():
+    landmark = AtlasLandmark(
+        id=804,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=_footprint(),
+        tags={
+            "building": "mosque",
+            "amenity": "place_of_worship",
+            "religion": "muslim",
+        },
+        source="OSM",
+    )
+
+    mesh = AtlasLandmarkMeshBuilder.build(
+        landmark,
+        terrain_mesh=None,
+    )
+
+    assert mesh["worship_grammar"] == "footprint_fallback"
+
+
+def test_synagogue_fallback_reports_resolved_worship_grammar():
+    landmark = AtlasLandmark(
+        id=805,
+        landmark_type=AtlasLandmarkType.SYNAGOGUE,
+        geometry=_footprint(),
+        tags={
+            "building": "synagogue",
+            "amenity": "place_of_worship",
+            "religion": "jewish",
+        },
+        source="OSM",
+    )
+
+    mesh = AtlasLandmarkMeshBuilder.build(
+        landmark,
+        terrain_mesh=None,
+    )
+
+    assert mesh["worship_grammar"] == "footprint_fallback"
+
+
+def test_fallback_mesher_rejects_unimplemented_special_mosque_grammar():
+    landmark = AtlasLandmark(
+        id=806,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=_footprint(),
+        tags={
+            "building": "mosque",
+            "religion": "muslim",
+            "atlas:worship_grammar": (
+                "single_dome_single_minaret"
+            ),
+        },
+        source="OSM",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="not implemented",
+    ):
+        AtlasLandmarkMeshBuilder.build(
+            landmark,
+            terrain_mesh=None,
+        )
+
+
+def test_fallback_mesher_rejects_unimplemented_special_synagogue_grammar():
+    landmark = AtlasLandmark(
+        id=807,
+        landmark_type=AtlasLandmarkType.SYNAGOGUE,
+        geometry=_footprint(),
+        tags={
+            "building": "synagogue",
+            "religion": "jewish",
+            "atlas:worship_grammar": (
+                "twin_tower_facade"
+            ),
+        },
+        source="OSM",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="not implemented",
+    ):
+        AtlasLandmarkMeshBuilder.build(
+            landmark,
+            terrain_mesh=None,
+        )
