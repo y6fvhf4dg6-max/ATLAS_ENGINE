@@ -34,6 +34,8 @@ class AtlasLandmarkMeshBuilder:
 
     @classmethod
     def build(cls, landmark, *, terrain_mesh=None):
+        foundation_footprint = None
+
         if landmark.landmark_type in {
             AtlasLandmarkType.CHURCH,
             AtlasLandmarkType.CATHEDRAL,
@@ -61,6 +63,7 @@ class AtlasLandmarkMeshBuilder:
             mesh = AtlasChurchLandmarkMesher.build(
                 geometry
             )
+            foundation_footprint = geometry.footprint
         elif landmark.landmark_type in {
             AtlasLandmarkType.MOSQUE,
             AtlasLandmarkType.SYNAGOGUE,
@@ -70,6 +73,7 @@ class AtlasLandmarkMeshBuilder:
                     landmark
                 )
             )
+            foundation_footprint = mesh["footprint"]
         else:
             builder = cls._BUILDERS.get(
                 landmark.landmark_type
@@ -85,13 +89,19 @@ class AtlasLandmarkMeshBuilder:
             mesh = AtlasLandmarkGeometryMesher.build(
                 geometry
             )
+            foundation_footprint = geometry.footprint
 
         if terrain_mesh is None:
             return mesh
 
+        if foundation_footprint is None:
+            raise RuntimeError(
+                "landmark builder did not resolve a foundation footprint"
+            )
+
         foundation_z = cls._resolve_foundation_z(
             terrain_mesh=terrain_mesh,
-            footprint=geometry.footprint,
+            footprint=foundation_footprint,
         )
 
         mesh["triangles"] = [

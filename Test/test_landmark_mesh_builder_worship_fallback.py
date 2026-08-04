@@ -74,3 +74,40 @@ def test_synagogue_uses_safe_footprint_fallback_mesh():
     report = AtlasMeshValidator.report(mesh)
 
     assert report["valid"] is True
+
+
+class FakeTerrain:
+    def sample_height(self, x, y):
+        return 2.5
+
+
+def test_mosque_fallback_can_be_embedded_into_terrain():
+    landmark = AtlasLandmark(
+        id=803,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=_footprint(),
+        tags={
+            "building": "mosque",
+            "amenity": "place_of_worship",
+            "religion": "muslim",
+        },
+        source="OSM",
+    )
+
+    mesh = AtlasLandmarkMeshBuilder.build(
+        landmark,
+        terrain_mesh=FakeTerrain(),
+    )
+
+    assert mesh["foundation_z"] == 2.5
+
+    assert {
+        round(point[2], 8)
+        for point in mesh["bottom"]
+    } == {2.5}
+
+    assert min(
+        point[2]
+        for triangle in mesh["triangles"]
+        for point in triangle
+    ) == 2.5
