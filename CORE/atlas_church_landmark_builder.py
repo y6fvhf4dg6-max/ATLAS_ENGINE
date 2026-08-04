@@ -269,6 +269,7 @@ class AtlasChurchLandmarkBuilder:
                 lateral_span=frame.lateral_span,
                 building_height=height_m,
                 landmark_class=profile.landmark_class,
+                grammar_name=profile.grammar_name,
             )
         )
 

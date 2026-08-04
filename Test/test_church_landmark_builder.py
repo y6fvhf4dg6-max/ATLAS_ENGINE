@@ -52,8 +52,6 @@ def test_builder_creates_default_church_component_plan():
         "transept",
         "apse",
         "tower",
-        "tower",
-        "tower",
         "buttress_system",
         "window_bay_system",
         "roof_section",
@@ -67,9 +65,7 @@ def test_builder_creates_default_church_component_plan():
         for component in result.components
         if component.component_type == "tower"
     ) == (
-        "crossing_tower",
-        "front_polygon_tower",
-        "west_tower_left",
+        "west_tower_center",
     )
 
 
@@ -80,6 +76,7 @@ def test_cathedral_profile_creates_resolved_architectural_towers():
         ),
         profile=AtlasChurchLandmarkProfile(
             landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
             tower_count=2,
         ),
     )
@@ -137,6 +134,7 @@ def test_builder_uses_landmark_class_fallback_height():
         ),
         profile=AtlasChurchLandmarkProfile(
             landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
             tower_count=2,
         ),
     )
@@ -243,6 +241,7 @@ def test_cathedral_geometry_carries_resolved_architectural_tower_profile():
         ),
         profile=AtlasChurchLandmarkProfile(
             landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
             tower_count=2,
         ),
     )

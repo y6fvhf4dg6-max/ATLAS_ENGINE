@@ -195,3 +195,33 @@ def test_bonner_muenster_has_no_front_apse_addition():
         roof["section_type"] != "apse"
         for roof in mesh["roof_meshes"]
     )
+
+
+def test_kreuzkirche_uses_single_west_tower_grammar():
+    meshes = _build_real_church_meshes()
+    landmark, mesh = meshes["Kreuzkirche"]
+
+    assert landmark.tags["wikidata"] == "Q1788329"
+    assert len(mesh["tower_meshes"]) == 1
+    assert tuple(
+        tower["tower_type"]
+        for tower in mesh["tower_meshes"]
+    ) == (
+        "west_tower_center",
+    )
+
+
+def test_bonner_muenster_preserves_catalog_four_tower_grammar():
+    meshes = _build_real_church_meshes()
+    landmark, mesh = meshes["Bonner Münster"]
+
+    assert landmark.tags["wikidata"] == "Q686664"
+    assert tuple(
+        tower["tower_type"]
+        for tower in mesh["tower_meshes"]
+    ) == (
+        "crossing_tower",
+        "outer_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
+    )

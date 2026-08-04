@@ -98,7 +98,7 @@ def test_cathedral_mesh_contains_twin_tower_components():
     )
 
     assert mesh["landmark_class"] == "cathedral"
-    assert len(mesh["tower_meshes"]) == 4
+    assert len(mesh["tower_meshes"]) == 2
     assert mesh["spire_meshes"] == []
 
 
@@ -115,7 +115,7 @@ def test_mesher_preserves_component_batches():
     assert len(mesh["nave_meshes"]) == 1
     assert len(mesh["transept_meshes"]) == 1
     assert len(mesh["apse_meshes"]) == 1
-    assert len(mesh["tower_meshes"]) == 3
+    assert len(mesh["tower_meshes"]) == 1
     assert mesh["spire_meshes"] == []
     assert len(mesh["roof_meshes"]) == 5
 
@@ -503,6 +503,7 @@ def test_landmark_mesher_integrates_architectural_tower_system():
         ),
         profile=AtlasChurchLandmarkProfile(
             landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
             tower_count=2,
         ),
     )
@@ -535,6 +536,7 @@ def test_crossing_and_outer_towers_use_polygon_geometry():
         ),
         profile=AtlasChurchLandmarkProfile(
             landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
             tower_count=2,
         ),
     )
@@ -567,6 +569,7 @@ def test_outer_polygon_tower_uses_polygon_spire():
         ),
         profile=AtlasChurchLandmarkProfile(
             landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
             tower_count=2,
         ),
     )

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from CORE.atlas_church_grammar_resolver import (
+    AtlasChurchGrammarResolver,
+)
 from CORE.atlas_church_landmark_profile import (
     AtlasChurchLandmarkProfile,
 )
@@ -42,6 +45,11 @@ class AtlasChurchLandmarkProfileResolver:
 
         return AtlasChurchLandmarkProfile(
             landmark_class=landmark_class,
+            grammar_name=(
+                AtlasChurchGrammarResolver.resolve(
+                    landmark
+                )
+            ),
             tower_count=(
                 2
                 if landmark_class == "cathedral"

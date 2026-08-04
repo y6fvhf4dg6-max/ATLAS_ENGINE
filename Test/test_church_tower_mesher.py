@@ -32,6 +32,7 @@ def _profile():
         lateral_span=30.0,
         building_height=42.0,
         landmark_class="cathedral",
+        grammar_name="bonn_muenster_catalog",
     )
 
 

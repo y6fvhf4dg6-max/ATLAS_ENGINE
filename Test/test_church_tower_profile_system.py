@@ -11,6 +11,7 @@ def _profile():
         lateral_span=30.0,
         building_height=42.0,
         landmark_class="cathedral",
+        grammar_name="bonn_muenster_catalog",
     )
 
 
@@ -285,3 +286,58 @@ def test_cathedral_crossing_tower_is_centered_on_nave_transept_intersection():
 
     assert crossing.center_longitudinal_ratio == 0.0
     assert crossing.center_lateral_ratio == 0.0
+
+
+def test_single_west_tower_grammar_defines_one_tower():
+    profile = AtlasChurchTowerProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        building_height=42.0,
+        landmark_class="church",
+        grammar_name="single_west_tower",
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in profile.towers
+    ) == (
+        "west_tower_center",
+    )
+
+
+def test_twin_west_towers_grammar_defines_two_towers():
+    profile = AtlasChurchTowerProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        building_height=42.0,
+        landmark_class="cathedral",
+        grammar_name="twin_west_towers",
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in profile.towers
+    ) == (
+        "west_tower_left",
+        "west_tower_right",
+    )
+
+
+def test_bonn_muenster_catalog_grammar_preserves_four_tower_system():
+    profile = AtlasChurchTowerProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        building_height=82.0,
+        landmark_class="cathedral",
+        grammar_name="bonn_muenster_catalog",
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in profile.towers
+    ) == (
+        "crossing_tower",
+        "outer_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
+    )

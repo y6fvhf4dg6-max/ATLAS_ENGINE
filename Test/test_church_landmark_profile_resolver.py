@@ -10,6 +10,7 @@ def _landmark(
     landmark_id,
     landmark_type=AtlasLandmarkType.CATHEDRAL,
     name=None,
+    wikidata=None,
 ):
     tags = {
         "building": (
@@ -21,6 +22,9 @@ def _landmark(
 
     if name is not None:
         tags["name"] = name
+
+    if wikidata is not None:
+        tags["wikidata"] = wikidata
 
     return AtlasLandmark(
         id=landmark_id,
@@ -41,6 +45,7 @@ def test_bonner_muenster_profile_disables_synthetic_front_apse():
         _landmark(
             landmark_id=112526702,
             name="Bonner Münster",
+            wikidata="Q686664",
         ),
         scale_ratio=5500.0,
     )
@@ -74,3 +79,29 @@ def test_generic_church_resolves_church_profile():
 
     assert profile.landmark_class == "church"
     assert profile.scale_ratio == 3000.0
+
+
+def test_profile_resolver_carries_bonner_muenster_catalog_grammar():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=112526702,
+            name="Bonner Münster",
+            wikidata="Q686664",
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.grammar_name == "bonn_muenster_catalog"
+
+
+def test_profile_resolver_uses_safe_default_grammar_for_unknown_church():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=999003,
+            landmark_type=AtlasLandmarkType.CHURCH,
+            name="Unknown Church",
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.grammar_name == "single_west_tower"

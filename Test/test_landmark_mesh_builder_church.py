@@ -53,5 +53,5 @@ def test_landmark_mesh_builder_builds_cathedral_landmark():
     )
 
     assert mesh["landmark_class"] == "cathedral"
-    assert len(mesh["tower_meshes"]) == 4
+    assert len(mesh["tower_meshes"]) == 2
     assert mesh["spire_meshes"] == []
