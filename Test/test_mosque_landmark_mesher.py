@@ -382,3 +382,53 @@ def test_minaret_body_ring_stays_inside_rotated_real_footprint():
         assert polygon.covers(
             Point(x, y)
         )
+
+
+def test_dome_and_drum_rings_stay_inside_irregular_real_footprint():
+    from shapely.geometry import Point, Polygon
+
+    footprint = (
+        (0.0, 0.0),
+        (20.0, 0.0),
+        (20.0, 6.0),
+        (11.0, 6.0),
+        (11.0, 18.0),
+        (0.0, 18.0),
+    )
+
+    landmark = AtlasLandmark(
+        id=1205,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=footprint,
+        tags={
+            "building": "mosque",
+            "religion": "muslim",
+            "height": "27",
+            "atlas:worship_grammar": (
+                "single_dome_single_minaret"
+            ),
+        },
+        source="OSM",
+    )
+
+    geometry = AtlasMosqueLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasMosqueLandmarkProfile(
+            scale_ratio=3000.0,
+            nozzle_diameter_mm=0.4,
+        ),
+    )
+
+    mesh = AtlasMosqueLandmarkMesher.build(
+        geometry
+    )
+
+    polygon = Polygon(footprint)
+    drum = mesh["dome_drum_meshes"][0]
+    dome = mesh["dome_meshes"][0]
+
+    for x, y, _ in drum["bottom"]:
+        assert polygon.covers(Point(x, y))
+
+    for x, y, _ in dome["base_ring"]:
+        assert polygon.covers(Point(x, y))

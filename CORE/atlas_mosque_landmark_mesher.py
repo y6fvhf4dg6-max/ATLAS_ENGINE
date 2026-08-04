@@ -234,6 +234,120 @@ class AtlasMosqueLandmarkMesher:
         }
 
     @staticmethod
+    def _resolve_dome_system(
+        *,
+        footprint,
+        desired_dome_radius,
+        drum_radius_ratio,
+        minimum_radius,
+    ):
+        polygon = Polygon(
+            footprint
+        )
+
+        if (
+            polygon.is_empty
+            or not polygon.is_valid
+            or polygon.area <= 1e-12
+        ):
+            raise ValueError(
+                "Mosque footprint must define "
+                "a valid polygon"
+            )
+
+        minimum_x, minimum_y, maximum_x, maximum_y = (
+            polygon.bounds
+        )
+
+        candidates = [
+            polygon.representative_point(),
+            polygon.centroid,
+        ]
+
+        grid_steps = 30
+
+        for x_index in range(grid_steps + 1):
+            x = (
+                minimum_x
+                + (maximum_x - minimum_x)
+                * x_index
+                / grid_steps
+            )
+
+            for y_index in range(grid_steps + 1):
+                y = (
+                    minimum_y
+                    + (maximum_y - minimum_y)
+                    * y_index
+                    / grid_steps
+                )
+
+                point = Point(
+                    x,
+                    y,
+                )
+
+                if polygon.covers(point):
+                    candidates.append(point)
+
+        valid_candidates = [
+            point
+            for point in candidates
+            if polygon.covers(point)
+        ]
+
+        if not valid_candidates:
+            raise ValueError(
+                "Mosque footprint has no valid "
+                "interior dome center"
+            )
+
+        center_point = max(
+            valid_candidates,
+            key=lambda point: point.distance(
+                polygon.boundary
+            ),
+        )
+
+        maximum_safe_radius = (
+            center_point.distance(
+                polygon.boundary
+            )
+            * 0.98
+        )
+
+        minimum_radius = float(
+            minimum_radius
+        )
+
+        if maximum_safe_radius < minimum_radius:
+            raise ValueError(
+                "Mosque footprint cannot contain "
+                "a printable dome system"
+            )
+
+        dome_radius = min(
+            float(desired_dome_radius),
+            maximum_safe_radius,
+        )
+
+        drum_radius = min(
+            dome_radius
+            * float(drum_radius_ratio),
+            maximum_safe_radius,
+        )
+
+        return {
+            "center_x": float(center_point.x),
+            "center_y": float(center_point.y),
+            "dome_radius": dome_radius,
+            "drum_radius": drum_radius,
+            "maximum_safe_radius": (
+                maximum_safe_radius
+            ),
+        }
+
+    @staticmethod
     def _resolve_minaret_center(
         *,
         footprint,
@@ -709,13 +823,6 @@ class AtlasMosqueLandmarkMesher:
                 "Mosque footprint must have positive area"
             )
 
-        center_x = (
-            minimum_x + maximum_x
-        ) / 2.0
-        center_y = (
-            minimum_y + maximum_y
-        ) / 2.0
-
         total_height = float(
             geometry.height_m
         )
@@ -750,12 +857,29 @@ class AtlasMosqueLandmarkMesher:
         )
         minaret_cap_top_z = total_height
 
-        dome_radius = (
-            short_span * 0.28
+        dome_system = cls._resolve_dome_system(
+            footprint=footprint,
+            desired_dome_radius=(
+                short_span * 0.28
+            ),
+            drum_radius_ratio=0.88,
+            minimum_radius=(
+                geometry.profile.nozzle_diameter_mm
+            ),
         )
-        drum_radius = (
-            dome_radius * 0.88
-        )
+
+        center_x = dome_system[
+            "center_x"
+        ]
+        center_y = dome_system[
+            "center_y"
+        ]
+        dome_radius = dome_system[
+            "dome_radius"
+        ]
+        drum_radius = dome_system[
+            "drum_radius"
+        ]
 
         minaret_radius = max(
             short_span * 0.045,
@@ -880,6 +1004,7 @@ class AtlasMosqueLandmarkMesher:
             "uses_real_footprint": True,
             "footprint": footprint,
             "height_m": total_height,
+            "dome_system": dome_system,
             "prayer_hall_meshes": [
                 prayer_hall,
             ],
