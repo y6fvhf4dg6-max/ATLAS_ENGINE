@@ -369,6 +369,15 @@ class AtlasFoundationFirstEngine:
         z_scale=5500,
         terrain_provider_name="srtm",
         terrain_smoothing_passes=0,
+        terrain_surface_texture_amplitude_mm=None,
+        terrain_surface_texture_wavelength_x_mm=28.0,
+        terrain_surface_texture_wavelength_y_mm=37.0,
+        terrain_surface_texture_edge_fade_mm=8.0,
+        water_surface_texture_amplitude_mm=None,
+        water_surface_texture_wavelength_x_mm=7.0,
+        water_surface_texture_wavelength_y_mm=11.0,
+        water_surface_texture_edge_fade_mm=1.5,
+        water_surface_texture_maximum_edge_length_mm=5.0,
         strict_input_quality=False,
         nature_provider_names=("worldcover",),
         castle_only=False,
@@ -587,6 +596,18 @@ class AtlasFoundationFirstEngine:
             grid_size=25,
             terrain_provider_name=(terrain_provider_name),
             smoothing_passes=terrain_smoothing_passes,
+            surface_texture_amplitude_mm=(
+                terrain_surface_texture_amplitude_mm
+            ),
+            surface_texture_wavelength_x_mm=(
+                terrain_surface_texture_wavelength_x_mm
+            ),
+            surface_texture_wavelength_y_mm=(
+                terrain_surface_texture_wavelength_y_mm
+            ),
+            surface_texture_edge_fade_mm=(
+                terrain_surface_texture_edge_fade_mm
+            ),
             debug=debug,
         )
 
@@ -635,6 +656,21 @@ class AtlasFoundationFirstEngine:
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_slab,
                 debug=debug,
+                surface_texture_amplitude_mm=(
+                    water_surface_texture_amplitude_mm
+                ),
+                surface_texture_wavelength_x_mm=(
+                    water_surface_texture_wavelength_x_mm
+                ),
+                surface_texture_wavelength_y_mm=(
+                    water_surface_texture_wavelength_y_mm
+                ),
+                surface_texture_edge_fade_mm=(
+                    water_surface_texture_edge_fade_mm
+                ),
+                surface_texture_maximum_edge_length_mm=(
+                    water_surface_texture_maximum_edge_length_mm
+                ),
             )
         )
 
@@ -647,6 +683,21 @@ class AtlasFoundationFirstEngine:
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_slab,
                 debug=debug,
+                surface_texture_amplitude_mm=(
+                    water_surface_texture_amplitude_mm
+                ),
+                surface_texture_wavelength_x_mm=(
+                    water_surface_texture_wavelength_x_mm
+                ),
+                surface_texture_wavelength_y_mm=(
+                    water_surface_texture_wavelength_y_mm
+                ),
+                surface_texture_edge_fade_mm=(
+                    water_surface_texture_edge_fade_mm
+                ),
+                surface_texture_maximum_edge_length_mm=(
+                    water_surface_texture_maximum_edge_length_mm
+                ),
             )
         )
 

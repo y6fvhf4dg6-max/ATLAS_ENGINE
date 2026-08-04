@@ -6,6 +6,9 @@ from CORE.providers.atlas_opentopography_provider import (
 )
 from CORE.atlas_terrain_mesh_generator import AtlasTerrainMeshGenerator
 from CORE.atlas_terrain_terrace_builder import AtlasTerrainTerraceBuilder
+from CORE.atlas_terrain_surface_texture import (
+    AtlasTerrainSurfaceTexture,
+)
 
 
 class AtlasTerrainPipeline:
@@ -32,6 +35,10 @@ class AtlasTerrainPipeline:
         size_y_mm=None,
         smoothing_passes=0,
         terrace_step_mm=None,
+        surface_texture_amplitude_mm=None,
+        surface_texture_wavelength_x_mm=28.0,
+        surface_texture_wavelength_y_mm=37.0,
+        surface_texture_edge_fade_mm=8.0,
         debug=True,
     ):
         if terrace_step_mm is not None:
@@ -40,6 +47,26 @@ class AtlasTerrainPipeline:
             if terrace_step_mm <= 0.0:
                 raise ValueError(
                     "terrace_step_mm must be greater than zero"
+                )
+
+        if surface_texture_amplitude_mm is not None:
+            surface_texture_amplitude_mm = float(
+                surface_texture_amplitude_mm
+            )
+
+            if surface_texture_amplitude_mm < 0.0:
+                raise ValueError(
+                    "surface_texture_amplitude_mm must be "
+                    "non-negative"
+                )
+
+            if (
+                surface_texture_amplitude_mm > 0.0
+                and terrace_step_mm is not None
+            ):
+                raise ValueError(
+                    "surface texture and terracing cannot "
+                    "be enabled together"
                 )
 
         provider_name = terrain_provider_name.lower()
@@ -70,6 +97,18 @@ class AtlasTerrainPipeline:
                 base_z=base_z,
                 bottom_z=bottom_z,
                 smoothing_passes=smoothing_passes,
+            )
+
+            mesh = AtlasTerrainPipeline._apply_surface_texture(
+                mesh=mesh,
+                amplitude_mm=surface_texture_amplitude_mm,
+                wavelength_x_mm=(
+                    surface_texture_wavelength_x_mm
+                ),
+                wavelength_y_mm=(
+                    surface_texture_wavelength_y_mm
+                ),
+                edge_fade_mm=surface_texture_edge_fade_mm,
             )
 
             return AtlasTerrainPipeline._apply_terracing(
@@ -157,6 +196,14 @@ class AtlasTerrainPipeline:
                     f"OpenTopography error: {fallback_error}"
                 ) from fallback_error
 
+        mesh = AtlasTerrainPipeline._apply_surface_texture(
+            mesh=mesh,
+            amplitude_mm=surface_texture_amplitude_mm,
+            wavelength_x_mm=surface_texture_wavelength_x_mm,
+            wavelength_y_mm=surface_texture_wavelength_y_mm,
+            edge_fade_mm=surface_texture_edge_fade_mm,
+        )
+
         return AtlasTerrainPipeline._apply_terracing(
             mesh=mesh,
             base_z=base_z,
@@ -189,6 +236,124 @@ class AtlasTerrainPipeline:
             bottom_z=bottom_z,
             smoothing_passes=smoothing_passes,
         )
+
+    @staticmethod
+    def _apply_surface_texture(
+        mesh,
+        amplitude_mm,
+        wavelength_x_mm,
+        wavelength_y_mm,
+        edge_fade_mm,
+    ):
+        if (
+            amplitude_mm is None
+            or float(amplitude_mm) <= 0.0
+        ):
+            return mesh
+
+        top_points = mesh.get("top_points")
+        bottom_points = mesh.get("bottom_points")
+        metadata = dict(mesh.get("metadata", {}))
+
+        if (
+            not top_points
+            or not bottom_points
+        ):
+            raise ValueError(
+                "surface texture requires a closed terrain slab"
+            )
+
+        size_x_mm = float(
+            metadata.get(
+                "size_x_mm",
+                metadata.get("size_mm"),
+            )
+        )
+        size_y_mm = float(
+            metadata.get(
+                "size_y_mm",
+                metadata.get("size_mm"),
+            )
+        )
+
+        texture = AtlasTerrainSurfaceTexture(
+            size_x_mm=size_x_mm,
+            size_y_mm=size_y_mm,
+            amplitude_mm=amplitude_mm,
+            wavelength_x_mm=wavelength_x_mm,
+            wavelength_y_mm=wavelength_y_mm,
+            edge_fade_mm=edge_fade_mm,
+        )
+
+        textured_top_points = [
+            [
+                (
+                    float(x),
+                    float(y),
+                    float(z)
+                    + texture.offset_at(
+                        x=float(x),
+                        y=float(y),
+                    ),
+                )
+                for x, y, z in row
+            ]
+            for row in top_points
+        ]
+
+        grid_size = len(textured_top_points)
+
+        triangles = []
+
+        triangles.extend(
+            AtlasTerrainMeshGenerator
+            .build_surface_triangles(
+                points=textured_top_points,
+                grid_size=grid_size,
+            )
+        )
+
+        triangles.extend(
+            AtlasTerrainMeshGenerator
+            .build_bottom_triangles(
+                bottom_points=bottom_points,
+                grid_size=grid_size,
+            )
+        )
+
+        triangles.extend(
+            AtlasTerrainMeshGenerator
+            .build_side_wall_triangles(
+                top_points=textured_top_points,
+                bottom_points=bottom_points,
+                grid_size=grid_size,
+            )
+        )
+
+        metadata["triangle_count"] = len(
+            triangles
+        )
+        metadata["surface_texture"] = {
+            "enabled": True,
+            "amplitude_mm": float(amplitude_mm),
+            "wavelength_x_mm": float(
+                wavelength_x_mm
+            ),
+            "wavelength_y_mm": float(
+                wavelength_y_mm
+            ),
+            "edge_fade_mm": float(
+                edge_fade_mm
+            ),
+        }
+
+        return {
+            **mesh,
+            "triangles": triangles,
+            "metadata": metadata,
+            "top_points": textured_top_points,
+            "bottom_points": bottom_points,
+        }
 
     @staticmethod
     def _apply_terracing(

@@ -17,6 +17,12 @@ from CORE.atlas_foundation_sampler import (
 from CORE.atlas_polygon_triangulator import (
     AtlasPolygonTriangulator,
 )
+from CORE.atlas_water_surface_texture import (
+    AtlasWaterSurfaceTexture,
+)
+from CORE.atlas_water_textured_solid_mesher import (
+    AtlasWaterTexturedSolidMesher,
+)
 
 
 class AtlasWaterFoundationBuilder:
@@ -31,7 +37,19 @@ class AtlasWaterFoundationBuilder:
         coordinate_engine,
         terrain_mesh,
         debug=True,
+        surface_texture_amplitude_mm=None,
+        surface_texture_wavelength_x_mm=7.0,
+        surface_texture_wavelength_y_mm=11.0,
+        surface_texture_edge_fade_mm=1.5,
+        surface_texture_maximum_edge_length_mm=2.5,
     ):
+        texture = AtlasWaterSurfaceTexture(
+            amplitude_mm=surface_texture_amplitude_mm,
+            wavelength_x_mm=surface_texture_wavelength_x_mm,
+            wavelength_y_mm=surface_texture_wavelength_y_mm,
+            edge_fade_mm=surface_texture_edge_fade_mm,
+        )
+
         meshes = []
         skipped = 0
 
@@ -46,6 +64,10 @@ class AtlasWaterFoundationBuilder:
                     coordinate_engine=coordinate_engine,
                     terrain_mesh=terrain_mesh,
                     source_index=index,
+                    texture=texture,
+                    maximum_edge_length_mm=(
+                        surface_texture_maximum_edge_length_mm
+                    ),
                 )
             )
 
@@ -106,7 +128,19 @@ class AtlasWaterFoundationBuilder:
         coordinate_engine,
         terrain_mesh,
         debug=True,
+        surface_texture_amplitude_mm=None,
+        surface_texture_wavelength_x_mm=7.0,
+        surface_texture_wavelength_y_mm=11.0,
+        surface_texture_edge_fade_mm=1.5,
+        surface_texture_maximum_edge_length_mm=2.5,
     ):
+        texture = AtlasWaterSurfaceTexture(
+            amplitude_mm=surface_texture_amplitude_mm,
+            wavelength_x_mm=surface_texture_wavelength_x_mm,
+            wavelength_y_mm=surface_texture_wavelength_y_mm,
+            edge_fade_mm=surface_texture_edge_fade_mm,
+        )
+
         meshes = []
         skipped = 0
 
@@ -121,6 +155,10 @@ class AtlasWaterFoundationBuilder:
                     coordinate_engine=coordinate_engine,
                     terrain_mesh=terrain_mesh,
                     source_index=index,
+                    texture=texture,
+                    maximum_edge_length_mm=(
+                        surface_texture_maximum_edge_length_mm
+                    ),
                 )
             )
 
@@ -161,6 +199,8 @@ class AtlasWaterFoundationBuilder:
         coordinate_engine,
         terrain_mesh,
         source_index,
+        texture,
+        maximum_edge_length_mm,
     ):
         prepared = (
             AtlasWaterFoundationBuilder
@@ -214,6 +254,10 @@ class AtlasWaterFoundationBuilder:
                 water_type="inland",
                 placement_mode="horizontal_above_terrain",
                 source_index=source_index,
+                texture=texture,
+                maximum_edge_length_mm=(
+                    maximum_edge_length_mm
+                ),
             )
         )
 
@@ -300,7 +344,42 @@ class AtlasWaterFoundationBuilder:
         water_type,
         placement_mode,
         source_index,
+        texture,
+        maximum_edge_length_mm,
     ):
+        if texture.enabled:
+            textured = AtlasWaterTexturedSolidMesher.build(
+                boundary_points=points,
+                water_bottom_z=water_bottom_z,
+                water_surface_z=water_surface_z,
+                texture=texture,
+                maximum_edge_length_mm=(
+                    maximum_edge_length_mm
+                ),
+            )
+
+            return {
+                **textured,
+                "type": mesh_type,
+                "source_index": source_index,
+                "water_type": water_type,
+                "water_bottom_z": water_bottom_z,
+                "water_surface_z": water_surface_z,
+                "placement_mode": placement_mode,
+                "surface_texture_amplitude_mm": (
+                    texture.amplitude_mm
+                ),
+                "surface_texture_wavelength_x_mm": (
+                    texture.wavelength_x_mm
+                ),
+                "surface_texture_wavelength_y_mm": (
+                    texture.wavelength_y_mm
+                ),
+                "surface_texture_edge_fade_mm": (
+                    texture.edge_fade_mm
+                ),
+            }
+
         bottom = [
             (
                 x,
@@ -397,6 +476,8 @@ class AtlasWaterFoundationBuilder:
             "water_bottom_z": water_bottom_z,
             "water_surface_z": water_surface_z,
             "placement_mode": placement_mode,
+            "surface_texture_enabled": False,
+            "surface_texture_amplitude_mm": None,
         }
 
     @staticmethod
@@ -405,6 +486,8 @@ class AtlasWaterFoundationBuilder:
         coordinate_engine,
         terrain_mesh,
         source_index,
+        texture,
+        maximum_edge_length_mm,
     ):
         if polygon is None or polygon.is_empty:
             return None
@@ -484,106 +567,23 @@ class AtlasWaterFoundationBuilder:
             .WATER_HEIGHT_MM
         )
 
-        bottom = [
-            (
-                x,
-                y,
-                water_bottom_z,
+        return (
+            AtlasWaterFoundationBuilder
+            ._build_horizontal_water_solid(
+                points=points,
+                flat_triangles=flat_triangles,
+                water_bottom_z=water_bottom_z,
+                water_surface_z=water_surface_z,
+                mesh_type="coastline_water_foundation",
+                water_type="sea",
+                placement_mode="horizontal_sea_level",
+                source_index=source_index,
+                texture=texture,
+                maximum_edge_length_mm=(
+                    maximum_edge_length_mm
+                ),
             )
-            for x, y in points
-        ]
-
-        top = [
-            (
-                x,
-                y,
-                water_surface_z,
-            )
-            for x, y in points
-        ]
-
-        triangles = []
-        walls = []
-
-        for triangle in flat_triangles:
-            top_triangle = tuple(
-                (
-                    x,
-                    y,
-                    water_surface_z,
-                )
-                for x, y in triangle
-            )
-
-            bottom_triangle = [
-                (
-                    x,
-                    y,
-                    water_bottom_z,
-                )
-                for x, y in triangle
-            ]
-
-            triangles.append(
-                top_triangle
-            )
-
-            triangles.append(
-                (
-                    bottom_triangle[2],
-                    bottom_triangle[1],
-                    bottom_triangle[0],
-                )
-            )
-
-        point_count = len(points)
-
-        for index in range(point_count):
-            next_index = (
-                index + 1
-            ) % point_count
-
-            b1 = bottom[index]
-            b2 = bottom[next_index]
-            t1 = top[index]
-            t2 = top[next_index]
-
-            walls.append(
-                (
-                    b1,
-                    b2,
-                    t2,
-                    t1,
-                )
-            )
-
-            triangles.extend(
-                [
-                    (
-                        b1,
-                        b2,
-                        t2,
-                    ),
-                    (
-                        b1,
-                        t2,
-                        t1,
-                    ),
-                ]
-            )
-
-        return {
-            "type": "coastline_water_foundation",
-            "source_index": source_index,
-            "water_type": "sea",
-            "bottom": bottom,
-            "top": top,
-            "walls": walls,
-            "triangles": triangles,
-            "water_bottom_z": water_bottom_z,
-            "water_surface_z": water_surface_z,
-            "placement_mode": "horizontal_sea_level",
-        }
+        )
 
     @staticmethod
     def _sea_level_z(
