@@ -570,115 +570,123 @@ class AtlasLandmarkFoundationBuilder:
                 == "galata"
             )
 
+            component_flags = frozenset(
+                catalog_entry.component_flags
+                if catalog_entry is not None
+                else ()
+            )
+
             if (
                 is_galata_bridge
                 and mesh.get("bottom")
             ):
-                frame = (
-                    AtlasGalataBridgeSupportResolver
-                    ._resolve_frame(
-                        scaled_geometry.footprint
-                    )
-                )
-
-                supports = (
-                    AtlasGalataBridgeSupportResolver
-                    .resolve(
-                        footprint=(
+                if "supports" in component_flags:
+                    frame = (
+                        AtlasGalataBridgeSupportResolver
+                        ._resolve_frame(
                             scaled_geometry.footprint
                         )
                     )
-                )
 
-                deck_bottom_z = min(
-                    point[2]
-                    for point in mesh["bottom"]
-                )
-
-                profile = AtlasBridgeLongitudinalProfile(
-                    shore_top_m=float(
-                        metadata["bridge_shore_top_m"]
-                    ),
-                    center_top_m=float(
-                        scaled_geometry.height_m
-                    ),
-                    approach_ratio=float(
-                        metadata.get(
-                            "bridge_approach_ratio",
-                            0.20,
+                    supports = (
+                        AtlasGalataBridgeSupportResolver
+                        .resolve(
+                            footprint=(
+                                scaled_geometry.footprint
+                            )
                         )
-                    ),
-                    deck_thickness_m=float(
-                        metadata[
-                            "bridge_deck_thickness_m"
-                        ]
-                    ),
-                    full_span_convex=bool(
-                        metadata.get(
-                            "bridge_full_span_convex",
-                            False,
-                        )
-                    ),
-                )
+                    )
 
-                support_meshes = []
+                    deck_bottom_z = min(
+                        point[2]
+                        for point in mesh["bottom"]
+                    )
 
-                for support in supports:
-                    local_bottom_z = (
-                        foundation_z
-                        + profile.bottom_z_at(
-                            support[
-                                "longitudinal_position"
+                    profile = AtlasBridgeLongitudinalProfile(
+                        shore_top_m=float(
+                            metadata["bridge_shore_top_m"]
+                        ),
+                        center_top_m=float(
+                            scaled_geometry.height_m
+                        ),
+                        approach_ratio=float(
+                            metadata.get(
+                                "bridge_approach_ratio",
+                                0.20,
+                            )
+                        ),
+                        deck_thickness_m=float(
+                            metadata[
+                                "bridge_deck_thickness_m"
                             ]
-                        )
+                        ),
+                        full_span_convex=bool(
+                            metadata.get(
+                                "bridge_full_span_convex",
+                                False,
+                            )
+                        ),
                     )
 
-                    support_meshes.extend(
-                        AtlasGalataBridgeSupportMesher
+                    support_meshes = []
+
+                    for support in supports:
+                        local_bottom_z = (
+                            foundation_z
+                            + profile.bottom_z_at(
+                                support[
+                                    "longitudinal_position"
+                                ]
+                            )
+                        )
+
+                        support_meshes.extend(
+                            AtlasGalataBridgeSupportMesher
+                            .build(
+                                supports=(support,),
+                                axis=(
+                                    frame["axis_x"],
+                                    frame["axis_y"],
+                                ),
+                                base_z=foundation_z,
+                                top_z=(
+                                    local_bottom_z
+                                    + cls.GALATA_SUPPORT_DECK_EMBED_MM
+                                ),
+                            )
+                        )
+
+                    support_meshes = tuple(
+                        support_meshes
+                    )
+
+                    mesh["supports"] = support_meshes
+
+                    mesh["triangles"].extend(
+                        triangle
+                        for support in support_meshes
+                        for triangle in support[
+                            "triangles"
+                        ]
+                    )
+
+                if "parapets" in component_flags:
+                    parapets = (
+                        AtlasGalataBridgeParapetMesher
                         .build(
-                            supports=(support,),
-                            axis=(
-                                frame["axis_x"],
-                                frame["axis_y"],
-                            ),
-                            base_z=foundation_z,
-                            top_z=(
-                                local_bottom_z
-                                + cls.GALATA_SUPPORT_DECK_EMBED_MM
-                            ),
+                            deck_top=mesh["top"],
                         )
                     )
 
-                support_meshes = tuple(
-                    support_meshes
-                )
+                    mesh["parapets"] = parapets
 
-                mesh["supports"] = support_meshes
-
-                mesh["triangles"].extend(
-                    triangle
-                    for support in support_meshes
-                    for triangle in support[
-                        "triangles"
-                    ]
-                )
-
-                parapets = (
-                    AtlasGalataBridgeParapetMesher
-                    .build(
-                        deck_top=mesh["top"],
+                    mesh["triangles"].extend(
+                        triangle
+                        for parapet in parapets
+                        for triangle in parapet[
+                            "triangles"
+                        ]
                     )
-                )
-
-                mesh["parapets"] = parapets
-
-                mesh["triangles"].extend(
-                    triangle
-                    for parapet in parapets
-                    for triangle in parapet[
-                        "triangles"
-                    ]
-                )
 
                 road_approaches = []
 

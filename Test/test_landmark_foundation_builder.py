@@ -3,6 +3,9 @@ import pytest
 from CORE.atlas_landmark_foundation_builder import (
     AtlasLandmarkFoundationBuilder,
 )
+from CORE.atlas_master_landmark_catalog import (
+    AtlasMasterLandmarkCatalog,
+)
 
 
 class FakeCoordinateEngine:
@@ -457,3 +460,31 @@ def test_galata_bridge_foundation_components_use_normalized_catalog_identity():
 
     assert len(meshes) == 1
     assert len(meshes[0]["supports"]) == 4
+
+
+def test_bridge_foundation_components_follow_catalog_flags(
+    monkeypatch,
+):
+    class CatalogEntry:
+        landmark_family = "bridge"
+        profile_name = "galata"
+        component_flags = ("supports",)
+
+    monkeypatch.setattr(
+        AtlasMasterLandmarkCatalog,
+        "resolve",
+        classmethod(
+            lambda cls, **kwargs: CatalogEntry()
+        ),
+    )
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[_galata_bridge_landmark()],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=FakeTerrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert len(meshes[0]["supports"]) == 4
+    assert "parapets" not in meshes[0]
