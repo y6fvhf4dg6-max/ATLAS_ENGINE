@@ -33,6 +33,9 @@ from CORE.atlas_worship_landmark_fallback_mesher import (
 )
 from CORE.atlas_lighthouse_builder import AtlasLighthouseBuilder
 from CORE.atlas_rock_cut_tomb_builder import AtlasRockCutTombBuilder
+from CORE.atlas_semantic_architecture_adapter_resolver import (
+    AtlasSemanticArchitectureAdapterResolver,
+)
 from CORE.atlas_tower_builder import AtlasTowerBuilder
 
 
@@ -45,8 +48,15 @@ class AtlasLandmarkMeshBuilder:
     }
 
     @classmethod
-    def build(cls, landmark, *, terrain_mesh=None):
+    def build(
+        cls,
+        landmark,
+        *,
+        terrain_mesh=None,
+        include_semantic_architecture=False,
+    ):
         foundation_footprint = None
+        geometry = None
 
         if landmark.landmark_type in {
             AtlasLandmarkType.CHURCH,
@@ -132,6 +142,18 @@ class AtlasLandmarkMeshBuilder:
                 geometry
             )
             foundation_footprint = geometry.footprint
+
+        if include_semantic_architecture:
+            if geometry is None:
+                raise ValueError(
+                    "semantic architecture is unavailable "
+                    "for this landmark build path"
+                )
+
+            mesh["semantic_architecture"] = (
+                AtlasSemanticArchitectureAdapterResolver
+                .resolve(geometry)
+            )
 
         if terrain_mesh is None:
             return mesh
