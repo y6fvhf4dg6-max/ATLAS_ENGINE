@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 
+from shapely.geometry import Point, Polygon
+
 from CORE.atlas_mosque_landmark_builder import (
     AtlasMosqueLandmarkGeometry,
 )
@@ -230,6 +232,77 @@ class AtlasMosqueLandmarkMesher:
             "triangles": triangles,
             **metadata,
         }
+
+    @staticmethod
+    def _resolve_minaret_center(
+        *,
+        footprint,
+        target_x,
+        target_y,
+    ):
+        polygon = Polygon(
+            footprint
+        )
+
+        if (
+            polygon.is_empty
+            or not polygon.is_valid
+            or polygon.area <= 1e-12
+        ):
+            raise ValueError(
+                "Mosque footprint must define "
+                "a valid polygon"
+            )
+
+        safe_point = polygon.representative_point()
+
+        safe_x = float(
+            safe_point.x
+        )
+        safe_y = float(
+            safe_point.y
+        )
+
+        target_x = float(
+            target_x
+        )
+        target_y = float(
+            target_y
+        )
+
+        # Güvenli iç noktadan hedef mimari köşeye doğru
+        # ilerleyerek polygon içinde kalan en dış merkezi seç.
+        for step in range(95, -1, -1):
+            progress = (
+                step / 100.0
+            )
+
+            candidate_x = (
+                safe_x
+                + (target_x - safe_x)
+                * progress
+            )
+            candidate_y = (
+                safe_y
+                + (target_y - safe_y)
+                * progress
+            )
+
+            if polygon.covers(
+                Point(
+                    candidate_x,
+                    candidate_y,
+                )
+            ):
+                return (
+                    candidate_x,
+                    candidate_y,
+                )
+
+        return (
+            safe_x,
+            safe_y,
+        )
 
     @staticmethod
     def _ring(
@@ -674,13 +747,22 @@ class AtlasMosqueLandmarkMesher:
             geometry.profile.nozzle_diameter_mm,
         )
 
-        minaret_center_x = (
+        target_minaret_x = (
             maximum_x
             - short_span * 0.10
         )
-        minaret_center_y = (
+        target_minaret_y = (
             minimum_y
             + short_span * 0.10
+        )
+
+        (
+            minaret_center_x,
+            minaret_center_y,
+        ) = cls._resolve_minaret_center(
+            footprint=footprint,
+            target_x=target_minaret_x,
+            target_y=target_minaret_y,
         )
 
         balcony_center_z = (
