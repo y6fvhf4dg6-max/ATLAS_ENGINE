@@ -442,3 +442,18 @@ def test_tower_roof_height_is_scaled_with_total_height():
         (54.0 / 5.0)
         - (10.0 / 5.0)
     )
+
+
+def test_galata_bridge_foundation_components_use_normalized_catalog_identity():
+    source = _galata_bridge_landmark()
+    source["tags"]["wikidata"] = " q81523 "
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=FakeTerrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert len(meshes[0]["supports"]) == 4

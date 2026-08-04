@@ -41,6 +41,9 @@ from CORE.atlas_landmark_geometry_mesher import (
 from CORE.atlas_landmark_mesh_builder import AtlasLandmarkMeshBuilder
 from CORE.atlas_landmark_provider_osm import AtlasLandmarkProviderOsm
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_master_landmark_catalog import (
+    AtlasMasterLandmarkCatalog,
+)
 from CORE.atlas_mosque_landmark_builder import (
     AtlasMosqueLandmarkBuilder,
 )
@@ -542,13 +545,29 @@ class AtlasLandmarkFoundationBuilder:
                     translated_sections
                 )
 
+            catalog_entry = (
+                AtlasMasterLandmarkCatalog.resolve(
+                    wikidata_id=landmark.tags.get(
+                        "wikidata"
+                    ),
+                    osm_id=getattr(
+                        landmark,
+                        "id",
+                        None,
+                    ),
+                )
+            )
+
             is_galata_bridge = (
                 isinstance(
                     resolved_geometry,
                     AtlasBridgeGeometry,
                 )
-                and landmark.tags.get("wikidata")
-                == "Q81523"
+                and catalog_entry is not None
+                and catalog_entry.landmark_family
+                == "bridge"
+                and catalog_entry.profile_name
+                == "galata"
             )
 
             if (
