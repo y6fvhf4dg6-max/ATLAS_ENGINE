@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 import math
 
+from CORE.atlas_master_landmark_catalog import (
+    AtlasMasterLandmarkCatalog,
+)
+
 
 @dataclass(frozen=True, slots=True)
 class AtlasBridgeGeometry:
@@ -68,9 +72,23 @@ class AtlasBridgeBuilder:
         pier_top_m = max(0.0, height_m - deck_thickness_m)
         pier_height_m = max(0.0, pier_top_m - pier_base_m)
 
+        catalog_entry = (
+            AtlasMasterLandmarkCatalog.resolve(
+                wikidata_id=tags.get("wikidata"),
+                osm_id=getattr(
+                    landmark,
+                    "id",
+                    None,
+                ),
+            )
+        )
+
         is_galata_bridge = (
-            str(tags.get("wikidata", "")).strip()
-            == "Q81523"
+            catalog_entry is not None
+            and catalog_entry.landmark_family
+            == "bridge"
+            and catalog_entry.profile_name
+            == "galata"
         )
 
         approach_profile = False

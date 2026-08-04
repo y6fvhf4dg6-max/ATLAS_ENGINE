@@ -227,3 +227,27 @@ def test_bridge_builder_does_not_assign_galata_profile_to_generic_bridge():
     result = AtlasBridgeBuilder.build(landmark)
 
     assert result.metadata["bridge_approach_profile"] is False
+
+
+def test_galata_bridge_catalog_matching_is_normalized():
+    landmark = AtlasLandmark(
+        id=280961352,
+        landmark_type=AtlasLandmarkType.BRIDGE,
+        geometry=(
+            (0.0, -5.0),
+            (80.0, -5.0),
+            (80.0, 5.0),
+            (0.0, 5.0),
+        ),
+        tags={
+            "man_made": "bridge",
+            "name": "Galata Köprüsü",
+            "wikidata": " q81523 ",
+        },
+        source="osm",
+    )
+
+    result = AtlasBridgeBuilder.build(landmark)
+
+    assert result.metadata["bridge_full_span_convex"] is True
+    assert result.metadata["bridge_shore_top_m"] == 6.0
