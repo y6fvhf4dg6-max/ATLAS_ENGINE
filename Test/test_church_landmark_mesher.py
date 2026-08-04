@@ -607,3 +607,22 @@ def test_old_generic_spire_batches_are_replaced():
         tower.get("type") == "church_tower"
         for tower in mesh["tower_meshes"]
     )
+
+
+def test_profile_can_disable_apse_without_landmark_id_special_case():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            has_apse=False,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    assert mesh["apse_meshes"] == []
+    assert all(
+        roof["section_type"] != "apse"
+        for roof in mesh["roof_meshes"]
+    )

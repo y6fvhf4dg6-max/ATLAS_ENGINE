@@ -5,8 +5,8 @@ from CORE.atlas_church_landmark_builder import (
 from CORE.atlas_church_landmark_mesher import (
     AtlasChurchLandmarkMesher,
 )
-from CORE.atlas_church_landmark_profile import (
-    AtlasChurchLandmarkProfile,
+from CORE.atlas_church_landmark_profile_resolver import (
+    AtlasChurchLandmarkProfileResolver,
 )
 from CORE.atlas_foundation_sampler import AtlasFoundationSampler
 from CORE.atlas_foundation_surface_builder import (
@@ -47,13 +47,10 @@ class AtlasLandmarkMeshBuilder:
                 else "church"
             )
 
-            profile = AtlasChurchLandmarkProfile(
-                landmark_class=landmark_class,
-                tower_count=(
-                    2
-                    if landmark_class == "cathedral"
-                    else 1
-                ),
+            profile = (
+                AtlasChurchLandmarkProfileResolver.resolve(
+                    landmark
+                )
             )
 
             geometry = AtlasChurchLandmarkBuilder.build(

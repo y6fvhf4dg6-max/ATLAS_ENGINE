@@ -20,9 +20,6 @@ from CORE.atlas_church_roof_profile_system import (
 from CORE.atlas_church_tower_mesher import (
     AtlasChurchTowerMesher,
 )
-from CORE.atlas_church_tower_profile_system import (
-    AtlasChurchTowerProfileSystem,
-)
 
 
 class AtlasChurchLandmarkMesher:
@@ -545,7 +542,7 @@ class AtlasChurchLandmarkMesher:
         )
 
         suppress_front_apse = (
-            int(geometry.landmark_id) == 112526702
+            not geometry.profile.has_apse
         )
 
         apse_meshes = (
@@ -571,21 +568,10 @@ class AtlasChurchLandmarkMesher:
             ]
         )
 
-        tower_profile = (
-            AtlasChurchTowerProfileSystem.resolve(
-                longitudinal_span=depth,
-                lateral_span=width,
-                building_height=geometry.height_m,
-                landmark_class=(
-                    geometry.profile.landmark_class
-                ),
-            )
-        )
-
         architectural_tower_system = (
             AtlasChurchTowerMesher.build(
                 frame=frame,
-                profile=tower_profile,
+                profile=geometry.tower_profile,
                 building_height=geometry.height_m,
             )
         )

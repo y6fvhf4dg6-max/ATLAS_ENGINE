@@ -8,8 +8,8 @@ from CORE.atlas_church_landmark_builder import (
 from CORE.atlas_church_landmark_mesher import (
     AtlasChurchLandmarkMesher,
 )
-from CORE.atlas_church_landmark_profile import (
-    AtlasChurchLandmarkProfile,
+from CORE.atlas_church_landmark_profile_resolver import (
+    AtlasChurchLandmarkProfileResolver,
 )
 from CORE.atlas_bridge_longitudinal_profile import (
     AtlasBridgeLongitudinalProfile,
@@ -245,14 +245,11 @@ class AtlasLandmarkFoundationBuilder:
                     else "church"
                 )
 
-                profile = AtlasChurchLandmarkProfile(
-                    landmark_class=landmark_class,
-                    tower_count=(
-                        2
-                        if landmark_class == "cathedral"
-                        else 1
-                    ),
-                    scale_ratio=coordinate_engine.xy_scale,
+                profile = (
+                    AtlasChurchLandmarkProfileResolver.resolve(
+                        metric_landmark,
+                        scale_ratio=coordinate_engine.xy_scale,
+                    )
                 )
 
                 resolved_geometry = (

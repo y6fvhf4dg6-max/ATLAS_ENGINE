@@ -52,7 +52,8 @@ def test_builder_creates_default_church_component_plan():
         "transept",
         "apse",
         "tower",
-        "spire",
+        "tower",
+        "tower",
         "buttress_system",
         "window_bay_system",
         "roof_section",
@@ -61,8 +62,18 @@ def test_builder_creates_default_church_component_plan():
         "roof_section",
     )
 
+    assert tuple(
+        component.section_name
+        for component in result.components
+        if component.component_type == "tower"
+    ) == (
+        "crossing_tower",
+        "front_polygon_tower",
+        "west_tower_left",
+    )
 
-def test_cathedral_profile_creates_two_towers_and_two_spires():
+
+def test_cathedral_profile_creates_resolved_architectural_towers():
     result = AtlasChurchLandmarkBuilder.build(
         landmark=_landmark(
             landmark_type=AtlasLandmarkType.CATHEDRAL,
@@ -85,8 +96,18 @@ def test_cathedral_profile_creates_two_towers_and_two_spires():
     )
 
     assert result.landmark_class == "cathedral"
-    assert len(tower_components) == 2
-    assert len(spire_components) == 2
+    assert len(tower_components) == 4
+    assert spire_components == ()
+
+    assert tuple(
+        component.section_name
+        for component in tower_components
+    ) == (
+        "crossing_tower",
+        "outer_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
+    )
 
 
 def test_builder_uses_osm_height_when_available():
@@ -212,4 +233,43 @@ def test_builder_uses_finer_nozzle_to_preserve_more_detail():
     assert (
         fine_window.resolved_size_mm
         <= coarse_window.resolved_size_mm
+    )
+
+
+def test_cathedral_geometry_carries_resolved_architectural_tower_profile():
+    result = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            tower_count=2,
+        ),
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in result.tower_profile.towers
+    ) == (
+        "crossing_tower",
+        "outer_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
+    )
+
+    tower_components = tuple(
+        component
+        for component in result.components
+        if component.component_type == "tower"
+    )
+
+    assert len(tower_components) == 4
+    assert tuple(
+        component.section_name
+        for component in tower_components
+    ) == (
+        "crossing_tower",
+        "outer_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
     )

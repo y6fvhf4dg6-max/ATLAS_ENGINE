@@ -5,6 +5,13 @@ from dataclasses import dataclass
 from CORE.atlas_church_landmark_profile import (
     AtlasChurchLandmarkProfile,
 )
+from CORE.atlas_church_footprint_resolver import (
+    AtlasChurchFootprintResolver,
+)
+from CORE.atlas_church_tower_profile_system import (
+    AtlasChurchTowerProfileCollection,
+    AtlasChurchTowerProfileSystem,
+)
 from CORE.atlas_landmark_type import AtlasLandmarkType
 from CORE.atlas_physical_detail_resolver import (
     AtlasPhysicalDetailResolver,
@@ -28,6 +35,7 @@ class AtlasChurchLandmarkGeometry:
     height_m: float
     components: tuple[AtlasChurchLandmarkComponent, ...]
     profile: AtlasChurchLandmarkProfile
+    tower_profile: AtlasChurchTowerProfileCollection
 
 
 class AtlasChurchLandmarkBuilder:
@@ -108,6 +116,7 @@ class AtlasChurchLandmarkBuilder:
     @staticmethod
     def _build_components(
         profile,
+        tower_profile,
     ):
         components = []
 
@@ -154,26 +163,16 @@ class AtlasChurchLandmarkBuilder:
                 )
             )
 
-        for index in range(
-            profile.tower_count
+        for index, tower in enumerate(
+            tower_profile.towers
         ):
             components.append(
                 AtlasChurchLandmarkComponent(
                     component_type="tower",
                     index=index,
+                    section_name=tower.tower_type,
                 )
             )
-
-        if profile.has_spires:
-            for index in range(
-                profile.tower_count
-            ):
-                components.append(
-                    AtlasChurchLandmarkComponent(
-                        component_type="spire",
-                        index=index,
-                    )
-                )
 
         if profile.has_buttresses:
             components.append(
@@ -255,16 +254,33 @@ class AtlasChurchLandmarkBuilder:
             landmark.geometry
         )
 
+        height_m = cls._resolve_height(
+            landmark=landmark,
+            profile=profile,
+        )
+
+        frame = AtlasChurchFootprintResolver.resolve(
+            footprint
+        )
+
+        tower_profile = (
+            AtlasChurchTowerProfileSystem.resolve(
+                longitudinal_span=frame.longitudinal_span,
+                lateral_span=frame.lateral_span,
+                building_height=height_m,
+                landmark_class=profile.landmark_class,
+            )
+        )
+
         return AtlasChurchLandmarkGeometry(
             landmark_id=int(landmark.id),
             landmark_class=profile.landmark_class,
             footprint=footprint,
-            height_m=cls._resolve_height(
-                landmark=landmark,
-                profile=profile,
-            ),
+            height_m=height_m,
             components=cls._build_components(
-                profile
+                profile,
+                tower_profile,
             ),
             profile=profile,
+            tower_profile=tower_profile,
         )
