@@ -157,7 +157,11 @@ def test_synagogue_fallback_reports_resolved_worship_grammar():
     assert mesh["worship_grammar"] == "footprint_fallback"
 
 
-def test_fallback_mesher_rejects_unimplemented_special_mosque_grammar():
+def test_fallback_mesher_rejects_special_mosque_grammar():
+    from CORE.atlas_worship_landmark_fallback_mesher import (
+        AtlasWorshipLandmarkFallbackMesher,
+    )
+
     landmark = AtlasLandmark(
         id=806,
         landmark_type=AtlasLandmarkType.MOSQUE,
@@ -176,9 +180,8 @@ def test_fallback_mesher_rejects_unimplemented_special_mosque_grammar():
         ValueError,
         match="not implemented",
     ):
-        AtlasLandmarkMeshBuilder.build(
-            landmark,
-            terrain_mesh=None,
+        AtlasWorshipLandmarkFallbackMesher.build(
+            landmark
         )
 
 
@@ -205,3 +208,59 @@ def test_fallback_mesher_rejects_unimplemented_special_synagogue_grammar():
             landmark,
             terrain_mesh=None,
         )
+
+
+def test_mesh_builder_routes_premium_mosque_grammar_to_special_architecture():
+    landmark = AtlasLandmark(
+        id=808,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=_footprint(),
+        tags={
+            "building": "mosque",
+            "religion": "muslim",
+            "height": "27",
+            "atlas:worship_grammar": (
+                "single_dome_single_minaret"
+            ),
+        },
+        source="OSM",
+    )
+
+    mesh = AtlasLandmarkMeshBuilder.build(
+        landmark,
+        terrain_mesh=None,
+    )
+
+    assert mesh["type"] == "mosque_landmark"
+    assert mesh["worship_grammar"] == (
+        "single_dome_single_minaret"
+    )
+    assert mesh["special_architecture_applied"] is True
+    assert len(mesh["dome_meshes"]) == 1
+    assert len(mesh["minaret_meshes"]) == 1
+
+
+def test_mesh_builder_keeps_unknown_mosque_on_safe_fallback():
+    landmark = AtlasLandmark(
+        id=809,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=_footprint(),
+        tags={
+            "building": "mosque",
+            "religion": "muslim",
+        },
+        source="OSM",
+    )
+
+    mesh = AtlasLandmarkMeshBuilder.build(
+        landmark,
+        terrain_mesh=None,
+    )
+
+    assert mesh["type"] == (
+        "worship_landmark_fallback"
+    )
+    assert mesh["worship_grammar"] == (
+        "footprint_fallback"
+    )
+    assert mesh["special_architecture_applied"] is False

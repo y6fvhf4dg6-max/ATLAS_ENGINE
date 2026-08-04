@@ -16,6 +16,18 @@ from CORE.atlas_landmark_geometry_mesher import (
     AtlasLandmarkGeometryMesher,
 )
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_mosque_landmark_builder import (
+    AtlasMosqueLandmarkBuilder,
+)
+from CORE.atlas_mosque_landmark_mesher import (
+    AtlasMosqueLandmarkMesher,
+)
+from CORE.atlas_mosque_landmark_profile import (
+    AtlasMosqueLandmarkProfile,
+)
+from CORE.atlas_worship_grammar_resolver import (
+    AtlasWorshipGrammarResolver,
+)
 from CORE.atlas_worship_landmark_fallback_mesher import (
     AtlasWorshipLandmarkFallbackMesher,
 )
@@ -65,12 +77,45 @@ class AtlasLandmarkMeshBuilder:
             AtlasLandmarkType.MOSQUE,
             AtlasLandmarkType.SYNAGOGUE,
         }:
-            mesh = (
-                AtlasWorshipLandmarkFallbackMesher.build(
+            worship_grammar = (
+                AtlasWorshipGrammarResolver.resolve(
                     landmark
                 )
             )
-            foundation_footprint = mesh["footprint"]
+
+            if (
+                landmark.landmark_type
+                is AtlasLandmarkType.MOSQUE
+                and worship_grammar
+                == "single_dome_single_minaret"
+            ):
+                profile = AtlasMosqueLandmarkProfile(
+                    grammar_name=worship_grammar,
+                )
+
+                geometry = (
+                    AtlasMosqueLandmarkBuilder.build(
+                        landmark=landmark,
+                        profile=profile,
+                    )
+                )
+
+                mesh = AtlasMosqueLandmarkMesher.build(
+                    geometry
+                )
+                foundation_footprint = (
+                    geometry.footprint
+                )
+            else:
+                mesh = (
+                    AtlasWorshipLandmarkFallbackMesher
+                    .build(
+                        landmark
+                    )
+                )
+                foundation_footprint = (
+                    mesh["footprint"]
+                )
         else:
             builder = cls._BUILDERS.get(
                 landmark.landmark_type

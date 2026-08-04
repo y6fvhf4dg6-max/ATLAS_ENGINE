@@ -41,6 +41,18 @@ from CORE.atlas_landmark_geometry_mesher import (
 from CORE.atlas_landmark_mesh_builder import AtlasLandmarkMeshBuilder
 from CORE.atlas_landmark_provider_osm import AtlasLandmarkProviderOsm
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_mosque_landmark_builder import (
+    AtlasMosqueLandmarkBuilder,
+)
+from CORE.atlas_mosque_landmark_mesher import (
+    AtlasMosqueLandmarkMesher,
+)
+from CORE.atlas_mosque_landmark_profile import (
+    AtlasMosqueLandmarkProfile,
+)
+from CORE.atlas_worship_grammar_resolver import (
+    AtlasWorshipGrammarResolver,
+)
 from CORE.atlas_worship_landmark_fallback_mesher import (
     AtlasWorshipLandmarkFallbackMesher,
 )
@@ -278,6 +290,12 @@ class AtlasLandmarkFoundationBuilder:
                 AtlasLandmarkType.MOSQUE,
                 AtlasLandmarkType.SYNAGOGUE,
             }:
+                worship_grammar = (
+                    AtlasWorshipGrammarResolver.resolve(
+                        metric_landmark
+                    )
+                )
+
                 real_height_m = (
                     AtlasWorshipLandmarkFallbackMesher
                     ._read_positive_metres(
@@ -312,26 +330,63 @@ class AtlasLandmarkFoundationBuilder:
                     tags=scaled_tags,
                 )
 
-                mesh = (
-                    AtlasWorshipLandmarkFallbackMesher.build(
-                        scaled_landmark
+                if (
+                    landmark.landmark_type
+                    is AtlasLandmarkType.MOSQUE
+                    and worship_grammar
+                    == "single_dome_single_minaret"
+                ):
+                    profile = AtlasMosqueLandmarkProfile(
+                        grammar_name=worship_grammar,
+                        scale_ratio=(
+                            coordinate_engine.xy_scale
+                        ),
                     )
-                )
 
-                mesh["height_m"] = float(
-                    real_height_m
-                )
-                mesh["height_mm"] = float(
-                    scaled_height
-                )
-
-                scaled_geometry = (
-                    AtlasWorshipFallbackScaledGeometry(
-                        footprint=tuple(stl_footprint),
-                        height_m=scaled_height,
+                    scaled_geometry = (
+                        AtlasMosqueLandmarkBuilder.build(
+                            landmark=scaled_landmark,
+                            profile=profile,
+                        )
                     )
-                )
-                resolved_geometry = scaled_geometry
+
+                    mesh = (
+                        AtlasMosqueLandmarkMesher.build(
+                            scaled_geometry
+                        )
+                    )
+
+                    mesh["height_m"] = float(
+                        real_height_m
+                    )
+                    mesh["height_mm"] = float(
+                        scaled_height
+                    )
+                    resolved_geometry = scaled_geometry
+                else:
+                    mesh = (
+                        AtlasWorshipLandmarkFallbackMesher
+                        .build(
+                            scaled_landmark
+                        )
+                    )
+
+                    mesh["height_m"] = float(
+                        real_height_m
+                    )
+                    mesh["height_mm"] = float(
+                        scaled_height
+                    )
+
+                    scaled_geometry = (
+                        AtlasWorshipFallbackScaledGeometry(
+                            footprint=tuple(
+                                stl_footprint
+                            ),
+                            height_m=scaled_height,
+                        )
+                    )
+                    resolved_geometry = scaled_geometry
             else:
                 builder = (
                     AtlasLandmarkMeshBuilder

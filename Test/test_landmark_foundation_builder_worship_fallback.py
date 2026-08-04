@@ -186,3 +186,53 @@ def test_foundation_builder_builds_worship_fallback_in_single_pass(
         0.7,
         6.7,
     }
+
+
+def test_foundation_builder_routes_premium_mosque_grammar():
+    source = {
+        **_source(
+            source_id=904,
+            building="mosque",
+            religion="muslim",
+        ),
+        "tags": {
+            "building": "mosque",
+            "amenity": "place_of_worship",
+            "religion": "muslim",
+            "height": "27",
+            "atlas:worship_grammar": (
+                "single_dome_single_minaret"
+            ),
+        },
+    }
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+
+    mesh = meshes[0]
+
+    assert mesh["type"] == "mosque_landmark"
+    assert mesh["worship_grammar"] == (
+        "single_dome_single_minaret"
+    )
+    assert mesh["special_architecture_applied"] is True
+    assert mesh["height_m"] == 27.0
+    assert mesh["height_mm"] == 9.0
+    assert mesh["foundation_z"] == 0.7
+    assert len(mesh["dome_meshes"]) == 1
+    assert len(mesh["minaret_meshes"]) == 1
+
+    triangle_z_values = {
+        round(point[2], 8)
+        for triangle in mesh["triangles"]
+        for point in triangle
+    }
+
+    assert min(triangle_z_values) == 0.7
+    assert max(triangle_z_values) == 9.7
