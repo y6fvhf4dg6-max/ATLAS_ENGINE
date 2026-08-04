@@ -46,6 +46,9 @@ from CORE.atlas_castle_wall_builder import (
 from CORE.atlas_castle_geometry_classifier import (
     AtlasCastleGeometryClassifier,
 )
+from CORE.atlas_semantic_architecture_adapter_resolver import (
+    AtlasSemanticArchitectureAdapterResolver,
+)
 from CORE.atlas_castle_shell_builder import (
     AtlasCastleShellBuilder,
 )
@@ -71,6 +74,34 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
+    @staticmethod
+    def resolve_castle_semantic_architecture(
+        castle_geometry,
+    ):
+        return (
+            AtlasSemanticArchitectureAdapterResolver
+            .resolve(castle_geometry)
+        )
+
+    @staticmethod
+    def attach_castle_semantic_architecture(
+        *,
+        result,
+        castle_geometry,
+        include,
+    ):
+        if not include:
+            return result
+
+        result["castle_semantic_architecture"] = (
+            AtlasFoundationFirstEngine
+            .resolve_castle_semantic_architecture(
+                castle_geometry
+            )
+        )
+
+        return result
+
     @staticmethod
     def _build_water_polygon_groups(
         waters,
@@ -385,6 +416,7 @@ class AtlasFoundationFirstEngine:
         castle_focus_padding_m=10.0,
         fixed_xy_scale=5500.0,
         use_fixed_xy_scale=False,
+        include_castle_semantic_architecture=False,
         debug=True,
     ):
         source_bbox = bbox
@@ -957,7 +989,7 @@ class AtlasFoundationFirstEngine:
             {},
         )
 
-        return {
+        result = {
             "output_path": output_path,
             "reader_buildings": len(raw_buildings),
             "reader_landmarks": len(landmarks),
@@ -1031,3 +1063,14 @@ class AtlasFoundationFirstEngine:
             "input_quality_report": input_quality_report,
             "mode": "foundation_first",
         }
+
+        return (
+            AtlasFoundationFirstEngine
+            .attach_castle_semantic_architecture(
+                result=result,
+                castle_geometry=castle_geometry,
+                include=(
+                    include_castle_semantic_architecture
+                ),
+            )
+        )
