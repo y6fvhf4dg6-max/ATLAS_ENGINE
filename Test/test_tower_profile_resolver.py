@@ -59,3 +59,16 @@ def test_generic_observation_tower_does_not_use_galata_profile():
     )
 
     assert profile == "observation"
+
+
+def test_galata_tower_catalog_matching_is_normalized():
+    profile = AtlasTowerProfileResolver.resolve(
+        {
+            "wikidata": " q91274 ",
+            "name": "Galata Kulesi",
+            "historic": "tower",
+            "man_made": "tower",
+        }
+    )
+
+    assert profile == "galata"
