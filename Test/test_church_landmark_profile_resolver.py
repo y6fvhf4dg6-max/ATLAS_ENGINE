@@ -105,3 +105,16 @@ def test_profile_resolver_uses_safe_default_grammar_for_unknown_church():
     )
 
     assert profile.grammar_name == "single_west_tower"
+
+
+def test_bonner_muenster_geometry_override_resolves_with_normalized_wikidata():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=999999,
+            name="Bonner Münster",
+            wikidata=" q686664 ",
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.has_apse is False

@@ -7,11 +7,12 @@ from CORE.atlas_church_landmark_profile import (
     AtlasChurchLandmarkProfile,
 )
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_master_landmark_catalog import (
+    AtlasMasterLandmarkCatalog,
+)
 
 
 class AtlasChurchLandmarkProfileResolver:
-    BONNER_MUENSTER_OSM_ID = 112526702
-
     @classmethod
     def resolve(
         cls,
@@ -36,11 +37,29 @@ class AtlasChurchLandmarkProfileResolver:
             else "church"
         )
 
-        landmark_id = int(landmark.id)
+        tags = getattr(
+            landmark,
+            "tags",
+            {},
+        ) or {}
 
-        has_apse = (
-            landmark_id
-            != cls.BONNER_MUENSTER_OSM_ID
+        catalog_entry = (
+            AtlasMasterLandmarkCatalog.resolve(
+                wikidata_id=tags.get("wikidata"),
+                osm_id=getattr(
+                    landmark,
+                    "id",
+                    None,
+                ),
+            )
+        )
+
+        has_apse = not (
+            catalog_entry is not None
+            and catalog_entry.landmark_family
+            == "church"
+            and "disable_synthetic_apse"
+            in catalog_entry.geometry_overrides
         )
 
         return AtlasChurchLandmarkProfile(
