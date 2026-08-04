@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 from CORE.atlas_landmark_type import AtlasLandmarkType
+from CORE.atlas_master_landmark_catalog import (
+    AtlasMasterLandmarkCatalog,
+)
 
 
 class AtlasChurchGrammarResolver:
-    CATALOG_GRAMMARS = {
-        "Q686664": "bonn_muenster_catalog",
-        "Q1788329": "single_west_tower",
-    }
-
     DEFAULT_GRAMMARS = {
         AtlasLandmarkType.CHURCH: "single_west_tower",
         AtlasLandmarkType.CATHEDRAL: "twin_west_towers",
@@ -29,16 +27,25 @@ class AtlasChurchGrammarResolver:
             {},
         ) or {}
 
-        wikidata = str(
-            tags.get("wikidata", "")
-        ).strip()
-
-        catalog_grammar = cls.CATALOG_GRAMMARS.get(
-            wikidata
+        catalog_entry = (
+            AtlasMasterLandmarkCatalog.resolve(
+                wikidata_id=tags.get("wikidata"),
+                osm_id=getattr(
+                    landmark,
+                    "id",
+                    None,
+                ),
+            )
         )
 
-        if catalog_grammar is not None:
-            return catalog_grammar
+        if (
+            catalog_entry is not None
+            and catalog_entry.landmark_family
+            == "church"
+            and catalog_entry.grammar_name
+            is not None
+        ):
+            return catalog_entry.grammar_name
 
         return cls.DEFAULT_GRAMMARS[
             landmark_type

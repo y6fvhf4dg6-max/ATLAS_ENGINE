@@ -80,3 +80,14 @@ def test_unknown_cathedral_uses_twin_west_tower_grammar():
     )
 
     assert grammar == "twin_west_towers"
+
+
+def test_catalog_wikidata_matching_is_normalized():
+    grammar = AtlasChurchGrammarResolver.resolve(
+        _landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+            wikidata=" q686664 ",
+        )
+    )
+
+    assert grammar == "bonn_muenster_catalog"
