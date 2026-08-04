@@ -625,18 +625,33 @@ class AtlasMosqueLandmarkMesher:
             geometry.height_m
         )
 
+        minimum_vertical_feature_mm = float(
+            geometry.profile.nozzle_diameter_mm
+        )
+
         prayer_hall_top_z = (
             total_height * 0.48
         )
-        drum_top_z = (
-            total_height * 0.58
+
+        drum_height = max(
+            total_height * 0.10,
+            minimum_vertical_feature_mm,
         )
-        dome_top_z = (
-            total_height * 0.76
+        drum_top_z = (
+            prayer_hall_top_z
+            + drum_height
         )
 
-        minaret_body_top_z = (
-            total_height * 0.86
+        dome_top_z = max(
+            total_height * 0.76,
+            drum_top_z
+            + minimum_vertical_feature_mm,
+        )
+
+        minaret_body_top_z = min(
+            total_height * 0.86,
+            total_height
+            - minimum_vertical_feature_mm,
         )
         minaret_cap_top_z = total_height
 

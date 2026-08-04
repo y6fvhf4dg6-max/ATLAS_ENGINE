@@ -193,3 +193,63 @@ def test_mesher_rejects_wrong_geometry_type():
         AtlasMosqueLandmarkMesher.build(
             object()
         )
+
+
+def test_small_mosque_components_respect_printable_minimums():
+    landmark = AtlasLandmark(
+        id=1202,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=(
+            (0.0, 0.0),
+            (2.0, 0.0),
+            (2.0, 3.0),
+            (0.0, 3.0),
+        ),
+        tags={
+            "building": "mosque",
+            "religion": "muslim",
+            "height": "3",
+            "atlas:worship_grammar": (
+                "single_dome_single_minaret"
+            ),
+        },
+        source="OSM",
+    )
+
+    geometry = AtlasMosqueLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasMosqueLandmarkProfile(
+            scale_ratio=3000.0,
+            nozzle_diameter_mm=0.4,
+        ),
+    )
+
+    mesh = AtlasMosqueLandmarkMesher.build(
+        geometry
+    )
+
+    drum = mesh["dome_drum_meshes"][0]
+    minaret = mesh["minaret_meshes"][0]
+    balcony = mesh[
+        "minaret_balcony_meshes"
+    ][0]
+    cap = mesh["minaret_cap_meshes"][0]
+
+    tolerance = 1e-9
+
+    assert (
+        drum["top_z"] - drum["bottom_z"]
+        >= 0.4 - tolerance
+    )
+    assert (
+        minaret["radius"] * 2.0
+        >= 0.8 - tolerance
+    )
+    assert (
+        balcony["top_z"] - balcony["bottom_z"]
+        >= 0.4 - tolerance
+    )
+    assert (
+        cap["top_z"] - cap["base_z"]
+        >= 0.4 - tolerance
+    )
