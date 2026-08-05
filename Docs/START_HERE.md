@@ -627,3 +627,77 @@ yapılmalıdır.
 Bu bölüm, belgenin daha eski Bonn merkez-kule “bir sonraki adım”
 kayıtlarına göre önceliklidir.
 
+## 5 Ağustos 2026 — Karaköy gerçek ibadethane doğrulaması
+
+Son temiz ve push edilmiş kod commit’i:
+
+- `aef280d Catalog Kılıç Ali Paşa Mosque grammar`
+
+Son tam regresyon:
+
+- `2267 passed in 9.88s`
+
+Tamamlanan genel motor çalışması:
+
+- building-part hiyerarşisinden cami grammar çıkarımı
+- building-part hiyerarşisinden kilise kule grammar çıkarımı
+- katalog grammar kararının component çıkarımına göre önceliği
+- gerçek footprint içinde güvenli çoklu kubbe/minare yerleşimi
+- component sayılarının üretim profil sınırlarında tutulması
+
+İlgili commit:
+
+- `5dbbffa Infer worship and church grammars from components`
+
+Gerçek Karaköy doğrulama yapıları:
+
+- Kılıç Ali Paşa Camii
+  - OSM way `165574748`
+  - Wikidata `Q862848`
+- Surp Krikor Lusavoriç Ermeni Kilisesi
+  - OSM way `165575977`
+  - Wikidata `Q20472836`
+
+İlk kontrolde Kılıç Ali Paşa Camii yalnız güvenli
+`footprint_fallback` gövdesi üretti. Mesh kapalı ve manifold olmasına
+rağmen cami olarak okunabilir değildi.
+
+Master Landmark Catalog’a şu kayıt eklendi:
+
+- key: `kilic-ali-pasha-mosque`
+- family: `mosque`
+- grammar: `single_dome_single_minaret`
+
+Katalog bağlantısından sonraki production preview’da:
+
+- ana kubbe
+- kasnak
+- tek minare
+- şerefe
+- minare külahı
+
+başarıyla üretildi ve yapı cami olarak okunabilir hale geldi.
+
+Surp Krikor Kilisesi üretimi korunmuştur:
+
+- nef
+- transept
+- apsis
+- çatı sistemi
+- tek batı kulesi
+
+Yerel görsel doğrulama çıktısı:
+
+- `OUTPUT/STL/karakoy_kilic_ali_pasa_surp_krikor_catalog_preview_1_3000.stl`
+
+Yerel PBF fixture ve preview STL `.gitignore` kapsamındadır; repoya
+dahil edilmemiştir.
+
+Bu sonuç grammar ve production-routing doğrulamasıdır; Kılıç Ali Paşa
+Camii’nin tarihî rekonstrüksiyonu değildir. Landmark’a özel mesher
+yazılmayacaktır. Gelecek kalite artışı genel Semantic Architecture,
+facade/detail ve LoD sistemlerinden gelmelidir.
+
+Karaköy doğrulama paketi tamamlanmıştır. Yeni Karaköy özel durumuna
+geçilmeden roadmap ve ürün öncelikleri esas alınmalıdır.
+

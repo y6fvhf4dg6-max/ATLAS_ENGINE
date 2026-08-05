@@ -854,3 +854,152 @@ Aktif geliştirme tekrar ürün doğrulama önceliğine döner:
 Bu bölüm, daha eski Bonn merkez-kule veya Dalyan merkezli
 “sıradaki tek işlem” kayıtlarına göre önceliklidir.
 
+# 5 Ağustos 2026 — Karaköy gerçek ibadethane doğrulaması
+
+## Güncel güvenli nokta
+
+Son temiz ve push edilmiş commit:
+
+- `aef280d Catalog Kılıç Ali Paşa Mosque grammar`
+
+Git durumu:
+
+- `HEAD == origin/main`
+- tracked çalışma ağacı temiz
+- yalnız aşağıdaki devir belgeleri untracked:
+  - `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-01.md`
+  - `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-04.md`
+
+Son tam regresyon:
+
+- `2267 passed in 9.88s`
+
+## Tamamlanan teknik çalışma
+
+Building-part hiyerarşisinden otomatik ibadethane grammar çıkarımı
+tamamlandı ve push edildi:
+
+- commit: `5dbbffa Infer worship and church grammars from components`
+
+Cami çıkarımı:
+
+- bir minare:
+  - `single_dome_single_minaret`
+- iki veya daha fazla minare ve iki veya daha fazla kubbe:
+  - `multi_dome_multi_minaret`
+- iki veya daha fazla minare fakat yeterli kubbe kanıtı yok:
+  - `footprint_fallback`
+- component sayıları üretim profilinin güvenli üst sınırında tutulur.
+
+Kilise çıkarımı:
+
+- bir `tower:type=bell_tower`:
+  - `single_west_tower`
+- iki `tower:type=bell_tower`:
+  - `twin_west_towers`
+- katalog grammar kararı component çıkarımından önce gelir.
+
+## Karaköy gerçek PBF doğrulaması
+
+Kaynak:
+
+- `Data/OSM/turkey-latest.osm.pbf`
+
+Yerel doğrulama fixture’ı:
+
+- `Data/OSM/karakoy-kilic-ali-pasa-surp-krikor-test.osm.pbf`
+- `.gitignore` kapsamındadır ve repoya dahil edilmemiştir.
+
+Seçilen gerçek landmark’lar:
+
+- Kılıç Ali Paşa Camii
+  - OSM way: `165574748`
+  - Wikidata: `Q862848`
+- Surp Krikor Lusavoriç Ermeni Kilisesi
+  - OSM way: `165575977`
+  - Wikidata: `Q20472836`
+
+İlk üretim sonucunda:
+
+- Kılıç Ali Paşa Camii yalnız `footprint_fallback` gövdesi aldı.
+- Mesh kapalı ve manifold idi fakat cami olarak görsel okunabilirliği
+  yetersizdi.
+- Surp Krikor kilisesi nef, transept, apsis, çatı ve tek batı kulesiyle
+  okunabilir üretildi.
+
+## Master Landmark Catalog genişletmesi
+
+Kılıç Ali Paşa Camii Master Landmark Catalog’a eklendi:
+
+- key:
+  - `kilic-ali-pasha-mosque`
+- family:
+  - `mosque`
+- Wikidata:
+  - `Q862848`
+- OSM:
+  - `165574748`
+- grammar:
+  - `single_dome_single_minaret`
+
+Commit:
+
+- `aef280d Catalog Kılıç Ali Paşa Mosque grammar`
+
+## Görsel doğrulama
+
+Katalog bağlantısından sonra production foundation hattı yeniden
+çalıştırıldı.
+
+Kılıç Ali Paşa Camii:
+
+- ana kubbe üretildi
+- kasnak üretildi
+- tek minare üretildi
+- şerefe üretildi
+- minare külahı üretildi
+- yapı artık cami olarak görsel biçimde okunabiliyor
+
+Surp Krikor Kilisesi:
+
+- mevcut kilise geometrisi korundu
+- kule, nef ve çatı sistemi bozulmadı
+
+Birleşik yerel preview:
+
+- `OUTPUT/STL/karakoy_kilic_ali_pasa_surp_krikor_catalog_preview_1_3000.stl`
+
+Bu STL `.gitignore` kapsamındaki yerel görsel doğrulama çıktısıdır ve
+repoya dahil edilmemiştir.
+
+## Teknik sınır
+
+Kılıç Ali Paşa çıktısı grammar doğrulaması açısından başarılıdır fakat
+tarihî rekonstrüksiyon değildir.
+
+Mevcut sınırlamalar:
+
+- minare oranı kısa ve gövdeye yakındır
+- ana kubbe oranları geneldir
+- alt yapı gerçek footprint tabanlı ağır bir kütle olarak kalır
+- landmark’a özgü tarihî oranlar modellenmemiştir
+
+Bu sınırlamalar için landmark’a özel mesher yazılmayacaktır.
+İleri iyileştirmeler genel Semantic Architecture, facade/detail ve LoD
+sistemleri üzerinden yapılmalıdır.
+
+## Sonuç
+
+Bu paket tamamlandı:
+
+- gerçek PBF landmark tespiti
+- catalog grammar routing
+- cami kubbe/minare üretimi
+- kilise regresyon güvenliği
+- manifold üretim
+- görsel doğrulama
+- commit ve push
+
+Sıradaki geliştirme yeni bir Karaköy özel durumu değil, mevcut roadmap
+ve ürün önceliklerine göre seçilmelidir.
+
