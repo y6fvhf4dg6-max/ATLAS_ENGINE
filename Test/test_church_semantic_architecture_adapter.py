@@ -184,9 +184,12 @@ def test_adapter_rejects_non_church_geometry():
 
 def test_adapter_carries_church_semantic_profile_name():
     geometry = _build_geometry(
+        landmark_type=AtlasLandmarkType.CATHEDRAL,
         profile=AtlasChurchLandmarkProfile(
-            grammar_name="single_west_tower",
-            profile_name="romanesque_basilica",
+            landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
+            profile_name="romanesque_cathedral",
+            tower_count=2,
         ),
     )
 
@@ -194,5 +197,45 @@ def test_adapter_carries_church_semantic_profile_name():
         geometry
     )
 
-    assert model.profile_name == "romanesque_basilica"
+    assert model.profile_name == "romanesque_cathedral"
+
+def test_adapter_exposes_resolved_church_semantic_profile_flags():
+    geometry = _build_geometry(
+        landmark_type=AtlasLandmarkType.CATHEDRAL,
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
+            profile_name="romanesque_cathedral",
+            tower_count=2,
+        ),
+    )
+
+    model = AtlasChurchSemanticArchitectureAdapter.adapt(
+        geometry
+    )
+
+    assert model.profile_name == "romanesque_cathedral"
+    assert model.flags == (
+        "class_cathedral",
+        "style_romanesque",
+        "plan_basilica_cross_plan",
+        "tower_scheme_multi_tower",
+        "roof_character_stepped_pitched",
+        "facade_rhythm_heavy_round_arch",
+    )
+
+
+def test_adapter_exposes_generic_church_profile_flags():
+    model = AtlasChurchSemanticArchitectureAdapter.adapt(
+        _build_geometry()
+    )
+
+    assert model.flags == (
+        "class_church",
+        "style_generic",
+        "plan_cross_plan",
+        "tower_scheme_grammar_driven",
+        "roof_character_pitched",
+        "facade_rhythm_regular",
+    )
 

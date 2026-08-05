@@ -3,6 +3,9 @@ from __future__ import annotations
 from CORE.atlas_church_landmark_builder import (
     AtlasChurchLandmarkGeometry,
 )
+from CORE.atlas_church_semantic_profile_system import (
+    AtlasChurchSemanticProfileSystem,
+)
 from CORE.atlas_semantic_architecture_component import (
     AtlasSemanticArchitectureComponent,
 )
@@ -42,6 +45,12 @@ class AtlasChurchSemanticArchitectureAdapter:
             for component in geometry.components
         )
 
+        semantic_profile = (
+            AtlasChurchSemanticProfileSystem.resolve(
+                geometry.profile.profile_name
+            )
+        )
+
         return AtlasSemanticArchitectureModel(
             landmark_family="church",
             grammar_name=geometry.profile.grammar_name,
@@ -49,6 +58,23 @@ class AtlasChurchSemanticArchitectureAdapter:
             profile_name=geometry.profile.profile_name,
             flags=(
                 f"class_{geometry.landmark_class}",
+                (
+                    "style_"
+                    f"{semantic_profile.architectural_style}"
+                ),
+                f"plan_{semantic_profile.plan_type}",
+                (
+                    "tower_scheme_"
+                    f"{semantic_profile.tower_scheme}"
+                ),
+                (
+                    "roof_character_"
+                    f"{semantic_profile.roof_character}"
+                ),
+                (
+                    "facade_rhythm_"
+                    f"{semantic_profile.facade_rhythm}"
+                ),
             ),
         )
 
