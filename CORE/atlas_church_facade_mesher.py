@@ -9,6 +9,9 @@ from CORE.atlas_church_facade_profile_system import (
 from CORE.atlas_church_footprint_resolver import (
     AtlasChurchFootprintFrame,
 )
+from CORE.atlas_facade_circular_panel_builder import (
+    AtlasFacadeCircularPanelBuilder,
+)
 from CORE.atlas_facade_panel_builder import (
     AtlasFacadePanelBuilder,
 )
@@ -335,6 +338,7 @@ class AtlasChurchFacadeMesher:
 
         side_facades = []
         end_facades = []
+        oculus_meshes = []
         component_meshes = []
         triangles = []
 
@@ -368,6 +372,7 @@ class AtlasChurchFacadeMesher:
                 ),
                 "side_facades": [],
                 "end_facades": [],
+                "oculus_meshes": [],
                 "component_meshes": [],
                 "triangles": [],
             }
@@ -513,6 +518,56 @@ class AtlasChurchFacadeMesher:
                 facade["triangles"]
             )
 
+        if (
+            facade_profile.front_composition
+            == "portal_with_oculus"
+        ):
+            oculus = (
+                AtlasFacadeCircularPanelBuilder.build(
+                    wall_quad=cls._end_wall_quad(
+                        frame=frame,
+                        facade_side="front",
+                        wall_height=wall_height,
+                        main_nave_depth=main_nave_depth,
+                        main_nave_width=main_nave_width,
+                    ),
+                    center_u=0.50,
+                    center_v=0.72,
+                    diameter_ratio=0.22,
+                    depth_mm=model_depth_m,
+                    embed_mm=model_embed_m,
+                    segments=16,
+                    metadata={
+                        "architectural_role": (
+                            "church_front_facade_oculus"
+                        ),
+                        "facade_side": "front",
+                        "facade_composition": (
+                            facade_profile.front_composition
+                        ),
+                        "facade_rhythm": (
+                            facade_profile.facade_rhythm
+                        ),
+                        "physical_action": (
+                            resolved_window_action
+                        ),
+                        "resolved_size_mm": (
+                            resolved_window_size_mm
+                        ),
+                    },
+                )
+            )
+
+            oculus_meshes.append(
+                oculus
+            )
+            component_meshes.append(
+                oculus
+            )
+            triangles.extend(
+                oculus["triangles"]
+            )
+
         return {
             "type": "church_facade_system",
             "facade_rhythm": (
@@ -538,6 +593,7 @@ class AtlasChurchFacadeMesher:
             ),
             "side_facades": side_facades,
             "end_facades": end_facades,
+            "oculus_meshes": oculus_meshes,
             "component_meshes": component_meshes,
             "triangles": triangles,
         }

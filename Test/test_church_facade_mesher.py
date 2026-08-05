@@ -52,7 +52,8 @@ def test_heavy_round_arch_builds_two_main_nave_side_facades():
         for facade in result["side_facades"]
     ) == 10
     assert len(result["end_facades"]) == 2
-    assert result["panel_count"] == 12
+    assert len(result["oculus_meshes"]) == 1
+    assert result["panel_count"] == 13
 
     assert {
         facade["facade_side"]
@@ -500,4 +501,111 @@ def test_omit_output_retains_composition_contract():
         result["rear_composition"]
         == "single_arch_opening"
     )
+
+def test_portal_with_oculus_adds_circular_front_facade_detail():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    assert len(result["oculus_meshes"]) == 1
+
+    oculus = result["oculus_meshes"][0]
+
+    assert (
+        oculus["architectural_role"]
+        == "church_front_facade_oculus"
+    )
+    assert oculus["facade_side"] == "front"
+    assert (
+        oculus["facade_composition"]
+        == "portal_with_oculus"
+    )
+    assert (
+        oculus["geometry_type"]
+        == "circular_facade_panel_prism"
+    )
+
+
+def test_single_arch_portal_does_not_add_oculus():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    assert result["oculus_meshes"] == []
+
+
+def test_window_omit_suppresses_oculus_geometry():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="omit",
+        window_resolved_size_mm=0.0,
+    )
+
+    assert result["oculus_meshes"] == []
+    assert result["panel_count"] == 0
+
+
+def test_oculus_is_closed_and_manifold():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    report = AtlasMeshValidator._topology_report(
+        result["oculus_meshes"][0]
+    )
+
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0
 

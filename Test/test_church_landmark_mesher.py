@@ -856,6 +856,7 @@ def test_semantic_facade_rhythm_drives_church_facade_geometry():
     assert facade_roles == {
         "church_main_nave_facade_bay",
         "church_front_facade_opening",
+        "church_front_facade_oculus",
         "church_rear_facade_opening",
     }
 
