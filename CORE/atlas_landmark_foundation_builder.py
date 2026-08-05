@@ -293,6 +293,46 @@ class AtlasLandmarkFoundationBuilder:
                 AtlasLandmarkType.MOSQUE,
                 AtlasLandmarkType.SYNAGOGUE,
             }:
+                catalog_entry = (
+                    AtlasMasterLandmarkCatalog.resolve(
+                        wikidata_id=landmark.tags.get(
+                            "wikidata"
+                        ),
+                        osm_id=getattr(
+                            landmark,
+                            "id",
+                            None,
+                        ),
+                    )
+                )
+
+                expected_catalog_family = (
+                    "mosque"
+                    if landmark.landmark_type
+                    is AtlasLandmarkType.MOSQUE
+                    else "synagogue"
+                )
+
+                if (
+                    catalog_entry is not None
+                    and catalog_entry.landmark_family
+                    == expected_catalog_family
+                    and catalog_entry.grammar_name is not None
+                    and "atlas:worship_grammar"
+                    not in metric_landmark.tags
+                ):
+                    catalog_tags = dict(
+                        metric_landmark.tags
+                    )
+                    catalog_tags[
+                        "atlas:worship_grammar"
+                    ] = catalog_entry.grammar_name
+
+                    metric_landmark = replace(
+                        metric_landmark,
+                        tags=catalog_tags,
+                    )
+
                 worship_grammar = (
                     AtlasWorshipGrammarResolver.resolve(
                         metric_landmark

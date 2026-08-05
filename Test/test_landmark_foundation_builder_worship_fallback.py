@@ -236,3 +236,62 @@ def test_foundation_builder_routes_premium_mosque_grammar():
 
     assert min(triangle_z_values) == 0.7
     assert max(triangle_z_values) == 9.7
+
+
+def test_foundation_builder_routes_catalog_worship_grammar_before_mesh(
+    monkeypatch,
+):
+    from CORE.atlas_master_landmark_catalog import (
+        AtlasMasterLandmarkCatalog,
+        AtlasMasterLandmarkCatalogEntry,
+    )
+
+    catalog_entry = AtlasMasterLandmarkCatalogEntry(
+        key="catalog-mosque",
+        landmark_family="mosque",
+        osm_ids=(905,),
+        grammar_name="single_dome_single_minaret",
+    )
+
+    monkeypatch.setattr(
+        AtlasMasterLandmarkCatalog,
+        "resolve",
+        classmethod(
+            lambda cls, **kwargs: catalog_entry
+        ),
+    )
+
+    source = {
+        **_source(
+            source_id=905,
+            building="mosque",
+            religion="muslim",
+        ),
+        "tags": {
+            "building": "mosque",
+            "amenity": "place_of_worship",
+            "religion": "muslim",
+            "height": "27",
+        },
+    }
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+
+    mesh = meshes[0]
+
+    assert mesh["type"] == "mosque_landmark"
+    assert mesh["worship_grammar"] == (
+        "single_dome_single_minaret"
+    )
+    assert mesh["special_architecture_applied"] is True
+    assert len(mesh["dome_meshes"]) == 1
+    assert len(mesh["minaret_meshes"]) == 1
+    assert len(mesh["minaret_balcony_meshes"]) == 1
+    assert len(mesh["minaret_cap_meshes"]) == 1
