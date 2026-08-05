@@ -145,6 +145,13 @@ class AtlasMasterLandmarkCatalog:
             grammar_name="single_dome_single_minaret",
         ),
         AtlasMasterLandmarkCatalogEntry(
+            key="kilic-ali-pasha-mosque",
+            landmark_family="mosque",
+            wikidata_id="Q862848",
+            osm_ids=(165574748,),
+            grammar_name="single_dome_single_minaret",
+        ),
+        AtlasMasterLandmarkCatalogEntry(
             key="galata-tower",
             landmark_family="tower",
             wikidata_id="Q91274",

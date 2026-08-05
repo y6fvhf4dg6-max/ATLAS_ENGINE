@@ -185,3 +185,19 @@ def test_cenabi_ahmet_pasha_mosque_catalog_contract():
     assert entry.grammar_name == (
         "single_dome_single_minaret"
     )
+
+def test_kilic_ali_pasha_mosque_catalog_contract():
+    entry = AtlasMasterLandmarkCatalog.resolve(
+        wikidata_id="Q862848",
+        osm_id=165574748,
+    )
+
+    assert entry is not None
+    assert entry.key == "kilic-ali-pasha-mosque"
+    assert entry.landmark_family == "mosque"
+    assert entry.wikidata_id == "Q862848"
+    assert entry.osm_ids == (165574748,)
+    assert entry.grammar_name == (
+        "single_dome_single_minaret"
+    )
+
