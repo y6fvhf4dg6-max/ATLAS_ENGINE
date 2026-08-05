@@ -1332,3 +1332,132 @@ def test_bonn_tower_windows_are_included_in_final_landmark_triangles():
         for triangle in window["triangles"]
     )
 
+def test_single_west_tower_routes_front_details_to_tower_face():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            grammar_name="single_west_tower",
+            profile_name="romanesque_cathedral",
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    facade = mesh[
+        "architectural_facade_system"
+    ]
+    tower = next(
+        tower
+        for tower in mesh["tower_meshes"]
+        if tower["tower_type"]
+        == "west_tower_center"
+    )
+
+    front = next(
+        item
+        for item in facade["end_facades"]
+        if item["facade_side"] == "front"
+    )
+    oculus = facade["oculus_meshes"][0]
+
+    assert facade["front_surface_target"] == (
+        "west_tower_center_front"
+    )
+    assert front["surface_target"] == (
+        "west_tower_center_front"
+    )
+    assert oculus["surface_target"] == (
+        "west_tower_center_front"
+    )
+
+    frame = mesh["footprint_frame"]
+
+    tower_front_longitudinal = (
+        tower["center_longitudinal"]
+        - tower["longitudinal_span"] / 2.0
+    )
+    nave_front_longitudinal = (
+        -facade["main_nave_depth"] / 2.0
+    )
+
+    portal = front["component_meshes"][0]
+
+    portal_longitudinal = sum(
+        frame.to_local(
+            (point[0], point[1])
+        )[0]
+        for point in portal["back"]
+    ) / len(portal["back"])
+
+    oculus_longitudinal = frame.to_local(
+        (
+            oculus["center"][0],
+            oculus["center"][1],
+        )
+    )[0]
+
+    assert abs(
+        portal_longitudinal
+        - tower_front_longitudinal
+    ) < abs(
+        portal_longitudinal
+        - nave_front_longitudinal
+    )
+
+    assert abs(
+        oculus_longitudinal
+        - tower_front_longitudinal
+    ) < abs(
+        oculus_longitudinal
+        - nave_front_longitudinal
+    )
+
+
+def test_twin_west_towers_keep_central_front_composition_on_nave():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="twin_west_towers",
+            profile_name="romanesque_cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    facade = mesh[
+        "architectural_facade_system"
+    ]
+
+    front = next(
+        item
+        for item in facade["end_facades"]
+        if item["facade_side"] == "front"
+    )
+
+    assert facade["front_surface_target"] == (
+        "main_nave_front"
+    )
+    assert front["surface_target"] == (
+        "main_nave_front"
+    )
+
+    assert all(
+        panel["surface_target"]
+        == "main_nave_front"
+        for panel in front["component_meshes"]
+    )
+
+    assert all(
+        oculus["surface_target"]
+        == "main_nave_front"
+        for oculus in facade["oculus_meshes"]
+    )
+

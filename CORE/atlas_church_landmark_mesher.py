@@ -936,6 +936,52 @@ class AtlasChurchLandmarkMesher:
             )
         )
 
+        front_wall_quad = None
+        front_surface_target = (
+            "main_nave_front"
+        )
+
+        west_center_tower = next(
+            (
+                tower
+                for tower in tower_meshes
+                if tower["tower_type"]
+                == "west_tower_center"
+            ),
+            None,
+        )
+
+        if west_center_tower is not None:
+            bottom_ring = tuple(
+                west_center_tower[
+                    "body_bottom_ring"
+                ]
+            )
+            top_ring = tuple(
+                west_center_tower[
+                    "body_top_ring"
+                ]
+            )
+
+            if (
+                len(bottom_ring) != 4
+                or len(top_ring) != 4
+            ):
+                raise ValueError(
+                    "west_tower_center requires "
+                    "a four-sided body"
+                )
+
+            front_wall_quad = (
+                bottom_ring[3],
+                bottom_ring[0],
+                top_ring[0],
+                top_ring[3],
+            )
+            front_surface_target = (
+                "west_tower_center_front"
+            )
+
         window_component = next(
             (
                 component
@@ -974,6 +1020,10 @@ class AtlasChurchLandmarkMesher:
                     window_resolved_size_mm
                 ),
                 side_wall_min_z=outer_aisle_height,
+                front_wall_quad=front_wall_quad,
+                front_surface_target=(
+                    front_surface_target
+                ),
             )
         )
         facade_meshes = list(

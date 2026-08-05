@@ -984,3 +984,77 @@ def test_side_facades_can_target_visible_clerestory_band():
         )
     ) >= 8.0
 
+def test_front_composition_can_target_custom_visible_surface():
+    frame = _frame()
+
+    front_wall_quad = (
+        (4.0, 7.0, 0.0),
+        (16.0, 7.0, 0.0),
+        (16.0, 7.0, 18.0),
+        (4.0, 7.0, 18.0),
+    )
+
+    result = AtlasChurchFacadeMesher.build(
+        frame=frame,
+        wall_height=20.0,
+        front_wall_quad=front_wall_quad,
+        front_surface_target=(
+            "west_tower_center_front"
+        ),
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    front = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+
+    assert result["front_surface_target"] == (
+        "west_tower_center_front"
+    )
+    assert front["surface_target"] == (
+        "west_tower_center_front"
+    )
+
+    assert all(
+        panel["surface_target"]
+        == "west_tower_center_front"
+        for panel in front["component_meshes"]
+    )
+
+    assert len(result["oculus_meshes"]) == 1
+    assert (
+        result["oculus_meshes"][0][
+            "surface_target"
+        ]
+        == "west_tower_center_front"
+    )
+
+    assert all(
+        abs(point[1] - 7.0)
+        <= result["model_depth_m"]
+        for panel in front["component_meshes"]
+        for point in (
+            *panel["back"],
+            *panel["front"],
+        )
+    )
+
+    oculus = result["oculus_meshes"][0]
+
+    assert abs(
+        oculus["center"][1] - 7.0
+    ) < 1e-9
+
