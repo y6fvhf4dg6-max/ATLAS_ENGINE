@@ -13,7 +13,12 @@ class AtlasChurchGrammarResolver:
     }
 
     @classmethod
-    def resolve(cls, landmark) -> str:
+    def resolve(
+        cls,
+        landmark,
+        *,
+        hierarchy_context=None,
+    ) -> str:
         landmark_type = landmark.landmark_type
 
         if landmark_type not in cls.DEFAULT_GRAMMARS:
@@ -47,6 +52,85 @@ class AtlasChurchGrammarResolver:
         ):
             return catalog_entry.grammar_name
 
+        bell_tower_count = (
+            cls._resolve_bell_tower_count(
+                landmark=landmark,
+                hierarchy_context=(
+                    hierarchy_context
+                ),
+            )
+        )
+
+        if bell_tower_count == 1:
+            return "single_west_tower"
+
+        if bell_tower_count == 2:
+            return "twin_west_towers"
+
         return cls.DEFAULT_GRAMMARS[
             landmark_type
         ]
+
+    @staticmethod
+    def _resolve_bell_tower_count(
+        *,
+        landmark,
+        hierarchy_context,
+    ) -> int:
+        if not hierarchy_context:
+            return 0
+
+        parents = hierarchy_context.get(
+            "parents",
+            {},
+        ) or {}
+
+        parent_data = parents.get(
+            getattr(
+                landmark,
+                "id",
+                None,
+            )
+        )
+
+        if not parent_data:
+            return 0
+
+        parts = tuple(
+            parent_data.get(
+                "parts",
+                (),
+            )
+            or ()
+        )
+
+        bell_tower_ids = {
+            (
+                part.get("id")
+                if part.get("id") is not None
+                else (
+                    "anonymous",
+                    index,
+                )
+            )
+            for index, part in enumerate(parts)
+            if (
+                str(
+                    (
+                        part.get(
+                            "tags",
+                            {},
+                        )
+                        or {}
+                    ).get(
+                        "tower:type",
+                        "",
+                    )
+                ).strip().lower()
+                == "bell_tower"
+            )
+        }
+
+        return len(
+            bell_tower_ids
+        )

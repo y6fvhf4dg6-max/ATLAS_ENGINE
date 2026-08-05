@@ -113,3 +113,65 @@ def test_profile_is_immutable():
 
     with pytest.raises(FrozenInstanceError):
         profile.minaret_count = 2
+
+def test_profile_supports_multi_dome_multi_minaret_grammar():
+    profile = AtlasMosqueLandmarkProfile(
+        grammar_name="multi_dome_multi_minaret",
+        dome_count=3,
+        minaret_count=2,
+    )
+
+    assert profile.grammar_name == (
+        "multi_dome_multi_minaret"
+    )
+    assert profile.dome_count == 3
+    assert profile.minaret_count == 2
+
+
+@pytest.mark.parametrize(
+    "dome_count,minaret_count",
+    [
+        (1, 2),
+        (2, 1),
+        (0, 2),
+        (2, 0),
+        (9, 2),
+        (2, 9),
+        (True, 2),
+        (2, False),
+    ],
+)
+def test_multi_grammar_requires_bounded_multiple_components(
+    dome_count,
+    minaret_count,
+):
+    with pytest.raises(ValueError):
+        AtlasMosqueLandmarkProfile(
+            grammar_name=(
+                "multi_dome_multi_minaret"
+            ),
+            dome_count=dome_count,
+            minaret_count=minaret_count,
+        )
+
+
+@pytest.mark.parametrize(
+    "dome_count,minaret_count",
+    [
+        (2, 1),
+        (1, 2),
+        (2, 2),
+    ],
+)
+def test_single_grammar_still_requires_exactly_one_component(
+    dome_count,
+    minaret_count,
+):
+    with pytest.raises(ValueError):
+        AtlasMosqueLandmarkProfile(
+            grammar_name=(
+                "single_dome_single_minaret"
+            ),
+            dome_count=dome_count,
+            minaret_count=minaret_count,
+        )

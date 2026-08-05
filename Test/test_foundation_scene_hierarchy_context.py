@@ -199,3 +199,55 @@ def test_resolves_adjacent_sibling_footprints_for_building_part():
             (10.0, 30.0),
         ],
     ]
+
+def test_scene_exposes_single_computed_building_part_hierarchy(
+    monkeypatch,
+):
+    expected_hierarchy = {
+        "main_buildings": [],
+        "building_parts": [],
+        "mesh_buildings": [],
+        "parent_metrics": {},
+        "suppressed_parent_ids": [],
+        "residual_replacement_parent_ids": [],
+        "residual_parent_records": [],
+        "attached_minaret_component_ids": [],
+        "minaret_component_to_minaret": {},
+        "minaret_components_by_minaret": {},
+        "parents": {},
+        "part_to_parent": {},
+        "unassigned_part_ids": [],
+        "summary": {
+            "main_building_count": 0,
+            "building_part_count": 0,
+            "parent_with_parts_count": 0,
+            "assigned_building_part_count": 0,
+            "unassigned_building_part_count": 0,
+            "parent_part_counts": {},
+            "suppressed_parent_count": 0,
+            "mesh_building_count": 0,
+        },
+    }
+
+    monkeypatch.setattr(
+        AtlasBuildingPartHierarchyProfiler,
+        "analyze",
+        staticmethod(
+            lambda records: expected_hierarchy
+        ),
+    )
+
+    scene = AtlasFoundationSceneBuilder.build_scene(
+        raw_buildings=[],
+        hierarchy_raw_buildings=[],
+        coordinate_engine=object(),
+        terrain_mesh=object(),
+        castles=[],
+        max_buildings=0,
+        debug=False,
+    )
+
+    assert (
+        scene.metadata["building_part_hierarchy"]
+        is expected_hierarchy
+    )

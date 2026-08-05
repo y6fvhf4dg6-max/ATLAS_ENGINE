@@ -807,6 +807,9 @@ class AtlasFoundationFirstEngine:
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             road_meshes=road_meshes,
+            hierarchy_context=scene.metadata.get(
+                "building_part_hierarchy"
+            ),
             debug=debug,
         )
 

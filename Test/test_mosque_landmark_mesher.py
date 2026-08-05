@@ -445,3 +445,124 @@ def test_combined_premium_mosque_mesh_is_closed_and_manifold():
 
     assert topology["open_edges"] == 0
     assert topology["non_manifold_edges"] == 0
+
+def _multi_geometry():
+    landmark = AtlasLandmark(
+        id=1210,
+        landmark_type=AtlasLandmarkType.MOSQUE,
+        geometry=(
+            (0.0, 0.0),
+            (30.0, 0.0),
+            (30.0, 42.0),
+            (0.0, 42.0),
+        ),
+        tags={
+            "building": "mosque",
+            "religion": "muslim",
+            "height": "36",
+            "atlas:worship_grammar": (
+                "multi_dome_multi_minaret"
+            ),
+        },
+        source="OSM",
+    )
+
+    return AtlasMosqueLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasMosqueLandmarkProfile(
+            grammar_name=(
+                "multi_dome_multi_minaret"
+            ),
+            dome_count=3,
+            minaret_count=2,
+            scale_ratio=3000.0,
+            nozzle_diameter_mm=0.4,
+        ),
+    )
+
+
+def test_mesher_builds_requested_multi_dome_multi_minaret_counts():
+    mesh = AtlasMosqueLandmarkMesher.build(
+        _multi_geometry()
+    )
+
+    assert mesh["worship_grammar"] == (
+        "multi_dome_multi_minaret"
+    )
+    assert len(mesh["prayer_hall_meshes"]) == 1
+    assert len(mesh["dome_drum_meshes"]) == 3
+    assert len(mesh["dome_meshes"]) == 3
+    assert len(mesh["minaret_meshes"]) == 2
+    assert len(
+        mesh["minaret_balcony_meshes"]
+    ) == 2
+    assert len(mesh["minaret_cap_meshes"]) == 2
+
+
+def test_multi_mosque_component_centers_are_distinct_and_inside_footprint():
+    from shapely.geometry import Point, Polygon
+
+    geometry = _multi_geometry()
+    mesh = AtlasMosqueLandmarkMesher.build(
+        geometry
+    )
+
+    polygon = Polygon(
+        geometry.footprint
+    )
+
+    dome_centers = tuple(
+        (
+            round(dome["center_x"], 8),
+            round(dome["center_y"], 8),
+        )
+        for dome in mesh["dome_meshes"]
+    )
+
+    minaret_centers = tuple(
+        (
+            round(minaret["center_x"], 8),
+            round(minaret["center_y"], 8),
+        )
+        for minaret in mesh["minaret_meshes"]
+    )
+
+    assert len(set(dome_centers)) == 3
+    assert len(set(minaret_centers)) == 2
+
+    for center_x, center_y in (
+        *dome_centers,
+        *minaret_centers,
+    ):
+        assert polygon.covers(
+            Point(
+                center_x,
+                center_y,
+            )
+        )
+
+
+def test_multi_mosque_component_shells_are_closed_and_manifold():
+    mesh = AtlasMosqueLandmarkMesher.build(
+        _multi_geometry()
+    )
+
+    component_groups = (
+        mesh["prayer_hall_meshes"],
+        mesh["dome_drum_meshes"],
+        mesh["dome_meshes"],
+        mesh["minaret_meshes"],
+        mesh["minaret_balcony_meshes"],
+        mesh["minaret_cap_meshes"],
+    )
+
+    for component_group in component_groups:
+        for component in component_group:
+            topology = _topology(
+                component["triangles"]
+            )
+
+            assert topology["open_edges"] == 0
+            assert topology[
+                "non_manifold_edges"
+            ] == 0

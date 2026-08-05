@@ -132,6 +132,7 @@ class AtlasLandmarkFoundationBuilder:
         coordinate_engine,
         terrain_mesh,
         road_meshes=(),
+        hierarchy_context=None,
         debug=True,
     ):
         meshes = []
@@ -143,6 +144,7 @@ class AtlasLandmarkFoundationBuilder:
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_mesh,
                 road_meshes=road_meshes,
+                hierarchy_context=hierarchy_context,
             )
 
             if mesh is None:
@@ -164,6 +166,96 @@ class AtlasLandmarkFoundationBuilder:
             print("")
 
         return meshes
+
+    @staticmethod
+    def _resolve_mosque_component_counts(
+        *,
+        landmark,
+        hierarchy_context,
+    ):
+        if not hierarchy_context:
+            return (
+                0,
+                0,
+            )
+
+        parents = hierarchy_context.get(
+            "parents",
+            {},
+        ) or {}
+
+        parent_data = parents.get(
+            getattr(
+                landmark,
+                "id",
+                None,
+            )
+        )
+
+        if not parent_data:
+            return (
+                0,
+                0,
+            )
+
+        parts = tuple(
+            parent_data.get(
+                "parts",
+                (),
+            )
+            or ()
+        )
+
+        minaret_ids = {
+            part.get("id")
+            for part in parts
+            if (
+                str(
+                    (
+                        part.get(
+                            "tags",
+                            {},
+                        )
+                        or {}
+                    ).get(
+                        "tower:type",
+                        "",
+                    )
+                ).strip().lower()
+                == "minaret"
+            )
+        }
+
+        dome_ids = {
+            part.get("id")
+            for part in parts
+            if (
+                str(
+                    (
+                        part.get(
+                            "tags",
+                            {},
+                        )
+                        or {}
+                    ).get(
+                        "roof:shape",
+                        "",
+                    )
+                ).strip().lower()
+                == "dome"
+            )
+        }
+
+        return (
+            min(
+                len(dome_ids),
+                8,
+            ),
+            min(
+                len(minaret_ids),
+                8,
+            ),
+        )
 
     @staticmethod
     def _resolve_stl_footprint(
@@ -228,6 +320,7 @@ class AtlasLandmarkFoundationBuilder:
         coordinate_engine,
         terrain_mesh,
         road_meshes=(),
+        hierarchy_context=None,
     ):
         geometry = tuple(source.get("geometry", ()))
 
@@ -329,6 +422,9 @@ class AtlasLandmarkFoundationBuilder:
                 profile = (
                     AtlasChurchLandmarkProfileResolver.resolve(
                         metric_landmark,
+                        hierarchy_context=(
+                            hierarchy_context
+                        ),
                         scale_ratio=coordinate_engine.xy_scale,
                     )
                 )
@@ -354,6 +450,9 @@ class AtlasLandmarkFoundationBuilder:
 
                 mesh = AtlasChurchLandmarkMesher.build(
                     scaled_geometry
+                )
+                mesh["grammar_name"] = (
+                    profile.grammar_name
                 )
             elif landmark.landmark_type in {
                 AtlasLandmarkType.MOSQUE,
@@ -401,7 +500,10 @@ class AtlasLandmarkFoundationBuilder:
 
                 worship_grammar = (
                     AtlasWorshipGrammarResolver.resolve(
-                        metric_landmark
+                        metric_landmark,
+                        hierarchy_context=(
+                            hierarchy_context
+                        ),
                     )
                 )
 
@@ -439,14 +541,61 @@ class AtlasLandmarkFoundationBuilder:
                     tags=scaled_tags,
                 )
 
+                mosque_dome_count = 0
+                mosque_minaret_count = 0
+
                 if (
                     landmark.landmark_type
                     is AtlasLandmarkType.MOSQUE
-                    and worship_grammar
-                    == "single_dome_single_minaret"
                 ):
+                    (
+                        mosque_dome_count,
+                        mosque_minaret_count,
+                    ) = (
+                        cls._resolve_mosque_component_counts(
+                            landmark=metric_landmark,
+                            hierarchy_context=(
+                                hierarchy_context
+                            ),
+                        )
+                    )
+
+                use_special_mosque_grammar = (
+                    landmark.landmark_type
+                    is AtlasLandmarkType.MOSQUE
+                    and (
+                        worship_grammar
+                        == "single_dome_single_minaret"
+                        or (
+                            worship_grammar
+                            == "multi_dome_multi_minaret"
+                            and mosque_dome_count >= 2
+                            and mosque_minaret_count >= 2
+                        )
+                    )
+                )
+
+                if use_special_mosque_grammar:
+                    if (
+                        worship_grammar
+                        == "single_dome_single_minaret"
+                    ):
+                        profile_dome_count = 1
+                        profile_minaret_count = 1
+                    else:
+                        profile_dome_count = (
+                            mosque_dome_count
+                        )
+                        profile_minaret_count = (
+                            mosque_minaret_count
+                        )
+
                     profile = AtlasMosqueLandmarkProfile(
                         grammar_name=worship_grammar,
+                        dome_count=profile_dome_count,
+                        minaret_count=(
+                            profile_minaret_count
+                        ),
                         scale_ratio=(
                             coordinate_engine.xy_scale
                         ),
@@ -471,6 +620,9 @@ class AtlasLandmarkFoundationBuilder:
                     mesh["height_mm"] = float(
                         scaled_height
                     )
+                    mesh["grammar_name"] = (
+                        worship_grammar
+                    )
                     resolved_geometry = scaled_geometry
                 else:
                     mesh = (
@@ -485,6 +637,9 @@ class AtlasLandmarkFoundationBuilder:
                     )
                     mesh["height_mm"] = float(
                         scaled_height
+                    )
+                    mesh["grammar_name"] = (
+                        worship_grammar
                     )
 
                     scaled_geometry = (

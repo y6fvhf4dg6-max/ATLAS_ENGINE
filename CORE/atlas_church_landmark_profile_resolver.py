@@ -18,6 +18,7 @@ class AtlasChurchLandmarkProfileResolver:
         cls,
         landmark,
         *,
+        hierarchy_context=None,
         scale_ratio=5500.0,
         nozzle_diameter_mm=0.4,
     ) -> AtlasChurchLandmarkProfile:
@@ -62,18 +63,30 @@ class AtlasChurchLandmarkProfileResolver:
             in catalog_entry.geometry_overrides
         )
 
-        return AtlasChurchLandmarkProfile(
-            landmark_class=landmark_class,
-            grammar_name=(
-                AtlasChurchGrammarResolver.resolve(
-                    landmark
-                )
-            ),
-            tower_count=(
+        grammar_name = (
+            AtlasChurchGrammarResolver.resolve(
+                landmark,
+                hierarchy_context=(
+                    hierarchy_context
+                ),
+            )
+        )
+
+        if grammar_name == "single_west_tower":
+            tower_count = 1
+        elif grammar_name == "twin_west_towers":
+            tower_count = 2
+        else:
+            tower_count = (
                 2
                 if landmark_class == "cathedral"
                 else 1
-            ),
+            )
+
+        return AtlasChurchLandmarkProfile(
+            landmark_class=landmark_class,
+            grammar_name=grammar_name,
+            tower_count=tower_count,
             has_apse=has_apse,
             scale_ratio=scale_ratio,
             nozzle_diameter_mm=nozzle_diameter_mm,

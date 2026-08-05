@@ -118,3 +118,86 @@ def test_bonner_muenster_geometry_override_resolves_with_normalized_wikidata():
     )
 
     assert profile.has_apse is False
+
+
+def _hierarchy_context(
+    *,
+    parent_id,
+    tower_count,
+):
+    parts = [
+        {
+            "id": 3000 + index,
+            "tags": {
+                "building:part": "yes",
+                "tower:type": "bell_tower",
+            },
+        }
+        for index in range(tower_count)
+    ]
+
+    return {
+        "parents": {
+            parent_id: {
+                "parts": parts,
+                "part_ids": [
+                    part["id"]
+                    for part in parts
+                ],
+            },
+        },
+    }
+
+
+def test_profile_resolver_uses_hierarchy_single_bell_tower_evidence():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=999101,
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+            name="Single Tower Cathedral",
+        ),
+        hierarchy_context=_hierarchy_context(
+            parent_id=999101,
+            tower_count=1,
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.grammar_name == "single_west_tower"
+    assert profile.tower_count == 1
+
+
+def test_profile_resolver_uses_hierarchy_twin_bell_tower_evidence():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=999102,
+            landmark_type=AtlasLandmarkType.CHURCH,
+            name="Twin Tower Church",
+        ),
+        hierarchy_context=_hierarchy_context(
+            parent_id=999102,
+            tower_count=2,
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.grammar_name == "twin_west_towers"
+    assert profile.tower_count == 2
+
+
+def test_profile_resolver_catalog_grammar_precedes_hierarchy_evidence():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=112526702,
+            name="Bonner Münster",
+            wikidata="Q686664",
+        ),
+        hierarchy_context=_hierarchy_context(
+            parent_id=112526702,
+            tower_count=1,
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.grammar_name == "bonn_muenster_catalog"
+    assert profile.tower_count == 2

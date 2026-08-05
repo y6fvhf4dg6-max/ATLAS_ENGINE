@@ -137,3 +137,57 @@ def test_builder_rejects_invalid_footprint():
             landmark=landmark,
             profile=AtlasMosqueLandmarkProfile(),
         )
+
+def test_builder_creates_multi_dome_multi_minaret_component_plan():
+    profile = AtlasMosqueLandmarkProfile(
+        grammar_name="multi_dome_multi_minaret",
+        dome_count=3,
+        minaret_count=2,
+    )
+
+    result = AtlasMosqueLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=profile,
+    )
+
+    component_types = tuple(
+        component.component_type
+        for component in result.components
+    )
+
+    assert result.grammar_name == (
+        "multi_dome_multi_minaret"
+    )
+    assert component_types.count(
+        "main_dome"
+    ) == 3
+    assert component_types.count(
+        "minaret_body"
+    ) == 2
+    assert component_types.count(
+        "minaret_balcony"
+    ) == 2
+    assert component_types.count(
+        "minaret_cap"
+    ) == 2
+
+    assert tuple(
+        component.index
+        for component in result.components
+        if component.component_type
+        == "main_dome"
+    ) == (
+        0,
+        1,
+        2,
+    )
+
+    assert tuple(
+        component.index
+        for component in result.components
+        if component.component_type
+        == "minaret_body"
+    ) == (
+        0,
+        1,
+    )

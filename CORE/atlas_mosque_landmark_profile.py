@@ -24,12 +24,16 @@ class AtlasMosqueLandmarkProfile:
             self.grammar_name
         ).strip().lower()
 
-        if grammar_name != (
-            "single_dome_single_minaret"
-        ):
+        supported_grammars = {
+            "single_dome_single_minaret",
+            "multi_dome_multi_minaret",
+        }
+
+        if grammar_name not in supported_grammars:
             raise ValueError(
                 "grammar_name must be "
-                "single_dome_single_minaret"
+                "single_dome_single_minaret or "
+                "multi_dome_multi_minaret"
             )
 
         for field_name, value in (
@@ -39,10 +43,29 @@ class AtlasMosqueLandmarkProfile:
             if (
                 isinstance(value, bool)
                 or not isinstance(value, int)
-                or value != 1
             ):
                 raise ValueError(
-                    f"{field_name} must be exactly 1"
+                    f"{field_name} must be an integer"
+                )
+
+            if (
+                grammar_name
+                == "single_dome_single_minaret"
+                and value != 1
+            ):
+                raise ValueError(
+                    f"{field_name} must be exactly 1 "
+                    "for single_dome_single_minaret"
+                )
+
+            if (
+                grammar_name
+                == "multi_dome_multi_minaret"
+                and not 2 <= value <= 8
+            ):
+                raise ValueError(
+                    f"{field_name} must be from 2 to 8 "
+                    "for multi_dome_multi_minaret"
                 )
 
         scale_ratio = float(

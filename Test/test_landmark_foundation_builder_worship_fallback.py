@@ -522,3 +522,310 @@ def test_foundation_builder_routes_from_validation_engine_result(
         "worship_landmark_fallback"
     )
     assert meshes[0]["worship_profile"] == "mosque"
+
+def test_landmark_builder_forwards_hierarchy_context(
+    monkeypatch,
+):
+    hierarchy_context = {
+        "parents": {
+            9902: {
+                "parent": {"id": 9902},
+                "parts": [],
+                "part_ids": [],
+            },
+        },
+    }
+
+    captured = []
+
+    def fake_build(
+        cls,
+        source,
+        coordinate_engine,
+        terrain_mesh,
+        road_meshes=(),
+        hierarchy_context=None,
+    ):
+        captured.append(
+            {
+                "source": source,
+                "hierarchy_context": hierarchy_context,
+            }
+        )
+
+        return {
+            "type": "fixture",
+            "triangles": (),
+        }
+
+    monkeypatch.setattr(
+        AtlasLandmarkFoundationBuilder,
+        "_build_landmark_mesh",
+        classmethod(fake_build),
+    )
+
+    source = _source(
+        source_id=9902,
+        building="mosque",
+        religion="muslim",
+    )
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        hierarchy_context=hierarchy_context,
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert captured == [
+        {
+            "source": source,
+            "hierarchy_context": hierarchy_context,
+        },
+    ]
+
+def test_foundation_builder_uses_hierarchy_inferred_single_minaret_grammar():
+    source = _source(
+        source_id=6100,
+        building="mosque",
+        religion="muslim",
+    )
+
+    hierarchy_context = {
+        "parents": {
+            6100: {
+                "parent": source,
+                "parts": [
+                    {
+                        "id": 6101,
+                        "geometry": [
+                            (41.00001, 29.00001),
+                            (41.00001, 29.00002),
+                            (41.00002, 29.00002),
+                            (41.00002, 29.00001),
+                        ],
+                        "tags": {
+                            "building:part": "yes",
+                            "tower:type": "minaret",
+                            "height": "28",
+                        },
+                    },
+                ],
+                "part_ids": [6101],
+            },
+        },
+    }
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        hierarchy_context=hierarchy_context,
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert meshes[0]["type"] == "mosque_landmark"
+    assert (
+        meshes[0]["grammar_name"]
+        == "single_dome_single_minaret"
+    )
+
+
+def test_foundation_builder_keeps_multi_minaret_without_dome_evidence_as_safe_fallback():
+    source = _source(
+        source_id=6200,
+        building="mosque",
+        religion="muslim",
+    )
+
+    hierarchy_context = {
+        "parents": {
+            6200: {
+                "parent": source,
+                "parts": [
+                    {
+                        "id": 6201,
+                        "tags": {
+                            "building:part": "yes",
+                            "tower:type": "minaret",
+                        },
+                    },
+                    {
+                        "id": 6202,
+                        "tags": {
+                            "building:part": "yes",
+                            "tower:type": "minaret",
+                        },
+                    },
+                ],
+                "part_ids": [6201, 6202],
+            },
+        },
+    }
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        hierarchy_context=hierarchy_context,
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert (
+        meshes[0]["type"]
+        == "worship_landmark_fallback"
+    )
+    assert (
+        meshes[0]["grammar_name"]
+        == "footprint_fallback"
+    )
+
+def test_foundation_builder_builds_multi_mosque_from_component_evidence():
+    source = _source(
+        source_id=6300,
+        building="mosque",
+        religion="muslim",
+    )
+
+    hierarchy_context = {
+        "parents": {
+            6300: {
+                "parent": source,
+                "parts": [
+                    {
+                        "id": 6301,
+                        "tags": {
+                            "building:part": "yes",
+                            "tower:type": "minaret",
+                        },
+                    },
+                    {
+                        "id": 6302,
+                        "tags": {
+                            "building:part": "yes",
+                            "tower:type": "minaret",
+                        },
+                    },
+                    {
+                        "id": 6311,
+                        "tags": {
+                            "building:part": "yes",
+                            "roof:shape": "dome",
+                        },
+                    },
+                    {
+                        "id": 6312,
+                        "tags": {
+                            "building:part": "yes",
+                            "roof:shape": "dome",
+                        },
+                    },
+                    {
+                        "id": 6313,
+                        "tags": {
+                            "building:part": "yes",
+                            "roof:shape": "dome",
+                        },
+                    },
+                ],
+                "part_ids": [
+                    6301,
+                    6302,
+                    6311,
+                    6312,
+                    6313,
+                ],
+            },
+        },
+    }
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        hierarchy_context=hierarchy_context,
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+
+    mesh = meshes[0]
+
+    assert mesh["type"] == "mosque_landmark"
+    assert mesh["grammar_name"] == (
+        "multi_dome_multi_minaret"
+    )
+    assert len(mesh["dome_meshes"]) == 3
+    assert len(mesh["dome_drum_meshes"]) == 3
+    assert len(mesh["minaret_meshes"]) == 2
+    assert len(
+        mesh["minaret_balcony_meshes"]
+    ) == 2
+    assert len(mesh["minaret_cap_meshes"]) == 2
+
+
+def test_foundation_builder_caps_multi_component_counts_at_profile_limit():
+    source = _source(
+        source_id=6400,
+        building="mosque",
+        religion="muslim",
+    )
+
+    parts = []
+
+    for index in range(10):
+        parts.append(
+            {
+                "id": 6410 + index,
+                "tags": {
+                    "building:part": "yes",
+                    "tower:type": "minaret",
+                },
+            }
+        )
+
+        parts.append(
+            {
+                "id": 6510 + index,
+                "tags": {
+                    "building:part": "yes",
+                    "roof:shape": "dome",
+                },
+            }
+        )
+
+    hierarchy_context = {
+        "parents": {
+            6400: {
+                "parent": source,
+                "parts": parts,
+                "part_ids": [
+                    part["id"]
+                    for part in parts
+                ],
+            },
+        },
+    }
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        hierarchy_context=hierarchy_context,
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+
+    mesh = meshes[0]
+
+    assert mesh["type"] == "mosque_landmark"
+    assert mesh["grammar_name"] == (
+        "multi_dome_multi_minaret"
+    )
+    assert len(mesh["dome_meshes"]) == 8
+    assert len(mesh["minaret_meshes"]) == 8

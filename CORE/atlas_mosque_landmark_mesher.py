@@ -441,6 +441,260 @@ class AtlasMosqueLandmarkMesher:
         )
 
     @staticmethod
+    def _resolve_safe_component_centers(
+        *,
+        footprint,
+        count,
+        clearance_radius,
+        target_points,
+    ):
+        polygon = Polygon(
+            footprint
+        )
+
+        if (
+            polygon.is_empty
+            or not polygon.is_valid
+            or polygon.area <= 1e-12
+        ):
+            raise ValueError(
+                "Mosque footprint must define "
+                "a valid polygon"
+            )
+
+        count = int(count)
+        clearance_radius = float(
+            clearance_radius
+        )
+
+        if count <= 0:
+            return ()
+
+        safe_polygon = polygon.buffer(
+            -clearance_radius
+        )
+
+        if (
+            safe_polygon.is_empty
+            or safe_polygon.area <= 1e-12
+        ):
+            safe_polygon = polygon
+
+        minimum_x, minimum_y, maximum_x, maximum_y = (
+            safe_polygon.bounds
+        )
+
+        candidates = [
+            safe_polygon.representative_point(),
+            safe_polygon.centroid,
+        ]
+
+        grid_steps = 20
+
+        for x_index in range(grid_steps + 1):
+            x = (
+                minimum_x
+                + (maximum_x - minimum_x)
+                * x_index
+                / grid_steps
+            )
+
+            for y_index in range(grid_steps + 1):
+                y = (
+                    minimum_y
+                    + (maximum_y - minimum_y)
+                    * y_index
+                    / grid_steps
+                )
+
+                point = Point(
+                    x,
+                    y,
+                )
+
+                if safe_polygon.covers(point):
+                    candidates.append(point)
+
+        resolved = []
+        minimum_separation = max(
+            clearance_radius * 1.50,
+            1e-9,
+        )
+
+        for target_x, target_y in target_points:
+            ordered = sorted(
+                candidates,
+                key=lambda point: (
+                    (
+                        float(point.x)
+                        - float(target_x)
+                    ) ** 2
+                    + (
+                        float(point.y)
+                        - float(target_y)
+                    ) ** 2
+                ),
+            )
+
+            selected = next(
+                (
+                    point
+                    for point in ordered
+                    if all(
+                        point.distance(existing)
+                        >= minimum_separation
+                        for existing in resolved
+                    )
+                ),
+                None,
+            )
+
+            if selected is None:
+                continue
+
+            resolved.append(selected)
+
+            if len(resolved) >= count:
+                break
+
+        if len(resolved) < count:
+            ordered = sorted(
+                candidates,
+                key=lambda point: point.distance(
+                    safe_polygon.centroid
+                ),
+            )
+
+            for point in ordered:
+                if any(
+                    point.distance(existing)
+                    < minimum_separation
+                    for existing in resolved
+                ):
+                    continue
+
+                resolved.append(point)
+
+                if len(resolved) >= count:
+                    break
+
+        if len(resolved) < count:
+            raise ValueError(
+                "Mosque footprint cannot contain "
+                "the requested component count"
+            )
+
+        return tuple(
+            (
+                float(point.x),
+                float(point.y),
+            )
+            for point in resolved[:count]
+        )
+
+    @classmethod
+    def _resolve_multi_dome_systems(
+        cls,
+        *,
+        footprint,
+        count,
+        desired_dome_radius,
+        drum_radius_ratio,
+        minimum_radius,
+    ):
+        count = int(count)
+
+        if count == 1:
+            return (
+                cls._resolve_dome_system(
+                    footprint=footprint,
+                    desired_dome_radius=(
+                        desired_dome_radius
+                    ),
+                    drum_radius_ratio=(
+                        drum_radius_ratio
+                    ),
+                    minimum_radius=minimum_radius,
+                ),
+            )
+
+        polygon = Polygon(
+            footprint
+        )
+
+        minimum_x, minimum_y, maximum_x, maximum_y = (
+            polygon.bounds
+        )
+
+        span_x = maximum_x - minimum_x
+        span_y = maximum_y - minimum_y
+        center_x = (
+            minimum_x + maximum_x
+        ) / 2.0
+        center_y = (
+            minimum_y + maximum_y
+        ) / 2.0
+
+        radius = max(
+            float(minimum_radius),
+            min(
+                float(desired_dome_radius) * 0.62,
+                min(span_x, span_y) * 0.17,
+            ),
+        )
+
+        if span_y >= span_x:
+            offset = span_y * 0.24
+            targets = [
+                (center_x, center_y),
+                (center_x, center_y - offset),
+                (center_x, center_y + offset),
+            ]
+        else:
+            offset = span_x * 0.24
+            targets = [
+                (center_x, center_y),
+                (center_x - offset, center_y),
+                (center_x + offset, center_y),
+            ]
+
+        corner_targets = (
+            (minimum_x, minimum_y),
+            (maximum_x, minimum_y),
+            (maximum_x, maximum_y),
+            (minimum_x, maximum_y),
+            (center_x, minimum_y),
+            (maximum_x, center_y),
+            (center_x, maximum_y),
+            (minimum_x, center_y),
+        )
+
+        targets.extend(
+            corner_targets
+        )
+
+        centers = cls._resolve_safe_component_centers(
+            footprint=footprint,
+            count=count,
+            clearance_radius=radius,
+            target_points=targets,
+        )
+
+        return tuple(
+            {
+                "center_x": component_x,
+                "center_y": component_y,
+                "dome_radius": radius,
+                "drum_radius": (
+                    radius
+                    * float(drum_radius_ratio)
+                ),
+                "maximum_safe_radius": radius,
+            }
+            for component_x, component_y in centers
+        )
+
+    @staticmethod
     def _ring(
         *,
         center_x,
@@ -857,29 +1111,22 @@ class AtlasMosqueLandmarkMesher:
         )
         minaret_cap_top_z = total_height
 
-        dome_system = cls._resolve_dome_system(
-            footprint=footprint,
-            desired_dome_radius=(
-                short_span * 0.28
-            ),
-            drum_radius_ratio=0.88,
-            minimum_radius=(
-                geometry.profile.nozzle_diameter_mm
-            ),
+        dome_systems = (
+            cls._resolve_multi_dome_systems(
+                footprint=footprint,
+                count=geometry.profile.dome_count,
+                desired_dome_radius=(
+                    short_span * 0.28
+                ),
+                drum_radius_ratio=0.88,
+                minimum_radius=(
+                    geometry.profile
+                    .nozzle_diameter_mm
+                ),
+            )
         )
 
-        center_x = dome_system[
-            "center_x"
-        ]
-        center_y = dome_system[
-            "center_y"
-        ]
-        dome_radius = dome_system[
-            "dome_radius"
-        ]
-        drum_radius = dome_system[
-            "drum_radius"
-        ]
+        dome_system = dome_systems[0]
 
         minaret_radius = max(
             short_span * 0.045,
@@ -893,23 +1140,70 @@ class AtlasMosqueLandmarkMesher:
             geometry.profile.nozzle_diameter_mm,
         )
 
-        target_minaret_x = (
-            maximum_x
-            - short_span * 0.10
-        )
-        target_minaret_y = (
-            minimum_y
-            + short_span * 0.10
+        minaret_targets = (
+            (
+                maximum_x
+                - short_span * 0.10,
+                minimum_y
+                + short_span * 0.10,
+            ),
+            (
+                minimum_x
+                + short_span * 0.10,
+                minimum_y
+                + short_span * 0.10,
+            ),
+            (
+                maximum_x
+                - short_span * 0.10,
+                maximum_y
+                - short_span * 0.10,
+            ),
+            (
+                minimum_x
+                + short_span * 0.10,
+                maximum_y
+                - short_span * 0.10,
+            ),
+            (
+                maximum_x
+                - short_span * 0.10,
+                (
+                    minimum_y + maximum_y
+                ) / 2.0,
+            ),
+            (
+                minimum_x
+                + short_span * 0.10,
+                (
+                    minimum_y + maximum_y
+                ) / 2.0,
+            ),
+            (
+                (
+                    minimum_x + maximum_x
+                ) / 2.0,
+                minimum_y
+                + short_span * 0.10,
+            ),
+            (
+                (
+                    minimum_x + maximum_x
+                ) / 2.0,
+                maximum_y
+                - short_span * 0.10,
+            ),
         )
 
-        (
-            minaret_center_x,
-            minaret_center_y,
-        ) = cls._resolve_minaret_center(
-            footprint=footprint,
-            target_x=target_minaret_x,
-            target_y=target_minaret_y,
-            clearance_radius=balcony_radius,
+        minaret_centers = (
+            cls._resolve_safe_component_centers(
+                footprint=footprint,
+                count=(
+                    geometry.profile.minaret_count
+                ),
+                clearance_radius=balcony_radius,
+                target_points=minaret_targets,
+            )
         )
 
         balcony_center_z = (
@@ -932,87 +1226,103 @@ class AtlasMosqueLandmarkMesher:
             mesh_type="mosque_prayer_hall",
         )
 
-        dome_drum = cls._closed_cylinder(
-            center_x=center_x,
-            center_y=center_y,
-            radius=drum_radius,
-            bottom_z=prayer_hall_top_z,
-            top_z=drum_top_z,
-            mesh_type="mosque_dome_drum",
-        )
+        dome_drums = [
+            cls._closed_cylinder(
+                center_x=system["center_x"],
+                center_y=system["center_y"],
+                radius=system["drum_radius"],
+                bottom_z=prayer_hall_top_z,
+                top_z=drum_top_z,
+                mesh_type="mosque_dome_drum",
+            )
+            for system in dome_systems
+        ]
 
-        dome = cls._closed_dome(
-            center_x=center_x,
-            center_y=center_y,
-            radius=dome_radius,
-            base_z=drum_top_z,
-            top_z=dome_top_z,
-        )
+        domes = [
+            cls._closed_dome(
+                center_x=system["center_x"],
+                center_y=system["center_y"],
+                radius=system["dome_radius"],
+                base_z=drum_top_z,
+                top_z=dome_top_z,
+            )
+            for system in dome_systems
+        ]
 
-        minaret = cls._closed_cylinder(
-            center_x=minaret_center_x,
-            center_y=minaret_center_y,
-            radius=minaret_radius,
-            bottom_z=0.0,
-            top_z=minaret_body_top_z,
-            mesh_type="mosque_minaret_body",
-        )
+        minarets = [
+            cls._closed_cylinder(
+                center_x=center_x,
+                center_y=center_y,
+                radius=minaret_radius,
+                bottom_z=0.0,
+                top_z=minaret_body_top_z,
+                mesh_type="mosque_minaret_body",
+            )
+            for center_x, center_y
+            in minaret_centers
+        ]
 
-        balcony = cls._closed_cylinder(
-            center_x=minaret_center_x,
-            center_y=minaret_center_y,
-            radius=balcony_radius,
-            bottom_z=balcony_bottom_z,
-            top_z=balcony_top_z,
-            mesh_type="mosque_minaret_balcony",
-        )
+        balconies = [
+            cls._closed_cylinder(
+                center_x=center_x,
+                center_y=center_y,
+                radius=balcony_radius,
+                bottom_z=balcony_bottom_z,
+                top_z=balcony_top_z,
+                mesh_type="mosque_minaret_balcony",
+            )
+            for center_x, center_y
+            in minaret_centers
+        ]
 
-        minaret_cap = cls._closed_cone(
-            center_x=minaret_center_x,
-            center_y=minaret_center_y,
-            radius=minaret_radius,
-            base_z=minaret_body_top_z,
-            top_z=minaret_cap_top_z,
-            mesh_type="mosque_minaret_cap",
-        )
-
-        component_meshes = (
-            prayer_hall,
-            dome_drum,
-            dome,
-            minaret,
-            balcony,
-            minaret_cap,
-        )
-
-        minaret_triangles = tuple(
-            minaret["triangles"]
-        )
-        minaret_cap_triangles = tuple(
-            minaret_cap["triangles"]
-        )
+        minaret_caps = [
+            cls._closed_cone(
+                center_x=center_x,
+                center_y=center_y,
+                radius=minaret_radius,
+                base_z=minaret_body_top_z,
+                top_z=minaret_cap_top_z,
+                mesh_type="mosque_minaret_cap",
+            )
+            for center_x, center_y
+            in minaret_centers
+        ]
 
         radial_segments = cls.RADIAL_SEGMENTS
 
-        combined_minaret_triangles = (
-            minaret_triangles[
-                :-radial_segments
-            ]
-        )
-        combined_minaret_cap_triangles = (
-            minaret_cap_triangles[
-                radial_segments:
-            ]
-        )
-
         triangles = [
             *prayer_hall["triangles"],
-            *dome_drum["triangles"],
-            *dome["triangles"],
-            *combined_minaret_triangles,
-            *balcony["triangles"],
-            *combined_minaret_cap_triangles,
         ]
+
+        for dome_drum, dome in zip(
+            dome_drums,
+            domes,
+        ):
+            triangles.extend(
+                dome_drum["triangles"]
+            )
+            triangles.extend(
+                dome["triangles"]
+            )
+
+        for minaret, balcony, minaret_cap in zip(
+            minarets,
+            balconies,
+            minaret_caps,
+        ):
+            triangles.extend(
+                minaret["triangles"][
+                    :-radial_segments
+                ]
+            )
+            triangles.extend(
+                balcony["triangles"]
+            )
+            triangles.extend(
+                minaret_cap["triangles"][
+                    radial_segments:
+                ]
+            )
 
         return {
             "type": "mosque_landmark",
@@ -1029,20 +1339,10 @@ class AtlasMosqueLandmarkMesher:
             "prayer_hall_meshes": [
                 prayer_hall,
             ],
-            "dome_drum_meshes": [
-                dome_drum,
-            ],
-            "dome_meshes": [
-                dome,
-            ],
-            "minaret_meshes": [
-                minaret,
-            ],
-            "minaret_balcony_meshes": [
-                balcony,
-            ],
-            "minaret_cap_meshes": [
-                minaret_cap,
-            ],
+            "dome_drum_meshes": dome_drums,
+            "dome_meshes": domes,
+            "minaret_meshes": minarets,
+            "minaret_balcony_meshes": balconies,
+            "minaret_cap_meshes": minaret_caps,
             "triangles": triangles,
         }

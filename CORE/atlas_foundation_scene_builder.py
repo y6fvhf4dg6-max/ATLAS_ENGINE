@@ -576,6 +576,10 @@ class AtlasFoundationSceneBuilder:
             mode="foundation_first",
         )
 
+        scene.metadata[
+            "building_part_hierarchy"
+        ] = building_part_hierarchy
+
         accepted_buildings = 0
         accepted_main_buildings = 0
         accepted_building_parts = 0
