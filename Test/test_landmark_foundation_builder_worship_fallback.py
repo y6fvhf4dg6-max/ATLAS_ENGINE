@@ -396,14 +396,11 @@ def test_real_ankara_pbf_mosque_routes_catalog_grammar_end_to_end(
     assert len(mesh["triangles"]) > 0
 
 
-def test_catalog_promotes_real_cenabi_ahmet_pasha_from_unknown_to_mosque(
-    monkeypatch,
-):
+def test_production_catalog_promotes_real_cenabi_ahmet_pasha_to_mosque():
     from CORE.atlas_coordinate_engine import AtlasCoordinateEngine
     from CORE.atlas_local_osm_reader import AtlasLocalOSMReader
     from CORE.atlas_master_landmark_catalog import (
         AtlasMasterLandmarkCatalog,
-        AtlasMasterLandmarkCatalogEntry,
     )
 
     bbox = (
@@ -434,29 +431,18 @@ def test_catalog_promotes_real_cenabi_ahmet_pasha_from_unknown_to_mosque(
         "place_of_worship"
     )
 
-    catalog_entry = AtlasMasterLandmarkCatalogEntry(
-        key="cenabi-ahmet-pasha-mosque-test",
-        landmark_family="mosque",
-        wikidata_id="Q96278624",
-        osm_ids=(322722702,),
-        grammar_name="single_dome_single_minaret",
+    catalog_entry = AtlasMasterLandmarkCatalog.resolve(
+        wikidata_id=source["tags"]["wikidata"],
+        osm_id=source["id"],
     )
 
-    original_resolve = AtlasMasterLandmarkCatalog.resolve
-
-    def resolve_catalog(cls, **kwargs):
-        if (
-            kwargs.get("wikidata_id") == "Q96278624"
-            or kwargs.get("osm_id") == 322722702
-        ):
-            return catalog_entry
-
-        return original_resolve(**kwargs)
-
-    monkeypatch.setattr(
-        AtlasMasterLandmarkCatalog,
-        "resolve",
-        classmethod(resolve_catalog),
+    assert catalog_entry is not None
+    assert catalog_entry.key == (
+        "cenabi-ahmet-pasha-mosque"
+    )
+    assert catalog_entry.landmark_family == "mosque"
+    assert catalog_entry.grammar_name == (
+        "single_dome_single_minaret"
     )
 
     class FixtureTerrain:

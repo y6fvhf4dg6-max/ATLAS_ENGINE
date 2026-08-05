@@ -169,3 +169,19 @@ def test_galata_bridge_catalog_contract():
     assert entry.profile_name == "galata"
     assert "supports" in entry.component_flags
     assert "parapets" in entry.component_flags
+
+
+def test_cenabi_ahmet_pasha_mosque_catalog_contract():
+    entry = AtlasMasterLandmarkCatalog.resolve(
+        wikidata_id="Q96278624",
+        osm_id=322722702,
+    )
+
+    assert entry is not None
+    assert entry.key == "cenabi-ahmet-pasha-mosque"
+    assert entry.landmark_family == "mosque"
+    assert entry.wikidata_id == "Q96278624"
+    assert entry.osm_ids == (322722702,)
+    assert entry.grammar_name == (
+        "single_dome_single_minaret"
+    )

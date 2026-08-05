@@ -138,6 +138,13 @@ class AtlasMasterLandmarkCatalog:
             grammar_name="single_west_tower",
         ),
         AtlasMasterLandmarkCatalogEntry(
+            key="cenabi-ahmet-pasha-mosque",
+            landmark_family="mosque",
+            wikidata_id="Q96278624",
+            osm_ids=(322722702,),
+            grammar_name="single_dome_single_minaret",
+        ),
+        AtlasMasterLandmarkCatalogEntry(
             key="galata-tower",
             landmark_family="tower",
             wikidata_id="Q91274",
