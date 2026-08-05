@@ -848,11 +848,26 @@ def test_semantic_facade_rhythm_drives_church_facade_geometry():
         romanesque_mesh["facade_meshes"]
     ) == romanesque_facade["panel_count"]
 
-    assert all(
+    facade_roles = {
         mesh["architectural_role"]
-        == "church_main_nave_facade_bay"
         for mesh in romanesque_mesh["facade_meshes"]
-    )
+    }
+
+    assert facade_roles == {
+        "church_main_nave_facade_bay",
+        "church_front_facade_opening",
+        "church_rear_facade_opening",
+    }
+
+    assert {
+        mesh["facade_side"]
+        for mesh in romanesque_mesh["facade_meshes"]
+    } == {
+        "left",
+        "right",
+        "front",
+        "rear",
+    }
 
 def test_window_bay_physical_decision_controls_landmark_facade_output():
     geometry = AtlasChurchLandmarkBuilder.build(

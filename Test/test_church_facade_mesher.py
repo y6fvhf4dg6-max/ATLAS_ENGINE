@@ -47,7 +47,12 @@ def test_heavy_round_arch_builds_two_main_nave_side_facades():
     assert result["type"] == "church_facade_system"
     assert result["facade_rhythm"] == "heavy_round_arch"
     assert len(result["side_facades"]) == 2
-    assert result["panel_count"] == 10
+    assert sum(
+        facade["panel_count"]
+        for facade in result["side_facades"]
+    ) == 10
+    assert len(result["end_facades"]) == 2
+    assert result["panel_count"] == 12
 
     assert {
         facade["facade_side"]
@@ -113,6 +118,12 @@ def test_facade_panels_preserve_semantic_metadata():
         nozzle_diameter_mm=0.4,
     )
 
+    side_panels = [
+        panel
+        for facade in result["side_facades"]
+        for panel in facade["component_meshes"]
+    ]
+
     assert all(
         panel["architectural_role"]
         == "church_main_nave_facade_bay"
@@ -120,7 +131,7 @@ def test_facade_panels_preserve_semantic_metadata():
         == "heavy_round_arch"
         and panel["arch_shape"]
         == "round_arch"
-        for panel in result["component_meshes"]
+        for panel in side_panels
     )
 
 
@@ -284,4 +295,102 @@ def test_window_bay_physical_decision_is_published():
         == result["model_depth_m"]
         for panel in result["component_meshes"]
     )
+
+def test_church_facade_builds_front_and_rear_compositions():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    assert len(result["end_facades"]) == 2
+    assert {
+        facade["facade_side"]
+        for facade in result["end_facades"]
+    } == {
+        "front",
+        "rear",
+    }
+
+    assert all(
+        facade["panel_count"] == 1
+        for facade in result["end_facades"]
+    )
+
+
+def test_front_and_rear_facades_preserve_semantic_roles():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    end_panels = [
+        panel
+        for facade in result["end_facades"]
+        for panel in facade["component_meshes"]
+    ]
+
+    assert {
+        panel["facade_side"]
+        for panel in end_panels
+    } == {
+        "front",
+        "rear",
+    }
+
+    assert {
+        panel["architectural_role"]
+        for panel in end_panels
+    } == {
+        "church_front_facade_opening",
+        "church_rear_facade_opening",
+    }
+
+
+def test_window_omit_suppresses_all_four_facade_sides():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="omit",
+        window_resolved_size_mm=0.0,
+    )
+
+    assert result["side_facades"] == []
+    assert result["end_facades"] == []
+    assert result["panel_count"] == 0
 

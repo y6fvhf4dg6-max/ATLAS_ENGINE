@@ -94,6 +94,63 @@ class AtlasChurchFacadeMesher:
             ),
         )
 
+    @classmethod
+    def _end_wall_quad(
+        cls,
+        *,
+        frame,
+        facade_side,
+        wall_height,
+        main_nave_depth,
+        main_nave_width,
+    ):
+        half_depth = (
+            float(main_nave_depth) / 2.0
+        )
+        half_width = (
+            float(main_nave_width) / 2.0
+        )
+
+        if facade_side == "front":
+            longitudinal = -half_depth
+            lateral_start = half_width
+            lateral_end = -half_width
+        elif facade_side == "rear":
+            longitudinal = half_depth
+            lateral_start = -half_width
+            lateral_end = half_width
+        else:
+            raise ValueError(
+                "facade_side must be front or rear"
+            )
+
+        return (
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal,
+                lateral=lateral_start,
+                z=0.0,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal,
+                lateral=lateral_end,
+                z=0.0,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal,
+                lateral=lateral_end,
+                z=wall_height,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal,
+                lateral=lateral_start,
+                z=wall_height,
+            ),
+        )
+
     @staticmethod
     def _column_count(
         facade_profile,
@@ -277,6 +334,7 @@ class AtlasChurchFacadeMesher:
         )
 
         side_facades = []
+        end_facades = []
         component_meshes = []
         triangles = []
 
@@ -303,6 +361,7 @@ class AtlasChurchFacadeMesher:
                     resolved_window_size_mm
                 ),
                 "side_facades": [],
+                "end_facades": [],
                 "component_meshes": [],
                 "triangles": [],
             }
@@ -369,6 +428,74 @@ class AtlasChurchFacadeMesher:
                 facade["triangles"]
             )
 
+        for facade_side in (
+            "front",
+            "rear",
+        ):
+            architectural_role = (
+                "church_front_facade_opening"
+                if facade_side == "front"
+                else "church_rear_facade_opening"
+            )
+
+            facade = (
+                AtlasFacadePanelBuilder
+                .build_repeated_arches(
+                    wall_quad=cls._end_wall_quad(
+                        frame=frame,
+                        facade_side=facade_side,
+                        wall_height=wall_height,
+                        main_nave_depth=main_nave_depth,
+                        main_nave_width=main_nave_width,
+                    ),
+                    column_count=1,
+                    row_count=1,
+                    panel_width_ratio=(
+                        facade_profile.opening_width_ratio
+                    ),
+                    panel_height_ratio=(
+                        facade_profile.opening_height_ratio
+                    ),
+                    arch_height_ratio=0.50,
+                    horizontal_margin_ratio=0.18,
+                    vertical_margin_ratio=0.18,
+                    depth_mm=model_depth_m,
+                    embed_mm=model_embed_m,
+                    arch_segments=arch_segments,
+                    metadata={
+                        "architectural_role": (
+                            architectural_role
+                        ),
+                        "facade_side": facade_side,
+                        "facade_rhythm": (
+                            facade_profile.facade_rhythm
+                        ),
+                        "arch_shape": (
+                            facade_profile.arch_shape
+                        ),
+                        "physical_action": (
+                            resolved_window_action
+                        ),
+                        "resolved_size_mm": (
+                            resolved_window_size_mm
+                        ),
+                    },
+                )
+            )
+
+            end_facades.append(
+                {
+                    **facade,
+                    "facade_side": facade_side,
+                }
+            )
+            component_meshes.extend(
+                facade["component_meshes"]
+            )
+            triangles.extend(
+                facade["triangles"]
+            )
+
         return {
             "type": "church_facade_system",
             "facade_rhythm": (
@@ -387,6 +514,7 @@ class AtlasChurchFacadeMesher:
                 resolved_window_size_mm
             ),
             "side_facades": side_facades,
+            "end_facades": end_facades,
             "component_meshes": component_meshes,
             "triangles": triangles,
         }
