@@ -1243,3 +1243,92 @@ def test_landmark_routes_side_facades_above_outer_aisles():
         )
     ) >= outer_aisle_top_z
 
+def test_landmark_integrates_single_west_tower_window_stage():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            grammar_name="single_west_tower",
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    tower_system = mesh[
+        "architectural_tower_system"
+    ]
+
+    assert len(
+        mesh["tower_window_meshes"]
+    ) == 4
+
+    assert (
+        tower_system["window_meshes"]
+        == mesh["tower_window_meshes"]
+    )
+
+    tower = tower_system["towers"][0]
+
+    assert (
+        tower["tower_type"]
+        == "west_tower_center"
+    )
+    assert (
+        tower["window_stage"]["type"]
+        == "bell_stage"
+    )
+    assert (
+        tower["window_stage"]["window_count"]
+        == 4
+    )
+    assert len(tower["window_meshes"]) == 4
+
+
+def test_bonn_tower_windows_are_included_in_final_landmark_triangles():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
+            profile_name="romanesque_cathedral",
+            tower_count=2,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    tower_system = mesh[
+        "architectural_tower_system"
+    ]
+    window_meshes = mesh[
+        "tower_window_meshes"
+    ]
+
+    assert len(window_meshes) == 24
+
+    assert {
+        tower["tower_type"]:
+        tower["window_stage"]["window_count"]
+        for tower in tower_system["towers"]
+    } == {
+        "crossing_tower": 8,
+        "outer_polygon_tower": 8,
+        "west_tower_left": 4,
+        "west_tower_right": 4,
+    }
+
+    final_triangles = set(
+        mesh["triangles"]
+    )
+
+    assert all(
+        triangle in final_triangles
+        for window in window_meshes
+        for triangle in window["triangles"]
+    )
+

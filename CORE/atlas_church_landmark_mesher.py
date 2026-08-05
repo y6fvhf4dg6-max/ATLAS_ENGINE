@@ -37,6 +37,9 @@ from CORE.atlas_church_semantic_profile_system import (
 from CORE.atlas_church_tower_mesher import (
     AtlasChurchTowerMesher,
 )
+from CORE.atlas_church_tower_window_mesher import (
+    AtlasChurchTowerWindowMesher,
+)
 
 
 class AtlasChurchLandmarkMesher:
@@ -881,15 +884,22 @@ class AtlasChurchLandmarkMesher:
         )
 
         architectural_tower_system = (
-            AtlasChurchTowerMesher.build(
-                frame=frame,
-                profile=geometry.tower_profile,
-                building_height=geometry.height_m,
+            AtlasChurchTowerWindowMesher.apply(
+                AtlasChurchTowerMesher.build(
+                    frame=frame,
+                    profile=geometry.tower_profile,
+                    building_height=geometry.height_m,
+                )
             )
         )
 
         tower_meshes = list(
             architectural_tower_system["towers"]
+        )
+        tower_window_meshes = list(
+            architectural_tower_system[
+                "window_meshes"
+            ]
         )
         spire_meshes = []
 
@@ -1004,6 +1014,9 @@ class AtlasChurchLandmarkMesher:
             "transept_meshes": transept_meshes,
             "apse_meshes": apse_meshes,
             "tower_meshes": tower_meshes,
+            "tower_window_meshes": (
+                tower_window_meshes
+            ),
             "spire_meshes": spire_meshes,
             "architectural_tower_system": (
                 architectural_tower_system
