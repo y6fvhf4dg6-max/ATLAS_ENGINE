@@ -432,3 +432,16 @@ def test_dome_and_drum_rings_stay_inside_irregular_real_footprint():
 
     for x, y, _ in dome["base_ring"]:
         assert polygon.covers(Point(x, y))
+
+
+def test_combined_premium_mosque_mesh_is_closed_and_manifold():
+    mesh = AtlasMosqueLandmarkMesher.build(
+        _geometry()
+    )
+
+    topology = _topology(
+        mesh["triangles"]
+    )
+
+    assert topology["open_edges"] == 0
+    assert topology["non_manifold_edges"] == 0

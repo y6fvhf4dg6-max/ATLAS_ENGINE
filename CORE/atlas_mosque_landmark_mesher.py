@@ -985,12 +985,33 @@ class AtlasMosqueLandmarkMesher:
             minaret_cap,
         )
 
-        triangles = [
-            triangle
-            for component in component_meshes
-            for triangle in component[
-                "triangles"
+        minaret_triangles = tuple(
+            minaret["triangles"]
+        )
+        minaret_cap_triangles = tuple(
+            minaret_cap["triangles"]
+        )
+
+        radial_segments = cls.RADIAL_SEGMENTS
+
+        combined_minaret_triangles = (
+            minaret_triangles[
+                :-radial_segments
             ]
+        )
+        combined_minaret_cap_triangles = (
+            minaret_cap_triangles[
+                radial_segments:
+            ]
+        )
+
+        triangles = [
+            *prayer_hall["triangles"],
+            *dome_drum["triangles"],
+            *dome["triangles"],
+            *combined_minaret_triangles,
+            *balcony["triangles"],
+            *combined_minaret_cap_triangles,
         ]
 
         return {
