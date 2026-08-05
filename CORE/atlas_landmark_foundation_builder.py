@@ -238,6 +238,40 @@ class AtlasLandmarkFoundationBuilder:
 
         landmark = AtlasLandmarkProviderOsm.from_source(source)
 
+        catalog_entry = AtlasMasterLandmarkCatalog.resolve(
+            wikidata_id=landmark.tags.get(
+                "wikidata"
+            ),
+            osm_id=getattr(
+                landmark,
+                "id",
+                None,
+            ),
+        )
+
+        catalog_worship_types = {
+            "mosque": AtlasLandmarkType.MOSQUE,
+            "synagogue": AtlasLandmarkType.SYNAGOGUE,
+        }
+
+        catalog_landmark_type = (
+            catalog_worship_types.get(
+                catalog_entry.landmark_family
+            )
+            if catalog_entry is not None
+            else None
+        )
+
+        if (
+            landmark.landmark_type
+            is AtlasLandmarkType.UNKNOWN
+            and catalog_landmark_type is not None
+        ):
+            landmark = replace(
+                landmark,
+                landmark_type=catalog_landmark_type,
+            )
+
         try:
             local_meter_geometry = tuple(
                 coordinate_engine.latlon_to_local_meters(lat, lon)

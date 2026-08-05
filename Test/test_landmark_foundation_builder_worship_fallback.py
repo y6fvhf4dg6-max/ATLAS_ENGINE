@@ -394,3 +394,102 @@ def test_real_ankara_pbf_mosque_routes_catalog_grammar_end_to_end(
         source["geometry"]
     )
     assert len(mesh["triangles"]) > 0
+
+
+def test_catalog_promotes_real_cenabi_ahmet_pasha_from_unknown_to_mosque(
+    monkeypatch,
+):
+    from CORE.atlas_coordinate_engine import AtlasCoordinateEngine
+    from CORE.atlas_local_osm_reader import AtlasLocalOSMReader
+    from CORE.atlas_master_landmark_catalog import (
+        AtlasMasterLandmarkCatalog,
+        AtlasMasterLandmarkCatalogEntry,
+    )
+
+    bbox = (
+        39.9351328,
+        32.8582838,
+        39.9521044,
+        32.8780862,
+    )
+
+    data = AtlasLocalOSMReader.read(
+        "Data/OSM/ankara-kalesi-test.osm.pbf",
+        bbox,
+    )
+
+    source = next(
+        record
+        for record in data["buildings"]
+        if record.get("id") == 322722702
+    )
+
+    assert source["tags"]["name"] == (
+        "Cenabi Ahmet Paşa Cami"
+    )
+    assert source["tags"]["wikidata"] == "Q96278624"
+    assert source["tags"]["building"] == "church"
+    assert source["tags"]["religion"] == "muslim"
+    assert source["tags"]["amenity"] == (
+        "place_of_worship"
+    )
+
+    catalog_entry = AtlasMasterLandmarkCatalogEntry(
+        key="cenabi-ahmet-pasha-mosque-test",
+        landmark_family="mosque",
+        wikidata_id="Q96278624",
+        osm_ids=(322722702,),
+        grammar_name="single_dome_single_minaret",
+    )
+
+    original_resolve = AtlasMasterLandmarkCatalog.resolve
+
+    def resolve_catalog(cls, **kwargs):
+        if (
+            kwargs.get("wikidata_id") == "Q96278624"
+            or kwargs.get("osm_id") == 322722702
+        ):
+            return catalog_entry
+
+        return original_resolve(**kwargs)
+
+    monkeypatch.setattr(
+        AtlasMasterLandmarkCatalog,
+        "resolve",
+        classmethod(resolve_catalog),
+    )
+
+    class FixtureTerrain:
+        @staticmethod
+        def sample_height(x, y):
+            return 1.25
+
+    coordinate_engine = AtlasCoordinateEngine(
+        origin_lat=bbox[0],
+        origin_lon=bbox[1],
+        xy_scale=5500.0,
+        z_scale=5500.0,
+    )
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=coordinate_engine,
+        terrain_mesh=FixtureTerrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+
+    mesh = meshes[0]
+
+    assert mesh["landmark_id"] == 322722702
+    assert mesh["type"] == "mosque_landmark"
+    assert mesh["worship_grammar"] == (
+        "single_dome_single_minaret"
+    )
+    assert mesh["special_architecture_applied"] is True
+    assert mesh["foundation_z"] == 1.25
+    assert len(mesh["dome_meshes"]) == 1
+    assert len(mesh["minaret_meshes"]) == 1
+    assert len(mesh["minaret_balcony_meshes"]) == 1
+    assert len(mesh["minaret_cap_meshes"]) == 1
