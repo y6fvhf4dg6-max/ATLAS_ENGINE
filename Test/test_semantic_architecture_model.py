@@ -161,3 +161,16 @@ def test_semantic_architecture_model_resolves_components_by_role():
         0,
         1,
     )
+
+def test_semantic_architecture_model_normalizes_profile_name():
+    model = AtlasSemanticArchitectureModel(
+        landmark_family="church",
+        grammar_name="single_west_tower",
+        profile_name=" Romanesque Basilica ",
+        components=(
+            _component("body"),
+        ),
+    )
+
+    assert model.profile_name == "romanesque_basilica"
+

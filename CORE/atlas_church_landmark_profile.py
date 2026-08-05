@@ -7,6 +7,7 @@ from dataclasses import dataclass
 class AtlasChurchLandmarkProfile:
     landmark_class: str = "church"
     grammar_name: str = "auto"
+    profile_name: str = "generic_church"
 
     has_nave: bool = True
     has_transept: bool = True
@@ -34,10 +35,20 @@ class AtlasChurchLandmarkProfile:
         grammar_name = str(
             self.grammar_name
         ).strip().lower()
+        profile_name = "_".join(
+            str(
+                self.profile_name
+            ).strip().lower().split()
+        )
 
         if not grammar_name:
             raise ValueError(
                 "grammar_name must not be blank"
+            )
+
+        if not profile_name:
+            raise ValueError(
+                "profile_name must not be blank"
             )
 
         if landmark_class not in {
@@ -94,6 +105,11 @@ class AtlasChurchLandmarkProfile:
             self,
             "grammar_name",
             grammar_name,
+        )
+        object.__setattr__(
+            self,
+            "profile_name",
+            profile_name,
         )
         object.__setattr__(
             self,

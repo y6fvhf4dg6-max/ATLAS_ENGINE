@@ -181,3 +181,18 @@ def test_adapter_rejects_non_church_geometry():
         AtlasChurchSemanticArchitectureAdapter.adapt(
             object()
         )
+
+def test_adapter_carries_church_semantic_profile_name():
+    geometry = _build_geometry(
+        profile=AtlasChurchLandmarkProfile(
+            grammar_name="single_west_tower",
+            profile_name="romanesque_basilica",
+        ),
+    )
+
+    model = AtlasChurchSemanticArchitectureAdapter.adapt(
+        geometry
+    )
+
+    assert model.profile_name == "romanesque_basilica"
+

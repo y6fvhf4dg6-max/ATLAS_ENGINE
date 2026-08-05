@@ -16,6 +16,7 @@ class AtlasSemanticArchitectureModel:
         AtlasSemanticArchitectureComponent,
         ...,
     ]
+    profile_name: str = "generic_architecture"
     flags: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -26,6 +27,10 @@ class AtlasSemanticArchitectureModel:
         grammar_name = _normalize_identifier(
             self.grammar_name,
             field_name="grammar_name",
+        )
+        profile_name = _normalize_identifier(
+            self.profile_name,
+            field_name="profile_name",
         )
 
         components = tuple(
@@ -94,6 +99,11 @@ class AtlasSemanticArchitectureModel:
             self,
             "components",
             components,
+        )
+        object.__setattr__(
+            self,
+            "profile_name",
+            profile_name,
         )
         object.__setattr__(
             self,

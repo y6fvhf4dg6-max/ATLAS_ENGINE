@@ -100,3 +100,17 @@ def test_profile_is_immutable():
 
     with pytest.raises(FrozenInstanceError):
         profile.tower_count = 2
+
+def test_church_profile_defines_semantic_profile_name():
+    profile = AtlasChurchLandmarkProfile(
+        profile_name=" Romanesque Basilica ",
+    )
+
+    assert profile.profile_name == "romanesque_basilica"
+
+
+def test_default_church_profile_uses_generic_semantic_profile():
+    profile = AtlasChurchLandmarkProfile()
+
+    assert profile.profile_name == "generic_church"
+

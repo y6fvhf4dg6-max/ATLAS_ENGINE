@@ -46,6 +46,7 @@ class AtlasChurchSemanticArchitectureAdapter:
             landmark_family="church",
             grammar_name=geometry.profile.grammar_name,
             components=components,
+            profile_name=geometry.profile.profile_name,
             flags=(
                 f"class_{geometry.landmark_class}",
             ),
