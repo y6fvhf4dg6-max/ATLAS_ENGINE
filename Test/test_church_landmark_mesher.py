@@ -958,3 +958,229 @@ def test_semantic_profile_routes_front_and_rear_facade_compositions():
         == "portal_with_oculus"
     )
 
+
+
+def test_outer_aisle_body_is_split_into_real_footprint_regions():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    aisle_meshes = mesh[
+        "outer_aisle_meshes"
+    ]
+
+    assert len(aisle_meshes) >= 2
+    assert {
+        aisle["section_type"]
+        for aisle in aisle_meshes
+    } == {
+        "outer_aisle_left",
+        "outer_aisle_right",
+    }
+    assert any(
+        aisle["section_type"]
+        == "outer_aisle_left"
+        for aisle in aisle_meshes
+    )
+    assert any(
+        aisle["section_type"]
+        == "outer_aisle_right"
+        for aisle in aisle_meshes
+    )
+    assert all(
+        aisle["uses_real_footprint"] is True
+        for aisle in aisle_meshes
+    )
+
+
+def test_outer_aisle_regions_leave_main_nave_corridor_uncovered():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    frame = mesh["footprint_frame"]
+    aisle_meshes = mesh[
+        "outer_aisle_meshes"
+    ]
+
+    local_lateral_values = {
+        "outer_aisle_left": [],
+        "outer_aisle_right": [],
+    }
+
+    for aisle in aisle_meshes:
+        local_lateral_values[
+            aisle["section_type"]
+        ].extend(
+            frame.to_local(point)[1]
+            for point in aisle["footprint"]
+        )
+
+    left_values = local_lateral_values[
+        "outer_aisle_left"
+    ]
+    right_values = local_lateral_values[
+        "outer_aisle_right"
+    ]
+
+    left_min = min(left_values)
+    left_max = max(left_values)
+    right_min = min(right_values)
+    right_max = max(right_values)
+
+    assert left_max < 0.0
+    assert right_min > 0.0
+    assert left_min < left_max
+    assert right_min < right_max
+
+
+def test_outer_aisle_clipping_preserves_expected_rectangular_area():
+    from shapely.geometry import Polygon
+
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    aisle_area = sum(
+        Polygon(
+            aisle["footprint"]
+        ).area
+        for aisle in mesh[
+            "outer_aisle_meshes"
+        ]
+    )
+
+    footprint_area = Polygon(
+        geometry.footprint
+    ).area
+
+    expected_main_nave_area = (
+        mesh["architectural_facade_system"][
+            "main_nave_width"
+        ]
+        * mesh["footprint_frame"].longitudinal_span
+    )
+
+    assert aisle_area == pytest.approx(
+        footprint_area
+        - expected_main_nave_area,
+        abs=1e-8,
+    )
+
+
+def test_concave_outer_aisle_regions_stay_inside_real_footprint():
+    from shapely.geometry import Polygon
+    from shapely.ops import unary_union
+
+    landmark = AtlasLandmark(
+        id=607,
+        landmark_type=AtlasLandmarkType.CHURCH,
+        geometry=(
+            (0.0, 0.0),
+            (10.0, 0.0),
+            (10.0, 10.0),
+            (6.0, 10.0),
+            (6.0, 20.0),
+            (0.0, 20.0),
+        ),
+        tags={},
+        source="OSM",
+    )
+
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    source_polygon = Polygon(
+        geometry.footprint
+    )
+    aisle_union = unary_union(
+        [
+            Polygon(aisle["footprint"])
+            for aisle in mesh[
+                "outer_aisle_meshes"
+            ]
+        ]
+    )
+
+    assert aisle_union.difference(
+        source_polygon
+    ).area == pytest.approx(
+        0.0,
+        abs=1e-8,
+    )
+    assert aisle_union.area > 0.0
+
+
+def test_outer_aisle_components_preserve_side_identity():
+    landmark = AtlasLandmark(
+        id=608,
+        landmark_type=AtlasLandmarkType.CHURCH,
+        geometry=(
+            (0.0, 0.0),
+            (10.0, 0.0),
+            (10.0, 10.0),
+            (6.0, 10.0),
+            (6.0, 20.0),
+            (0.0, 20.0),
+        ),
+        tags={},
+        source="OSM",
+    )
+
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=landmark,
+        profile=AtlasChurchLandmarkProfile(),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    aisle_meshes = mesh[
+        "outer_aisle_meshes"
+    ]
+
+    assert all(
+        aisle["section_type"] in {
+            "outer_aisle_left",
+            "outer_aisle_right",
+        }
+        for aisle in aisle_meshes
+    )
+
+    component_indices = {}
+
+    for aisle in aisle_meshes:
+        component_indices.setdefault(
+            aisle["section_type"],
+            [],
+        ).append(
+            aisle["component_index"]
+        )
+
+    assert all(
+        sorted(indices)
+        == list(range(len(indices)))
+        for indices in component_indices.values()
+    )

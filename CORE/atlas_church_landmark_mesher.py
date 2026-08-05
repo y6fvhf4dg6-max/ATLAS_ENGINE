@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from shapely.geometry import Polygon
+from shapely.geometry import (
+    GeometryCollection,
+    MultiPolygon,
+    Polygon,
+    box,
+)
 
 from CORE.atlas_church_body_profile_system import (
     AtlasChurchBodyProfileSystem,
@@ -361,6 +366,235 @@ class AtlasChurchLandmarkMesher:
             **metadata,
         }
 
+    @staticmethod
+    def _polygon_components(
+        geometry,
+    ):
+        if geometry.is_empty:
+            return []
+
+        if isinstance(
+            geometry,
+            Polygon,
+        ):
+            return (
+                [geometry]
+                if geometry.area > 1e-12
+                else []
+            )
+
+        if isinstance(
+            geometry,
+            MultiPolygon,
+        ):
+            return [
+                polygon
+                for polygon in geometry.geoms
+                if polygon.area > 1e-12
+            ]
+
+        if isinstance(
+            geometry,
+            GeometryCollection,
+        ):
+            polygons = []
+
+            for item in geometry.geoms:
+                polygons.extend(
+                    AtlasChurchLandmarkMesher
+                    ._polygon_components(item)
+                )
+
+            return polygons
+
+        return []
+
+    @staticmethod
+    def _clean_local_polygon_points(
+        points,
+        *,
+        reference_span,
+    ):
+        from math import hypot
+
+        points = tuple(
+            (
+                float(point[0]),
+                float(point[1]),
+            )
+            for point in points
+        )
+
+        tolerance = max(
+            float(reference_span) * 1e-9,
+            1e-15,
+        )
+
+        cleaned = []
+
+        for point in points:
+            if not cleaned:
+                cleaned.append(point)
+                continue
+
+            previous = cleaned[-1]
+
+            if (
+                hypot(
+                    point[0] - previous[0],
+                    point[1] - previous[1],
+                )
+                <= tolerance
+            ):
+                continue
+
+            cleaned.append(point)
+
+        if (
+            len(cleaned) > 1
+            and hypot(
+                cleaned[0][0] - cleaned[-1][0],
+                cleaned[0][1] - cleaned[-1][1],
+            )
+            <= tolerance
+        ):
+            cleaned.pop()
+
+        if len(cleaned) < 3:
+            raise ValueError(
+                "Church clipped polygon has fewer "
+                "than three distinct vertices"
+            )
+
+        cleaned_polygon = Polygon(
+            cleaned
+        )
+
+        if (
+            cleaned_polygon.is_empty
+            or not cleaned_polygon.is_valid
+            or cleaned_polygon.area <= 1e-12
+        ):
+            raise ValueError(
+                "Church clipped polygon became invalid "
+                "after vertex cleaning"
+            )
+
+        return tuple(cleaned)
+
+    @classmethod
+    def _build_outer_aisle_meshes(
+        cls,
+        *,
+        frame,
+        footprint,
+        nave_width,
+        min_z,
+        max_z,
+    ):
+        local_footprint = Polygon(
+            tuple(
+                frame.to_local(point)
+                for point in footprint
+            )
+        )
+
+        if (
+            local_footprint.is_empty
+            or not local_footprint.is_valid
+            or local_footprint.area <= 1e-12
+        ):
+            raise ValueError(
+                "Church footprint must define "
+                "a valid local polygon"
+            )
+
+        half_depth = (
+            frame.longitudinal_span / 2.0
+        )
+        half_width = (
+            frame.lateral_span / 2.0
+        )
+        half_nave_width = (
+            float(nave_width) / 2.0
+        )
+
+        regions = (
+            (
+                "outer_aisle_left",
+                box(
+                    -half_depth,
+                    -half_width,
+                    half_depth,
+                    -half_nave_width,
+                ),
+            ),
+            (
+                "outer_aisle_right",
+                box(
+                    -half_depth,
+                    half_nave_width,
+                    half_depth,
+                    half_width,
+                ),
+            ),
+        )
+
+        meshes = []
+
+        for section_type, region in regions:
+            clipped = local_footprint.intersection(
+                region
+            )
+
+            components = cls._polygon_components(
+                clipped
+            )
+
+            for component_index, polygon in enumerate(
+                components
+            ):
+                local_points = (
+                    cls._clean_local_polygon_points(
+                        tuple(
+                            polygon.exterior.coords
+                        )[:-1],
+                        reference_span=max(
+                            frame.longitudinal_span,
+                            frame.lateral_span,
+                        ),
+                    )
+                )
+
+                world_footprint = tuple(
+                    frame.to_world(
+                        longitudinal=longitudinal,
+                        lateral=lateral,
+                    )
+                    for longitudinal, lateral
+                    in local_points
+                )
+
+                mesh = cls._extrude_real_footprint(
+                    footprint=world_footprint,
+                    min_z=min_z,
+                    max_z=max_z,
+                    mesh_type="church_outer_aisle_body",
+                    section_type=section_type,
+                    component_index=component_index,
+                    clipped_from_real_footprint=True,
+                )
+
+                meshes.append(mesh)
+
+        if not meshes:
+            raise ValueError(
+                "Church outer aisle clipping "
+                "produced no geometry"
+            )
+
+        return meshes
+
     @classmethod
     def _oriented_spire(
         cls,
@@ -514,6 +748,16 @@ class AtlasChurchLandmarkMesher:
             )
         ]
 
+        outer_aisle_meshes = (
+            cls._build_outer_aisle_meshes(
+                frame=frame,
+                footprint=geometry.footprint,
+                nave_width=nave_width,
+                min_z=0.0,
+                max_z=outer_aisle_height,
+            )
+        )
+
         main_nave_body_meshes = [
             cls._oriented_box(
                 frame=frame,
@@ -529,23 +773,41 @@ class AtlasChurchLandmarkMesher:
             )
         ]
 
+        left_aisle_meshes = tuple(
+            mesh
+            for mesh in outer_aisle_meshes
+            if mesh["section_type"]
+            == "outer_aisle_left"
+        )
+        right_aisle_meshes = tuple(
+            mesh
+            for mesh in outer_aisle_meshes
+            if mesh["section_type"]
+            == "outer_aisle_right"
+        )
+
         architectural_body_system = {
             "type": "church_stepped_body",
             "sections": (
                 {
                     "section_type": "outer_aisle_left",
                     "top_z": outer_aisle_height,
-                    "mesh": nave_meshes[0],
+                    "mesh": left_aisle_meshes[0],
+                    "meshes": left_aisle_meshes,
                 },
                 {
                     "section_type": "outer_aisle_right",
                     "top_z": outer_aisle_height,
-                    "mesh": nave_meshes[0],
+                    "mesh": right_aisle_meshes[0],
+                    "meshes": right_aisle_meshes,
                 },
                 {
                     "section_type": "main_nave",
                     "top_z": main_nave_height,
                     "mesh": main_nave_body_meshes[0],
+                    "meshes": tuple(
+                        main_nave_body_meshes
+                    ),
                 },
             ),
         }
@@ -710,7 +972,7 @@ class AtlasChurchLandmarkMesher:
         )
 
         component_meshes = (
-            nave_meshes
+            outer_aisle_meshes
             + main_nave_body_meshes
             + transept_meshes
             + apse_meshes
@@ -733,6 +995,7 @@ class AtlasChurchLandmarkMesher:
             "footprint_frame": frame,
             "triangles": triangles,
             "nave_meshes": nave_meshes,
+            "outer_aisle_meshes": outer_aisle_meshes,
             "main_nave_body_meshes": main_nave_body_meshes,
             "architectural_body_system": (
                 architectural_body_system

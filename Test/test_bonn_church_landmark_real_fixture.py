@@ -225,3 +225,48 @@ def test_bonner_muenster_preserves_catalog_four_tower_grammar():
         "west_tower_left",
         "west_tower_right",
     )
+
+
+def test_bonn_outer_aisle_footprints_have_no_near_duplicate_consecutive_vertices():
+    import math
+
+    meshes = _build_real_church_meshes()
+
+    for _, mesh in meshes.values():
+        frame = mesh["footprint_frame"]
+
+        reference_span = max(
+            frame.longitudinal_span,
+            frame.lateral_span,
+        )
+        minimum_edge_length = (
+            reference_span * 1e-9
+        )
+
+        for aisle in mesh[
+            "outer_aisle_meshes"
+        ]:
+            local_points = tuple(
+                frame.to_local(point)
+                for point in aisle["footprint"]
+            )
+
+            assert len(local_points) >= 3
+
+            for index, first in enumerate(
+                local_points
+            ):
+                second = local_points[
+                    (index + 1)
+                    % len(local_points)
+                ]
+
+                edge_length = math.hypot(
+                    second[0] - first[0],
+                    second[1] - first[1],
+                )
+
+                assert (
+                    edge_length
+                    > minimum_edge_length
+                )
