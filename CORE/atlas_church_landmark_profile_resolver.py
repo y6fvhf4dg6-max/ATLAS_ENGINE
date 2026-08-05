@@ -55,12 +55,30 @@ class AtlasChurchLandmarkProfileResolver:
             )
         )
 
+        church_catalog_entry = (
+            catalog_entry
+            if (
+                catalog_entry is not None
+                and catalog_entry.landmark_family
+                == "church"
+            )
+            else None
+        )
+
         has_apse = not (
-            catalog_entry is not None
-            and catalog_entry.landmark_family
-            == "church"
+            church_catalog_entry is not None
             and "disable_synthetic_apse"
-            in catalog_entry.geometry_overrides
+            in church_catalog_entry.geometry_overrides
+        )
+
+        profile_name = (
+            church_catalog_entry.profile_name
+            if (
+                church_catalog_entry is not None
+                and church_catalog_entry.profile_name
+                is not None
+            )
+            else "generic_church"
         )
 
         grammar_name = (
@@ -86,6 +104,7 @@ class AtlasChurchLandmarkProfileResolver:
         return AtlasChurchLandmarkProfile(
             landmark_class=landmark_class,
             grammar_name=grammar_name,
+            profile_name=profile_name,
             tower_count=tower_count,
             has_apse=has_apse,
             scale_ratio=scale_ratio,

@@ -136,7 +136,7 @@ def test_bonn_muenster_catalog_contract():
 
     assert entry.landmark_family == "church"
     assert entry.grammar_name == "bonn_muenster_catalog"
-    assert entry.profile_name is None
+    assert entry.profile_name == "romanesque_cathedral"
     assert "disable_synthetic_apse" in entry.geometry_overrides
 
 

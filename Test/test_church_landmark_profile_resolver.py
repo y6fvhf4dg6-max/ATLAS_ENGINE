@@ -201,3 +201,42 @@ def test_profile_resolver_catalog_grammar_precedes_hierarchy_evidence():
 
     assert profile.grammar_name == "bonn_muenster_catalog"
     assert profile.tower_count == 2
+
+def test_profile_resolver_carries_bonner_muenster_catalog_profile():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=112526702,
+            name="Bonner Münster",
+            wikidata="Q686664",
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.profile_name == "romanesque_cathedral"
+
+
+def test_profile_resolver_uses_generic_profile_for_unknown_church():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=999201,
+            landmark_type=AtlasLandmarkType.CHURCH,
+            name="Unknown Church",
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.profile_name == "generic_church"
+
+
+def test_catalog_profile_resolves_with_normalized_wikidata():
+    profile = AtlasChurchLandmarkProfileResolver.resolve(
+        _landmark(
+            landmark_id=999202,
+            name="Bonner Münster",
+            wikidata=" q686664 ",
+        ),
+        scale_ratio=5500.0,
+    )
+
+    assert profile.profile_name == "romanesque_cathedral"
+

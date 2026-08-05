@@ -127,6 +127,7 @@ class AtlasMasterLandmarkCatalog:
             wikidata_id="Q686664",
             osm_ids=(112526702,),
             grammar_name="bonn_muenster_catalog",
+            profile_name="romanesque_cathedral",
             geometry_overrides=(
                 "disable_synthetic_apse",
             ),
