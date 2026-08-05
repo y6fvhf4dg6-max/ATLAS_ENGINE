@@ -347,6 +347,12 @@ class AtlasChurchFacadeMesher:
                 "arch_shape": (
                     facade_profile.arch_shape
                 ),
+                "front_composition": (
+                    facade_profile.front_composition
+                ),
+                "rear_composition": (
+                    facade_profile.rear_composition
+                ),
                 "column_count_per_side": column_count,
                 "row_count": 1,
                 "main_nave_width": main_nave_width,
@@ -437,6 +443,11 @@ class AtlasChurchFacadeMesher:
                 if facade_side == "front"
                 else "church_rear_facade_opening"
             )
+            facade_composition = (
+                facade_profile.front_composition
+                if facade_side == "front"
+                else facade_profile.rear_composition
+            )
 
             facade = (
                 AtlasFacadePanelBuilder
@@ -467,6 +478,9 @@ class AtlasChurchFacadeMesher:
                             architectural_role
                         ),
                         "facade_side": facade_side,
+                        "facade_composition": (
+                            facade_composition
+                        ),
                         "facade_rhythm": (
                             facade_profile.facade_rhythm
                         ),
@@ -487,6 +501,9 @@ class AtlasChurchFacadeMesher:
                 {
                     **facade,
                     "facade_side": facade_side,
+                    "facade_composition": (
+                        facade_composition
+                    ),
                 }
             )
             component_meshes.extend(
@@ -502,6 +519,12 @@ class AtlasChurchFacadeMesher:
                 facade_profile.facade_rhythm
             ),
             "arch_shape": facade_profile.arch_shape,
+            "front_composition": (
+                facade_profile.front_composition
+            ),
+            "rear_composition": (
+                facade_profile.rear_composition
+            ),
             "column_count_per_side": column_count,
             "row_count": 1,
             "main_nave_width": main_nave_width,

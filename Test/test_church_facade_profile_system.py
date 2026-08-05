@@ -63,3 +63,55 @@ def test_unknown_facade_rhythm_is_rejected():
         AtlasChurchFacadeProfileSystem.resolve(
             "glass_curtain"
         )
+
+def test_regular_profile_defines_front_and_rear_compositions():
+    profile = AtlasChurchFacadeProfileSystem.resolve(
+        "regular"
+    )
+
+    assert (
+        profile.front_composition
+        == "single_arch_portal"
+    )
+    assert (
+        profile.rear_composition
+        == "single_arch_opening"
+    )
+
+
+def test_heavy_round_arch_profile_adds_oculus_composition():
+    profile = AtlasChurchFacadeProfileSystem.resolve(
+        "heavy_round_arch"
+    )
+
+    assert (
+        profile.front_composition
+        == "portal_with_oculus"
+    )
+    assert (
+        profile.rear_composition
+        == "round_arch_opening"
+    )
+
+
+def test_facade_composition_identifiers_are_normalized():
+    profile = AtlasChurchFacadeProfile(
+        facade_rhythm=" Custom Rhythm ",
+        bay_spacing_ratio=0.20,
+        opening_width_ratio=0.30,
+        opening_height_ratio=0.40,
+        arch_shape=" Round Arch ",
+        recess_depth_ratio=0.05,
+        front_composition=" Portal With Oculus ",
+        rear_composition=" Round Arch Opening ",
+    )
+
+    assert (
+        profile.front_composition
+        == "portal_with_oculus"
+    )
+    assert (
+        profile.rear_composition
+        == "round_arch_opening"
+    )
+

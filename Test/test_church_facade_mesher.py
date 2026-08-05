@@ -394,3 +394,110 @@ def test_window_omit_suppresses_all_four_facade_sides():
     assert result["end_facades"] == []
     assert result["panel_count"] == 0
 
+def test_facade_output_publishes_front_and_rear_compositions():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    assert (
+        result["front_composition"]
+        == "portal_with_oculus"
+    )
+    assert (
+        result["rear_composition"]
+        == "round_arch_opening"
+    )
+
+
+def test_end_facades_preserve_composition_identity():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    front = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+    rear = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "rear"
+    )
+
+    assert (
+        front["facade_composition"]
+        == "portal_with_oculus"
+    )
+    assert (
+        rear["facade_composition"]
+        == "round_arch_opening"
+    )
+
+    assert all(
+        panel["facade_composition"]
+        == front["facade_composition"]
+        for panel in front["component_meshes"]
+    )
+    assert all(
+        panel["facade_composition"]
+        == rear["facade_composition"]
+        for panel in rear["component_meshes"]
+    )
+
+
+def test_omit_output_retains_composition_contract():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="omit",
+        window_resolved_size_mm=0.0,
+    )
+
+    assert (
+        result["front_composition"]
+        == "single_arch_portal"
+    )
+    assert (
+        result["rear_composition"]
+        == "single_arch_opening"
+    )
+

@@ -904,3 +904,56 @@ def test_window_bay_physical_decision_controls_landmark_facade_output():
     assert facade["panel_count"] == 0
     assert result["facade_meshes"] == []
 
+def test_semantic_profile_routes_front_and_rear_facade_compositions():
+    generic_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="church",
+            grammar_name="single_west_tower",
+            profile_name="generic_church",
+        ),
+    )
+    romanesque_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="church",
+            grammar_name="single_west_tower",
+            profile_name="romanesque_cathedral",
+        ),
+    )
+
+    generic = AtlasChurchLandmarkMesher.build(
+        generic_geometry
+    )["architectural_facade_system"]
+    romanesque = AtlasChurchLandmarkMesher.build(
+        romanesque_geometry
+    )["architectural_facade_system"]
+
+    assert (
+        generic["front_composition"]
+        == "single_arch_portal"
+    )
+    assert (
+        generic["rear_composition"]
+        == "single_arch_opening"
+    )
+    assert (
+        romanesque["front_composition"]
+        == "portal_with_oculus"
+    )
+    assert (
+        romanesque["rear_composition"]
+        == "round_arch_opening"
+    )
+
+    romanesque_front = next(
+        facade
+        for facade in romanesque["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+
+    assert (
+        romanesque_front["facade_composition"]
+        == "portal_with_oculus"
+    )
+

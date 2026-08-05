@@ -44,6 +44,8 @@ class AtlasChurchFacadeProfile:
     opening_height_ratio: float
     arch_shape: str
     recess_depth_ratio: float
+    front_composition: str
+    rear_composition: str
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -60,6 +62,22 @@ class AtlasChurchFacadeProfile:
             _normalize_identifier(
                 self.arch_shape,
                 field_name="arch_shape",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "front_composition",
+            _normalize_identifier(
+                self.front_composition,
+                field_name="front_composition",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "rear_composition",
+            _normalize_identifier(
+                self.rear_composition,
+                field_name="rear_composition",
             ),
         )
 
@@ -91,6 +109,8 @@ class AtlasChurchFacadeProfileSystem:
             opening_height_ratio=0.34,
             arch_shape="simple_arch",
             recess_depth_ratio=0.04,
+            front_composition="single_arch_portal",
+            rear_composition="single_arch_opening",
         ),
         "heavy_round_arch": AtlasChurchFacadeProfile(
             facade_rhythm="heavy_round_arch",
@@ -99,6 +119,8 @@ class AtlasChurchFacadeProfileSystem:
             opening_height_ratio=0.30,
             arch_shape="round_arch",
             recess_depth_ratio=0.06,
+            front_composition="portal_with_oculus",
+            rear_composition="round_arch_opening",
         ),
     }
 
