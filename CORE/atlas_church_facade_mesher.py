@@ -504,6 +504,11 @@ class AtlasChurchFacadeMesher:
                     ),
                     horizontal_margin_ratio=0.18,
                     vertical_margin_ratio=0.18,
+                    vertical_alignment=(
+                        "bottom"
+                        if facade_side == "front"
+                        else "center"
+                    ),
                     depth_mm=model_depth_m,
                     embed_mm=model_embed_m,
                     arch_segments=arch_segments,

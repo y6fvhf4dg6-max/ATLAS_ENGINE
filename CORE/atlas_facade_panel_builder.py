@@ -368,6 +368,7 @@ def _build_repeated_arches(
     arch_height_ratio=0.38,
     horizontal_margin_ratio=0.06,
     vertical_margin_ratio=0.10,
+    vertical_alignment="center",
     depth_mm=None,
     embed_mm=None,
     arch_segments=6,
@@ -426,6 +427,19 @@ def _build_repeated_arches(
     if embed_mm < 0.0:
         raise ValueError(
             "embed_mm must be non-negative"
+        )
+
+    vertical_alignment = str(
+        vertical_alignment
+    ).strip().lower()
+
+    if vertical_alignment not in {
+        "center",
+        "bottom",
+    }:
+        raise ValueError(
+            "vertical_alignment must be "
+            "center or bottom"
         )
 
     bottom_left = wall_quad[0]
@@ -598,6 +612,12 @@ def _build_repeated_arches(
                 * (row_index + 0.5)
             )
 
+            if vertical_alignment == "bottom":
+                center_v = (
+                    panel_height * 0.5
+                    + cell_v * row_index
+                )
+
             u_min = (
                 center_u - panel_width * 0.5
             )
@@ -767,6 +787,7 @@ def _build_repeated_arches(
         "depth_mm": depth_mm,
         "embed_mm": embed_mm,
         "arch_segments": arch_segments,
+        "vertical_alignment": vertical_alignment,
         "arch_height_ratio": float(
             arch_height_ratio
         ),

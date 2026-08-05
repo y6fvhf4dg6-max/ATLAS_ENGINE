@@ -352,3 +352,30 @@ def test_unit_arch_height_ratio_builds_physical_semicircle():
         - physical_width * 0.5
     ) < 1e-9
 
+
+
+def test_repeated_arches_support_bottom_vertical_alignment():
+    result = AtlasFacadePanelBuilder.build_repeated_arches(
+        wall_quad=(
+            (0.0, 0.0, 0.0),
+            (20.0, 0.0, 0.0),
+            (20.0, 0.0, 30.0),
+            (0.0, 0.0, 30.0),
+        ),
+        column_count=1,
+        row_count=1,
+        panel_width_ratio=0.30,
+        panel_height_ratio=0.40,
+        horizontal_margin_ratio=0.10,
+        vertical_margin_ratio=0.18,
+        vertical_alignment="bottom",
+        arch_segments=8,
+    )
+
+    panel = result["component_meshes"][0]
+
+    assert min(
+        point[2]
+        for point in panel["back"]
+    ) == 0.0
+    assert result["vertical_alignment"] == "bottom"

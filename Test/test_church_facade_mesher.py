@@ -888,3 +888,50 @@ def test_portal_with_oculus_builds_larger_front_portal():
     assert romanesque_width > regular_width
     assert romanesque_height > regular_height
 
+
+
+def test_front_portal_is_ground_anchored_but_rear_opening_is_not():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    front = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+    rear = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "rear"
+    )
+
+    front_panel = front["component_meshes"][0]
+    rear_panel = rear["component_meshes"][0]
+
+    front_min_z = min(
+        point[2]
+        for point in front_panel["back"]
+    )
+    rear_min_z = min(
+        point[2]
+        for point in rear_panel["back"]
+    )
+
+    assert front_min_z == 0.0
+    assert rear_min_z > 0.0
+    assert front["vertical_alignment"] == "bottom"
+    assert rear["vertical_alignment"] == "center"
