@@ -116,6 +116,8 @@ class AtlasChurchFacadeMesher:
         body_profile,
         scale_ratio,
         nozzle_diameter_mm,
+        window_action=None,
+        window_resolved_size_mm=None,
     ):
         if not isinstance(
             frame,
@@ -150,6 +152,55 @@ class AtlasChurchFacadeMesher:
         nozzle_diameter_mm = float(
             nozzle_diameter_mm
         )
+
+        if window_action is not None:
+            window_action = str(
+                window_action
+            ).strip().lower()
+
+            if window_action not in {
+                "preserve",
+                "enlarge",
+                "omit",
+            }:
+                raise ValueError(
+                    "window_action must be preserve, "
+                    "enlarge, omit, or None"
+                )
+
+            if window_resolved_size_mm is None:
+                raise ValueError(
+                    "window_resolved_size_mm is required "
+                    "when window_action is provided"
+                )
+
+            window_resolved_size_mm = float(
+                window_resolved_size_mm
+            )
+
+            if window_resolved_size_mm < 0.0:
+                raise ValueError(
+                    "window_resolved_size_mm must be "
+                    "non-negative"
+                )
+
+            if (
+                window_action == "omit"
+                and window_resolved_size_mm != 0.0
+            ):
+                raise ValueError(
+                    "omit requires "
+                    "window_resolved_size_mm=0"
+                )
+
+            if (
+                window_action != "omit"
+                and window_resolved_size_mm <= 0.0
+            ):
+                raise ValueError(
+                    "preserve and enlarge require a "
+                    "positive window_resolved_size_mm"
+                )
 
         if wall_height <= 0.0:
             raise ValueError(
@@ -194,6 +245,18 @@ class AtlasChurchFacadeMesher:
             depth_decision.resolved_size_mm,
             nozzle_diameter_mm,
         )
+
+        resolved_window_action = (
+            "preserve"
+            if window_action is None
+            else window_action
+        )
+        resolved_window_size_mm = (
+            physical_depth_mm
+            if window_resolved_size_mm is None
+            else window_resolved_size_mm
+        )
+
         model_depth_m = (
             physical_depth_mm
             * scale_ratio
@@ -216,6 +279,33 @@ class AtlasChurchFacadeMesher:
         side_facades = []
         component_meshes = []
         triangles = []
+
+        if resolved_window_action == "omit":
+            return {
+                "type": "church_facade_system",
+                "facade_rhythm": (
+                    facade_profile.facade_rhythm
+                ),
+                "arch_shape": (
+                    facade_profile.arch_shape
+                ),
+                "column_count_per_side": column_count,
+                "row_count": 1,
+                "main_nave_width": main_nave_width,
+                "main_nave_depth": main_nave_depth,
+                "panel_count": 0,
+                "physical_depth_mm": 0.0,
+                "model_depth_m": 0.0,
+                "window_action": (
+                    resolved_window_action
+                ),
+                "window_resolved_size_mm": (
+                    resolved_window_size_mm
+                ),
+                "side_facades": [],
+                "component_meshes": [],
+                "triangles": [],
+            }
 
         for facade_side in (
             "left",
@@ -256,6 +346,12 @@ class AtlasChurchFacadeMesher:
                         "arch_shape": (
                             facade_profile.arch_shape
                         ),
+                        "physical_action": (
+                            resolved_window_action
+                        ),
+                        "resolved_size_mm": (
+                            resolved_window_size_mm
+                        ),
                     },
                 )
             )
@@ -286,6 +382,10 @@ class AtlasChurchFacadeMesher:
             "panel_count": len(component_meshes),
             "physical_depth_mm": physical_depth_mm,
             "model_depth_m": model_depth_m,
+            "window_action": resolved_window_action,
+            "window_resolved_size_mm": (
+                resolved_window_size_mm
+            ),
             "side_facades": side_facades,
             "component_meshes": component_meshes,
             "triangles": triangles,

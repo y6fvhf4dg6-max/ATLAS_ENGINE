@@ -854,3 +854,38 @@ def test_semantic_facade_rhythm_drives_church_facade_geometry():
         for mesh in romanesque_mesh["facade_meshes"]
     )
 
+def test_window_bay_physical_decision_controls_landmark_facade_output():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="church",
+            grammar_name="single_west_tower",
+            profile_name="generic_church",
+            scale_ratio=50000.0,
+            nozzle_diameter_mm=0.4,
+        ),
+    )
+
+    window_component = next(
+        component
+        for component in geometry.components
+        if component.component_type
+        == "window_bay_system"
+    )
+
+    assert window_component.physical_action == "omit"
+    assert window_component.resolved_size_mm == 0.0
+
+    result = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    facade = result[
+        "architectural_facade_system"
+    ]
+
+    assert facade["window_action"] == "omit"
+    assert facade["window_resolved_size_mm"] == 0.0
+    assert facade["panel_count"] == 0
+    assert result["facade_meshes"] == []
+

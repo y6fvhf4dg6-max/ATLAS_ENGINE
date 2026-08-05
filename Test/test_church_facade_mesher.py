@@ -224,3 +224,64 @@ def test_basilica_body_profile_controls_facade_wall_proportions():
         60.0 * 0.82
     )
 
+def test_window_bay_omit_action_suppresses_facade_panels():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="omit",
+        window_resolved_size_mm=0.0,
+    )
+
+    assert result["window_action"] == "omit"
+    assert result["window_resolved_size_mm"] == 0.0
+    assert result["panel_count"] == 0
+    assert result["side_facades"] == []
+    assert result["component_meshes"] == []
+    assert result["triangles"] == []
+
+
+def test_window_bay_physical_decision_is_published():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="enlarge",
+        window_resolved_size_mm=0.8,
+    )
+
+    assert result["window_action"] == "enlarge"
+    assert result["window_resolved_size_mm"] == 0.8
+    assert result["physical_depth_mm"] == 0.4
+    assert result["panel_count"] > 0
+
+    assert all(
+        panel["physical_action"] == "enlarge"
+        and panel["resolved_size_mm"] == 0.8
+        and panel["depth_mm"]
+        == result["model_depth_m"]
+        for panel in result["component_meshes"]
+    )
+

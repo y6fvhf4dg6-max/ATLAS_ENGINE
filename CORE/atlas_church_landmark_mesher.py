@@ -663,6 +663,28 @@ class AtlasChurchLandmarkMesher:
                 semantic_profile.facade_rhythm
             )
         )
+
+        window_component = next(
+            (
+                component
+                for component in geometry.components
+                if component.component_type
+                == "window_bay_system"
+            ),
+            None,
+        )
+
+        window_action = (
+            "omit"
+            if window_component is None
+            else window_component.physical_action
+        )
+        window_resolved_size_mm = (
+            0.0
+            if window_component is None
+            else window_component.resolved_size_mm
+        )
+
         architectural_facade_system = (
             AtlasChurchFacadeMesher.build(
                 frame=frame,
@@ -674,6 +696,10 @@ class AtlasChurchLandmarkMesher:
                 ),
                 nozzle_diameter_mm=(
                     geometry.profile.nozzle_diameter_mm
+                ),
+                window_action=window_action,
+                window_resolved_size_mm=(
+                    window_resolved_size_mm
                 ),
             )
         )
