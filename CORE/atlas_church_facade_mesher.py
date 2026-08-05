@@ -182,6 +182,8 @@ class AtlasChurchFacadeMesher:
         side_wall_min_z=0.0,
         front_wall_quad=None,
         front_surface_target="main_nave_front",
+        rear_wall_quad=None,
+        rear_surface_target="main_nave_rear",
     ):
         if not isinstance(
             frame,
@@ -248,6 +250,38 @@ class AtlasChurchFacadeMesher:
             ):
                 raise ValueError(
                     "front_wall_quad must contain "
+                    "four 3D points"
+                )
+
+        rear_surface_target = "_".join(
+            str(
+                rear_surface_target
+            ).strip().lower().split()
+        )
+
+        if not rear_surface_target:
+            raise ValueError(
+                "rear_surface_target must not be blank"
+            )
+
+        if rear_wall_quad is not None:
+            rear_wall_quad = tuple(
+                tuple(
+                    float(coordinate)
+                    for coordinate in point
+                )
+                for point in rear_wall_quad
+            )
+
+            if (
+                len(rear_wall_quad) != 4
+                or any(
+                    len(point) != 3
+                    for point in rear_wall_quad
+                )
+            ):
+                raise ValueError(
+                    "rear_wall_quad must contain "
                     "four 3D points"
                 )
 
@@ -426,6 +460,9 @@ class AtlasChurchFacadeMesher:
                 "front_surface_target": (
                     front_surface_target
                 ),
+                "rear_surface_target": (
+                    rear_surface_target
+                ),
                 "side_facades": [],
                 "end_facades": [],
                 "oculus_meshes": [],
@@ -541,25 +578,35 @@ class AtlasChurchFacadeMesher:
                     else 0.35
                 )
 
-            target_wall_quad = (
-                front_wall_quad
-                if (
-                    facade_side == "front"
-                    and front_wall_quad is not None
+            if (
+                facade_side == "front"
+                and front_wall_quad is not None
+            ):
+                target_wall_quad = (
+                    front_wall_quad
                 )
-                else cls._end_wall_quad(
-                    frame=frame,
-                    facade_side=facade_side,
-                    wall_height=wall_height,
-                    main_nave_depth=main_nave_depth,
-                    main_nave_width=main_nave_width,
+            elif (
+                facade_side == "rear"
+                and rear_wall_quad is not None
+            ):
+                target_wall_quad = (
+                    rear_wall_quad
                 )
-            )
+            else:
+                target_wall_quad = (
+                    cls._end_wall_quad(
+                        frame=frame,
+                        facade_side=facade_side,
+                        wall_height=wall_height,
+                        main_nave_depth=main_nave_depth,
+                        main_nave_width=main_nave_width,
+                    )
+                )
 
             surface_target = (
                 front_surface_target
                 if facade_side == "front"
-                else "main_nave_rear"
+                else rear_surface_target
             )
 
             facade = (
@@ -729,6 +776,9 @@ class AtlasChurchFacadeMesher:
             ),
             "front_surface_target": (
                 front_surface_target
+            ),
+            "rear_surface_target": (
+                rear_surface_target
             ),
             "side_facades": side_facades,
             "end_facades": end_facades,

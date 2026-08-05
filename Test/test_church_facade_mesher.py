@@ -1058,3 +1058,66 @@ def test_front_composition_can_target_custom_visible_surface():
         oculus["center"][1] - 7.0
     ) < 1e-9
 
+def test_rear_composition_can_target_custom_visible_surface():
+    rear_wall_quad = (
+        (6.0, 52.0, 0.0),
+        (24.0, 52.0, 0.0),
+        (24.0, 52.0, 14.0),
+        (6.0, 52.0, 14.0),
+    )
+
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        rear_wall_quad=rear_wall_quad,
+        rear_surface_target="apse_outer_rear",
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    rear = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "rear"
+    )
+
+    assert result["rear_surface_target"] == (
+        "apse_outer_rear"
+    )
+    assert rear["surface_target"] == (
+        "apse_outer_rear"
+    )
+
+    assert all(
+        panel["surface_target"]
+        == "apse_outer_rear"
+        for panel in rear["component_meshes"]
+    )
+
+    assert all(
+        abs(point[1] - 52.0)
+        <= result["model_depth_m"]
+        for panel in rear["component_meshes"]
+        for point in (
+            *panel["back"],
+            *panel["front"],
+        )
+    )
+
+    rear_panel = rear["component_meshes"][0]
+
+    assert max(
+        point[2]
+        for point in rear_panel["back"]
+    ) <= 14.0
+

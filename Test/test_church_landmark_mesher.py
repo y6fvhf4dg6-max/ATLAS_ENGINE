@@ -1461,3 +1461,103 @@ def test_twin_west_towers_keep_central_front_composition_on_nave():
         for oculus in facade["oculus_meshes"]
     )
 
+def test_apse_routes_rear_opening_to_visible_outer_face():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            profile_name="romanesque_cathedral",
+            has_apse=True,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    facade = mesh[
+        "architectural_facade_system"
+    ]
+
+    rear = next(
+        item
+        for item in facade["end_facades"]
+        if item["facade_side"] == "rear"
+    )
+
+    assert facade["rear_surface_target"] == (
+        "apse_outer_rear"
+    )
+    assert rear["surface_target"] == (
+        "apse_outer_rear"
+    )
+
+    frame = mesh["footprint_frame"]
+    rear_panel = rear["component_meshes"][0]
+
+    panel_longitudinal = sum(
+        frame.to_local(
+            (point[0], point[1])
+        )[0]
+        for point in rear_panel["back"]
+    ) / len(rear_panel["back"])
+
+    apse_outer_longitudinal = (
+        frame.longitudinal_span / 2.0
+    )
+    nave_rear_longitudinal = (
+        facade["main_nave_depth"] / 2.0
+    )
+
+    assert abs(
+        panel_longitudinal
+        - apse_outer_longitudinal
+    ) < abs(
+        panel_longitudinal
+        - nave_rear_longitudinal
+    )
+
+    apse_top_z = max(
+        point[2]
+        for triangle in mesh["apse_meshes"][0][
+            "triangles"
+        ]
+        for point in triangle
+    )
+
+    assert max(
+        point[2]
+        for point in rear_panel["back"]
+    ) <= apse_top_z
+
+
+def test_church_without_apse_keeps_rear_opening_on_main_nave():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            profile_name="romanesque_cathedral",
+            has_apse=False,
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    facade = mesh[
+        "architectural_facade_system"
+    ]
+
+    rear = next(
+        item
+        for item in facade["end_facades"]
+        if item["facade_side"] == "rear"
+    )
+
+    assert mesh["apse_meshes"] == []
+    assert facade["rear_surface_target"] == (
+        "main_nave_rear"
+    )
+    assert rear["surface_target"] == (
+        "main_nave_rear"
+    )
+

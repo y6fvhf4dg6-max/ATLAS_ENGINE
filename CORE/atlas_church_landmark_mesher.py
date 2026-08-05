@@ -940,6 +940,58 @@ class AtlasChurchLandmarkMesher:
         front_surface_target = (
             "main_nave_front"
         )
+        rear_wall_quad = None
+        rear_surface_target = (
+            "main_nave_rear"
+        )
+
+        if apse_meshes:
+            apse_height = (
+                body_height
+                * body_profile.apse_height_ratio
+            )
+            apse_outer_longitudinal = (
+                apse_center_longitudinal
+                + apse_depth / 2.0
+            )
+
+            rear_wall_quad = (
+                cls._world_vertex(
+                    frame=frame,
+                    longitudinal=(
+                        apse_outer_longitudinal
+                    ),
+                    lateral=-apse_width / 2.0,
+                    z=0.0,
+                ),
+                cls._world_vertex(
+                    frame=frame,
+                    longitudinal=(
+                        apse_outer_longitudinal
+                    ),
+                    lateral=apse_width / 2.0,
+                    z=0.0,
+                ),
+                cls._world_vertex(
+                    frame=frame,
+                    longitudinal=(
+                        apse_outer_longitudinal
+                    ),
+                    lateral=apse_width / 2.0,
+                    z=apse_height,
+                ),
+                cls._world_vertex(
+                    frame=frame,
+                    longitudinal=(
+                        apse_outer_longitudinal
+                    ),
+                    lateral=-apse_width / 2.0,
+                    z=apse_height,
+                ),
+            )
+            rear_surface_target = (
+                "apse_outer_rear"
+            )
 
         west_center_tower = next(
             (
@@ -1023,6 +1075,10 @@ class AtlasChurchLandmarkMesher:
                 front_wall_quad=front_wall_quad,
                 front_surface_target=(
                     front_surface_target
+                ),
+                rear_wall_quad=rear_wall_quad,
+                rear_surface_target=(
+                    rear_surface_target
                 ),
             )
         )
