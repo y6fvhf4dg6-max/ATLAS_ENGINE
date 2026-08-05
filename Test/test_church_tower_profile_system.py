@@ -341,3 +341,91 @@ def test_bonn_muenster_catalog_grammar_preserves_four_tower_system():
         "west_tower_left",
         "west_tower_right",
     )
+
+def test_multi_tower_scheme_drives_auto_grammar():
+    profile = AtlasChurchTowerProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        building_height=42.0,
+        landmark_class="church",
+        grammar_name="auto",
+        tower_scheme="multi_tower",
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in profile.towers
+    ) == (
+        "west_tower_left",
+        "west_tower_right",
+    )
+
+
+def test_grammar_driven_scheme_preserves_landmark_class_fallback():
+    church = AtlasChurchTowerProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        building_height=42.0,
+        landmark_class="church",
+        grammar_name="auto",
+        tower_scheme="grammar_driven",
+    )
+    cathedral = AtlasChurchTowerProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        building_height=42.0,
+        landmark_class="cathedral",
+        grammar_name="auto",
+        tower_scheme="grammar_driven",
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in church.towers
+    ) == (
+        "west_tower_center",
+    )
+    assert tuple(
+        tower.tower_type
+        for tower in cathedral.towers
+    ) == (
+        "west_tower_left",
+        "west_tower_right",
+    )
+
+
+def test_explicit_catalog_grammar_overrides_semantic_tower_scheme():
+    profile = AtlasChurchTowerProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        building_height=82.0,
+        landmark_class="cathedral",
+        grammar_name="bonn_muenster_catalog",
+        tower_scheme="grammar_driven",
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in profile.towers
+    ) == (
+        "crossing_tower",
+        "outer_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
+    )
+
+
+def test_unknown_tower_scheme_is_rejected():
+    with pytest.raises(
+        ValueError,
+        match="unsupported church tower_scheme",
+    ):
+        AtlasChurchTowerProfileSystem.resolve(
+            longitudinal_span=60.0,
+            lateral_span=30.0,
+            building_height=42.0,
+            landmark_class="church",
+            grammar_name="auto",
+            tower_scheme="detached_campanile",
+        )
+

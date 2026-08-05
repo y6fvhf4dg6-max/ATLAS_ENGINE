@@ -48,6 +48,7 @@ class AtlasChurchTowerProfileSystem:
         building_height,
         landmark_class,
         grammar_name=None,
+        tower_scheme="grammar_driven",
     ) -> AtlasChurchTowerProfileCollection:
         longitudinal_span = float(
             longitudinal_span
@@ -61,6 +62,11 @@ class AtlasChurchTowerProfileSystem:
         landmark_class = str(
             landmark_class
         ).strip().lower()
+        tower_scheme = "_".join(
+            str(
+                tower_scheme
+            ).strip().lower().split()
+        )
 
         if longitudinal_span <= 0.0:
             raise ValueError(
@@ -85,6 +91,14 @@ class AtlasChurchTowerProfileSystem:
                 "landmark_class must be church or cathedral"
             )
 
+        if tower_scheme not in {
+            "grammar_driven",
+            "multi_tower",
+        }:
+            raise ValueError(
+                "unsupported church tower_scheme"
+            )
+
         if grammar_name is not None:
             grammar_name = str(
                 grammar_name
@@ -104,11 +118,14 @@ class AtlasChurchTowerProfileSystem:
             None,
             "auto",
         }:
-            grammar_name = (
-                "twin_west_towers"
-                if landmark_class == "cathedral"
-                else "single_west_tower"
-            )
+            if tower_scheme == "multi_tower":
+                grammar_name = "twin_west_towers"
+            else:
+                grammar_name = (
+                    "twin_west_towers"
+                    if landmark_class == "cathedral"
+                    else "single_west_tower"
+                )
 
         if grammar_name == "single_west_tower":
             towers = (

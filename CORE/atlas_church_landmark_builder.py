@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from CORE.atlas_church_landmark_profile import (
     AtlasChurchLandmarkProfile,
 )
+from CORE.atlas_church_semantic_profile_system import (
+    AtlasChurchSemanticProfileSystem,
+)
 from CORE.atlas_church_footprint_resolver import (
     AtlasChurchFootprintResolver,
 )
@@ -263,6 +266,12 @@ class AtlasChurchLandmarkBuilder:
             footprint
         )
 
+        semantic_profile = (
+            AtlasChurchSemanticProfileSystem.resolve(
+                profile.profile_name
+            )
+        )
+
         tower_profile = (
             AtlasChurchTowerProfileSystem.resolve(
                 longitudinal_span=frame.longitudinal_span,
@@ -270,6 +279,9 @@ class AtlasChurchLandmarkBuilder:
                 building_height=height_m,
                 landmark_class=profile.landmark_class,
                 grammar_name=profile.grammar_name,
+                tower_scheme=(
+                    semantic_profile.tower_scheme
+                ),
             )
         )
 

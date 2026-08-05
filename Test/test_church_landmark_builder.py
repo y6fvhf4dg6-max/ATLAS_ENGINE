@@ -272,3 +272,47 @@ def test_cathedral_geometry_carries_resolved_architectural_tower_profile():
         "west_tower_left",
         "west_tower_right",
     )
+
+def test_builder_routes_semantic_tower_scheme_when_grammar_is_auto():
+    result = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="church",
+            grammar_name="auto",
+            profile_name="romanesque_cathedral",
+            tower_count=2,
+        ),
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in result.tower_profile.towers
+    ) == (
+        "west_tower_left",
+        "west_tower_right",
+    )
+
+
+def test_builder_preserves_explicit_catalog_grammar_over_semantic_tower_scheme():
+    result = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
+            profile_name="generic_church",
+            tower_count=2,
+        ),
+    )
+
+    assert tuple(
+        tower.tower_type
+        for tower in result.tower_profile.towers
+    ) == (
+        "crossing_tower",
+        "outer_polygon_tower",
+        "west_tower_left",
+        "west_tower_right",
+    )
+
