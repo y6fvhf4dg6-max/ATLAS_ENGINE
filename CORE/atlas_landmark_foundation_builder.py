@@ -38,6 +38,9 @@ from CORE.atlas_galata_bridge_support_resolver import (
 from CORE.atlas_landmark_geometry_mesher import (
     AtlasLandmarkGeometryMesher,
 )
+from CORE.atlas_landmark_validation_engine import (
+    AtlasLandmarkValidationEngine,
+)
 from CORE.atlas_landmark_mesh_builder import AtlasLandmarkMeshBuilder
 from CORE.atlas_landmark_provider_osm import AtlasLandmarkProviderOsm
 from CORE.atlas_landmark_type import AtlasLandmarkType
@@ -237,6 +240,35 @@ class AtlasLandmarkFoundationBuilder:
             return None
 
         landmark = AtlasLandmarkProviderOsm.from_source(source)
+
+        validation_result = (
+            AtlasLandmarkValidationEngine.validate(
+                source
+            )
+        )
+
+        validated_worship_types = {
+            "church": AtlasLandmarkType.CHURCH,
+            "cathedral": AtlasLandmarkType.CATHEDRAL,
+            "mosque": AtlasLandmarkType.MOSQUE,
+            "synagogue": AtlasLandmarkType.SYNAGOGUE,
+        }
+
+        validated_landmark_type = (
+            validated_worship_types.get(
+                validation_result.family
+            )
+        )
+
+        if (
+            validated_landmark_type is not None
+            and validation_result.action
+            != "reject"
+        ):
+            landmark = replace(
+                landmark,
+                landmark_type=validated_landmark_type,
+            )
 
         catalog_entry = AtlasMasterLandmarkCatalog.resolve(
             wikidata_id=landmark.tags.get(

@@ -16,6 +16,9 @@ Supported objects:
 
 import osmium
 
+from CORE.atlas_landmark_validation_engine import (
+    AtlasLandmarkValidationEngine,
+)
 from CORE.atlas_place_of_worship_profile_resolver import (
     AtlasPlaceOfWorshipProfileResolver,
 )
@@ -145,13 +148,15 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         ):
             return True
 
-        worship_profile = (
-            AtlasPlaceOfWorshipProfileResolver.resolve(
-                tags
+        worship_validation = (
+            AtlasLandmarkValidationEngine.validate(
+                {
+                    "tags": tags,
+                }
             )
         )
 
-        if worship_profile in {
+        if worship_validation.family in {
             "church",
             "cathedral",
             "mosque",

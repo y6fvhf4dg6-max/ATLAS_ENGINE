@@ -32,3 +32,25 @@ def test_reader_collects_galata_tower_as_landmark():
         == "observation;museum_and_observation"
     )
     assert len(galata["geometry"]) >= 3
+
+def test_reader_collects_catalog_verified_conflicting_worship_landmark():
+    data = AtlasLocalOSMReader.read(
+        "Data/OSM/ankara-kalesi-test.osm.pbf",
+        (
+            39.9351328,
+            32.8582838,
+            39.9521044,
+            32.8780862,
+        ),
+    )
+
+    cenabi = next(
+        landmark
+        for landmark in data["landmarks"]
+        if landmark["id"] == 322722702
+    )
+
+    assert cenabi["tags"]["building"] == "church"
+    assert cenabi["tags"]["religion"] == "muslim"
+    assert cenabi["tags"]["wikidata"] == "Q96278624"
+    assert len(cenabi["geometry"]) >= 3

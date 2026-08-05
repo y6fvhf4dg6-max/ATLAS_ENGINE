@@ -479,3 +479,46 @@ def test_production_catalog_promotes_real_cenabi_ahmet_pasha_to_mosque():
     assert len(mesh["minaret_meshes"]) == 1
     assert len(mesh["minaret_balcony_meshes"]) == 1
     assert len(mesh["minaret_cap_meshes"]) == 1
+
+def test_foundation_builder_routes_from_validation_engine_result(
+    monkeypatch,
+):
+    from CORE.atlas_landmark_validation_engine import (
+        AtlasLandmarkValidationEngine,
+        AtlasLandmarkValidationResult,
+    )
+
+    source = _source(
+        source_id=9901,
+        building="church",
+        religion="christian",
+    )
+
+    def validate_as_mosque(cls, candidate):
+        assert candidate is source
+
+        return AtlasLandmarkValidationResult(
+            family="mosque",
+            confidence="high",
+            action="fallback",
+            evidence=("integration_test",),
+        )
+
+    monkeypatch.setattr(
+        AtlasLandmarkValidationEngine,
+        "validate",
+        classmethod(validate_as_mosque),
+    )
+
+    meshes = AtlasLandmarkFoundationBuilder.build_landmarks(
+        landmarks=[source],
+        coordinate_engine=FakeCoordinateEngine(),
+        terrain_mesh=_flat_terrain(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert meshes[0]["type"] == (
+        "worship_landmark_fallback"
+    )
+    assert meshes[0]["worship_profile"] == "mosque"
