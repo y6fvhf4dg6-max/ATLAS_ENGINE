@@ -453,9 +453,27 @@ class AtlasChurchFacadeMesher:
                 if facade_side == "front"
                 else facade_profile.rear_composition
             )
+            panel_width_ratio = (
+                facade_profile.opening_width_ratio
+            )
+            panel_height_ratio = (
+                facade_profile.opening_height_ratio
+            )
             arch_height_ratio = 0.50
 
-            if facade_side == "rear":
+            if facade_side == "front":
+                if (
+                    facade_composition
+                    == "portal_with_oculus"
+                ):
+                    panel_width_ratio = 0.34
+                    panel_height_ratio = 0.42
+                    arch_height_ratio = 1.00
+                else:
+                    panel_width_ratio = 0.28
+                    panel_height_ratio = 0.34
+                    arch_height_ratio = 0.50
+            else:
                 arch_height_ratio = (
                     1.00
                     if facade_composition
@@ -476,10 +494,10 @@ class AtlasChurchFacadeMesher:
                     column_count=1,
                     row_count=1,
                     panel_width_ratio=(
-                        facade_profile.opening_width_ratio
+                        panel_width_ratio
                     ),
                     panel_height_ratio=(
-                        facade_profile.opening_height_ratio
+                        panel_height_ratio
                     ),
                     arch_height_ratio=(
                         arch_height_ratio
@@ -522,6 +540,12 @@ class AtlasChurchFacadeMesher:
                     ),
                     "arch_height_ratio": (
                         arch_height_ratio
+                    ),
+                    "panel_width_ratio": (
+                        panel_width_ratio
+                    ),
+                    "panel_height_ratio": (
+                        panel_height_ratio
                     ),
                 }
             )

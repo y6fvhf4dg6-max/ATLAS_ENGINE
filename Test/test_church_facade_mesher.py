@@ -731,9 +731,160 @@ def test_front_portal_arch_ratio_remains_independent_from_rear():
     )
 
     assert abs(
-        front["arch_height_ratio"] - 0.50
+        front["arch_height_ratio"] - 1.00
     ) < 1e-9
     assert abs(
         rear["arch_height_ratio"] - 1.00
     ) < 1e-9
+
+def test_front_composition_controls_portal_geometry():
+    regular = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+    romanesque = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    regular_front = next(
+        facade
+        for facade in regular["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+    romanesque_front = next(
+        facade
+        for facade in romanesque["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+
+    assert abs(
+        regular_front["panel_width_ratio"] - 0.28
+    ) < 1e-9
+    assert abs(
+        regular_front["panel_height_ratio"] - 0.34
+    ) < 1e-9
+    assert abs(
+        regular_front["arch_height_ratio"] - 0.50
+    ) < 1e-9
+
+    assert abs(
+        romanesque_front["panel_width_ratio"] - 0.34
+    ) < 1e-9
+    assert abs(
+        romanesque_front["panel_height_ratio"] - 0.42
+    ) < 1e-9
+    assert abs(
+        romanesque_front["arch_height_ratio"] - 1.00
+    ) < 1e-9
+
+
+def test_portal_with_oculus_builds_larger_front_portal():
+    regular = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+    romanesque = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    regular_front = next(
+        facade
+        for facade in regular["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+    romanesque_front = next(
+        facade
+        for facade in romanesque["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+
+    regular_panel = (
+        regular_front["component_meshes"][0]
+    )
+    romanesque_panel = (
+        romanesque_front["component_meshes"][0]
+    )
+
+    regular_width = abs(
+        regular_panel["back"][1][0]
+        - regular_panel["back"][0][0]
+    )
+    romanesque_width = abs(
+        romanesque_panel["back"][1][0]
+        - romanesque_panel["back"][0][0]
+    )
+
+    regular_height = (
+        max(
+            point[2]
+            for point in regular_panel["back"]
+        )
+        - min(
+            point[2]
+            for point in regular_panel["back"]
+        )
+    )
+    romanesque_height = (
+        max(
+            point[2]
+            for point in romanesque_panel["back"]
+        )
+        - min(
+            point[2]
+            for point in romanesque_panel["back"]
+        )
+    )
+
+    assert romanesque_width > regular_width
+    assert romanesque_height > regular_height
 
