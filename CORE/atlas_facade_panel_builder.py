@@ -496,10 +496,43 @@ def _build_repeated_arches(
         cell_v * float(panel_height_ratio)
     )
 
-    arch_height = min(
-        panel_width * 0.5,
-        panel_height
+    wall_width = (
+        wall_u[0] ** 2
+        + wall_u[1] ** 2
+        + wall_u[2] ** 2
+    ) ** 0.5
+
+    wall_height = (
+        wall_v[0] ** 2
+        + wall_v[1] ** 2
+        + wall_v[2] ** 2
+    ) ** 0.5
+
+    if (
+        wall_width <= 0.0
+        or wall_height <= 0.0
+    ):
+        raise ValueError(
+            "wall_quad is degenerate"
+        )
+
+    physical_panel_width = (
+        panel_width * wall_width
+    )
+    physical_panel_height = (
+        panel_height * wall_height
+    )
+
+    physical_arch_height = min(
+        physical_panel_width
+        * 0.5
         * float(arch_height_ratio),
+        physical_panel_height,
+    )
+
+    arch_height = (
+        physical_arch_height
+        / wall_height
     )
 
     straight_height = (
@@ -691,6 +724,12 @@ def _build_repeated_arches(
                 "depth_mm": depth_mm,
                 "embed_mm": embed_mm,
                 "arch_segments": arch_segments,
+                "arch_height_ratio": float(
+                    arch_height_ratio
+                ),
+                "physical_arch_height": (
+                    physical_arch_height
+                ),
                 "component_type": (
                     "arched_facade_panel"
                 ),
@@ -728,6 +767,12 @@ def _build_repeated_arches(
         "depth_mm": depth_mm,
         "embed_mm": embed_mm,
         "arch_segments": arch_segments,
+        "arch_height_ratio": float(
+            arch_height_ratio
+        ),
+        "physical_arch_height": (
+            physical_arch_height
+        ),
         "geometry_type": (
             "repeated_arched_facade_panels"
         ),

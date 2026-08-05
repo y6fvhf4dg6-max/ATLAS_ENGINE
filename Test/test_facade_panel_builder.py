@@ -270,3 +270,85 @@ def test_arched_panels_reject_too_few_segments():
                 arch_segments=2,
             )
         )
+
+def test_arch_height_ratio_is_measured_in_physical_wall_space():
+    result = AtlasFacadePanelBuilder.build_repeated_arches(
+        wall_quad=(
+            (0.0, 0.0, 0.0),
+            (20.0, 0.0, 0.0),
+            (20.0, 0.0, 40.0),
+            (0.0, 0.0, 40.0),
+        ),
+        column_count=1,
+        row_count=1,
+        panel_width_ratio=0.40,
+        panel_height_ratio=0.60,
+        arch_height_ratio=0.35,
+        horizontal_margin_ratio=0.10,
+        vertical_margin_ratio=0.10,
+        arch_segments=8,
+    )
+
+    panel = result["component_meshes"][0]
+    back = panel["back"]
+
+    physical_width = (
+        (
+            (back[1][0] - back[0][0]) ** 2
+            + (back[1][1] - back[0][1]) ** 2
+            + (back[1][2] - back[0][2]) ** 2
+        )
+        ** 0.5
+    )
+    spring_height = back[2][2]
+    physical_rise = (
+        max(point[2] for point in back)
+        - spring_height
+    )
+
+    assert abs(
+        physical_rise
+        - physical_width * 0.5 * 0.35
+    ) < 1e-9
+
+
+def test_unit_arch_height_ratio_builds_physical_semicircle():
+    result = AtlasFacadePanelBuilder.build_repeated_arches(
+        wall_quad=(
+            (0.0, 0.0, 0.0),
+            (30.0, 0.0, 0.0),
+            (30.0, 0.0, 18.0),
+            (0.0, 0.0, 18.0),
+        ),
+        column_count=1,
+        row_count=1,
+        panel_width_ratio=0.30,
+        panel_height_ratio=0.70,
+        arch_height_ratio=1.00,
+        horizontal_margin_ratio=0.10,
+        vertical_margin_ratio=0.10,
+        arch_segments=12,
+    )
+
+    panel = result["component_meshes"][0]
+    back = panel["back"]
+
+    physical_width = (
+        (
+            (back[1][0] - back[0][0]) ** 2
+            + (back[1][1] - back[0][1]) ** 2
+            + (back[1][2] - back[0][2]) ** 2
+        )
+        ** 0.5
+    )
+    spring_height = back[2][2]
+    physical_rise = (
+        max(point[2] for point in back)
+        - spring_height
+    )
+
+    assert abs(
+        physical_rise
+        - physical_width * 0.5
+    ) < 1e-9
+

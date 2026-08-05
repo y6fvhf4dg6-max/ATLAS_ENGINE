@@ -453,6 +453,15 @@ class AtlasChurchFacadeMesher:
                 if facade_side == "front"
                 else facade_profile.rear_composition
             )
+            arch_height_ratio = 0.50
+
+            if facade_side == "rear":
+                arch_height_ratio = (
+                    1.00
+                    if facade_composition
+                    == "round_arch_opening"
+                    else 0.35
+                )
 
             facade = (
                 AtlasFacadePanelBuilder
@@ -472,7 +481,9 @@ class AtlasChurchFacadeMesher:
                     panel_height_ratio=(
                         facade_profile.opening_height_ratio
                     ),
-                    arch_height_ratio=0.50,
+                    arch_height_ratio=(
+                        arch_height_ratio
+                    ),
                     horizontal_margin_ratio=0.18,
                     vertical_margin_ratio=0.18,
                     depth_mm=model_depth_m,
@@ -508,6 +519,9 @@ class AtlasChurchFacadeMesher:
                     "facade_side": facade_side,
                     "facade_composition": (
                         facade_composition
+                    ),
+                    "arch_height_ratio": (
+                        arch_height_ratio
                     ),
                 }
             )

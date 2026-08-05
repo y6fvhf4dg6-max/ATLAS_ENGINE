@@ -609,3 +609,131 @@ def test_oculus_is_closed_and_manifold():
     assert report["open_edge_count"] == 0
     assert report["non_manifold_edge_count"] == 0
 
+def test_rear_composition_controls_arch_geometry():
+    regular = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "regular"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+    romanesque = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    regular_rear = next(
+        facade
+        for facade in regular["end_facades"]
+        if facade["facade_side"] == "rear"
+    )
+    romanesque_rear = next(
+        facade
+        for facade in romanesque["end_facades"]
+        if facade["facade_side"] == "rear"
+    )
+
+    assert abs(
+        regular_rear["arch_height_ratio"] - 0.35
+    ) < 1e-9
+    assert abs(
+        romanesque_rear["arch_height_ratio"] - 1.00
+    ) < 1e-9
+
+    regular_panel = (
+        regular_rear["component_meshes"][0]
+    )
+    romanesque_panel = (
+        romanesque_rear["component_meshes"][0]
+    )
+
+    regular_arch_rise = (
+        max(
+            point[2]
+            for point in regular_panel["back"]
+        )
+        - regular_panel["back"][2][2]
+    )
+    romanesque_arch_rise = (
+        max(
+            point[2]
+            for point in romanesque_panel["back"]
+        )
+        - romanesque_panel["back"][2][2]
+    )
+
+    regular_width = abs(
+        regular_panel["back"][1][0]
+        - regular_panel["back"][0][0]
+    )
+    romanesque_width = abs(
+        romanesque_panel["back"][1][0]
+        - romanesque_panel["back"][0][0]
+    )
+
+    assert regular_arch_rise < (
+        regular_width * 0.5
+    )
+    assert abs(
+        romanesque_arch_rise
+        - romanesque_width * 0.5
+    ) < 1e-9
+
+
+def test_front_portal_arch_ratio_remains_independent_from_rear():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    front = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+    rear = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "rear"
+    )
+
+    assert abs(
+        front["arch_height_ratio"] - 0.50
+    ) < 1e-9
+    assert abs(
+        rear["arch_height_ratio"] - 1.00
+    ) < 1e-9
+
