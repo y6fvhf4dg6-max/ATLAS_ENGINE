@@ -137,3 +137,66 @@ def test_roof_system_rejects_non_positive_dimensions(
             lateral_span=lateral_span,
             wall_height=wall_height,
         )
+
+def test_pitched_roof_character_preserves_default_profile():
+    default_profile = AtlasChurchRoofProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        wall_height=20.0,
+    )
+    explicit_profile = AtlasChurchRoofProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        wall_height=20.0,
+        roof_character="pitched",
+    )
+
+    assert explicit_profile == default_profile
+
+
+def test_stepped_pitched_roof_character_strengthens_architectural_layering():
+    pitched = AtlasChurchRoofProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        wall_height=20.0,
+        roof_character="pitched",
+    )
+    stepped = AtlasChurchRoofProfileSystem.resolve(
+        longitudinal_span=60.0,
+        lateral_span=30.0,
+        wall_height=20.0,
+        roof_character="stepped_pitched",
+    )
+
+    pitched_aisle = pitched.section(
+        "outer_aisle_left"
+    )
+    stepped_aisle = stepped.section(
+        "outer_aisle_left"
+    )
+    pitched_nave = pitched.section(
+        "main_nave"
+    )
+    stepped_nave = stepped.section(
+        "main_nave"
+    )
+
+    assert stepped_aisle.eave_z < pitched_aisle.eave_z
+    assert stepped_aisle.ridge_z == pitched_aisle.ridge_z
+    assert stepped_nave.eave_z == pitched_nave.eave_z
+    assert stepped_nave.ridge_z > pitched_nave.ridge_z
+    assert stepped_aisle.ridge_z < stepped_nave.eave_z
+
+
+def test_roof_system_rejects_unknown_roof_character():
+    with pytest.raises(
+        ValueError,
+        match="unsupported church roof_character",
+    ):
+        AtlasChurchRoofProfileSystem.resolve(
+            longitudinal_span=60.0,
+            lateral_span=30.0,
+            wall_height=20.0,
+            roof_character="flat_modern",
+        )
+

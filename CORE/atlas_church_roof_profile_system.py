@@ -40,6 +40,7 @@ class AtlasChurchRoofProfileSystem:
         longitudinal_span,
         lateral_span,
         wall_height,
+        roof_character="pitched",
     ) -> AtlasChurchRoofProfile:
         longitudinal_span = float(
             longitudinal_span
@@ -50,6 +51,19 @@ class AtlasChurchRoofProfileSystem:
         wall_height = float(
             wall_height
         )
+        roof_character = "_".join(
+            str(
+                roof_character
+            ).strip().lower().split()
+        )
+
+        if roof_character not in {
+            "pitched",
+            "stepped_pitched",
+        }:
+            raise ValueError(
+                "unsupported church roof_character"
+            )
 
         if longitudinal_span <= 0.0:
             raise ValueError(
@@ -66,16 +80,25 @@ class AtlasChurchRoofProfileSystem:
                 "wall_height must be greater than zero"
             )
 
+        if roof_character == "stepped_pitched":
+            aisle_eave_ratio = 0.68
+            aisle_ridge_ratio = 0.84
+            nave_ridge_ratio = 1.24
+        else:
+            aisle_eave_ratio = 0.72
+            aisle_ridge_ratio = 0.84
+            nave_ridge_ratio = 1.18
+
         aisle_eave_z = (
-            wall_height * 0.72
+            wall_height * aisle_eave_ratio
         )
         aisle_ridge_z = (
-            wall_height * 0.84
+            wall_height * aisle_ridge_ratio
         )
 
         nave_eave_z = wall_height
         nave_ridge_z = (
-            wall_height * 1.18
+            wall_height * nave_ridge_ratio
         )
 
         transept_eave_z = (

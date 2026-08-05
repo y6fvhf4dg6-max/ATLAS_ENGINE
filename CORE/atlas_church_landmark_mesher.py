@@ -17,6 +17,9 @@ from CORE.atlas_church_roof_mesher import (
 from CORE.atlas_church_roof_profile_system import (
     AtlasChurchRoofProfileSystem,
 )
+from CORE.atlas_church_semantic_profile_system import (
+    AtlasChurchSemanticProfileSystem,
+)
 from CORE.atlas_church_tower_mesher import (
     AtlasChurchTowerMesher,
 )
@@ -581,11 +584,20 @@ class AtlasChurchLandmarkMesher:
         )
         spire_meshes = []
 
+        semantic_profile = (
+            AtlasChurchSemanticProfileSystem.resolve(
+                geometry.profile.profile_name
+            )
+        )
+
         roof_profile = (
             AtlasChurchRoofProfileSystem.resolve(
                 longitudinal_span=depth,
                 lateral_span=width,
                 wall_height=body_height,
+                roof_character=(
+                    semantic_profile.roof_character
+                ),
             )
         )
 

@@ -629,3 +629,57 @@ def test_profile_can_disable_apse_without_landmark_id_special_case():
         roof["section_type"] != "apse"
         for roof in mesh["roof_meshes"]
     )
+
+def test_romanesque_semantic_profile_drives_stepped_pitched_roof_character():
+    generic_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="twin_west_towers",
+            profile_name="generic_church",
+            tower_count=2,
+        ),
+    )
+    romanesque_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
+            profile_name="romanesque_cathedral",
+            tower_count=2,
+        ),
+    )
+
+    generic_mesh = AtlasChurchLandmarkMesher.build(
+        generic_geometry
+    )
+    romanesque_mesh = AtlasChurchLandmarkMesher.build(
+        romanesque_geometry
+    )
+
+    generic_sections = {
+        section["section_type"]: section
+        for section in generic_mesh["roof_meshes"]
+    }
+    romanesque_sections = {
+        section["section_type"]: section
+        for section in romanesque_mesh["roof_meshes"]
+    }
+
+    assert (
+        romanesque_sections["outer_aisle_left"]["eave_z"]
+        < generic_sections["outer_aisle_left"]["eave_z"]
+    )
+    assert (
+        romanesque_sections["outer_aisle_left"]["ridge_z"]
+        == generic_sections["outer_aisle_left"]["ridge_z"]
+    )
+    assert (
+        romanesque_sections["main_nave"]["ridge_z"]
+        > generic_sections["main_nave"]["ridge_z"]
+    )
+
