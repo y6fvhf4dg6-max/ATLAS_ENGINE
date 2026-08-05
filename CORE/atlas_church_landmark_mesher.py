@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from shapely.geometry import Polygon
 
+from CORE.atlas_church_body_profile_system import (
+    AtlasChurchBodyProfileSystem,
+)
 from CORE.atlas_church_footprint_resolver import (
     AtlasChurchFootprintResolver,
 )
@@ -466,13 +469,33 @@ class AtlasChurchLandmarkMesher:
         tower_height = geometry.height_m * 0.82
         spire_top = geometry.height_m
 
+        semantic_profile = (
+            AtlasChurchSemanticProfileSystem.resolve(
+                geometry.profile.profile_name
+            )
+        )
+        body_profile = (
+            AtlasChurchBodyProfileSystem.resolve(
+                semantic_profile.plan_type
+            )
+        )
+
         half_depth = depth / 2.0
         half_width = width / 2.0
 
-        nave_width = width * 0.52
-        nave_depth = depth * 0.78
+        nave_width = (
+            width
+            * body_profile.nave_width_ratio
+        )
+        nave_depth = (
+            depth
+            * body_profile.nave_depth_ratio
+        )
 
-        outer_aisle_height = body_height * 0.72
+        outer_aisle_height = (
+            body_height
+            * body_profile.outer_aisle_height_ratio
+        )
         main_nave_height = body_height
 
         nave_meshes = [
@@ -521,8 +544,14 @@ class AtlasChurchLandmarkMesher:
             ),
         }
 
-        transept_depth = depth * 0.22
-        transept_width = width * 0.84
+        transept_depth = (
+            depth
+            * body_profile.transept_depth_ratio
+        )
+        transept_width = (
+            width
+            * body_profile.transept_width_ratio
+        )
 
         transept_meshes = [
             cls._oriented_box(
@@ -532,13 +561,22 @@ class AtlasChurchLandmarkMesher:
                 min_lateral=-transept_width / 2.0,
                 max_lateral=transept_width / 2.0,
                 min_z=0.0,
-                max_z=body_height * 0.92,
+                max_z=(
+                    body_height
+                    * body_profile.transept_height_ratio
+                ),
                 mesh_type="church_transept",
             )
         ]
 
-        apse_depth = depth * 0.14
-        apse_width = nave_width * 0.78
+        apse_depth = (
+            depth
+            * body_profile.apse_depth_ratio
+        )
+        apse_width = (
+            nave_width
+            * body_profile.apse_width_ratio
+        )
         apse_center_longitudinal = (
             half_depth
             - apse_depth / 2.0
@@ -565,7 +603,10 @@ class AtlasChurchLandmarkMesher:
                     min_lateral=-apse_width / 2.0,
                     max_lateral=apse_width / 2.0,
                     min_z=0.0,
-                    max_z=body_height * 0.82,
+                    max_z=(
+                        body_height
+                        * body_profile.apse_height_ratio
+                    ),
                     mesh_type="church_apse",
                 )
             ]
@@ -583,12 +624,6 @@ class AtlasChurchLandmarkMesher:
             architectural_tower_system["towers"]
         )
         spire_meshes = []
-
-        semantic_profile = (
-            AtlasChurchSemanticProfileSystem.resolve(
-                geometry.profile.profile_name
-            )
-        )
 
         roof_profile = (
             AtlasChurchRoofProfileSystem.resolve(

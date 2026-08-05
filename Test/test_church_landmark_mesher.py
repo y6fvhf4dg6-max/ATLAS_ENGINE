@@ -683,3 +683,119 @@ def test_romanesque_semantic_profile_drives_stepped_pitched_roof_character():
         > generic_sections["main_nave"]["ridge_z"]
     )
 
+def test_basilica_cross_plan_drives_church_body_proportions():
+    generic_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="twin_west_towers",
+            profile_name="generic_church",
+            tower_count=2,
+        ),
+    )
+    basilica_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(
+            landmark_type=AtlasLandmarkType.CATHEDRAL,
+        ),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="cathedral",
+            grammar_name="bonn_muenster_catalog",
+            profile_name="romanesque_cathedral",
+            tower_count=2,
+        ),
+    )
+
+    generic_mesh = AtlasChurchLandmarkMesher.build(
+        generic_geometry
+    )
+    basilica_mesh = AtlasChurchLandmarkMesher.build(
+        basilica_geometry
+    )
+
+    generic_body = generic_mesh[
+        "architectural_body_system"
+    ]
+    basilica_body = basilica_mesh[
+        "architectural_body_system"
+    ]
+
+    generic_main = next(
+        section
+        for section in generic_body["sections"]
+        if section["section_type"] == "main_nave"
+    )
+    basilica_main = next(
+        section
+        for section in basilica_body["sections"]
+        if section["section_type"] == "main_nave"
+    )
+
+    generic_aisle = next(
+        section
+        for section in generic_body["sections"]
+        if section["section_type"] == "outer_aisle_left"
+    )
+    basilica_aisle = next(
+        section
+        for section in basilica_body["sections"]
+        if section["section_type"] == "outer_aisle_left"
+    )
+
+    from CORE.atlas_church_footprint_resolver import (
+        AtlasChurchFootprintResolver,
+    )
+
+    def mesh_spans(mesh, geometry):
+        frame = AtlasChurchFootprintResolver.resolve(
+            geometry.footprint
+        )
+
+        local_points = tuple(
+            frame.to_local(vertex)
+            for triangle in mesh["triangles"]
+            for vertex in triangle
+        )
+
+        longitudinal_values = tuple(
+            point[0]
+            for point in local_points
+        )
+        lateral_values = tuple(
+            point[1]
+            for point in local_points
+        )
+
+        return (
+            max(longitudinal_values)
+            - min(longitudinal_values),
+            max(lateral_values)
+            - min(lateral_values),
+        )
+
+    generic_nave_depth, generic_nave_width = mesh_spans(
+        generic_main["mesh"],
+        generic_geometry,
+    )
+    basilica_nave_depth, basilica_nave_width = mesh_spans(
+        basilica_main["mesh"],
+        basilica_geometry,
+    )
+
+    generic_transept_depth, generic_transept_width = mesh_spans(
+        generic_mesh["transept_meshes"][0],
+        generic_geometry,
+    )
+    basilica_transept_depth, basilica_transept_width = mesh_spans(
+        basilica_mesh["transept_meshes"][0],
+        basilica_geometry,
+    )
+
+    assert basilica_nave_width < generic_nave_width
+    assert basilica_nave_depth > generic_nave_depth
+    assert basilica_aisle["top_z"] < generic_aisle["top_z"]
+
+    assert basilica_transept_width > generic_transept_width
+    assert basilica_transept_depth > generic_transept_depth
+
