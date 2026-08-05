@@ -1,0 +1,292 @@
+from __future__ import annotations
+
+from CORE.atlas_church_body_profile_system import (
+    AtlasChurchBodyProfile,
+)
+from CORE.atlas_church_facade_profile_system import (
+    AtlasChurchFacadeProfile,
+)
+from CORE.atlas_church_footprint_resolver import (
+    AtlasChurchFootprintFrame,
+)
+from CORE.atlas_facade_panel_builder import (
+    AtlasFacadePanelBuilder,
+)
+from CORE.atlas_physical_detail_resolver import (
+    AtlasPhysicalDetailResolver,
+)
+
+
+class AtlasChurchFacadeMesher:
+    @staticmethod
+    def _world_vertex(
+        *,
+        frame,
+        longitudinal,
+        lateral,
+        z,
+    ):
+        x, y = frame.to_world(
+            longitudinal=longitudinal,
+            lateral=lateral,
+        )
+
+        return (
+            float(x),
+            float(y),
+            float(z),
+        )
+
+    @classmethod
+    def _side_wall_quad(
+        cls,
+        *,
+        frame,
+        facade_side,
+        wall_height,
+        main_nave_depth,
+        main_nave_width,
+    ):
+        half_depth = (
+            float(main_nave_depth) / 2.0
+        )
+        half_width = (
+            float(main_nave_width) / 2.0
+        )
+
+        if facade_side == "left":
+            lateral = -half_width
+            longitudinal_start = half_depth
+            longitudinal_end = -half_depth
+        elif facade_side == "right":
+            lateral = half_width
+            longitudinal_start = -half_depth
+            longitudinal_end = half_depth
+        else:
+            raise ValueError(
+                "facade_side must be left or right"
+            )
+
+        return (
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal_start,
+                lateral=lateral,
+                z=0.0,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal_end,
+                lateral=lateral,
+                z=0.0,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal_end,
+                lateral=lateral,
+                z=wall_height,
+            ),
+            cls._world_vertex(
+                frame=frame,
+                longitudinal=longitudinal_start,
+                lateral=lateral,
+                z=wall_height,
+            ),
+        )
+
+    @staticmethod
+    def _column_count(
+        facade_profile,
+    ):
+        return max(
+            1,
+            round(
+                1.0
+                / facade_profile.bay_spacing_ratio
+            ),
+        )
+
+    @classmethod
+    def build(
+        cls,
+        *,
+        frame,
+        wall_height,
+        facade_profile,
+        body_profile,
+        scale_ratio,
+        nozzle_diameter_mm,
+    ):
+        if not isinstance(
+            frame,
+            AtlasChurchFootprintFrame,
+        ):
+            raise TypeError(
+                "frame must be AtlasChurchFootprintFrame"
+            )
+
+        if not isinstance(
+            facade_profile,
+            AtlasChurchFacadeProfile,
+        ):
+            raise TypeError(
+                "facade_profile must be AtlasChurchFacadeProfile"
+            )
+
+        if not isinstance(
+            body_profile,
+            AtlasChurchBodyProfile,
+        ):
+            raise TypeError(
+                "body_profile must be AtlasChurchBodyProfile"
+            )
+
+        wall_height = float(
+            wall_height
+        )
+        scale_ratio = float(
+            scale_ratio
+        )
+        nozzle_diameter_mm = float(
+            nozzle_diameter_mm
+        )
+
+        if wall_height <= 0.0:
+            raise ValueError(
+                "wall_height must be greater than zero"
+            )
+
+        if scale_ratio <= 0.0:
+            raise ValueError(
+                "scale_ratio must be greater than zero"
+            )
+
+        if nozzle_diameter_mm <= 0.0:
+            raise ValueError(
+                "nozzle_diameter_mm must be greater than zero"
+            )
+
+        main_nave_width = (
+            frame.lateral_span
+            * body_profile.nave_width_ratio
+        )
+        main_nave_depth = (
+            frame.longitudinal_span
+            * body_profile.nave_depth_ratio
+        )
+
+        nominal_depth_m = (
+            min(
+                main_nave_depth,
+                main_nave_width,
+            )
+            * facade_profile.recess_depth_ratio
+        )
+
+        depth_decision = AtlasPhysicalDetailResolver.resolve(
+            real_size_m=nominal_depth_m,
+            scale_ratio=scale_ratio,
+            nozzle_diameter_mm=nozzle_diameter_mm,
+            detail_type="church_facade_recess",
+        )
+
+        physical_depth_mm = max(
+            depth_decision.resolved_size_mm,
+            nozzle_diameter_mm,
+        )
+        model_depth_m = (
+            physical_depth_mm
+            * scale_ratio
+            / 1000.0
+        )
+        model_embed_m = (
+            model_depth_m * 0.20
+        )
+
+        column_count = cls._column_count(
+            facade_profile
+        )
+        arch_segments = (
+            8
+            if facade_profile.arch_shape
+            == "round_arch"
+            else 4
+        )
+
+        side_facades = []
+        component_meshes = []
+        triangles = []
+
+        for facade_side in (
+            "left",
+            "right",
+        ):
+            facade = (
+                AtlasFacadePanelBuilder
+                .build_repeated_arches(
+                    wall_quad=cls._side_wall_quad(
+                        frame=frame,
+                        facade_side=facade_side,
+                        wall_height=wall_height,
+                        main_nave_depth=main_nave_depth,
+                        main_nave_width=main_nave_width,
+                    ),
+                    column_count=column_count,
+                    row_count=1,
+                    panel_width_ratio=(
+                        facade_profile.opening_width_ratio
+                    ),
+                    panel_height_ratio=(
+                        facade_profile.opening_height_ratio
+                    ),
+                    arch_height_ratio=0.50,
+                    horizontal_margin_ratio=0.06,
+                    vertical_margin_ratio=0.18,
+                    depth_mm=model_depth_m,
+                    embed_mm=model_embed_m,
+                    arch_segments=arch_segments,
+                    metadata={
+                        "architectural_role": (
+                            "church_main_nave_facade_bay"
+                        ),
+                        "facade_side": facade_side,
+                        "facade_rhythm": (
+                            facade_profile.facade_rhythm
+                        ),
+                        "arch_shape": (
+                            facade_profile.arch_shape
+                        ),
+                    },
+                )
+            )
+
+            side_facades.append(
+                {
+                    **facade,
+                    "facade_side": facade_side,
+                }
+            )
+            component_meshes.extend(
+                facade["component_meshes"]
+            )
+            triangles.extend(
+                facade["triangles"]
+            )
+
+        return {
+            "type": "church_facade_system",
+            "facade_rhythm": (
+                facade_profile.facade_rhythm
+            ),
+            "arch_shape": facade_profile.arch_shape,
+            "column_count_per_side": column_count,
+            "row_count": 1,
+            "main_nave_width": main_nave_width,
+            "main_nave_depth": main_nave_depth,
+            "panel_count": len(component_meshes),
+            "physical_depth_mm": physical_depth_mm,
+            "model_depth_m": model_depth_m,
+            "side_facades": side_facades,
+            "component_meshes": component_meshes,
+            "triangles": triangles,
+        }

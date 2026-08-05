@@ -799,3 +799,58 @@ def test_basilica_cross_plan_drives_church_body_proportions():
     assert basilica_transept_width > generic_transept_width
     assert basilica_transept_depth > generic_transept_depth
 
+def test_semantic_facade_rhythm_drives_church_facade_geometry():
+    generic_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="church",
+            grammar_name="single_west_tower",
+            profile_name="generic_church",
+        ),
+    )
+    romanesque_geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            landmark_class="church",
+            grammar_name="single_west_tower",
+            profile_name="romanesque_cathedral",
+        ),
+    )
+
+    generic_mesh = AtlasChurchLandmarkMesher.build(
+        generic_geometry
+    )
+    romanesque_mesh = AtlasChurchLandmarkMesher.build(
+        romanesque_geometry
+    )
+
+    generic_facade = generic_mesh[
+        "architectural_facade_system"
+    ]
+    romanesque_facade = romanesque_mesh[
+        "architectural_facade_system"
+    ]
+
+    assert generic_facade["facade_rhythm"] == "regular"
+    assert (
+        romanesque_facade["facade_rhythm"]
+        == "heavy_round_arch"
+    )
+    assert (
+        generic_facade["panel_count"]
+        > romanesque_facade["panel_count"]
+    )
+    assert (
+        romanesque_facade["arch_shape"]
+        == "round_arch"
+    )
+    assert len(
+        romanesque_mesh["facade_meshes"]
+    ) == romanesque_facade["panel_count"]
+
+    assert all(
+        mesh["architectural_role"]
+        == "church_main_nave_facade_bay"
+        for mesh in romanesque_mesh["facade_meshes"]
+    )
+

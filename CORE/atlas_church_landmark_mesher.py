@@ -5,6 +5,12 @@ from shapely.geometry import Polygon
 from CORE.atlas_church_body_profile_system import (
     AtlasChurchBodyProfileSystem,
 )
+from CORE.atlas_church_facade_mesher import (
+    AtlasChurchFacadeMesher,
+)
+from CORE.atlas_church_facade_profile_system import (
+    AtlasChurchFacadeProfileSystem,
+)
 from CORE.atlas_church_footprint_resolver import (
     AtlasChurchFootprintResolver,
 )
@@ -652,6 +658,31 @@ class AtlasChurchLandmarkMesher:
             )
         ]
 
+        facade_profile = (
+            AtlasChurchFacadeProfileSystem.resolve(
+                semantic_profile.facade_rhythm
+            )
+        )
+        architectural_facade_system = (
+            AtlasChurchFacadeMesher.build(
+                frame=frame,
+                wall_height=main_nave_height,
+                facade_profile=facade_profile,
+                body_profile=body_profile,
+                scale_ratio=(
+                    geometry.profile.scale_ratio
+                ),
+                nozzle_diameter_mm=(
+                    geometry.profile.nozzle_diameter_mm
+                ),
+            )
+        )
+        facade_meshes = list(
+            architectural_facade_system[
+                "component_meshes"
+            ]
+        )
+
         component_meshes = (
             nave_meshes
             + main_nave_body_meshes
@@ -660,6 +691,7 @@ class AtlasChurchLandmarkMesher:
             + tower_meshes
             + spire_meshes
             + roof_meshes
+            + facade_meshes
         )
 
         triangles = [
@@ -689,5 +721,9 @@ class AtlasChurchLandmarkMesher:
             "roof_meshes": roof_meshes,
             "architectural_roof_system": (
                 architectural_roof_system
+            ),
+            "facade_meshes": facade_meshes,
+            "architectural_facade_system": (
+                architectural_facade_system
             ),
         }
