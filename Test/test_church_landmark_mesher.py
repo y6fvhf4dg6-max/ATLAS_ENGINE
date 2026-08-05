@@ -1184,3 +1184,62 @@ def test_outer_aisle_components_preserve_side_identity():
         == list(range(len(indices)))
         for indices in component_indices.values()
     )
+
+def test_landmark_routes_side_facades_above_outer_aisles():
+    geometry = AtlasChurchLandmarkBuilder.build(
+        landmark=_landmark(),
+        profile=AtlasChurchLandmarkProfile(
+            profile_name="romanesque_cathedral",
+        ),
+    )
+
+    mesh = AtlasChurchLandmarkMesher.build(
+        geometry
+    )
+
+    body_sections = {
+        section["section_type"]: section
+        for section in mesh[
+            "architectural_body_system"
+        ]["sections"]
+    }
+
+    outer_aisle_top_z = max(
+        body_sections["outer_aisle_left"]["top_z"],
+        body_sections["outer_aisle_right"]["top_z"],
+    )
+
+    facade = mesh[
+        "architectural_facade_system"
+    ]
+
+    side_panels = [
+        panel
+        for side_facade in facade["side_facades"]
+        for panel in side_facade["component_meshes"]
+    ]
+
+    assert facade["side_wall_min_z"] == (
+        outer_aisle_top_z
+    )
+    assert facade["side_surface_target"] == (
+        "visible_clerestory_band"
+    )
+
+    assert side_panels
+
+    assert all(
+        panel["surface_target"]
+        == "visible_clerestory_band"
+        for panel in side_panels
+    )
+
+    assert min(
+        vertex[2]
+        for panel in side_panels
+        for vertex in (
+            *panel["back"],
+            *panel["front"],
+        )
+    ) >= outer_aisle_top_z
+

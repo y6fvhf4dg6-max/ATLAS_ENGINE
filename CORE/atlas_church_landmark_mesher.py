@@ -963,6 +963,7 @@ class AtlasChurchLandmarkMesher:
                 window_resolved_size_mm=(
                     window_resolved_size_mm
                 ),
+                side_wall_min_z=outer_aisle_height,
             )
         )
         facade_meshes = list(

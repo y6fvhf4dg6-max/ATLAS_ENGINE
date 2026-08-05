@@ -935,3 +935,52 @@ def test_front_portal_is_ground_anchored_but_rear_opening_is_not():
     assert rear_min_z > 0.0
     assert front["vertical_alignment"] == "bottom"
     assert rear["vertical_alignment"] == "center"
+
+def test_side_facades_can_target_visible_clerestory_band():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        side_wall_min_z=8.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+    )
+
+    side_panels = [
+        panel
+        for facade in result["side_facades"]
+        for panel in facade["component_meshes"]
+    ]
+
+    assert result["side_wall_min_z"] == 8.0
+    assert result["side_wall_max_z"] == 20.0
+    assert result["side_surface_target"] == (
+        "visible_clerestory_band"
+    )
+
+    assert side_panels
+
+    assert all(
+        panel["surface_target"]
+        == "visible_clerestory_band"
+        for panel in side_panels
+    )
+
+    assert min(
+        vertex[2]
+        for panel in side_panels
+        for vertex in (
+            *panel["back"],
+            *panel["front"],
+        )
+    ) >= 8.0
+

@@ -49,6 +49,7 @@ class AtlasChurchFacadeMesher:
         wall_height,
         main_nave_depth,
         main_nave_width,
+        min_z=0.0,
     ):
         half_depth = (
             float(main_nave_depth) / 2.0
@@ -75,13 +76,13 @@ class AtlasChurchFacadeMesher:
                 frame=frame,
                 longitudinal=longitudinal_start,
                 lateral=lateral,
-                z=0.0,
+                z=min_z,
             ),
             cls._world_vertex(
                 frame=frame,
                 longitudinal=longitudinal_end,
                 lateral=lateral,
-                z=0.0,
+                z=min_z,
             ),
             cls._world_vertex(
                 frame=frame,
@@ -178,6 +179,7 @@ class AtlasChurchFacadeMesher:
         nozzle_diameter_mm,
         window_action=None,
         window_resolved_size_mm=None,
+        side_wall_min_z=0.0,
     ):
         if not isinstance(
             frame,
@@ -211,6 +213,9 @@ class AtlasChurchFacadeMesher:
         )
         nozzle_diameter_mm = float(
             nozzle_diameter_mm
+        )
+        side_wall_min_z = float(
+            side_wall_min_z
         )
 
         if window_action is not None:
@@ -265,6 +270,16 @@ class AtlasChurchFacadeMesher:
         if wall_height <= 0.0:
             raise ValueError(
                 "wall_height must be greater than zero"
+            )
+
+        if side_wall_min_z < 0.0:
+            raise ValueError(
+                "side_wall_min_z must be non-negative"
+            )
+
+        if side_wall_min_z >= wall_height:
+            raise ValueError(
+                "side_wall_min_z must be below wall_height"
             )
 
         if scale_ratio <= 0.0:
@@ -370,6 +385,11 @@ class AtlasChurchFacadeMesher:
                 "window_resolved_size_mm": (
                     resolved_window_size_mm
                 ),
+                "side_wall_min_z": side_wall_min_z,
+                "side_wall_max_z": wall_height,
+                "side_surface_target": (
+                    "visible_clerestory_band"
+                ),
                 "side_facades": [],
                 "end_facades": [],
                 "oculus_meshes": [],
@@ -390,6 +410,7 @@ class AtlasChurchFacadeMesher:
                         wall_height=wall_height,
                         main_nave_depth=main_nave_depth,
                         main_nave_width=main_nave_width,
+                        min_z=side_wall_min_z,
                     ),
                     column_count=column_count,
                     row_count=1,
@@ -408,6 +429,9 @@ class AtlasChurchFacadeMesher:
                     metadata={
                         "architectural_role": (
                             "church_main_nave_facade_bay"
+                        ),
+                        "surface_target": (
+                            "visible_clerestory_band"
                         ),
                         "facade_side": facade_side,
                         "facade_rhythm": (
@@ -633,6 +657,11 @@ class AtlasChurchFacadeMesher:
             "window_action": resolved_window_action,
             "window_resolved_size_mm": (
                 resolved_window_size_mm
+            ),
+            "side_wall_min_z": side_wall_min_z,
+            "side_wall_max_z": wall_height,
+            "side_surface_target": (
+                "visible_clerestory_band"
             ),
             "side_facades": side_facades,
             "end_facades": end_facades,
