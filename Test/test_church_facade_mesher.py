@@ -1121,3 +1121,154 @@ def test_rear_composition_can_target_custom_visible_surface():
         for point in rear_panel["back"]
     ) <= 14.0
 
+
+def _panel_surface_dimensions_mm(
+    panel,
+    *,
+    scale_ratio,
+):
+    points = tuple(panel["back"])
+
+    spans = []
+    for axis in range(3):
+        values = tuple(
+            point[axis]
+            for point in points
+        )
+        span = max(values) - min(values)
+
+        if span > 1e-9:
+            spans.append(span)
+
+    return tuple(
+        span * 1000.0 / scale_ratio
+        for span in sorted(spans)
+    )
+
+
+def test_enlarge_applies_print_minimum_to_side_opening_dimensions():
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="enlarge",
+        window_resolved_size_mm=0.8,
+        side_wall_min_z=8.0,
+    )
+
+    side_panel = next(
+        panel
+        for panel in result["component_meshes"]
+        if panel["facade_side"] == "left"
+    )
+
+    dimensions_mm = (
+        _panel_surface_dimensions_mm(
+            side_panel,
+            scale_ratio=5500.0,
+        )
+    )
+
+    assert min(dimensions_mm) >= 0.8 - 1e-9
+
+
+def test_enlarge_applies_print_minimum_to_front_portal_width():
+    front_wall_quad = (
+        (0.0, 0.0, 0.0),
+        (4.4, 0.0, 0.0),
+        (4.4, 0.0, 18.0),
+        (0.0, 0.0, 18.0),
+    )
+
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="enlarge",
+        window_resolved_size_mm=0.8,
+        front_wall_quad=front_wall_quad,
+        front_surface_target=(
+            "west_tower_center_front"
+        ),
+    )
+
+    front = next(
+        facade
+        for facade in result["end_facades"]
+        if facade["facade_side"] == "front"
+    )
+    portal = front["component_meshes"][0]
+
+    dimensions_mm = (
+        _panel_surface_dimensions_mm(
+            portal,
+            scale_ratio=5500.0,
+        )
+    )
+
+    assert min(dimensions_mm) >= 0.8 - 1e-9
+
+
+def test_enlarge_applies_print_minimum_to_oculus_diameter():
+    front_wall_quad = (
+        (0.0, 0.0, 0.0),
+        (4.4, 0.0, 0.0),
+        (4.4, 0.0, 18.0),
+        (0.0, 0.0, 18.0),
+    )
+
+    result = AtlasChurchFacadeMesher.build(
+        frame=_frame(),
+        wall_height=20.0,
+        facade_profile=(
+            AtlasChurchFacadeProfileSystem.resolve(
+                "heavy_round_arch"
+            )
+        ),
+        body_profile=(
+            AtlasChurchBodyProfileSystem.resolve(
+                "basilica_cross_plan"
+            )
+        ),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
+        window_action="enlarge",
+        window_resolved_size_mm=0.8,
+        front_wall_quad=front_wall_quad,
+        front_surface_target=(
+            "west_tower_center_front"
+        ),
+    )
+
+    oculus = result["oculus_meshes"][0]
+
+    diameter_mm = (
+        oculus["diameter"]
+        * 1000.0
+        / 5500.0
+    )
+
+    assert diameter_mm >= 0.8 - 1e-9
+

@@ -683,6 +683,199 @@ class AtlasChurchLandmarkMesher:
             "triangles": triangles,
         }
 
+    @staticmethod
+    def _mesh_bounds(mesh):
+        points = tuple(
+            point
+            for triangle in mesh.get(
+                "triangles",
+                (),
+            )
+            for point in triangle
+        )
+
+        if not points:
+            return None
+
+        return tuple(
+            (
+                min(
+                    point[axis]
+                    for point in points
+                ),
+                max(
+                    point[axis]
+                    for point in points
+                ),
+            )
+            for axis in range(3)
+        )
+
+    @staticmethod
+    def _bounds_overlap(
+        first,
+        second,
+        *,
+        tolerance=1e-9,
+    ):
+        if first is None or second is None:
+            return False
+
+        return all(
+            min(
+                first[axis][1],
+                second[axis][1],
+            )
+            - max(
+                first[axis][0],
+                second[axis][0],
+            )
+            > tolerance
+            for axis in range(3)
+        )
+
+    @classmethod
+    def _resolve_tower_window_conflicts(
+        cls,
+        *,
+        tower_system,
+        facade_meshes,
+    ):
+        towers = []
+
+        for source_tower in tower_system.get(
+            "towers",
+            (),
+        ):
+            tower = dict(source_tower)
+            tower_type = tower.get(
+                "tower_type"
+            )
+            surface_target = (
+                f"{tower_type}_front"
+            )
+
+            blocking_meshes = tuple(
+                mesh
+                for mesh in facade_meshes
+                if mesh.get(
+                    "surface_target"
+                ) == surface_target
+            )
+            blocking_bounds = tuple(
+                cls._mesh_bounds(mesh)
+                for mesh in blocking_meshes
+            )
+
+            source_windows = list(
+                tower.get(
+                    "window_meshes",
+                    (),
+                )
+            )
+
+            window_meshes = [
+                window
+                for window in source_windows
+                if not any(
+                    cls._bounds_overlap(
+                        cls._mesh_bounds(
+                            window
+                        ),
+                        bounds,
+                    )
+                    for bounds in blocking_bounds
+                )
+            ]
+
+            source_window_triangles = {
+                triangle
+                for window in source_windows
+                for triangle in window.get(
+                    "triangles",
+                    (),
+                )
+            }
+
+            body_triangles = [
+                triangle
+                for triangle in tower.get(
+                    "triangles",
+                    (),
+                )
+                if triangle
+                not in source_window_triangles
+            ]
+
+            window_triangles = [
+                triangle
+                for window in window_meshes
+                for triangle in window.get(
+                    "triangles",
+                    (),
+                )
+            ]
+
+            window_stage = dict(
+                tower.get(
+                    "window_stage",
+                    {},
+                )
+            )
+            window_stage[
+                "window_count"
+            ] = len(window_meshes)
+
+            tower[
+                "window_stage"
+            ] = window_stage
+            tower[
+                "window_meshes"
+            ] = window_meshes
+            tower[
+                "window_triangles"
+            ] = window_triangles
+            tower["triangles"] = [
+                *body_triangles,
+                *window_triangles,
+            ]
+
+            towers.append(tower)
+
+        window_meshes = [
+            window
+            for tower in towers
+            for window in tower.get(
+                "window_meshes",
+                (),
+            )
+        ]
+        window_triangles = [
+            triangle
+            for tower in towers
+            for triangle in tower.get(
+                "window_triangles",
+                (),
+            )
+        ]
+
+        return {
+            **tower_system,
+            "towers": towers,
+            "window_meshes": window_meshes,
+            "window_triangles": (
+                window_triangles
+            ),
+            "triangles": [
+                triangle
+                for tower in towers
+                for triangle in tower.get(
+                    "triangles",
+                    (),
+                )
+            ],
+        }
+
     @classmethod
     def build(
         cls,
@@ -1085,6 +1278,25 @@ class AtlasChurchLandmarkMesher:
         facade_meshes = list(
             architectural_facade_system[
                 "component_meshes"
+            ]
+        )
+
+        architectural_tower_system = (
+            cls._resolve_tower_window_conflicts(
+                tower_system=(
+                    architectural_tower_system
+                ),
+                facade_meshes=facade_meshes,
+            )
+        )
+        tower_meshes = list(
+            architectural_tower_system[
+                "towers"
+            ]
+        )
+        tower_window_meshes = list(
+            architectural_tower_system[
+                "window_meshes"
             ]
         )
 

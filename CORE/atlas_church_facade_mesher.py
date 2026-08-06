@@ -167,6 +167,166 @@ class AtlasChurchFacadeMesher:
             ),
         )
 
+    @staticmethod
+    def _wall_dimensions(
+        wall_quad,
+    ):
+        bottom_left = wall_quad[0]
+        bottom_right = wall_quad[1]
+        top_left = wall_quad[3]
+
+        wall_width = sum(
+            (
+                bottom_right[axis]
+                - bottom_left[axis]
+            ) ** 2
+            for axis in range(3)
+        ) ** 0.5
+
+        wall_height = sum(
+            (
+                top_left[axis]
+                - bottom_left[axis]
+            ) ** 2
+            for axis in range(3)
+        ) ** 0.5
+
+        if (
+            wall_width <= 0.0
+            or wall_height <= 0.0
+        ):
+            raise ValueError(
+                "wall_quad is degenerate"
+            )
+
+        return (
+            wall_width,
+            wall_height,
+        )
+
+    @classmethod
+    def _print_safe_panel_ratios(
+        cls,
+        *,
+        wall_quad,
+        column_count,
+        row_count,
+        panel_width_ratio,
+        panel_height_ratio,
+        horizontal_margin_ratio,
+        vertical_margin_ratio,
+        physical_action,
+        resolved_size_mm,
+        scale_ratio,
+    ):
+        panel_width_ratio = float(
+            panel_width_ratio
+        )
+        panel_height_ratio = float(
+            panel_height_ratio
+        )
+
+        if physical_action != "enlarge":
+            return (
+                panel_width_ratio,
+                panel_height_ratio,
+            )
+
+        minimum_model_size = (
+            float(resolved_size_mm)
+            * float(scale_ratio)
+            / 1000.0
+        )
+
+        wall_width, wall_height = (
+            cls._wall_dimensions(
+                wall_quad
+            )
+        )
+
+        usable_u = (
+            1.0
+            - 2.0
+            * float(horizontal_margin_ratio)
+        )
+        usable_v = (
+            1.0
+            - 2.0
+            * float(vertical_margin_ratio)
+        )
+
+        cell_u = (
+            usable_u / int(column_count)
+        )
+        cell_v = (
+            usable_v / int(row_count)
+        )
+
+        required_width_ratio = (
+            minimum_model_size
+            / (cell_u * wall_width)
+        )
+        required_height_ratio = (
+            minimum_model_size
+            / (cell_v * wall_height)
+        )
+
+        return (
+            max(
+                panel_width_ratio,
+                required_width_ratio,
+            ),
+            max(
+                panel_height_ratio,
+                required_height_ratio,
+            ),
+        )
+
+    @classmethod
+    def _print_safe_diameter_ratio(
+        cls,
+        *,
+        wall_quad,
+        diameter_ratio,
+        physical_action,
+        resolved_size_mm,
+        scale_ratio,
+    ):
+        diameter_ratio = float(
+            diameter_ratio
+        )
+
+        if physical_action != "enlarge":
+            return diameter_ratio
+
+        minimum_model_size = (
+            float(resolved_size_mm)
+            * float(scale_ratio)
+            / 1000.0
+        )
+
+        wall_width, wall_height = (
+            cls._wall_dimensions(
+                wall_quad
+            )
+        )
+
+        required_ratio = (
+            minimum_model_size
+            / min(
+                wall_width,
+                wall_height,
+            )
+        )
+
+        return min(
+            1.0,
+            max(
+                diameter_ratio,
+                required_ratio,
+            ),
+        )
+
     @classmethod
     def build(
         cls,
@@ -474,24 +634,52 @@ class AtlasChurchFacadeMesher:
             "left",
             "right",
         ):
+            side_wall_quad = (
+                cls._side_wall_quad(
+                    frame=frame,
+                    facade_side=facade_side,
+                    wall_height=wall_height,
+                    main_nave_depth=main_nave_depth,
+                    main_nave_width=main_nave_width,
+                    min_z=side_wall_min_z,
+                )
+            )
+
+            (
+                side_panel_width_ratio,
+                side_panel_height_ratio,
+            ) = cls._print_safe_panel_ratios(
+                wall_quad=side_wall_quad,
+                column_count=column_count,
+                row_count=1,
+                panel_width_ratio=(
+                    facade_profile.opening_width_ratio
+                ),
+                panel_height_ratio=(
+                    facade_profile.opening_height_ratio
+                ),
+                horizontal_margin_ratio=0.06,
+                vertical_margin_ratio=0.18,
+                physical_action=(
+                    resolved_window_action
+                ),
+                resolved_size_mm=(
+                    resolved_window_size_mm
+                ),
+                scale_ratio=scale_ratio,
+            )
+
             facade = (
                 AtlasFacadePanelBuilder
                 .build_repeated_arches(
-                    wall_quad=cls._side_wall_quad(
-                        frame=frame,
-                        facade_side=facade_side,
-                        wall_height=wall_height,
-                        main_nave_depth=main_nave_depth,
-                        main_nave_width=main_nave_width,
-                        min_z=side_wall_min_z,
-                    ),
+                    wall_quad=side_wall_quad,
                     column_count=column_count,
                     row_count=1,
                     panel_width_ratio=(
-                        facade_profile.opening_width_ratio
+                        side_panel_width_ratio
                     ),
                     panel_height_ratio=(
-                        facade_profile.opening_height_ratio
+                        side_panel_height_ratio
                     ),
                     arch_height_ratio=0.50,
                     horizontal_margin_ratio=0.06,
@@ -609,6 +797,30 @@ class AtlasChurchFacadeMesher:
                 else rear_surface_target
             )
 
+            (
+                panel_width_ratio,
+                panel_height_ratio,
+            ) = cls._print_safe_panel_ratios(
+                wall_quad=target_wall_quad,
+                column_count=1,
+                row_count=1,
+                panel_width_ratio=(
+                    panel_width_ratio
+                ),
+                panel_height_ratio=(
+                    panel_height_ratio
+                ),
+                horizontal_margin_ratio=0.18,
+                vertical_margin_ratio=0.18,
+                physical_action=(
+                    resolved_window_action
+                ),
+                resolved_size_mm=(
+                    resolved_window_size_mm
+                ),
+                scale_ratio=scale_ratio,
+            )
+
             facade = (
                 AtlasFacadePanelBuilder
                 .build_repeated_arches(
@@ -693,22 +905,40 @@ class AtlasChurchFacadeMesher:
             facade_profile.front_composition
             == "portal_with_oculus"
         ):
+            oculus_wall_quad = (
+                front_wall_quad
+                if front_wall_quad is not None
+                else cls._end_wall_quad(
+                    frame=frame,
+                    facade_side="front",
+                    wall_height=wall_height,
+                    main_nave_depth=main_nave_depth,
+                    main_nave_width=main_nave_width,
+                )
+            )
+
+            oculus_diameter_ratio = (
+                cls._print_safe_diameter_ratio(
+                    wall_quad=oculus_wall_quad,
+                    diameter_ratio=0.22,
+                    physical_action=(
+                        resolved_window_action
+                    ),
+                    resolved_size_mm=(
+                        resolved_window_size_mm
+                    ),
+                    scale_ratio=scale_ratio,
+                )
+            )
+
             oculus = (
                 AtlasFacadeCircularPanelBuilder.build(
-                    wall_quad=(
-                        front_wall_quad
-                        if front_wall_quad is not None
-                        else cls._end_wall_quad(
-                            frame=frame,
-                            facade_side="front",
-                            wall_height=wall_height,
-                            main_nave_depth=main_nave_depth,
-                            main_nave_width=main_nave_width,
-                        )
-                    ),
+                    wall_quad=oculus_wall_quad,
                     center_u=0.50,
                     center_v=0.72,
-                    diameter_ratio=0.22,
+                    diameter_ratio=(
+                        oculus_diameter_ratio
+                    ),
                     depth_mm=model_depth_m,
                     embed_mm=model_embed_m,
                     segments=16,

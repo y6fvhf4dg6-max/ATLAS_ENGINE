@@ -1561,3 +1561,82 @@ def test_church_without_apse_keeps_rear_opening_on_main_nave():
         "main_nave_rear"
     )
 
+
+def test_single_west_tower_oculus_suppresses_overlapping_front_window():
+    generic_geometry = (
+        AtlasChurchLandmarkBuilder.build(
+            landmark=_landmark(),
+            profile=AtlasChurchLandmarkProfile(
+                grammar_name="single_west_tower",
+                profile_name="generic_church",
+            ),
+        )
+    )
+    romanesque_geometry = (
+        AtlasChurchLandmarkBuilder.build(
+            landmark=_landmark(),
+            profile=AtlasChurchLandmarkProfile(
+                grammar_name="single_west_tower",
+                profile_name="romanesque_cathedral",
+            ),
+        )
+    )
+
+    generic = AtlasChurchLandmarkMesher.build(
+        generic_geometry
+    )
+    romanesque = AtlasChurchLandmarkMesher.build(
+        romanesque_geometry
+    )
+
+    assert (
+        generic[
+            "architectural_facade_system"
+        ]["front_composition"]
+        == "single_arch_portal"
+    )
+    assert (
+        romanesque[
+            "architectural_facade_system"
+        ]["front_composition"]
+        == "portal_with_oculus"
+    )
+
+    assert len(
+        generic["tower_window_meshes"]
+    ) == 4
+    assert len(
+        romanesque["tower_window_meshes"]
+    ) == 3
+
+    romanesque_tower = next(
+        tower
+        for tower in romanesque[
+            "architectural_tower_system"
+        ]["towers"]
+        if tower["tower_type"]
+        == "west_tower_center"
+    )
+
+    assert (
+        romanesque_tower[
+            "window_stage"
+        ]["window_count"]
+        == 3
+    )
+    assert len(
+        romanesque_tower["window_meshes"]
+    ) == 3
+
+    final_triangles = set(
+        romanesque["triangles"]
+    )
+
+    assert all(
+        triangle in final_triangles
+        for window in romanesque[
+            "tower_window_meshes"
+        ]
+        for triangle in window["triangles"]
+    )
+
