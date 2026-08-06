@@ -35,6 +35,10 @@ class AtlasFacadeOpening:
     u_max: float
     v_min: float
     v_max: float
+    bay_u_min: float
+    bay_u_max: float
+    floor_v_min: float
+    floor_v_max: float
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -70,6 +74,10 @@ class AtlasFacadeOpening:
         u_max = float(self.u_max)
         v_min = float(self.v_min)
         v_max = float(self.v_max)
+        bay_u_min = float(self.bay_u_min)
+        bay_u_max = float(self.bay_u_max)
+        floor_v_min = float(self.floor_v_min)
+        floor_v_max = float(self.floor_v_max)
 
         if (
             u_min < 0.0
@@ -89,6 +97,26 @@ class AtlasFacadeOpening:
             raise ValueError(
                 "opening vertical bounds must satisfy "
                 "0 <= v_min < v_max <= 1"
+            )
+
+        if (
+            bay_u_min < 0.0
+            or bay_u_max > 1.0
+            or bay_u_max <= bay_u_min
+        ):
+            raise ValueError(
+                "bay horizontal bounds must satisfy "
+                "0 <= bay_u_min < bay_u_max <= 1"
+            )
+
+        if (
+            floor_v_min < 0.0
+            or floor_v_max > 1.0
+            or floor_v_max <= floor_v_min
+        ):
+            raise ValueError(
+                "floor vertical bounds must satisfy "
+                "0 <= floor_v_min < floor_v_max <= 1"
             )
 
         object.__setattr__(
@@ -120,6 +148,26 @@ class AtlasFacadeOpening:
             self,
             "v_max",
             v_max,
+        )
+        object.__setattr__(
+            self,
+            "bay_u_min",
+            bay_u_min,
+        )
+        object.__setattr__(
+            self,
+            "bay_u_max",
+            bay_u_max,
+        )
+        object.__setattr__(
+            self,
+            "floor_v_min",
+            floor_v_min,
+        )
+        object.__setattr__(
+            self,
+            "floor_v_max",
+            floor_v_max,
         )
 
 
@@ -275,6 +323,18 @@ class AtlasFacadeOpeningLayout:
                     "0 <= margin < 0.5"
                 )
 
+        facade_min_z = min(
+            bay.min_z
+            for bay in bay_analysis.bays
+        )
+        facade_max_z = max(
+            bay.max_z
+            for bay in bay_analysis.bays
+        )
+        facade_height = (
+            facade_max_z - facade_min_z
+        )
+
         openings = tuple(
             AtlasFacadeOpening(
                 level_index=bay.level_index,
@@ -291,6 +351,22 @@ class AtlasFacadeOpeningLayout:
                 v_max=(
                     1.0
                     - vertical_margin_ratio
+                ),
+                bay_u_min=bay.u_min,
+                bay_u_max=bay.u_max,
+                floor_v_min=(
+                    (
+                        bay.min_z
+                        - facade_min_z
+                    )
+                    / facade_height
+                ),
+                floor_v_max=(
+                    (
+                        bay.max_z
+                        - facade_min_z
+                    )
+                    / facade_height
                 ),
             )
             for bay in bay_analysis.bays

@@ -149,10 +149,38 @@ class AtlasFacadeOpeningMesher:
                 ._build_panel_prism(
                     wall_quad=wall_quad,
                     normal=normal,
-                    u_min=opening.u_min,
-                    u_max=opening.u_max,
-                    v_min=opening.v_min,
-                    v_max=opening.v_max,
+                    u_min=(
+                        opening.bay_u_min
+                        + opening.u_min
+                        * (
+                            opening.bay_u_max
+                            - opening.bay_u_min
+                        )
+                    ),
+                    u_max=(
+                        opening.bay_u_min
+                        + opening.u_max
+                        * (
+                            opening.bay_u_max
+                            - opening.bay_u_min
+                        )
+                    ),
+                    v_min=(
+                        opening.floor_v_min
+                        + opening.v_min
+                        * (
+                            opening.floor_v_max
+                            - opening.floor_v_min
+                        )
+                    ),
+                    v_max=(
+                        opening.floor_v_min
+                        + opening.v_max
+                        * (
+                            opening.floor_v_max
+                            - opening.floor_v_min
+                        )
+                    ),
                     depth_mm=depth_mm,
                     embed_mm=embed_mm,
                     metadata=(

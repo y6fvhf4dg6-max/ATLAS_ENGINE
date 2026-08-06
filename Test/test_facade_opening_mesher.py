@@ -207,3 +207,45 @@ def test_custom_metadata_is_added_to_every_opening_mesh():
         ]
     )
 
+
+def test_openings_are_mapped_to_distinct_facade_bays_and_floors():
+    result = AtlasFacadeOpeningMesher.build(
+        wall_quad=WALL_QUAD,
+        opening_analysis=_opening_layout(
+            "window"
+        ),
+    )
+
+    bounds = tuple(
+        (
+            round(
+                min(point[0] for point in component["back"]),
+                6,
+            ),
+            round(
+                max(point[0] for point in component["back"]),
+                6,
+            ),
+            round(
+                min(point[2] for point in component["back"]),
+                6,
+            ),
+            round(
+                max(point[2] for point in component["back"]),
+                6,
+            ),
+        )
+        for component in result[
+            "component_meshes"
+        ]
+    )
+
+    assert bounds == (
+        (0.8, 3.2, 0.875, 2.625),
+        (4.8, 7.2, 0.875, 2.625),
+        (8.8, 11.2, 0.875, 2.625),
+        (0.8, 3.2, 4.375, 6.125),
+        (4.8, 7.2, 4.375, 6.125),
+        (8.8, 11.2, 4.375, 6.125),
+    )
+
