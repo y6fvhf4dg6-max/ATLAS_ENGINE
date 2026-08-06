@@ -701,3 +701,71 @@ facade/detail ve LoD sistemlerinden gelmelidir.
 Karaköy doğrulama paketi tamamlanmıştır. Yeni Karaköy özel durumuna
 geçilmeden roadmap ve ürün öncelikleri esas alınmalıdır.
 
+## 6 Ağustos 2026 — Resmî LoD Sistemi V1
+
+Resmî Level of Detail sistemi test-first geliştirilmiş ve gerçek landmark
+verisiyle doğrulanmıştır.
+
+LoD seviyeleri:
+
+- LoD 0: footprint ve temel kütle
+- LoD 1: ana gövde ve temel çatı
+- LoD 2: kule, kubbe, apsis ve ana mimari bileşenler
+- LoD 3: cephe açıklıkları ve yapısal detaylar
+- LoD 4: ornament ve architectural relief
+
+Tamamlanan paketler:
+
+- resmî LoD seviye kataloğu
+- ürün ve baskı girdilerine dayalı deterministik LoD resolver
+- semantic architecture component görünürlük politikası
+- semantic component → mesh group eşleme sözleşmesi
+- opt-in ve non-mutating LoD mesh filtresi
+- church synthetic fixture doğrulaması
+- mosque synthetic fixture doğrulaması
+- mevcut production davranışının korunması
+- gerçek Bonner Münster LoD doğrulaması
+
+LoD resolver şu girdileri sözleşmeye bağlar:
+
+- ürün ölçüsü
+- ölçek oranı
+- nozzle çapı
+- katman yüksekliği
+- minimum duvar kalınlığı
+- landmark önemi
+- bakış mesafesi
+- kullanılabilir renk sayısı
+
+Önemli üretim sınırı:
+
+- LoD filtresi otomatik uygulanmaz.
+- Mevcut üretim yolları değişmeden korunur.
+- Filtre yalnız açıkça istendiğinde çalışır.
+- Kaynak production mesh mutasyona uğratılmaz.
+- Premium Worship Engine V1 davranışı değiştirilmemiştir.
+
+Gerçek landmark doğrulaması:
+
+- fixture: `Data/OSM/bonn-muensterplatz-test.osm.pbf`
+- landmark: Bonner Münster
+- Wikidata: `Q686664`
+- LoD 1: ana gövde ve çatı korunur
+- LoD 2: katalogdaki dört kule korunur
+- LoD 3: cephe ve kule pencere detayları korunur
+
+Doğrulama sonuçları:
+
+- LoD + Bonn gerçek fixture regresyonu: `158 passed in 1.89s`
+- mevcut production-routing regresyonu: `110 passed in 0.47s`
+- tam regresyon: `2685 passed in 12.58s`
+
+LoD roadmap durumu:
+
+- 6.1–6.9 tamamlandı
+- 6.10 tam regresyon ve dokümantasyon tamamlandı
+- Resmî LoD Sistemi V1 kilitlenmeye hazırdır
+
+LoD V1 sonrasında roadmap sırasındaki aktif ana paket:
+
+- Automatic Print Optimization and Reporting
