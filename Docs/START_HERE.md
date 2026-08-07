@@ -848,3 +848,35 @@ Sıradaki tek roadmap adımı:
 Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
 `7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.3`
 bölümü esas alınmalıdır.
+
+
+## 7 Ağustos 2026 — Print Optimization 7.4
+
+Automatic Print Optimization and Reporting ilerleme durumu:
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+
+7.4 ile genel ve landmark-bağımsız fragile connection analizi eklendi.
+
+Temel ölçüt:
+
+- `connection_width_mm / component_span_mm`
+
+Bu analiz 7.2 mutlak thickness kontrolünden ayrı tutulur.
+
+Doğrulama:
+
+- focused final: `28 passed in 0.03s`
+- ilgili regression: `86 passed in 0.22s`
+- full regression: `2770 passed in 12.33s`
+
+Sıradaki tek roadmap adımı:
+
+- **7.5 Nozzle-based detail analysis**
+
+Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
+`7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.4`
+bölümü esas alınmalıdır.

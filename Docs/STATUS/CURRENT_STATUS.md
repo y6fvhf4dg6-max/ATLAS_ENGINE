@@ -1388,3 +1388,118 @@ Tam regresyon:
 
 Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
 önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.4
+
+## Fragile connection analysis tamamlandı
+
+7.4 paketi test-first tamamlandı.
+
+Yeni production modülü:
+
+- `CORE/atlas_fragile_connection_analyzer.py`
+
+Yeni test:
+
+- `Test/test_fragile_connection_analyzer.py`
+
+Yeni immutable sözleşmeler:
+
+- `AtlasConnectionMeasurement`
+  - `component`
+  - `connection_width_mm`
+  - `component_span_mm`
+  - türetilmiş `connection_ratio`
+- `AtlasFragileConnectionAnalysis`
+  - `minimum_connection_ratio`
+  - `measurements`
+  - `minimum_observed_ratio`
+  - `fragile_components`
+  - `has_fragile_connections`
+
+Yeni analyzer:
+
+- `AtlasFragileConnectionAnalyzer.analyze(...)`
+
+## Fragility semantiği
+
+7.4 mutlak duvar/kalınlık kontrolünü tekrar etmez.
+
+Bağlantı kırılganlığı şu oran üzerinden değerlendirilir:
+
+- `connection_ratio = connection_width_mm / component_span_mm`
+
+Karar:
+
+- oran minimum threshold'un altındaysa: fragile
+- threshold'a eşit veya üzerindeyse: safe
+
+Bu nedenle 7.2 ile görev ayrımı şöyledir:
+
+- 7.2: mutlak fiziksel thickness
+- 7.4: bağlı bileşenin kendi açıklığına göre bağlantı/boğaz oranı
+
+## Contract davranışı
+
+- component adları trim edilir ve lowercase normalize edilir.
+- bağlantı genişliği ve component açıklığı finite ve pozitif olmak zorundadır.
+- `connection_width_mm > component_span_mm` geçersizdir.
+- `connection_ratio` constructor girdisi değildir; immutable türetilmiş alandır.
+- minimum connection ratio finite, `> 0` ve `<= 1` olmak zorundadır.
+- minimum gözlenen oran raporlanır.
+- fragile component'ler giriş sırasıyla korunur.
+- duplicate component yalnız bir kez raporlanır.
+- measurement koleksiyonu immutable tuple olarak korunur.
+- input koleksiyonu mutate edilmez.
+
+## Mimari sınır
+
+Bu pakette yapılmamıştır:
+
+- finite-element / structural load analysis
+- otomatik mesh bağlantı kesiti çıkarımı
+- landmark-specific kırılganlık kuralları
+- mevcut minare/kule printable minimumlarının değiştirilmesi
+- 7.1 `AtlasPrintOptimizationReport` aggregation
+- otomatik geometry thickening veya redesign
+
+Mevcut mesher printable-minimum davranışları korunmuştur.
+
+## Doğrulama
+
+İlk focused GREEN:
+
+- `27 passed in 0.02s`
+
+Derived-field contract düzeltmesi sonrası focused:
+
+- `28 passed in 0.03s`
+
+İlgili fragile / thickness / physical-detail / mosque regression:
+
+- `86 passed in 0.22s`
+
+Tam regresyon:
+
+- `2770 passed in 12.33s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [ ] 7.5 Nozzle-based detail analysis
+- [ ] 7.6 Color-change analysis
+- [ ] 7.7 Triangle/file-count analysis
+- [ ] 7.8 Aggregate optimizer/report builder
+- [ ] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.5 Nozzle-based detail analysis** paketine test-first başlamak.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
