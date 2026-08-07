@@ -915,3 +915,37 @@ Sıradaki tek roadmap adımı:
 Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
 `7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.5`
 bölümü esas alınmalıdır.
+
+
+## 7 Ağustos 2026 — Print Optimization 7.6
+
+Automatic Print Optimization and Reporting ilerleme durumu:
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+- [x] 7.6 Color-change analysis
+
+7.6 ile gerçek slicer/production color-change sayısını audit eden
+genel sözleşme eklendi.
+
+Önemli ayrım:
+
+- `color_count` / `part_count` gerçek color-change sayısı değildir.
+- 7.6 yalnız ölçülmüş `color_change_count` üzerinden karar verir.
+
+Doğrulama:
+
+- focused: `20 passed in 0.02s`
+- ilgili regression: `91 passed in 0.11s`
+- full regression: `2815 passed in 12.52s`
+
+Sıradaki tek roadmap adımı:
+
+- **7.7 Triangle/file-count analysis**
+
+Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
+`7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.6`
+bölümü esas alınmalıdır.

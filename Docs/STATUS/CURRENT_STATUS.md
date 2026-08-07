@@ -1622,3 +1622,115 @@ Tam regresyon:
 
 Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
 önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.6
+
+## Color-change analysis tamamlandı
+
+7.6 paketi test-first tamamlandı.
+
+Yeni production modülü:
+
+- `CORE/atlas_color_change_analyzer.py`
+
+Yeni test:
+
+- `Test/test_color_change_analyzer.py`
+
+Yeni immutable sözleşme:
+
+- `AtlasColorChangeAnalysis`
+  - `color_change_count`
+  - `maximum_color_changes`
+  - `excess_color_changes`
+  - `is_excessive`
+
+Yeni analyzer:
+
+- `AtlasColorChangeAnalyzer.analyze(...)`
+
+## Color-change semantiği
+
+7.6 renk sayısı ile gerçek filament/color change sayısını birbirinden ayırır.
+
+Mevcut multicolor exporter:
+
+- `color_count`
+- `part_count`
+
+bilgisini üretmeye devam eder.
+
+Bunlar gerçek slicer color-change sayısı değildir.
+
+7.6 yalnız ölçülmüş veya slicer tarafından raporlanmış gerçek
+`color_change_count` değerini audit eder.
+
+Karar:
+
+- `color_change_count <= maximum_color_changes`: safe
+- `color_change_count > maximum_color_changes`: excessive
+
+Türetilmiş sonuç:
+
+- `excess_color_changes = max(0, color_change_count - maximum_color_changes)`
+
+## Contract davranışı
+
+- `color_change_count` non-negative integer olmak zorundadır.
+- `maximum_color_changes` non-negative integer olmak zorundadır.
+- `bool`, float ve string sayaç olarak kabul edilmez.
+- `0` color change geçerlidir.
+- `0` maximum threshold geçerlidir.
+- threshold'a eşit change count safe kabul edilir.
+- analysis immutable'dır.
+
+## Mimari sınır
+
+Bu pakette yapılmamıştır:
+
+- color count üzerinden change-count tahmini
+- `color_count - 1` türetimi
+- slicer çağrısı
+- Bambu Studio entegrasyonu
+- multicolor exporter değişikliği
+- LoD policy değişikliği
+- filament assignment değişikliği
+- 7.1 `AtlasPrintOptimizationReport` aggregation
+
+`EXCESSIVE_COLOR_CHANGE` issue code'u 7.1 contract'ında mevcut kalır;
+7.6 sonucunun aggregate report'a bağlanması 7.8 kapsamındadır.
+
+## Doğrulama
+
+Focused:
+
+- `20 passed in 0.02s`
+
+İlgili color / multicolor / LoD / print regression:
+
+- `91 passed in 0.11s`
+
+Tam regresyon:
+
+- `2815 passed in 12.52s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+- [x] 7.6 Color-change analysis
+- [ ] 7.7 Triangle/file-count analysis
+- [ ] 7.8 Aggregate optimizer/report builder
+- [ ] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.7 Triangle/file-count analysis** paketine test-first başlamak.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
