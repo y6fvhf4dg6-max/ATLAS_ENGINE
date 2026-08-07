@@ -880,3 +880,38 @@ Sıradaki tek roadmap adımı:
 Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
 `7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.4`
 bölümü esas alınmalıdır.
+
+
+## 7 Ağustos 2026 — Print Optimization 7.5
+
+Automatic Print Optimization and Reporting ilerleme durumu:
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+
+7.5 ile genel ve landmark-bağımsız nozzle/detail audit sözleşmesi eklendi.
+
+Temel karar:
+
+- detail ölçüsü nozzle çapından küçükse `below nozzle`
+- eşit veya büyükse safe
+
+`AtlasPhysicalDetailResolver` değiştirilmedi; production-side
+`preserve / enlarge / omit` mantığı ayrı tutuldu.
+
+Doğrulama:
+
+- focused: `25 passed in 0.02s`
+- ilgili regression: `103 passed in 0.15s`
+- full regression: `2795 passed in 12.37s`
+
+Sıradaki tek roadmap adımı:
+
+- **7.6 Color-change analysis**
+
+Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
+`7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.5`
+bölümü esas alınmalıdır.

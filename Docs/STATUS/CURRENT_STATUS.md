@@ -1503,3 +1503,122 @@ Tam regresyon:
 
 Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
 önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.5
+
+## Nozzle-based detail analysis tamamlandı
+
+7.5 paketi test-first tamamlandı.
+
+Yeni production modülü:
+
+- `CORE/atlas_nozzle_detail_analyzer.py`
+
+Yeni test:
+
+- `Test/test_nozzle_detail_analyzer.py`
+
+Yeni immutable sözleşmeler:
+
+- `AtlasNozzleDetailMeasurement`
+  - `component`
+  - `detail_size_mm`
+  - `nozzle_diameter_mm`
+  - türetilmiş `nozzle_ratio`
+- `AtlasNozzleDetailAnalysis`
+  - `nozzle_diameter_mm`
+  - `measurements`
+  - `minimum_observed_detail_mm`
+  - `below_nozzle_components`
+  - `has_below_nozzle_details`
+
+Yeni analyzer:
+
+- `AtlasNozzleDetailAnalyzer.analyze(...)`
+
+## Nozzle/detail semantiği
+
+7.5 üretim öncesi detail-resolution kararını tekrar etmez.
+
+Mevcut `AtlasPhysicalDetailResolver`:
+
+- gerçek ölçü
+- model scale
+- nozzle diameter
+
+üzerinden `preserve / enlarge / omit` kararı vermeye devam eder.
+
+7.5 ise üretilmiş veya çözülmüş fiziksel detail ölçülerini audit eder.
+
+Temel ölçüt:
+
+- `nozzle_ratio = detail_size_mm / nozzle_diameter_mm`
+
+Karar:
+
+- `detail_size_mm < nozzle_diameter_mm`: below nozzle
+- `detail_size_mm >= nozzle_diameter_mm`: safe
+
+## Contract davranışı
+
+- component adları trim edilir ve lowercase normalize edilir.
+- detail ölçüsü finite ve pozitif olmak zorundadır.
+- nozzle çapı finite ve pozitif olmak zorundadır.
+- `nozzle_ratio` constructor girdisi değildir; immutable türetilmiş alandır.
+- analyzer içindeki bütün measurement'ların nozzle çapı analysis nozzle çapıyla eşleşmek zorundadır.
+- minimum gözlenen detail ölçüsü raporlanır.
+- nozzle altındaki component'ler giriş sırasıyla korunur.
+- duplicate component yalnız bir kez raporlanır.
+- measurement koleksiyonu immutable tuple olarak korunur.
+- input koleksiyonu mutate edilmez.
+
+## Mimari sınır
+
+Bu pakette yapılmamıştır:
+
+- detail resize
+- detail enlarge
+- detail omit
+- geometry mutation
+- `AtlasPhysicalDetailResolver` değişikliği
+- LoD policy değişikliği
+- landmark-specific nozzle kuralı
+- 7.1 `AtlasPrintOptimizationReport` aggregation
+
+`DETAIL_BELOW_NOZZLE` issue code'u 7.1 contract'ında mevcut kalır;
+7.5 sonucunun aggregate report'a bağlanması 7.8 kapsamındadır.
+
+## Doğrulama
+
+Focused:
+
+- `25 passed in 0.02s`
+
+İlgili nozzle / physical-detail / LoD / print regression:
+
+- `103 passed in 0.15s`
+
+Tam regresyon:
+
+- `2795 passed in 12.37s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+- [ ] 7.6 Color-change analysis
+- [ ] 7.7 Triangle/file-count analysis
+- [ ] 7.8 Aggregate optimizer/report builder
+- [ ] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.6 Color-change analysis** paketine test-first başlamak.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
