@@ -1183,18 +1183,45 @@ Ana sonuç:
 Detaylı audit sonucu:
 `Docs/Roadmap/URBAN_FABRIC_PRODUCT_COMPOSITION_V1.md`
 
+### 8.1 Urban Fabric Scene Contract — TAMAMLANDI
+
+8.1 test-first tamamlandı.
+
+Yeni immutable semantic contract katmanı:
+
+- `AtlasUrbanFabricElement`
+- `AtlasUrbanFabricRelationship`
+- `AtlasUrbanFabricScene`
+
+Contract artık source identity, semantic class, product priority,
+LoD eligibility, geometry reference ve urban-element relationships
+bilgilerini koruyor.
+
+Minimum Urban Fabric V1 semantic kapsamı road, railway, pedestrian path,
+urban block, generic building, park, plaza, vegetation, water,
+infrastructure corridor ve terrain sınıflarını içeriyor.
+
+Semantic class sistemi extensible kalır; bu liste kapalı enum değildir.
+
+Doğrulama:
+
+- focused: `40 passed`
+- related: `120 passed in 0.53s`
+- full: `2913 passed in 12.75s`
+
+8.1 final production geometry davranışını değiştirmedi.
+
 ### Sıradaki tek adım
 
-**8.1 Urban Fabric Scene Contract**
+**8.2 Road Hierarchy Engine**
 
-8.1 test-first yürütülecek.
+8.2 test-first yürütülecek.
 
-Amaç yeni final geometry behavior üretmeden önce roads, railway, pedestrian
-paths, urban blocks, generic buildings, parks, plazas, vegetation, water,
-infrastructure corridors ve terrain için stabil semantic scene contract
-oluşturmaktır.
+Amaç mevcut vehicle-road sistemini bozmadan road ve pedestrian fabric'i
+product-semantic hierarchy altında çözmek ve sonraki composition/LoD
+katmanları için stabil road semantics üretmektir.
 
-8.1 tamamlanmadan 8.2 veya sonraki production behavior başlamaz.
+8.2 tamamlanmadan 8.3 veya sonraki behavior başlamaz.
 
 Detaylı teknik sözleşme, roadmap, kısıtlar ve acceptance kriterleri için:
 

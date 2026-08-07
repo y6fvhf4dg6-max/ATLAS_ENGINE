@@ -4,7 +4,7 @@
 **Date:** 7 August 2026
 **Baseline safe commit:** `50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
 **Previous locked package:** Automatic Print Optimization and Reporting V1
-**Current first step:** 8.1 Urban Fabric Scene Contract
+**Current first step:** 8.2 Road Hierarchy Engine
 
 ---
 
@@ -457,37 +457,67 @@ product/morphology-aware composition policy.
 
 ## 8.1 — Urban Fabric Scene Contract
 
-Create a general semantic contract for urban-product fabric.
+**Status: COMPLETED — 7 August 2026**
 
-The contract must represent at least:
+Implemented:
 
-- roads
-- railway
-- pedestrian paths
-- urban blocks
-- generic buildings
-- parks
-- plazas
-- vegetation
-- water
-- infrastructure corridors
-- terrain
+- `CORE/atlas_urban_fabric_scene_contract.py`
+- `Test/test_urban_fabric_scene_contract.py`
 
-The contract must preserve:
+Core immutable contracts:
 
-- source identity where available
+- `AtlasUrbanFabricElement`
+- `AtlasUrbanFabricRelationship`
+- `AtlasUrbanFabricScene`
+
+The contract preserves:
+
+- source identity
 - semantic class
 - product priority
 - LoD eligibility
-- geometry references
-- relationships between urban elements
+- geometry reference
+- element relationships
+- typed relationships
+- scene-level referential integrity
 
-8.1 is a classification and scene-contract package.
+Required core semantic classes are:
 
-It must not immediately change final production geometry.
+- road
+- railway
+- pedestrian_path
+- urban_block
+- generic_building
+- park
+- plaza
+- vegetation
+- water
+- infrastructure_corridor
+- terrain
 
-The purpose is to give later Urban Fabric systems one stable semantic scene
-model instead of making each subsystem interpret raw source data independently.
+The semantic-class system remains extensible; the required classes are the
+minimum Urban Fabric V1 coverage, not a closed enum.
+
+Scene behavior includes:
+
+- deterministic element lookup
+- semantic-class filtering
+- duplicate element-ID rejection
+- duplicate relationship-ID rejection
+- relationship endpoint validation
+- legacy related-element reference validation
+- deterministic present-class reporting
+- deterministic missing-required-class reporting
+
+Validation:
+
+- focused: `40 passed`
+- related regression: `120 passed in 0.53s`
+- full regression: `2913 passed in 12.75s`
+
+8.1 changes classification/scene contracts only.
+
+**No final production geometry behavior was changed.**
 
 
 ## 8.2 — Road Hierarchy Engine
@@ -1373,15 +1403,12 @@ semantic systems already developed.
 
 The next and only development step is:
 
-## 8.1 — Urban Fabric Scene Contract
+## 8.2 — Road Hierarchy Engine
 
-8.0 is complete.
+8.1 is complete.
 
-The next package is test-first and must create a stable semantic urban-fabric
-scene contract before any new production geometry behavior is introduced.
+8.2 must proceed test-first and extend the existing vehicle-road hierarchy
+into a product-semantic road and pedestrian network without replacing
+working road geometry or introducing Bonn-specific behavior.
 
-8.1 must preserve source identity where available and represent relationships
-between roads, railway, pedestrian paths, urban blocks, generic buildings,
-parks, plazas, vegetation, water, infrastructure corridors and terrain.
-
-Do not start 8.2 or later production behavior until 8.1 is complete.
+Do not start 8.3 or later behavior until 8.2 is complete.

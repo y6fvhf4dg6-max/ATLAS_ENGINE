@@ -2473,19 +2473,79 @@ Ana sonuç:
 ürün ölçeğinde ortak semantic composition altında birleştiren stabil bir
 scene contract ve morphology-aware policy eksikliğidir.`
 
+### 8.1 Urban Fabric Scene Contract — TAMAMLANDI
+
+8.1 test-first tamamlandı.
+
+Yeni dosyalar:
+
+- `CORE/atlas_urban_fabric_scene_contract.py`
+- `Test/test_urban_fabric_scene_contract.py`
+
+Kilitlenen immutable contract'lar:
+
+- `AtlasUrbanFabricElement`
+- `AtlasUrbanFabricRelationship`
+- `AtlasUrbanFabricScene`
+
+Contract artık şu bilgileri taşıyor:
+
+- source identity
+- semantic class
+- product priority
+- LoD eligibility
+- geometry reference
+- element relationships
+- typed relationships
+- scene-level referential integrity
+
+Minimum Urban Fabric V1 semantic kapsamı:
+
+- road
+- railway
+- pedestrian_path
+- urban_block
+- generic_building
+- park
+- plaza
+- vegetation
+- water
+- infrastructure_corridor
+- terrain
+
+Bu liste kapalı enum değildir; semantic class sistemi extensible kalır.
+
+Scene contract davranışları:
+
+- deterministic element lookup
+- semantic-class filtering
+- duplicate element-ID rejection
+- duplicate relationship-ID rejection
+- relationship endpoint validation
+- related-element referential integrity
+- present semantic class reporting
+- missing required semantic class reporting
+
+Doğrulama:
+
+- focused: `40 passed`
+- related regression: `120 passed in 0.53s`
+- full regression: `2913 passed in 12.75s`
+
+8.1 sırasında final production geometry davranışı değiştirilmedi.
+
 ### Sıradaki tek adım
 
-**8.1 Urban Fabric Scene Contract**
+**8.2 Road Hierarchy Engine**
 
-8.1 test-first yürütülecek.
+8.2 test-first yürütülecek.
 
-İlk amaç yeni geometry behavior üretmek değil; roads, railway, pedestrian
-paths, urban blocks, generic buildings, parks, plazas, vegetation, water,
-infrastructure corridors ve terrain için source identity / semantic class /
-product priority / LoD eligibility / relationships taşıyan stabil bir
-urban-fabric scene contract oluşturmaktır.
+Amaç mevcut vehicle-road hierarchy'yi bozmadan road ve pedestrian network'ü
+product-semantic hierarchy altında birleştirmek; printable/product-scale
+minimumları daha sonraki composition policy ile uyumlu biçimde temsil
+etmektir.
 
-8.1 tamamlanmadan 8.2 veya sonraki production behavior başlamayacak.
+8.2 tamamlanmadan 8.3 veya sonraki behavior başlamayacak.
 
 Uzun-form teknik sözleşme ve acceptance kriterleri için:
 
