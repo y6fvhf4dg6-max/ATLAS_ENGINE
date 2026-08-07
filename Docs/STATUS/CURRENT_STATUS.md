@@ -1290,3 +1290,101 @@ Tam regresyon:
 
 Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
 önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.3
+
+## Overhang/support analysis tamamlandı
+
+7.3 paketi test-first tamamlandı.
+
+Yeni production modülü:
+
+- `CORE/atlas_overhang_support_analyzer.py`
+
+Yeni test:
+
+- `Test/test_overhang_support_analyzer.py`
+
+Yeni immutable sözleşmeler:
+
+- `AtlasOverhangMeasurement`
+  - `component`
+  - `overhang_degrees`
+- `AtlasOverhangSupportAnalysis`
+  - `support_threshold_degrees`
+  - `measurements`
+  - `maximum_overhang_degrees`
+  - `support_required_components`
+  - `support_required`
+
+Yeni analyzer:
+
+- `AtlasOverhangSupportAnalyzer.analyze(...)`
+
+Açı semantiği:
+
+- `0°`: dikey / support-free referans
+- `90°`: yatay çıkıntı
+- threshold altı: support-free
+- threshold'a eşit veya üzeri: support required
+
+Davranış:
+
+- component adları trim edilir ve lowercase normalize edilir.
+- overhang ölçümleri finite ve `0..90°` aralığında olmak zorundadır.
+- support threshold finite, `> 0°` ve `<= 90°` olmak zorundadır.
+- maksimum overhang değeri raporlanır.
+- support gerektiren component'ler giriş sırasıyla raporlanır.
+- aynı component birden fazla ihlal üretse bile yalnız bir kez listelenir.
+- measurement koleksiyonu immutable tuple olarak korunur.
+- input koleksiyonu mutate edilmez.
+
+## Mimari sınır
+
+7.3 genel ve landmark-bağımsız overhang/support değerlendirme sözleşmesidir.
+
+Bu pakette yapılmamıştır:
+
+- triangle normal'larından otomatik overhang ölçümü
+- slicer-specific support üretimi
+- landmark-specific support kuralları
+- 7.1 `AtlasPrintOptimizationReport` aggregation
+- relief slope sisteminin değiştirilmesi
+
+Mevcut `AtlasReliefQualityReport` kendi relief yüzey eğimi/risk semantiğiyle
+korunmuştur. Genel FDM overhang/support kararı ayrı analyzer olarak tutulur.
+
+## Doğrulama
+
+Focused:
+
+- `22 passed in 0.02s`
+
+İlgili overhang / relief / print regression:
+
+- `77 passed in 0.12s`
+
+Tam regresyon:
+
+- `2742 passed in 12.31s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [ ] 7.4 Fragile connection analysis
+- [ ] 7.5 Nozzle-based detail analysis
+- [ ] 7.6 Color-change analysis
+- [ ] 7.7 Triangle/file-count analysis
+- [ ] 7.8 Aggregate optimizer/report builder
+- [ ] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.4 Fragile connection analysis** paketine test-first başlamak.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
