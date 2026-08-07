@@ -1148,7 +1148,7 @@ Baseline güvenli commit:
 
 Ana hedef:
 
-`Lichtbild-level urban coherence + ATLAS landmark intelligence + ATLAS LoD/print infrastructure`
+`best-in-class urban coherence + ATLAS landmark intelligence + ATLAS LoD/print infrastructure`
 
 İlk kontrollü benchmark:
 
@@ -1317,3 +1317,28 @@ Detaylı teknik sözleşme, roadmap, kısıtlar ve acceptance kriterleri için:
 Güncel operasyonel durum için:
 
 `Docs/STATUS/CURRENT_STATUS.md`
+
+### 8.4 Urban Block Resolver — TAMAMLANDI
+
+8.4 test-first tamamlandı.
+
+Kilitlenen ana davranışlar:
+
+- road-defined urban block polygonization
+- generic-building block membership
+- deterministic exclusive multi-block assignment
+- source-footprint and courtyard preservation
+- block density and shared-boundary metrics
+- local median-height and landmark-proximity reporting
+- existing LoD level pass-through
+- `urban_block` scene integration with `contains_building` relationships
+
+Doğrulama:
+
+- focused: `39 passed in 0.06s`
+- related: `379 passed in 0.35s`
+- full: `3124 passed in 12.86s`
+
+### Sıradaki tek adım
+
+**8.5 Park & Plaza Semantic Surface Engine**

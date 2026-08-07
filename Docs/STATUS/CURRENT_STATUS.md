@@ -2695,3 +2695,53 @@ Uzun-form teknik sözleşme ve acceptance kriterleri için:
 `Docs/Roadmap/URBAN_FABRIC_PRODUCT_COMPOSITION_V1.md`
 
 esas alınmalıdır.
+
+## 8 Ağustos 2026 — Urban Fabric 8.4 Urban Block Resolver
+
+8.4 test-first geliştirildi ve full regression aşamasına ulaştı.
+
+Yeni ana dosyalar:
+
+- `CORE/atlas_urban_block_resolver.py`
+- `Test/test_urban_block_resolver.py`
+
+Kilitlenen çekirdek davranışlar:
+
+- road-defined urban block polygonization
+- generic-building block membership
+- deterministic exclusive multi-block assignment
+- source-footprint preservation
+- courtyard / inner-void preservation
+- block density reporting
+- shared-boundary / street-wall continuity metric
+
+Ek block-level metadata:
+
+- local `median_height_m` reporting
+- nearest-landmark distance reporting
+- existing `AtlasLoDLevel` pass-through as composition metadata
+- courtyard count
+- `urban_block` scene element integration
+- deterministic `contains_building` relationships
+
+Doğrulama:
+
+- focused 8.4: `39 passed in 0.06s`
+- related regression: `379 passed in 0.35s`
+- full regression: `3124 passed in 12.86s`
+
+8.4 sınırları:
+
+- source building footprint'leri mutate edilmez
+- courtyard geometrileri kapatılmaz
+- landmark binalar generic block membership'e alınmaz
+- bina yükseklikleri değiştirilmez; yalnız block-level istatistik raporlanır
+- yeni bir LoD resolver oluşturulmaz; mevcut LoD contract kullanılır
+- Bonn-specific koordinat veya competitor-specific implementation kuralı yoktur
+
+### Sıradaki tek adım
+
+**8.5 Park & Plaza Semantic Surface Engine**
+
+8.5 de test-first yürütülecek. 8.4 yeni davranış eklenmeden önce dokümantasyon,
+scoped commit, push ve `HEAD == origin/main` doğrulamasıyla kilitlenecektir.
