@@ -4,7 +4,7 @@
 **Date:** 7 August 2026
 **Baseline safe commit:** `50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
 **Previous locked package:** Automatic Print Optimization and Reporting V1
-**Current first step:** 8.2 Road Hierarchy Engine
+**Current first step:** 8.3 Linear Infrastructure Engine
 
 ---
 
@@ -522,22 +522,42 @@ Validation:
 
 ## 8.2 — Road Hierarchy Engine
 
-Resolve source road classes into a product-semantic hierarchy.
+**Status: COMPLETED — 7 August 2026**
 
-Candidate road classes include:
+Implemented:
 
-- motorway
-- trunk
-- primary
-- secondary
-- tertiary
-- residential
-- service
-- pedestrian
-- footway
-- cycleway
+- `CORE/atlas_urban_road_hierarchy_resolver.py`
+- `Test/test_urban_road_hierarchy_resolver.py`
+- `Test/test_road_foundation_builder_urban_hierarchy.py`
+- `Test/test_foundation_first_road_hierarchy_integration.py`
 
-The engine must resolve product-facing properties such as:
+Integrated with:
+
+- `CORE/atlas_road_foundation_builder.py`
+- `CORE/atlas_foundation_first_engine.py`
+
+Core immutable product contract:
+
+- `AtlasUrbanRoadProfile`
+
+Core resolver:
+
+- `AtlasUrbanRoadHierarchyResolver`
+
+Source highway classes are resolved into product-semantic classes:
+
+- motorway / trunk / primary / secondary / tertiary -> `major_road`
+- residential / living_street / unclassified / road -> `local_road`
+- service -> `service_road`
+- footway / path / pedestrian / steps -> `pedestrian_path`
+- cycleway -> `cycleway`
+- bridleway -> `bridleway`
+
+`cycleway` and `bridleway` are recognized semantically but their physical
+corridor profiles are intentionally deferred to 8.3 Linear Infrastructure
+Engine.
+
+Road product profiles carry:
 
 - semantic priority
 - physical width
@@ -546,17 +566,42 @@ The engine must resolve product-facing properties such as:
 - LoD eligibility
 - simplification priority
 
-Strict real-world scale alone must not determine final physical road width.
+Physical-width resolution preserves source truth while supporting product
+readability:
 
-The system must preserve relative hierarchy so that major roads remain more
-visually important than minor roads.
+- valid OSM `width=*` is used when available
+- existing ATLAS vehicle-class default widths are preserved when source width
+  is absent or invalid
+- real width is scaled to product millimeters
+- minimum printable width is enforced
+- pedestrian paths do not invent a real-world fallback width; absent or invalid
+  source width falls directly to the explicit printable minimum
 
-Primary acceptance principle:
+Relative visual hierarchy is validated for:
 
-> The major street network should remain readable even when generic buildings
-> are visually suppressed.
+`major_road > local_road > service_road > pedestrian_path`
 
-Do not add Bonn-specific road widths or coordinate-specific exceptions.
+The hierarchy is enforced for semantic priority, physical width and
+simplification priority when profiles are compared.
+
+Production integration is opt-in and backward compatible:
+
+- `AtlasRoadFoundationBuilder.build_roads(...)` accepts optional
+  `minimum_printable_width_mm`
+- when omitted, legacy vehicle-road behavior is preserved
+- when provided, semantic road profiles can include pedestrian paths
+- `AtlasFoundationFirstEngine.generate_city_stl(...)` exposes optional
+  `road_minimum_printable_width_mm`
+- its default is `None`, so existing products are not silently changed
+
+No Bonn-specific widths, coordinates or landmark-specific exceptions were
+introduced.
+
+Validation:
+
+- focused + integration: `69 passed`
+- related regression: `82 passed in 1.25s`
+- full regression: `2982 passed in 12.70s`
 
 
 ## 8.3 — Linear Infrastructure Engine
@@ -1403,12 +1448,12 @@ semantic systems already developed.
 
 The next and only development step is:
 
-## 8.2 — Road Hierarchy Engine
+## 8.3 — Linear Infrastructure Engine
 
-8.1 is complete.
+8.2 is complete.
 
-8.2 must proceed test-first and extend the existing vehicle-road hierarchy
-into a product-semantic road and pedestrian network without replacing
-working road geometry or introducing Bonn-specific behavior.
+8.3 must proceed test-first and create a general product-semantic system for
+railway, tram and cycle corridors while preserving source visibility,
+operational state and infrastructure semantics.
 
-Do not start 8.3 or later behavior until 8.2 is complete.
+Do not start 8.4 or later behavior until 8.3 is complete.

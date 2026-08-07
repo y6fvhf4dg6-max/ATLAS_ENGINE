@@ -2534,18 +2534,82 @@ Doğrulama:
 
 8.1 sırasında final production geometry davranışı değiştirilmedi.
 
+### 8.2 Road Hierarchy Engine — TAMAMLANDI
+
+8.2 test-first tamamlandı.
+
+Yeni ana sözleşmeler:
+
+- `AtlasUrbanRoadProfile`
+- `AtlasUrbanRoadHierarchyResolver`
+
+Source highway sınıfları product-semantic hierarchy'ye çözülüyor:
+
+- motorway / trunk / primary / secondary / tertiary -> `major_road`
+- residential / living_street / unclassified / road -> `local_road`
+- service -> `service_road`
+- footway / path / pedestrian / steps -> `pedestrian_path`
+- cycleway -> `cycleway`
+- bridleway -> `bridleway`
+
+`cycleway` ve `bridleway` fiziksel corridor davranışı bilinçli olarak
+8.3 Linear Infrastructure Engine'e bırakıldı.
+
+Road profile contract şu alanları taşıyor:
+
+- semantic priority
+- physical width
+- minimum printable width
+- vertical treatment
+- LoD eligibility
+- simplification priority
+
+Fiziksel genişlik çözümü:
+
+- geçerli OSM `width=*` source truth olarak kullanılır
+- vehicle sınıflarında source width yok/geçersizse mevcut ATLAS default
+  genişlikleri korunur
+- gerçek genişlik product scale'e çevrilir
+- açıkça verilen printable minimum uygulanır
+- pedestrian path için source width yok/geçersizse gerçek-metre fallback
+  uydurulmaz; doğrudan explicit printable minimum kullanılır
+
+Relative hierarchy:
+
+`major_road > local_road > service_road > pedestrian_path`
+
+Bu sıra semantic priority, physical width ve simplification priority
+açısından doğrulanabilir.
+
+Production entegrasyonu geriye dönük uyumludur:
+
+- `AtlasRoadFoundationBuilder.build_roads(...)`
+  `minimum_printable_width_mm=None` kabul eder
+- `None` iken legacy vehicle-road davranışı korunur
+- değer verildiğinde semantic hierarchy ve pedestrian yollar etkinleşebilir
+- `AtlasFoundationFirstEngine.generate_city_stl(...)`
+  `road_minimum_printable_width_mm=None` kabul eder
+- mevcut ürünlere gizli minimum genişlik uygulanmaz
+
+Bonn-specific width, koordinat veya landmark hack eklenmedi.
+
+Doğrulama:
+
+- focused + integration: `69 passed`
+- related regression: `82 passed in 1.25s`
+- full regression: `2982 passed in 12.70s`
+
 ### Sıradaki tek adım
 
-**8.2 Road Hierarchy Engine**
+**8.3 Linear Infrastructure Engine**
 
-8.2 test-first yürütülecek.
+8.3 test-first yürütülecek.
 
-Amaç mevcut vehicle-road hierarchy'yi bozmadan road ve pedestrian network'ü
-product-semantic hierarchy altında birleştirmek; printable/product-scale
-minimumları daha sonraki composition policy ile uyumlu biçimde temsil
-etmektir.
+Amaç railway, tram ve cycle corridor source verilerini visibility,
+operational state ve semantic infrastructure özelliklerini koruyan genel
+product-semantic bir sisteme bağlamaktır.
 
-8.2 tamamlanmadan 8.3 veya sonraki behavior başlamayacak.
+8.3 tamamlanmadan 8.4 veya sonraki behavior başlamayacak.
 
 Uzun-form teknik sözleşme ve acceptance kriterleri için:
 

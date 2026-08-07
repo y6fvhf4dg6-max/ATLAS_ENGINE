@@ -1,6 +1,9 @@
 # CORE/atlas_road_foundation_builder.py
 
 from CORE.atlas_road_foundation_extruder import AtlasRoadFoundationExtruder
+from CORE.atlas_urban_road_hierarchy_resolver import (
+    AtlasUrbanRoadHierarchyResolver,
+)
 
 
 class AtlasRoadFoundationBuilder:
@@ -30,6 +33,7 @@ class AtlasRoadFoundationBuilder:
         roads,
         coordinate_engine,
         terrain_mesh,
+        minimum_printable_width_mm=None,
         debug=True,
     ):
         meshes = []
@@ -39,18 +43,43 @@ class AtlasRoadFoundationBuilder:
         for road in roads:
             road_type = road.get("road_type") or road.get("tags", {}).get("highway")
 
-            if road_type not in AtlasRoadFoundationBuilder.DEFAULT_WIDTHS_M:
-                skipped += 1
-                continue
-
             geometry = road.get("geometry", [])
 
             if len(geometry) < 2:
                 skipped += 1
                 continue
 
-            width_m = AtlasRoadFoundationBuilder.DEFAULT_WIDTHS_M[road_type]
-            width_mm = coordinate_engine.height_to_stl_mm(width_m)
+            if minimum_printable_width_mm is None:
+                if road_type not in AtlasRoadFoundationBuilder.DEFAULT_WIDTHS_M:
+                    skipped += 1
+                    continue
+
+                width_m = AtlasRoadFoundationBuilder.DEFAULT_WIDTHS_M[
+                    road_type
+                ]
+                width_mm = coordinate_engine.height_to_stl_mm(
+                    width_m
+                )
+            else:
+                profile = (
+                    AtlasUrbanRoadHierarchyResolver.resolve_profile(
+                        highway=road_type,
+                        source_width=road.get(
+                            "tags",
+                            {},
+                        ).get("width"),
+                        scale_ratio=coordinate_engine.xy_scale,
+                        minimum_printable_width_mm=(
+                            minimum_printable_width_mm
+                        ),
+                    )
+                )
+
+                if profile is None:
+                    skipped += 1
+                    continue
+
+                width_mm = profile.physical_width_mm
 
             mesh = AtlasRoadFoundationBuilder._build_polyline_mesh(
                 geometry=geometry,

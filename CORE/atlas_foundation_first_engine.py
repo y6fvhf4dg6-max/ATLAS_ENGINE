@@ -417,6 +417,7 @@ class AtlasFoundationFirstEngine:
         fixed_xy_scale=5500.0,
         use_fixed_xy_scale=False,
         include_castle_semantic_architecture=False,
+        road_minimum_printable_width_mm=None,
         debug=True,
     ):
         source_bbox = bbox
@@ -779,6 +780,9 @@ class AtlasFoundationFirstEngine:
             roads=road_input,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
+            minimum_printable_width_mm=(
+                road_minimum_printable_width_mm
+            ),
             debug=debug,
         )
 

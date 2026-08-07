@@ -1211,17 +1211,55 @@ Doğrulama:
 
 8.1 final production geometry davranışını değiştirmedi.
 
+### 8.2 Road Hierarchy Engine — TAMAMLANDI
+
+8.2 test-first tamamlandı.
+
+Yeni ana sözleşmeler:
+
+- `AtlasUrbanRoadProfile`
+- `AtlasUrbanRoadHierarchyResolver`
+
+Road hierarchy artık source highway sınıflarını major road, local road,
+service road ve pedestrian path product semantics altında çözüyor.
+
+Fiziksel genişlik çözümü source `width=*`, mevcut vehicle defaultları,
+product scale ve explicit printable minimum bilgisini birlikte kullanıyor.
+
+Pedestrian path source width yoksa gerçek-metre genişliği uydurulmuyor;
+explicit printable minimum kullanılıyor.
+
+Relative hierarchy:
+
+`major_road > local_road > service_road > pedestrian_path`
+
+`cycleway` ve `bridleway` semantic olarak tanınıyor ancak fiziksel corridor
+davranışları 8.3 Linear Infrastructure Engine'e bırakıldı.
+
+Production entegrasyonu opt-in:
+
+- road builder: `minimum_printable_width_mm=None`
+- FoundationFirst: `road_minimum_printable_width_mm=None`
+
+Default `None` olduğu için mevcut ürün davranışı sessizce değiştirilmedi.
+
+Doğrulama:
+
+- focused + integration: `69 passed`
+- related: `82 passed in 1.25s`
+- full: `2982 passed in 12.70s`
+
 ### Sıradaki tek adım
 
-**8.2 Road Hierarchy Engine**
+**8.3 Linear Infrastructure Engine**
 
-8.2 test-first yürütülecek.
+8.3 test-first yürütülecek.
 
-Amaç mevcut vehicle-road sistemini bozmadan road ve pedestrian fabric'i
-product-semantic hierarchy altında çözmek ve sonraki composition/LoD
-katmanları için stabil road semantics üretmektir.
+Amaç railway, tram ve cycle corridor verilerini source visibility,
+operational state ve infrastructure semantics bilgilerini koruyan genel
+product-semantic bir sisteme bağlamaktır.
 
-8.2 tamamlanmadan 8.3 veya sonraki behavior başlamaz.
+8.3 tamamlanmadan 8.4 veya sonraki behavior başlamaz.
 
 Detaylı teknik sözleşme, roadmap, kısıtlar ve acceptance kriterleri için:
 
