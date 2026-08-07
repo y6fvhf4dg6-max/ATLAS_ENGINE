@@ -1459,10 +1459,14 @@ The final ATLAS competitive target is therefore:
 - controlled LoD
 - validated print production
 - faithful customer preview
+- deterministic recoverable product configuration
+- asynchronous preview generation with backend progress
+- preview caching based on deterministic product state
+- explicit preview-to-production parity contract
 
 The intended differentiation is:
 
-> Lichtbild-level urban coherence
+> best-in-class urban coherence
 > +
 > ATLAS-level landmark intelligence
 > +
