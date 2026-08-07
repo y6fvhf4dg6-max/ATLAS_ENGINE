@@ -2427,25 +2427,65 @@ Aktif roadmap:
 - 8.19 Urban Fabric Quality Report
 - 8.20 Multi-Morphology Acceptance Benchmarks
 
+### 8.0 Bonn Urban Fabric Ground-Truth Audit — TAMAMLANDI
+
+8.0 read-only audit olarak tamamlandı. Production davranışı değiştirilmedi.
+
+Kesinleşen ana bulgular:
+
+- Railway source exact bbox içinde mevcut fakat `AtlasLocalOSMReader`
+  normal railway collection üretmiyor. Surface-aday tram/platform verisi
+  production geometry'ye girmiyor.
+- `353` highway-line girdisinin yalnız `62` tanesi road builder tarafından
+  kabul ediliyor; `291` pedestrian/path sınıfı mevcut production road
+  geometry'sinde temsil edilmiyor.
+- Münsterplatz ve benzeri önemli meydanların önemli kısmı line-based
+  `highway=pedestrian` source olarak mevcut; source eksikliği değil,
+  semantic/product expression eksikliği var.
+- Hofgarten source→reader→final park mesh zincirinde mevcut; sorun missing
+  source değil, zayıf park semantic composition.
+- Vegetation clutter'ın ana nedeni WorldCover tree-cover örneklerinin
+  context-free isolated tree objelerine dönüştürülmesi.
+- `tree_rows` contract mevcut fakat producer ve production consumer yok.
+- Building-part vertical interval bug bulunmadı.
+- Generic height parser'da belirgin hata bulunmadı.
+- Universitätshauptgebäude yüksekliği source-valid historic/castle semantics
+  ile product-scale castle exaggeration birleşiminden geliyor; morphology /
+  product composition policy konusu.
+- Water `4 → 3` dönüşümü mevcut policy ile deterministik; fakat water source
+  identity/name metadata downstream'de korunmuyor.
+- Bonn terrain benchmarkı local SRTM eksikliği nedeniyle OpenTopography
+  COP30 fallback ile üretildi. Belirgin terrain scaling bug bulunmadı; gerçek
+  provider/fallback provenance final result metadata'da taşınmıyor.
+- Exact Bonn'da `435` main building polygon var. Proximity sonucu:
+  `43` cluster @2 m, `39` @4 m, `24` @6 m, `6` @10 m.
+- `1:4738` product scale'de çok sayıda footprint fiziksel olarak küçülüyor:
+  `59 <1 mm²`, `201 <4 mm²`, `340 <9 mm²`.
+- Mevcut minimum-size filtering zaten bilinçli:
+  `48` area minimum, `47` width minimum, `6` depth minimum,
+  `1` triangulation failure.
+- Dolayısıyla 8.4 yeni kaba size filter veya uncontrolled merge olmamalı;
+  block-aware composition / LoD katmanı olmalı.
+
+Ana sonuç:
+
+`Bonn'daki temel boşluk source truth eksikliği değil; mevcut urban öğeleri
+ürün ölçeğinde ortak semantic composition altında birleştiren stabil bir
+scene contract ve morphology-aware policy eksikliğidir.`
+
 ### Sıradaki tek adım
 
-**8.0 Bonn Urban Fabric Ground-Truth Audit**
+**8.1 Urban Fabric Scene Contract**
 
-8.0 sırasında production davranışı değiştirilmeyecek.
+8.1 test-first yürütülecek.
 
-Önce mevcut Bonn benchmarkında:
+İlk amaç yeni geometry behavior üretmek değil; roads, railway, pedestrian
+paths, urban blocks, generic buildings, parks, plazas, vegetation, water,
+infrastructure corridors ve terrain için source identity / semantic class /
+product priority / LoD eligibility / relationships taşıyan stabil bir
+urban-fabric scene contract oluşturmaktır.
 
-- source truth
-- consumed data
-- ignored data
-- generated geometry
-- visually weak geometry
-- pipeline bugs
-- gerçek eksik capabilities
-
-birbirinden ayrılacak.
-
-8.0 tamamlanmadan 8.1 veya sonraki production implementation başlamayacak.
+8.1 tamamlanmadan 8.2 veya sonraki production behavior başlamayacak.
 
 Uzun-form teknik sözleşme ve acceptance kriterleri için:
 

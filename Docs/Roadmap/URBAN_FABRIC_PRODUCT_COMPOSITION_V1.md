@@ -4,7 +4,7 @@
 **Date:** 7 August 2026
 **Baseline safe commit:** `50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
 **Previous locked package:** Automatic Print Optimization and Reporting V1
-**Current first step:** 8.0 Bonn Urban Fabric Ground-Truth Audit
+**Current first step:** 8.1 Urban Fabric Scene Contract
 
 ---
 
@@ -376,46 +376,83 @@ This roadmap is the authoritative long-form design reference for package 8.
 
 ## 8.0 — Bonn Urban Fabric Ground-Truth Audit
 
-**No production behavior changes.**
+**Status: COMPLETED — 7 August 2026**
 
-The exact Bonn benchmark must first be audited before new urban-fabric
-behavior is implemented.
+**No production behavior changes were made during this audit.**
 
-Inspect and trace:
+Exact benchmark:
 
-- roads and road classes
-- railway and transport infrastructure
-- Hofgarten source geometry and tags
-- park polygons
-- pedestrian paths
-- tree sources
-- possible tree-row structure
-- forest and wood areas
-- landcover and surface meshes
-- water features
-- terrain elevation range
-- final terrain Z range
-- generic building heights
-- building levels
-- height fallbacks
-- urban-block continuity
-- final mesh inclusion
+- center: `50.733270, 7.100440`
+- product: `140 × 140 mm`
+- coverage: `0.44 km²`
+- effective scale: approximately `1:4738`
+- final benchmark: `922` meshes / `70798` triangles
 
-The audit must identify:
+Verified findings:
 
-- source data that exists
-- source data currently consumed
-- geometry currently generated
-- available data currently ignored
-- geometry generated but visually weak
-- actual pipeline bugs
-- true missing capabilities
+- Railway source exists but is not collected by `AtlasLocalOSMReader`.
+  Exact bbox contains `27` railway ways; surface candidates are `3` tram
+  ways and `2` Hauptbahnhof platforms. Tunnel/proposed/disused records
+  require separate policy. This is a true missing capability.
+- Highway-line source contains `353` records. `62` are accepted by the
+  current road builder and `291` are rejected:
+  `144 footway`, `118 pedestrian`, `23 steps`, `6 path`.
+  Vehicle-road width hierarchy already exists; pedestrian fabric does not.
+- Major Bonn plazas such as Münsterplatz and Markt are predominantly
+  represented by line-based `highway=pedestrian` source geometry, not one
+  closed plaza polygon. Existing source is therefore present but currently
+  not expressed in production geometry.
+- Hofgarten source geometry is present end-to-end. OSM way `102199952`
+  (`leisure=park`) becomes a final terrain-following park mesh, but its
+  semantic/product expression is weak rather than missing.
+- Vegetation clutter is primarily composition-related. Exact bbox contains
+  `146` OSM trees and `276` WorldCover samples. Inside Hofgarten the split
+  is `6` OSM trees versus `75` WorldCover-derived trees.
+- WorldCover tree-cover is currently sampled into isolated tree objects
+  without urban-context semantics. `AtlasGreenAreaTreeSampler` exists but
+  is not integrated into production. `tree_rows` exists in the nature
+  contract but has neither a producer nor a production consumer.
+- No building-part vertical-interval double-counting bug was found.
+  Elevated parts correctly use `bottom = foundation + min_height` and
+  `top = foundation + height`.
+- High Bonn building-part records inspected during the audit belong to
+  Bonner Münster and Kreuzkirche and are not generic-height outliers.
+- Generic building height handling is broadly coherent. The notable
+  Universitätshauptgebäude outlier is source-valid historic castle
+  semantics combined with product-scale castle exaggeration:
+  `6.0 mm` castle-wing body minimum plus `4.4 mm` multi-gable roof.
+  This is a morphology/product-composition policy issue, not a source or
+  height-parser bug.
+- Inland water source contains `4` records and produces `3` final meshes.
+  `Kaiserbrunnen` is deterministically excluded because `amenity=fountain`
+  alone is outside current surface-water policy. Water source identity and
+  names are lost before final mesh output.
+- Terrain generation requested SRTM but local `N50E007.hgt` was absent, so
+  the benchmark used the existing OpenTopography COP30 fallback.
+  No obvious terrain scaling bug was found. Actual provider/fallback
+  provenance is not preserved in final result metadata.
+- Bonn contains `435` main building polygons. Proximity grouping produces
+  `43` clusters at `2 m`, `39` at `4 m`, `24` at `6 m`, and `6` at `10 m`,
+  confirming a naturally dense block morphology.
+- At `1:4738`, many source footprints are physically tiny:
+  `59` below `1 mm²`, `201` below `4 mm²`, and `340` below `9 mm²`.
+- Existing building printability filtering is already intentional:
+  scene rejection counts are `48` area-below-minimum,
+  `47` width-below-minimum, `6` depth-below-minimum, and
+  `1` triangulation failure.
+  Therefore 8.4 must be block-aware composition/LoD, not a replacement
+  minimum-size filter or uncontrolled building merge.
 
-The purpose of 8.0 is to separate:
+Audit conclusion:
 
-**bugs from missing features.**
+**The principal Bonn gap is not missing OSM source truth. It is the absence
+of one coherent product-scale semantic composition layer connecting existing
+roads, pedestrian fabric, blocks, parks, vegetation, rail, water, terrain,
+generic buildings and landmark priorities.**
 
-No 8.1 or later production implementation starts until this audit is complete.
+8.0 therefore validates the later roadmap packages while separating
+confirmed missing capabilities from existing behavior that merely needs
+product/morphology-aware composition policy.
 
 
 ## 8.1 — Urban Fabric Scene Contract
@@ -1336,19 +1373,15 @@ semantic systems already developed.
 
 The next and only development step is:
 
-## 8.0 — Bonn Urban Fabric Ground-Truth Audit
+## 8.1 — Urban Fabric Scene Contract
 
-Do not implement 8.1 or later behavior until the audit is complete.
+8.0 is complete.
 
-The audit must:
+The next package is test-first and must create a stable semantic urban-fabric
+scene contract before any new production geometry behavior is introduced.
 
-- measure source truth
-- trace current pipeline behavior
-- identify which data is consumed
-- identify which data is ignored
-- identify visually weak generated geometry
-- separate pipeline bugs from missing capabilities
-- produce a reproducible audit result
+8.1 must preserve source identity where available and represent relationships
+between roads, railway, pedestrian paths, urban blocks, generic buildings,
+parks, plazas, vegetation, water, infrastructure corridors and terrain.
 
-Only after 8.0 is complete should test-first implementation of later Urban
-Fabric packages begin.
+Do not start 8.2 or later production behavior until 8.1 is complete.

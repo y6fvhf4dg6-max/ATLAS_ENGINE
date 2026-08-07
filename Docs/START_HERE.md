@@ -1161,25 +1161,40 @@ Ana hedef:
 - meshes: `922`
 - triangles: `70798`
 
+### 8.0 Bonn Urban Fabric Ground-Truth Audit — TAMAMLANDI
+
+8.0 read-only audit tamamlandı; production davranışı değiştirilmedi.
+
+Ana sonuç:
+
+- Bonn'daki temel problem genel olarak source truth eksikliği değil.
+- Railway ve pedestrian fabric gibi bazı source sınıfları production'a
+  taşınmıyor.
+- Hofgarten ve water gibi bazı öğeler production'da mevcut fakat semantic
+  expression / metadata zayıf.
+- WorldCover vegetation mevcut şehir bağlamından bağımsız isolated tree
+  üretimi nedeniyle clutter oluşturuyor.
+- Generic building height ve building-part vertical interval için genel bir
+  parser/geometri bug doğrulanmadı.
+- Urban blocks doğal olarak yoğun; mevcut minimum-size filtering zaten aktif.
+- Terrain exact benchmarkta SRTM yerine COP30 fallback kullandı; belirgin
+  scaling bug bulunmadı fakat provider provenance downstream'de kayboluyor.
+
+Detaylı audit sonucu:
+`Docs/Roadmap/URBAN_FABRIC_PRODUCT_COMPOSITION_V1.md`
+
 ### Sıradaki tek adım
 
-**8.0 Bonn Urban Fabric Ground-Truth Audit**
+**8.1 Urban Fabric Scene Contract**
 
-Bu aşamada production davranışı değiştirilmez.
+8.1 test-first yürütülecek.
 
-Amaç önce mevcut Bonn sahnesinde:
+Amaç yeni final geometry behavior üretmeden önce roads, railway, pedestrian
+paths, urban blocks, generic buildings, parks, plazas, vegetation, water,
+infrastructure corridors ve terrain için stabil semantic scene contract
+oluşturmaktır.
 
-- source truth
-- consumed data
-- ignored data
-- generated geometry
-- visually weak geometry
-- pipeline bugs
-- gerçek missing capabilities
-
-ayrımını kesinleştirmektir.
-
-8.0 tamamlanmadan 8.1 veya sonraki production implementation başlamaz.
+8.1 tamamlanmadan 8.2 veya sonraki production behavior başlamaz.
 
 Detaylı teknik sözleşme, roadmap, kısıtlar ve acceptance kriterleri için:
 
