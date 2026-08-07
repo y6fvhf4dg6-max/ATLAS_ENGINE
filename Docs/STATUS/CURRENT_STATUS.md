@@ -1734,3 +1734,123 @@ Tam regresyon:
 
 Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
 önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.7
+
+## Triangle/file-count analysis tamamlandı
+
+7.7 paketi test-first tamamlandı.
+
+Yeni production modülü:
+
+- `CORE/atlas_triangle_file_count_analyzer.py`
+
+Yeni test:
+
+- `Test/test_triangle_file_count_analyzer.py`
+
+Yeni immutable sözleşme:
+
+- `AtlasTriangleFileCountAnalysis`
+  - `triangle_count`
+  - `maximum_triangle_count`
+  - `file_count`
+  - `maximum_file_count`
+  - `excess_triangle_count`
+  - `excess_file_count`
+  - `is_triangle_count_excessive`
+  - `is_file_count_excessive`
+  - `has_excessive_counts`
+
+Yeni analyzer:
+
+- `AtlasTriangleFileCountAnalyzer.analyze(...)`
+
+## Analiz semantiği
+
+Triangle count ve file count birbirinden bağımsız iki üretim karmaşıklığı sinyali olarak ele alınır.
+
+Kararlar:
+
+- `triangle_count <= maximum_triangle_count`: safe
+- `triangle_count > maximum_triangle_count`: excessive
+- `file_count <= maximum_file_count`: safe
+- `file_count > maximum_file_count`: excessive
+
+Türetilmiş sonuçlar:
+
+- `excess_triangle_count = max(0, triangle_count - maximum_triangle_count)`
+- `excess_file_count = max(0, file_count - maximum_file_count)`
+
+## Contract davranışı
+
+- Tüm count ve threshold alanları non-negative integer olmak zorundadır.
+- `bool`, float ve string sayaç olarak kabul edilmez.
+- `0` değerleri geçerlidir.
+- threshold'a eşit değerler safe kabul edilir.
+- analysis immutable'dır.
+
+## Mevcut sistemle sınır
+
+Repo içinde triangle count zaten farklı üretim noktalarında ölçülmektedir.
+
+Mevcut multicolor exporter:
+
+- `part_count`
+- `color_count`
+- renk bazlı STL parçaları
+
+bilgisini üretmeye devam eder.
+
+7.7 bunları yeniden üretmez veya exporter'a bağlanmaz.
+
+Bu pakette yapılmamıştır:
+
+- STL writer değişikliği
+- multicolor exporter değişikliği
+- LoD policy değişikliği
+- mesh simplification
+- otomatik dosya birleştirme
+- otomatik triangle reduction
+- yeni report issue aggregation
+
+`EXCESSIVE_TRIANGLE_COUNT` issue code'u 7.1 contract'ında mevcut kalır.
+7.7 analiz sonucunun `AtlasPrintOptimizationReport` içine bağlanması 7.8 kapsamındadır.
+
+File-count için 7.7 aşamasında yeni issue code eklenmemiştir;
+aggregate karar 7.8'de genel report builder tasarımıyla birlikte verilecektir.
+
+## Doğrulama
+
+Focused:
+
+- `31 passed in 0.02s`
+
+İlgili STL / exporter / LoD / print regression:
+
+- `88 passed in 0.20s`
+
+Tam regresyon:
+
+- `2846 passed in 12.33s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+- [x] 7.6 Color-change analysis
+- [x] 7.7 Triangle/file-count analysis
+- [ ] 7.8 Aggregate optimizer/report builder
+- [ ] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.8 Aggregate optimizer/report builder** paketine test-first başlamak.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
