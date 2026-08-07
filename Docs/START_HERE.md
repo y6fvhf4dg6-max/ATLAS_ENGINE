@@ -1133,3 +1133,58 @@ etmez.
 Güncel kesin durum için `Docs/STATUS/CURRENT_STATUS.md` içindeki
 `7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.10 FINAL LOCK`
 bölümü esas alınmalıdır.
+
+## 7 Ağustos 2026 — ACTIVE ROADMAP: Urban Fabric & Product Composition V1
+
+Automatic Print Optimization and Reporting V1 tamamlandı ve kilitlendi.
+
+Yeni aktif geliştirme paketi:
+
+`Docs/Roadmap/URBAN_FABRIC_PRODUCT_COMPOSITION_V1.md`
+
+Baseline güvenli commit:
+
+`50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
+
+Ana hedef:
+
+`Lichtbild-level urban coherence + ATLAS landmark intelligence + ATLAS LoD/print infrastructure`
+
+İlk kontrollü benchmark:
+
+- Bonn
+- center: `50.733270, 7.100440`
+- product size: `140 × 140 mm`
+- coverage: `0.44 km²`
+- equivalent scale: yaklaşık `1:4738`
+- output: `OUTPUT/STL/bonn_lichtbild_14cm_exact_0_44km2.stl`
+- meshes: `922`
+- triangles: `70798`
+
+### Sıradaki tek adım
+
+**8.0 Bonn Urban Fabric Ground-Truth Audit**
+
+Bu aşamada production davranışı değiştirilmez.
+
+Amaç önce mevcut Bonn sahnesinde:
+
+- source truth
+- consumed data
+- ignored data
+- generated geometry
+- visually weak geometry
+- pipeline bugs
+- gerçek missing capabilities
+
+ayrımını kesinleştirmektir.
+
+8.0 tamamlanmadan 8.1 veya sonraki production implementation başlamaz.
+
+Detaylı teknik sözleşme, roadmap, kısıtlar ve acceptance kriterleri için:
+
+`Docs/Roadmap/URBAN_FABRIC_PRODUCT_COMPOSITION_V1.md`
+
+Güncel operasyonel durum için:
+
+`Docs/STATUS/CURRENT_STATUS.md`

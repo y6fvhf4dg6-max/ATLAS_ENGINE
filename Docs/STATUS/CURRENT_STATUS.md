@@ -2361,3 +2361,94 @@ roadmap paketi olarak açılmalıdır.
 
 Bu bölüm, 7.1–7.9 içindeki tarihsel ara roadmap kayıtlarına göre güncel ve
 nihai durumu tanımlar.
+
+## 7 Ağustos 2026 — Urban Fabric & Product Composition V1 ACTIVE
+
+Automatic Print Optimization and Reporting V1 final kilidinden sonra yeni aktif
+roadmap paketi:
+
+`Docs/Roadmap/URBAN_FABRIC_PRODUCT_COMPOSITION_V1.md`
+
+Baseline güvenli commit:
+
+`50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
+
+Yeni paket amacı:
+
+- ATLAS landmark ve architectural-semantic üstünlüğünü korumak
+- generic şehir dokusunu ürün ölçeğinde daha bütünlüklü hale getirmek
+- road hierarchy, urban blocks, parks, vegetation, rail, water ve terrain
+  bileşenlerini ortak ürün kompozisyonuna bağlamak
+- fiziksel okunabilirliği strict map scale'den ayrı ve kontrollü biçimde ele almak
+- farklı şehir morfolojilerine göre composition policy geliştirmek
+
+Lichtbild karşılaştırmasından çıkan ana teknik sonuç:
+
+Lichtbild'in görünür güçlü tarafı tekil bina detayından çok coherent urban,
+landscape ve infrastructure composition'dır.
+
+ATLAS hedefi:
+
+`Lichtbild-level urban coherence + ATLAS landmark intelligence + ATLAS LoD/print infrastructure`
+
+İlk kontrollü benchmark:
+
+- Bonn
+- center: `50.733270, 7.100440`
+- Lichtbild product size: `14 × 14 cm`
+- displayed coverage: `0.44 km²`
+- ATLAS equivalent scale: yaklaşık `1:4738`
+- exact benchmark output:
+  `OUTPUT/STL/bonn_lichtbild_14cm_exact_0_44km2.stl`
+- meshes: `922`
+- triangles: `70798`
+
+Aktif roadmap:
+
+- 8.0 Bonn Urban Fabric Ground-Truth Audit
+- 8.1 Urban Fabric Scene Contract
+- 8.2 Road Hierarchy Engine
+- 8.3 Linear Infrastructure Engine
+- 8.4 Urban Block Resolver
+- 8.5 Park & Plaza Semantic Surface Engine
+- 8.6 Vegetation Composition Engine
+- 8.7 Avenue Tree Row Engine
+- 8.8 Semantic Surface Texture Engine
+- 8.9 Morphology-Aware Terrain Product Resolver
+- 8.10 Water & Shoreline Composition Engine
+- 8.11 Bridge / Infrastructure Urban Integration
+- 8.12 Building Height Product Normalizer
+- 8.13 Physical Cartographic Exaggeration Resolver
+- 8.14 City Composition LoD
+- 8.15 Scene Morphology Classifier
+- 8.16 Morphology Composition Policy
+- 8.17 Semantic Color / Material Hierarchy
+- 8.18 Customer Preview Parity
+- 8.19 Urban Fabric Quality Report
+- 8.20 Multi-Morphology Acceptance Benchmarks
+
+### Sıradaki tek adım
+
+**8.0 Bonn Urban Fabric Ground-Truth Audit**
+
+8.0 sırasında production davranışı değiştirilmeyecek.
+
+Önce mevcut Bonn benchmarkında:
+
+- source truth
+- consumed data
+- ignored data
+- generated geometry
+- visually weak geometry
+- pipeline bugs
+- gerçek eksik capabilities
+
+birbirinden ayrılacak.
+
+8.0 tamamlanmadan 8.1 veya sonraki production implementation başlamayacak.
+
+Uzun-form teknik sözleşme ve acceptance kriterleri için:
+
+`Docs/Roadmap/URBAN_FABRIC_PRODUCT_COMPOSITION_V1.md`
+
+esas alınmalıdır.
