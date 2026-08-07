@@ -10,10 +10,13 @@ MUST_SIMPLIFY = "must_simplify"
 MUST_THICKEN = "must_thicken"
 SUPPORT_REQUIRED = "support_required"
 
+THICKNESS_BELOW_MINIMUM = "thickness_below_minimum"
+SUPPORT_REQUIRED_ISSUE = "support_required"
 DETAIL_BELOW_NOZZLE = "detail_below_nozzle"
 FRAGILE_COMPONENT = "fragile_component"
 EXCESSIVE_COLOR_CHANGE = "excessive_color_change"
 EXCESSIVE_TRIANGLE_COUNT = "excessive_triangle_count"
+EXCESSIVE_FILE_COUNT = "excessive_file_count"
 
 
 _VALID_STATUSES = frozenset(

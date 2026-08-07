@@ -985,3 +985,46 @@ Sıradaki tek roadmap adımı:
 Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
 `7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.7`
 bölümü esas alınmalıdır.
+
+
+## 7 Ağustos 2026 — Print Optimization 7.8
+
+Automatic Print Optimization and Reporting ilerleme durumu:
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+- [x] 7.6 Color-change analysis
+- [x] 7.7 Triangle/file-count analysis
+- [x] 7.8 Aggregate optimizer/report builder
+
+7.8 ile 7.1–7.7 analizleri tek genel
+`AtlasPrintOptimizationReport` içinde aggregate edilmektedir.
+
+Final status precedence:
+
+- `MUST_THICKEN`
+- `SUPPORT_REQUIRED`
+- `MUST_SIMPLIFY`
+- `WARNING`
+- `PRINTABLE`
+
+Builder yalnız report üretir; geometri, slicer, exporter veya LoD davranışını
+değiştirmez.
+
+Doğrulama:
+
+- focused: `19 passed in 0.03s`
+- 7.1–7.8 regression: `180 passed in 0.13s`
+- geniş regression: `239 passed in 0.31s`
+- full regression: `2865 passed in 12.31s`
+
+Sıradaki tek roadmap adımı:
+
+- **7.9 Real production validation**
+
+Güncel kesin ayrıntılar için `Docs/STATUS/CURRENT_STATUS.md` içindeki
+`7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.8`
+bölümü esas alınmalıdır.

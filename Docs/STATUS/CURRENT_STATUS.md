@@ -1854,3 +1854,160 @@ Tam regresyon:
 
 Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
 önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.8
+
+## Aggregate optimizer/report builder tamamlandı
+
+7.8 paketi test-first tamamlandı.
+
+Yeni production modülü:
+
+- `CORE/atlas_print_optimization_report_builder.py`
+
+Yeni test:
+
+- `Test/test_print_optimization_report_builder.py`
+
+Güncellenen report contract:
+
+- `CORE/atlas_print_optimization_report.py`
+
+Eklenen issue code'ları:
+
+- `THICKNESS_BELOW_MINIMUM = "thickness_below_minimum"`
+- `SUPPORT_REQUIRED_ISSUE = "support_required"`
+- `EXCESSIVE_FILE_COUNT = "excessive_file_count"`
+
+## Aggregate builder kapsamı
+
+`AtlasPrintOptimizationReportBuilder.build(...)` şu analiz sonuçlarını
+tek `AtlasPrintOptimizationReport` içinde birleştirir:
+
+- `AtlasMinimumThicknessAnalysis`
+- `AtlasOverhangSupportAnalysis`
+- `AtlasFragileConnectionAnalysis`
+- `AtlasNozzleDetailAnalysis`
+- `AtlasColorChangeAnalysis`
+- `AtlasTriangleFileCountAnalysis`
+
+Builder yalnız mevcut analiz sonuçlarını report issue'larına çevirir.
+
+## Status önceliği
+
+Final status precedence kilitlendi:
+
+1. `MUST_THICKEN`
+2. `SUPPORT_REQUIRED`
+3. `MUST_SIMPLIFY`
+4. `WARNING`
+5. `PRINTABLE`
+
+Bu sayede birden fazla bulgu birlikte bulunduğunda daha yüksek üretim riski
+final status'u belirler.
+
+## Issue mapping
+
+- minimum thickness violation
+  - code: `THICKNESS_BELOW_MINIMUM`
+  - severity: `MUST_THICKEN`
+
+- fragile connection
+  - code: `FRAGILE_COMPONENT`
+  - severity: `MUST_THICKEN`
+
+- support-required overhang
+  - code: `SUPPORT_REQUIRED_ISSUE`
+  - severity: `SUPPORT_REQUIRED`
+
+- detail below nozzle
+  - code: `DETAIL_BELOW_NOZZLE`
+  - severity: `WARNING`
+
+- excessive color changes
+  - code: `EXCESSIVE_COLOR_CHANGE`
+  - severity: `WARNING`
+
+- excessive triangle count
+  - code: `EXCESSIVE_TRIANGLE_COUNT`
+  - severity: `MUST_SIMPLIFY`
+
+- excessive file count
+  - code: `EXCESSIVE_FILE_COUNT`
+  - severity: `WARNING`
+
+## Deterministik issue sırası
+
+Builder issue'ları şu sırayla üretir:
+
+1. thickness
+2. support
+3. fragile connection
+4. nozzle detail
+5. color change
+6. triangle count
+7. file count
+
+Bu sıra test ile kilitlenmiştir.
+
+## Mimari sınır
+
+7.8 bir mutation/optimization engine değildir.
+
+Bu pakette yapılmamıştır:
+
+- mesh thickening
+- mesh simplification
+- automatic support generation
+- automatic file merging
+- automatic color reduction
+- slicer çağrısı
+- Bambu Studio entegrasyonu
+- LoD policy değişikliği
+- landmark-specific rule
+- exporter behavior değişikliği
+
+7.8'in görevi yalnız 7.1–7.7 analizlerini tek genel production report içinde
+toplamaktır.
+
+## Doğrulama
+
+Focused builder:
+
+- `19 passed in 0.03s`
+
+7.1–7.8 odaklı regression:
+
+- `180 passed in 0.13s`
+
+Geniş print / exporter / LoD regression:
+
+- `239 passed in 0.31s`
+
+Tam regresyon:
+
+- `2865 passed in 12.31s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+- [x] 7.6 Color-change analysis
+- [x] 7.7 Triangle/file-count analysis
+- [x] 7.8 Aggregate optimizer/report builder
+- [ ] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.9 Real production validation** paketine kontrollü biçimde başlamak.
+
+Önce mevcut gerçek ürün üretim çıktılarından hangi ölçümlerin güvenilir biçimde
+elde edilebildiği okunmalı; yeni production entegrasyonu varsayılmamalıdır.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
