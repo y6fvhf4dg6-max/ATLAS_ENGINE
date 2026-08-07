@@ -1197,3 +1197,96 @@ analizinin genel, landmark-bağımsız contract'ı kırmızı test ile tanımlan
 
 Bu 7 Ağustos 2026 bölümü, daha eski belgelerdeki “sıradaki tek işlem”
 kayıtlarına göre güncel teknik önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.2
+
+## Minimum wall/thickness analysis tamamlandı
+
+7.2 paketi test-first tamamlandı.
+
+Yeni production modülü:
+
+- `CORE/atlas_minimum_thickness_analyzer.py`
+
+Yeni test:
+
+- `Test/test_minimum_thickness_analyzer.py`
+
+Yeni immutable sözleşmeler:
+
+- `AtlasThicknessMeasurement`
+  - `component`
+  - `thickness_mm`
+- `AtlasMinimumThicknessAnalysis`
+  - `minimum_thickness_mm`
+  - `measurements`
+  - `minimum_observed_thickness_mm`
+  - `violating_components`
+  - `is_safe`
+
+Yeni analyzer:
+
+- `AtlasMinimumThicknessAnalyzer.analyze(...)`
+
+Davranış:
+
+- component adları trim edilir ve lowercase normalize edilir.
+- thickness değerleri pozitif ve finite olmak zorundadır.
+- minimum thickness eşiği pozitif ve finite olmak zorundadır.
+- eşik değerine eşit thickness güvenli kabul edilir.
+- eşik altındaki component'ler sıralı biçimde raporlanır.
+- aynı component birden fazla ihlal üretse bile `violating_components` içinde tek kez yer alır.
+- measurement koleksiyonu immutable tuple olarak korunur.
+- input koleksiyonu mutate edilmez.
+
+## Mimari sınır
+
+7.2 yalnız ölçülmüş fiziksel thickness değerlerinin genel,
+landmark-bağımsız değerlendirilmesini sağlar.
+
+Bu pakette yapılmamıştır:
+
+- triangle mesh üzerinden otomatik thickness reconstruction
+- landmark-specific thickness kuralları
+- 7.1 `AtlasPrintOptimizationReport` aggregation
+- otomatik production optimizer entegrasyonu
+- overhang/support analizi
+
+Bu ayrım mevcut `AtlasPhysicalDetailResolver` davranışını korur:
+resolver üretim öncesi detay boyutlandırması yaparken,
+7.2 üretilmiş/ölçülmüş fiziksel thickness değerlerini değerlendirir.
+
+## Doğrulama
+
+Focused:
+
+- `20 passed in 0.02s`
+
+İlgili physical-detail / quality / mesh regression:
+
+- `51 passed in 0.09s`
+
+Tam regresyon:
+
+- `2720 passed in 12.31s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [ ] 7.3 Overhang/support analysis
+- [ ] 7.4 Fragile connection analysis
+- [ ] 7.5 Nozzle-based detail analysis
+- [ ] 7.6 Color-change analysis
+- [ ] 7.7 Triangle/file-count analysis
+- [ ] 7.8 Aggregate optimizer/report builder
+- [ ] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.3 Overhang/support analysis** paketine test-first başlamak.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
