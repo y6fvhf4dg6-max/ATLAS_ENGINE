@@ -19,6 +19,9 @@ import osmium
 from CORE.atlas_landmark_validation_engine import (
     AtlasLandmarkValidationEngine,
 )
+from CORE.atlas_linear_infrastructure_resolver import (
+    AtlasLinearInfrastructureResolver,
+)
 from CORE.atlas_place_of_worship_profile_resolver import (
     AtlasPlaceOfWorshipProfileResolver,
 )
@@ -34,6 +37,7 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         self.trees = []
         self.roads = []
         self.pedestrian_paths = []
+        self.linear_infrastructure = []
         self.elevated_areas = []
         self.artworks = []
         self.parks = []
@@ -233,6 +237,18 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             self._read_elevated_area(w, tags)
             return
 
+        linear_semantic_class = (
+            AtlasLinearInfrastructureResolver
+            .resolve_semantic_class(tags)
+        )
+
+        if (
+            linear_semantic_class is not None
+            and linear_semantic_class != "pedestrian_path"
+        ):
+            self._read_linear_infrastructure(w, tags)
+            return
+
         if "highway" in tags:
             self._read_highway(w, tags)
             return
@@ -372,6 +388,35 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             return float(tags.get("height")) > 0.0
         except (TypeError, ValueError):
             return False
+
+    def _read_linear_infrastructure(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 2:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        self.linear_infrastructure.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tags": tags,
+                "semantic_class": (
+                    AtlasLinearInfrastructureResolver
+                    .resolve_semantic_class(tags)
+                ),
+                "operational_state": (
+                    AtlasLinearInfrastructureResolver
+                    .resolve_operational_state(tags)
+                ),
+                "surface_visible": (
+                    AtlasLinearInfrastructureResolver
+                    .is_surface_visible(tags)
+                ),
+            }
+        )
 
     def _read_highway(self, w, tags):
         geometry = self._extract_way_geometry(w)
@@ -1306,6 +1351,7 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             "trees": reader.trees,
             "roads": reader.roads,
             "pedestrian_paths": reader.pedestrian_paths,
+            "linear_infrastructure": reader.linear_infrastructure,
             "elevated_areas": reader.elevated_areas,
             "artworks": reader.artworks,
             "parks": reader.parks,

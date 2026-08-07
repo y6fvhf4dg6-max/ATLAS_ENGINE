@@ -1249,17 +1249,66 @@ Doğrulama:
 - related: `82 passed in 1.25s`
 - full: `2982 passed in 12.70s`
 
+### 8.3 Linear Infrastructure Engine — TAMAMLANDI / LOCKED
+
+8.3 test-first tamamlandı.
+
+Ana sistem:
+
+- `AtlasLinearInfrastructureResolver`
+- `AtlasLinearInfrastructureGeometryBuilder`
+- `AtlasLinearInfrastructureSolidBuilder`
+
+Kapsam:
+
+- railway / light rail / tram
+- cycle / bridleway corridors
+- pedestrian paths
+- embankments
+- infrastructure corridors
+- active / proposed / disused state
+- surface visibility
+- vertical treatment
+- source-driven physical width
+- printable minimum width
+- gauge-aware parallel-line readability
+- LoD eligibility
+- linear-strip / area-strip geometry
+- product XY footprint
+- terrain-following closed solid
+
+`AtlasLocalOSMReader` artık linear infrastructure verisini toplar ve
+`read()` sonucunda expose eder.
+
+Anıtkabir cycleway regression'ı yeni semantic contract'a geçirildi:
+way `883691085` artık `cycle_corridor` olarak korunur.
+
+Bonn exact benchmark'ta product-surface eligible infrastructure:
+`3 tram + 1 landuse=railway corridor`.
+
+Doğrulama:
+
+- focused: `102 passed in 0.09s`
+- related: `105 passed in 0.35s`
+- full: `3085 passed in 12.59s`
+
+Son güvenli/push edilmiş commit hâlâ:
+
+`e75cb10d64d8e2ab3f52fd88a7c9df12ce1bea3c`
+
+8.3 commit henüz oluşturulmadı.
+
 ### Sıradaki tek adım
 
-**8.3 Linear Infrastructure Engine**
+**8.4 Urban Block Resolver**
 
-8.3 test-first yürütülecek.
+8.4 test-first yürütülecek.
 
-Amaç railway, tram ve cycle corridor verilerini source visibility,
-operational state ve infrastructure semantics bilgilerini koruyan genel
-product-semantic bir sisteme bağlamaktır.
+Generic building grupları block-aware composition altında çözülecek;
+source footprint, courtyard, semantic landmark ve mevcut LoD sözleşmeleri
+korunacak.
 
-8.3 tamamlanmadan 8.4 veya sonraki behavior başlamaz.
+8.4 tamamlanmadan 8.5 veya sonraki behavior başlamaz.
 
 Detaylı teknik sözleşme, roadmap, kısıtlar ve acceptance kriterleri için:
 

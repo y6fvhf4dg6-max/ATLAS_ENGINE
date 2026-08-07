@@ -59,7 +59,13 @@ def test_anitkabir_fixture_separates_elevated_areas_from_paths():
     )
 
     assert len(data["elevated_areas"]) == 57
-    assert len(data["pedestrian_paths"]) == 32
+    assert len(data["pedestrian_paths"]) == 31
+
+    assert any(
+        item["id"] == 883691085
+        and item["semantic_class"] == "cycle_corridor"
+        for item in data["linear_infrastructure"]
+    )
 
     assert all(
         item["area_type"] == "elevated_pedestrian_area"

@@ -2599,17 +2599,96 @@ Doğrulama:
 - related regression: `82 passed in 1.25s`
 - full regression: `2982 passed in 12.70s`
 
+### 8.3 Linear Infrastructure Engine — TAMAMLANDI / LOCKED
+
+8.3 test-first tamamlandı ve final regression ile doğrulandı.
+
+Yeni ana modüller:
+
+- `CORE/atlas_linear_infrastructure_resolver.py`
+- `CORE/atlas_linear_infrastructure_geometry_builder.py`
+- `CORE/atlas_linear_infrastructure_solid_builder.py`
+
+Reader entegrasyonu:
+
+- `CORE/atlas_local_osm_reader.py`
+- public `read()` sonucu artık `linear_infrastructure` koleksiyonunu taşır
+- cycleway source artık legacy pedestrian-path bucket'ında tutulmaz;
+  `cycle_corridor` olarak sınıflanır
+
+Kilitlenen semantic kapsam:
+
+- railway
+- light rail
+- tram
+- cycle corridor
+- bridleway corridor
+- pedestrian path
+- embankment
+- infrastructure corridor
+
+Kilitlenen davranışlar:
+
+- active / proposed / disused operational state
+- surface visibility
+- product-surface eligibility
+- surface / bridge-elevated / subsurface vertical treatment
+- visual priority
+- source-driven physical width
+- explicit printable minimum width
+- gauge-aware parallel-line readability
+- LoD eligibility
+- `linear_strip` / `area_strip` geometry kind
+- product-space footprint generation
+- terrain-following closed infrastructure solid generation
+
+Linear infrastructure için source width yoksa gerçek-metre genişliği
+uydurulmaz; explicit printable minimum kullanılır.
+
+`AtlasUrbanRoadHierarchyResolver.resolve_physical_width_mm(...)` yeniden
+kullanıldığı için scale matematiği ikinci kez yazılmadı.
+
+Bonn exact benchmark doğrulaması:
+
+- reader linear infrastructure: `26`
+- product-surface eligible: `4`
+- `3` active surface tram
+- `1` closed `landuse=railway` infrastructure corridor
+- tunnel/proposed/disused rail records surface product geometry'sine alınmaz
+
+Anıtkabir regression güncellemesi:
+
+- source way `883691085`
+- `highway=cycleway`
+- artık `cycle_corridor`
+- pedestrian-path sayısı `32 -> 31`
+- source kaybolmaz; `linear_infrastructure` sonucu içinde korunur
+
+Doğrulama:
+
+- focused 8.3 package: `102 passed in 0.09s`
+- related regression: `105 passed in 0.35s`
+- full regression: `3085 passed in 12.59s`
+
+8.3 içinde Bonn-specific koordinat, landmark veya görsel taklit hack'i
+eklenmedi.
+
+8.3 commit henüz oluşturulmadığı için bu kayıtta yeni commit hash
+uydurulmamıştır. Son güvenli/push edilmiş 8.2 commit:
+
+`e75cb10d64d8e2ab3f52fd88a7c9df12ce1bea3c`
+
 ### Sıradaki tek adım
 
-**8.3 Linear Infrastructure Engine**
+**8.4 Urban Block Resolver**
 
-8.3 test-first yürütülecek.
+8.4 test-first yürütülecek.
 
-Amaç railway, tram ve cycle corridor source verilerini visibility,
-operational state ve semantic infrastructure özelliklerini koruyan genel
-product-semantic bir sisteme bağlamaktır.
+Amaç generic building gruplarını source footprint, gerçek courtyard,
+semantic landmark ve mevcut LoD davranışını bozmadan block-aware product
+composition altında çözmektir.
 
-8.3 tamamlanmadan 8.4 veya sonraki behavior başlamayacak.
+8.4 tamamlanmadan 8.5 veya sonraki behavior başlamayacak.
 
 Uzun-form teknik sözleşme ve acceptance kriterleri için:
 

@@ -4,7 +4,7 @@
 **Date:** 7 August 2026
 **Baseline safe commit:** `50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
 **Previous locked package:** Automatic Print Optimization and Reporting V1
-**Current first step:** 8.3 Linear Infrastructure Engine
+**Current first step:** 8.4 Urban Block Resolver
 
 ---
 
@@ -606,6 +606,8 @@ Validation:
 
 ## 8.3 — Linear Infrastructure Engine
 
+**Status: COMPLETED / LOCKED — 7 August 2026**
+
 Create a general product-semantic system for linear infrastructure.
 
 The engine must support at least:
@@ -634,6 +636,32 @@ Rail corridors must remain readable when they are important to city morphology.
 The implementation must remain general and source-driven.
 
 Do not add location-specific infrastructure rules.
+
+Locked 8.3 implementation includes:
+
+- source-driven semantic resolution for railway, light rail, tram,
+  cycle corridors, bridleway corridors, pedestrian paths, embankments and
+  infrastructure corridors
+- active / proposed / disused operational-state resolution
+- explicit surface-visibility and product-surface eligibility
+- surface / bridge-elevated / subsurface vertical treatment
+- immutable infrastructure product profiles
+- source width scaling without invented real-world fallback widths
+- explicit printable minimum widths
+- gauge-aware parallel-line readability
+- `linear_strip` and `area_strip` geometry contracts
+- source geometry to product-space footprint conversion
+- terrain-following closed infrastructure solids
+- `AtlasLocalOSMReader` collection and public result exposure
+- cycleway separation from the legacy pedestrian-path bucket
+- Bonn exact-benchmark validation preserving three active surface tram
+  corridors and one closed railway land-use corridor
+
+Validation at final pre-commit lock:
+
+- focused 8.3 package: `102 passed in 0.09s`
+- related regression: `105 passed in 0.35s`
+- full regression: `3085 passed in 12.59s`
 
 
 ## 8.4 — Urban Block Resolver
@@ -1448,12 +1476,12 @@ semantic systems already developed.
 
 The next and only development step is:
 
-## 8.3 — Linear Infrastructure Engine
+## 8.4 — Urban Block Resolver
 
-8.2 is complete.
+8.3 Linear Infrastructure Engine is complete and locked.
 
-8.3 must proceed test-first and create a general product-semantic system for
-railway, tram and cycle corridors while preserving source visibility,
-operational state and infrastructure semantics.
+8.4 must proceed test-first and improve generic urban-block coherence while
+preserving source building footprints, courtyards, semantic landmarks and
+existing LoD behavior.
 
-Do not start 8.4 or later behavior until 8.3 is complete.
+Do not start 8.5 or later behavior until 8.4 is complete.
