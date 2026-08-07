@@ -2011,3 +2011,155 @@ elde edilebildiği okunmalı; yeni production entegrasyonu varsayılmamalıdır.
 
 Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
 önceliği tanımlar.
+
+
+# 7 Ağustos 2026 — Automatic Print Optimization and Reporting 7.9
+
+## Real production validation tamamlandı
+
+7.9 paketi gerçek Köln production artifact'ı üzerinden doğrulandı.
+
+Yeni genel validator:
+
+- `CORE/atlas_bambu_3mf_production_validator.py`
+
+Yeni test:
+
+- `Test/test_bambu_3mf_production_validator.py`
+
+## Genel Bambu 3MF validation contract
+
+`AtlasBambu3MFProductionValidator.validate(...)` Bambu Studio `.3mf`
+artifact'ını read-only olarak doğrular.
+
+Okunan metadata kaynakları:
+
+- `Metadata/model_settings.config`
+- `Metadata/project_settings.config`
+- `Metadata/plate_1.json`
+
+Validator şu production bilgilerini raporlar:
+
+- object face count
+- toplam part face count
+- part count
+- object/part face-count eşleşmesi
+- Bambu mesh repair sayaçları
+- printer model
+- nozzle diameter
+- layer height
+- support enabled/disabled
+- bed type
+- structural validity
+
+## Structural validity kuralı
+
+`is_structurally_valid` yalnız şu iki koşul birlikte sağlanırsa `True` olur:
+
+1. object face count == toplam part face count
+2. Bambu mesh repair toplamı == 0
+
+Validator geometriyi değiştirmez ve Bambu Studio'yu çalıştırmaz.
+
+## Gerçek Köln production artifact doğrulaması
+
+Doğrulanan artifact:
+
+- `OUTPUT/3MF/koeln_paedagogische_fakultaet_150mm_FINAL.3mf`
+
+Artifact Git tarafından tracked değildir ve 7.9 test fixture'ı olarak repoya
+eklenmemiştir.
+
+Gerçek Köln sonucu:
+
+- object face count: `64776`
+- part face count: `64776`
+- part count: `4`
+- face counts match: `True`
+- mesh repair count: `0`
+- has mesh repairs: `False`
+- printer model: `Bambu Lab P2S`
+- nozzle diameter: yaklaşık `0.4 mm`
+- layer height: `0.2 mm`
+- support enabled: `False`
+- bed type: `textured_plate`
+- structurally valid: `True`
+
+Kaynak dört multicolor STL triangle sayıları da bire bir doğrulandı:
+
+- black: `2904`
+- green: `32588`
+- red: `9188`
+- white: `20096`
+- toplam: `64776`
+
+Bu toplam `.3mf` içindeki object face count ile tam eşleşmektedir.
+
+## Bilinçli kapsam dışı production metrikleri
+
+Mevcut Köln `.3mf` metadata'sında güvenilir biçimde bulunmayan değerler
+validator tarafından tahmin edilmez:
+
+- toplam color-change count
+- toplam print time
+- toplam filament gramı
+
+`filament_sequence.json` mevcut artifact'ta gerçek toplam filament-change
+ölçümü sağlamamaktadır.
+
+Bu nedenle 7.6'daki `AtlasColorChangeAnalyzer` gerçek slicer ölçümü
+gerektirmeye devam eder; multicolor `part_count` veya `color_count`
+color-change sayısı yerine kullanılmaz.
+
+## Mimari sınır
+
+7.9 kapsamında yapılmamıştır:
+
+- Bambu Studio otomasyonu
+- slicer çağrısı
+- `.3mf` mutation
+- G-code üretimi veya parsing
+- filament tüketimi tahmini
+- print time tahmini
+- color-change tahmini
+- mesh repair
+- LoD değişikliği
+- exporter değişikliği
+- landmark-specific validation
+
+## Doğrulama
+
+Focused validator:
+
+- `8 passed in 0.04s`
+
+İlgili production / print regression:
+
+- `192 passed in 0.18s`
+
+Tam regresyon:
+
+- `2873 passed in 12.34s`
+
+## Automatic Print Optimization roadmap durumu
+
+- [x] 7.1 `AtlasPrintOptimizationReport` contract
+- [x] 7.2 Minimum wall/thickness analysis
+- [x] 7.3 Overhang/support analysis
+- [x] 7.4 Fragile connection analysis
+- [x] 7.5 Nozzle-based detail analysis
+- [x] 7.6 Color-change analysis
+- [x] 7.7 Triangle/file-count analysis
+- [x] 7.8 Aggregate optimizer/report builder
+- [x] 7.9 Real production validation
+- [ ] 7.10 Full regression + documentation + final lock
+
+## Sıradaki tek teknik işlem
+
+**7.10 Full regression + documentation + final lock**
+
+Bu aşamada yeni analyzer veya production davranışı eklenmemeli; mevcut
+7.1–7.9 paketinin final kapsamı ve güvenli checkpoint'i kilitlenmelidir.
+
+Bu bölüm, daha eski "sıradaki tek işlem" kayıtlarına göre güncel teknik
+önceliği tanımlar.
