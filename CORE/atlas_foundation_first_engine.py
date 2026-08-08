@@ -39,7 +39,13 @@ from CORE.atlas_artwork_foundation_builder import (
 from CORE.atlas_tree_foundation_builder import (
     AtlasTreeFoundationBuilder,
 )
+from CORE.atlas_forest_canopy_foundation_builder import (
+    AtlasForestCanopyFoundationBuilder,
+)
 from CORE.atlas_nature_pipeline import AtlasNaturePipeline
+from CORE.atlas_vegetation_composition_resolver import (
+    AtlasVegetationCompositionResolver,
+)
 from CORE.atlas_castle_wall_builder import (
     AtlasCastleWallBuilder,
 )
@@ -74,6 +80,122 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
+    @staticmethod
+    def _assemble_vegetation_output(
+        *,
+        tree_meshes,
+        forest_canopy_meshes,
+    ):
+        tree_meshes = list(tree_meshes or ())
+        forest_canopy_meshes = list(
+            forest_canopy_meshes or ()
+        )
+
+        return {
+            "meshes": [
+                *tree_meshes,
+                *forest_canopy_meshes,
+            ],
+            "mesh_groups": {
+                "trees": tree_meshes,
+                "forest_canopies": forest_canopy_meshes,
+            },
+        }
+
+    @classmethod
+    def _prepare_scene_vegetation(
+        cls,
+        *,
+        existing_trees,
+        nature_data,
+        coordinate_engine,
+        terrain_mesh,
+        castle_only,
+        debug=True,
+    ):
+        if castle_only:
+            return {
+                "tree_input": (),
+                "tree_rows": (),
+                "tree_clusters": (),
+                "forest_canopies": (),
+                "forest_canopy_surfaces": (),
+                "tree_meshes": [],
+                "forest_canopy_meshes": [],
+            }
+
+        return cls._build_vegetation_meshes(
+            existing_trees=existing_trees,
+            nature_data=nature_data,
+            coordinate_engine=coordinate_engine,
+            terrain_mesh=terrain_mesh,
+            debug=debug,
+        )
+
+
+    @classmethod
+    def _build_vegetation_meshes(
+        cls,
+        *,
+        existing_trees,
+        nature_data,
+        coordinate_engine,
+        terrain_mesh,
+        debug=True,
+    ):
+        composition = cls._resolve_vegetation_composition(
+            existing_trees=existing_trees,
+            nature_data=nature_data,
+        )
+
+        tree_meshes = AtlasTreeFoundationBuilder.build_trees(
+            trees=composition["tree_input"],
+            coordinate_engine=coordinate_engine,
+            terrain_mesh=terrain_mesh,
+            debug=debug,
+        )
+
+        forest_canopy_meshes = (
+            AtlasForestCanopyFoundationBuilder.build(
+                surfaces=composition["forest_canopy_surfaces"],
+                coordinate_engine=coordinate_engine,
+                terrain_mesh=terrain_mesh,
+                debug=debug,
+            )
+        )
+
+        return {
+            **composition,
+            "tree_meshes": tree_meshes,
+            "forest_canopy_meshes": forest_canopy_meshes,
+        }
+
+    @staticmethod
+    def _resolve_vegetation_composition(
+        *,
+        existing_trees,
+        nature_data,
+    ):
+        composition = (
+            AtlasVegetationCompositionResolver
+            .compose_nature_data(nature_data)
+        )
+
+        return {
+            "tree_input": tuple(
+                [
+                    *(existing_trees or ()),
+                    *composition["isolated_trees"],
+                ]
+            ),
+            "tree_rows": composition["tree_rows"],
+            "tree_clusters": composition["tree_clusters"],
+            "forest_canopies": composition["forest_canopies"],
+            "forest_canopy_surfaces": (
+                composition["forest_canopy_surfaces"]
+            ),
+        }
+
     @staticmethod
     def resolve_castle_semantic_architecture(
         castle_geometry,
@@ -515,13 +637,6 @@ class AtlasFoundationFirstEngine:
             debug=debug,
         )
 
-        trees.extend(
-            nature_data.get(
-                "trees",
-                [],
-            )
-        )
-
         castle_geometry = AtlasCastleGeometryClassifier.classify(
             castles=castles,
             castle_walls=castle_walls,
@@ -864,12 +979,22 @@ class AtlasFoundationFirstEngine:
             )
         )
 
-        tree_meshes = AtlasTreeFoundationBuilder.build_trees(
-            trees=tree_input,
-            coordinate_engine=coordinate_engine,
-            terrain_mesh=terrain_slab,
-            debug=debug,
+        vegetation = (
+            AtlasFoundationFirstEngine
+            ._prepare_scene_vegetation(
+                existing_trees=tree_input,
+                nature_data=nature_data,
+                coordinate_engine=coordinate_engine,
+                terrain_mesh=terrain_slab,
+                castle_only=castle_only,
+                debug=debug,
+            )
         )
+
+        tree_meshes = vegetation["tree_meshes"]
+        forest_canopy_meshes = vegetation[
+            "forest_canopy_meshes"
+        ]
 
         water_polygons_mm = (
             AtlasFoundationFirstEngine
@@ -930,7 +1055,17 @@ class AtlasFoundationFirstEngine:
 
         meshes.extend(landmark_meshes)
 
-        meshes.extend(tree_meshes)
+        vegetation_output = (
+            AtlasFoundationFirstEngine
+            ._assemble_vegetation_output(
+                tree_meshes=tree_meshes,
+                forest_canopy_meshes=forest_canopy_meshes,
+            )
+        )
+
+        meshes.extend(
+            vegetation_output["meshes"]
+        )
 
         meshes.extend(water_meshes)
 
@@ -958,6 +1093,10 @@ class AtlasFoundationFirstEngine:
             print(f"Artwork meshes     : " f"{len(artwork_meshes)}")
             print(f"Landmark meshes    : " f"{len(landmark_meshes)}")
             print(f"Tree meshes        : " f"{len(tree_meshes)}")
+            print(
+                f"Forest canopies    : "
+                f"{len(forest_canopy_meshes)}"
+            )
             print(f"Water meshes       : " f"{len(water_meshes)}")
             print(f"Castle wall meshes : " f"{len(castle_wall_meshes)}")
             print(f"Castle shell meshes: " f"{len(castle_shell_meshes)}")
@@ -1018,6 +1157,9 @@ class AtlasFoundationFirstEngine:
             "elevated_area_meshes": len(elevated_area_meshes),
             "artwork_meshes": len(artwork_meshes),
             "landmark_meshes": len(landmark_meshes),
+            "forest_canopy_meshes": len(
+                forest_canopy_meshes
+            ),
             "castle_wall_meshes": len(castle_wall_meshes),
             "castle_shell_meshes": len(castle_shell_meshes),
             "castle_tower_cap_meshes": len(castle_tower_cap_meshes),
@@ -1030,7 +1172,14 @@ class AtlasFoundationFirstEngine:
                 "elevated_areas": elevated_area_meshes,
                 "artworks": artwork_meshes,
                 "landmarks": landmark_meshes,
-                "trees": tree_meshes,
+                "trees": (
+                    vegetation_output["mesh_groups"]["trees"]
+                ),
+                "forest_canopies": (
+                    vegetation_output[
+                        "mesh_groups"
+                    ]["forest_canopies"]
+                ),
                 "waters": water_meshes,
                 "castle_walls": (castle_wall_meshes),
                 "castle_shells": (castle_shell_meshes),

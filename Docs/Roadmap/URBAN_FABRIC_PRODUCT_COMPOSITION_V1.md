@@ -4,7 +4,7 @@
 **Date:** 7 August 2026
 **Baseline safe commit:** `50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
 **Previous locked package:** Automatic Print Optimization and Reporting V1
-**Current first step:** 8.6 Vegetation Composition Engine
+**Current first step:** 8.7 Avenue Tree Row Engine
 
 ---
 
@@ -1478,17 +1478,18 @@ semantic systems already developed.
 
 # 13. Immediate next action
 
-8.5 Park & Plaza Semantic Surface Engine is complete and locked.
+8.6 Vegetation Composition Engine is complete and ready to lock.
 
 Final validation:
 
-- focused: `35 passed in 0.05s`
-- related regression: `206 passed in 0.24s`
-- full regression: `3159 passed in 12.98s`
+- focused vegetation resolver: `51 passed in 0.07s`
+- vegetation + engine integration: `57 passed in 0.16s`
+- related regression: `154 passed in 0.36s`
+- full regression: `3217 passed in 12.60s`
 
 The next and only development step is:
 
-## 8.6 — Vegetation Composition Engine
+## 8.7 — Avenue Tree Row Engine
 
-8.6 must proceed test-first. Do not start 8.7 or later behavior until
-8.6 is complete.
+8.7 must proceed test-first. Do not start 8.8 or later behavior until
+8.7 is complete.

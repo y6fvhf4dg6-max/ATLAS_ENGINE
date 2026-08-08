@@ -32,6 +32,7 @@ class AtlasProductColorPreviewRenderer:
         "roads": "roads",
         "parks": "parks",
         "trees": "trees",
+        "forest_canopies": "trees",
         "waters": "water",
     }
 

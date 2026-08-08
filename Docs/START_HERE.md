@@ -1370,3 +1370,41 @@ Doğrulama:
 ### Sıradaki tek adım
 
 **8.6 Vegetation Composition Engine**
+
+### 8.6 Vegetation Composition Engine — TAMAMLANDI
+
+8.6 test-first tamamlandı ve production vegetation hattına bağlandı.
+
+Kilitlenen ana davranışlar:
+
+- `isolated_tree` / `tree_row` / `tree_cluster` / `forest_canopy` semantic rolleri
+- source-context-aware vegetation resolution
+- gerçek OSM tree kayıtlarının isolated tree olarak korunması
+- WorldCover sampled tree kayıtlarının tekil ağaç olarak kullanılmaması
+- WorldCover forest hücrelerinin deterministic spatial canopy gruplarına ayrılması
+- source `resolution_m` değerinin connectivity kararında kullanılması
+- WorldCover double representation'ın engellenmesi
+- forest canopy polygonlarının mevcut WorldCover dissolve hattıyla üretilmesi
+- kapalı/manifold `forest_canopy_foundation` fiziksel temsili
+- FoundationFirstEngine production entegrasyonu
+- `mesh_groups["forest_canopies"]`
+- preview'da `forest_canopies → trees` material batch
+- multicolor output'ta canopy'nin green STL içine taşınması
+- `castle_only` vegetation suppression davranışının korunması
+
+8.6 sınırları:
+
+- tree-row detection / physical row producer 8.7 kapsamındadır
+- avenue / boulevard / promenade alignment çözümü 8.7 kapsamındadır
+- Bonn/Hofgarten-specific kural eklenmedi
+
+Doğrulama:
+
+- focused vegetation resolver: `51 passed in 0.07s`
+- vegetation + engine integration: `57 passed in 0.16s`
+- related regression: `154 passed in 0.36s`
+- full regression: `3217 passed in 12.60s`
+
+### Sıradaki tek adım
+
+**8.7 Avenue Tree Row Engine**

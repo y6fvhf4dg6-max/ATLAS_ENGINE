@@ -200,3 +200,71 @@ def test_multicolor_exporter_deduplicates_identical_triangles_across_same_color_
     assert len(writes) == 1
     assert len(writes[0]) == 1
     assert len(writes[0][0]["triangles"]) == 1
+
+
+def test_multicolor_exporter_includes_forest_canopy_in_green_part(
+    monkeypatch,
+    tmp_path,
+):
+    green = (80, 125, 65)
+
+    canopy_mesh = {
+        "type": "forest_canopy_foundation",
+        "triangles": [
+            (
+                (0.0, 0.0, 0.0),
+                (1.0, 0.0, 0.0),
+                (0.0, 1.0, 0.0),
+            ),
+        ],
+    }
+
+    scene = {
+        "type": "product_color_preview_scene",
+        "profile_name": "TEST_PROFILE",
+        "material_batches": {
+            "trees": {
+                "rgb": green,
+                "meshes": [canopy_mesh],
+            },
+        },
+    }
+
+    writes = []
+
+    def fake_write(meshes, output_path, solid_name="ATLAS_MODEL"):
+        writes.append(
+            {
+                "meshes": meshes,
+                "output_path": Path(output_path),
+                "solid_name": solid_name,
+            }
+        )
+        return output_path
+
+    monkeypatch.setattr(
+        "CORE.atlas_wall_collection_multicolor_stl_exporter."
+        "AtlasSTLWriter.write",
+        fake_write,
+    )
+
+    result = AtlasWallCollectionMulticolorSTLExporter.export_scene(
+        scene=scene,
+        output_directory=tmp_path,
+        product_name="forest_canopy_test",
+    )
+
+    assert result["color_count"] == 1
+    assert set(result["parts"]) == {"green"}
+    assert result["parts"]["green"]["rgb"] == green
+    assert result["parts"]["green"]["source_batches"] == (
+        "trees",
+    )
+
+    assert len(writes) == 1
+    assert len(writes[0]["meshes"]) == 1
+
+    exported_mesh = writes[0]["meshes"][0]
+
+    assert exported_mesh["type"] == "multicolor_merged_color_mesh"
+    assert exported_mesh["triangles"] == canopy_mesh["triangles"]

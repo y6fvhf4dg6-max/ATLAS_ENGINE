@@ -2805,3 +2805,86 @@ Doğrulama:
 
 8.6 test-first yürütülecek. 8.5 yeni davranış eklenmeden önce dokümantasyon,
 scoped commit, push ve `HEAD == origin/main` doğrulamasıyla kilitlenecektir.
+
+## 8 Ağustos 2026 — Urban Fabric 8.6 Vegetation Composition Engine
+
+8.6 test-first geliştirildi ve production vegetation hattına entegre edildi.
+
+Yeni ana dosyalar:
+
+- `CORE/atlas_vegetation_composition_resolver.py`
+- `CORE/atlas_forest_canopy_foundation_builder.py`
+- `Test/test_vegetation_composition_resolver.py`
+
+Kilitlenen semantic roller:
+
+- `isolated_tree`
+- `tree_row`
+- `tree_cluster`
+- `forest_canopy`
+
+Kilitlenen composition davranışları:
+
+- immutable vegetation composition profile
+- source-context-aware semantic role resolution
+- gerçek OSM tree kayıtlarının `isolated_tree` olarak korunması
+- WorldCover sampled tree kayıtlarının tekil ağaç olarak yorumlanmaması
+- `osm_green_area_fill` kayıtlarının `tree_cluster` olarak çözülmesi
+- deterministic collection grouping and ordering
+- source mutation yapılmaması
+- park fill cluster'larının `park_id` bazında ayrılması
+- WorldCover forest hücrelerinin source resolution'a göre spatial connectivity ile canopy gruplarına ayrılması
+- raw WorldCover provider record formatının desteklenmesi
+- `resolution_m` değerinin canopy connectivity kararına taşınması
+- WorldCover sampled tree + raw forest double representation'ın engellenmesi
+
+Forest canopy fiziksel temsili:
+
+- mevcut `AtlasWorldCoverSurfaceAggregator.dissolve()` yeniden kullanılır
+- bağlı forest hücreleri birleşik polygon yüzeylere dönüştürülür
+- açık terrain-following visual surface final STL'ye doğrudan sokulmaz
+- `AtlasForestCanopyFoundationBuilder`, mevcut kapalı terrain-following foundation geometrisini reuse eder
+- canopy mesh semantic type: `forest_canopy_foundation`
+- topology doğrulaması: `0 open edge`, `0 non-manifold edge`
+
+Production entegrasyonu:
+
+- `AtlasFoundationFirstEngine` artık vegetation composition resolver üzerinden çalışır
+- WorldCover sampled tree kayıtları doğrudan `tree_meshes` hattına eklenmez
+- gerçek isolated tree'ler mevcut `AtlasTreeFoundationBuilder` hattında kalır
+- forest canopy meshleri final scene'e ayrı vegetation grubu olarak eklenir
+- yeni scene group: `mesh_groups["forest_canopies"]`
+- result metadata: `forest_canopy_meshes`
+- `castle_only=True` durumunda tree ve canopy vegetation çıktısı bastırılır
+- mevcut water/tree filtering davranışı korunur
+
+Preview / multicolor product entegrasyonu:
+
+- `forest_canopies` → mevcut `trees` material batch
+- canopy mevcut green vegetation material rengini kullanır
+- multicolor exporter canopy geometrisini green STL içine taşır
+- yeni ayrı renk/material sistemi oluşturulmaz
+
+8.6 sınırları:
+
+- yeni tree-row detector veya producer eklenmedi; 8.7 kapsamındadır
+- avenue / boulevard / promenade alignment çözümü 8.7 kapsamındadır
+- dormant `AtlasGreenAreaTreeSampler` production'a bağlanmadı
+- Bonn/Hofgarten-specific koordinat veya görsel taklit kuralı eklenmedi
+- yeni genel spatial-cluster motoru oluşturulmadı
+- mevcut landmark, LoD, road, park ve water davranışları değiştirilmedi
+
+Doğrulama:
+
+- focused vegetation resolver: `51 passed in 0.07s`
+- vegetation + engine integration: `57 passed in 0.16s`
+- related regression: `154 passed in 0.36s`
+- full regression: `3217 passed in 12.60s`
+
+### Sıradaki tek adım
+
+**8.7 Avenue Tree Row Engine**
+
+8.7 test-first yürütülecek. 8.6 yeni davranış eklenmeden önce roadmap ve
+START_HERE güncellemesi, scoped commit, push ve `HEAD == origin/main`
+doğrulamasıyla kilitlenecektir.

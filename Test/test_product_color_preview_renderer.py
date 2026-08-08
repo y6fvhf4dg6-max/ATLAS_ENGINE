@@ -1426,3 +1426,48 @@ def test_renderer_routes_selected_landmark_to_roof_batch():
         batches["building_roofs"]["meshes"][0]["landmark_id"]
         == 143975860
     )
+
+
+def test_forest_canopies_route_to_tree_color_batch():
+    assert (
+        AtlasProductColorPreviewRenderer.GROUP_TO_BATCH[
+            "forest_canopies"
+        ]
+        == "trees"
+    )
+
+
+def test_renderer_places_forest_canopy_meshes_in_tree_material_batch():
+    city_result = _city_result()
+    canopy = _mesh(
+        "forest_canopy_foundation",
+        72.0,
+        82.0,
+        0.3,
+    )
+    city_result["mesh_groups"]["forest_canopies"] = [
+        canopy,
+    ]
+
+    profile = (
+        AtlasProductPreviewMaterialProfile
+        .competitor_comparison_v1()
+    )
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    tree_meshes = scene["material_batches"]["trees"]["meshes"]
+
+    assert len(tree_meshes) == 2
+    assert any(
+        mesh["type"] == "forest_canopy_foundation"
+        for mesh in tree_meshes
+    )
+    assert scene["material_batches"]["trees"]["rgb"] == (
+        profile.tree_rgb
+    )
