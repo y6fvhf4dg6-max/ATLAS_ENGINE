@@ -264,3 +264,45 @@ def test_known_generated_tree_source_is_preserved():
     source = AtlasTreeFoundationBuilder._resolve_source(tree)
 
     assert source == "osm_green_area_fill"
+
+
+def test_tree_kind_explicit_override_selects_controlled_row_symbol():
+    tree = {
+        "id": "formal_row_1_0",
+        "lat": 50.0,
+        "lon": 8.0,
+        "tree_kind": "park_tree_symbol",
+        "tags": {
+            "source": "osm_tree_row",
+        },
+    }
+
+    result = AtlasTreeFoundationBuilder._select_tree_kind(
+        tree=tree,
+        rng=random.Random(1234),
+    )
+
+    assert result == "park_tree_symbol"
+
+
+def test_park_tree_symbol_exposes_physical_dimension_contract():
+    assert (
+        AtlasTreeFoundationBuilder
+        .PARK_TREE_SYMBOL_MIN_DIAMETER_MM
+        == 0.60
+    )
+    assert (
+        AtlasTreeFoundationBuilder
+        .PARK_TREE_SYMBOL_MAX_DIAMETER_MM
+        == 1.10
+    )
+    assert (
+        AtlasTreeFoundationBuilder
+        .PARK_TREE_SYMBOL_MIN_HEIGHT_MM
+        == 1.0
+    )
+    assert (
+        AtlasTreeFoundationBuilder
+        .PARK_TREE_SYMBOL_MAX_HEIGHT_MM
+        == 1.4
+    )

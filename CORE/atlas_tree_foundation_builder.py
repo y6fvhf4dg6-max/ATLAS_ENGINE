@@ -21,6 +21,11 @@ from CORE.atlas_foundation_sampler import AtlasFoundationSampler
 class AtlasTreeFoundationBuilder:
     TREE_SEGMENTS = 12
 
+    PARK_TREE_SYMBOL_MIN_HEIGHT_MM = 1.0
+    PARK_TREE_SYMBOL_MAX_HEIGHT_MM = 1.4
+    PARK_TREE_SYMBOL_MIN_DIAMETER_MM = 0.60
+    PARK_TREE_SYMBOL_MAX_DIAMETER_MM = 1.10
+
     @staticmethod
     def build_trees(
         trees,
@@ -122,6 +127,22 @@ class AtlasTreeFoundationBuilder:
 
     @staticmethod
     def _select_tree_kind(tree, rng):
+        explicit_kind = tree.get("tree_kind")
+
+        if explicit_kind is not None:
+            explicit_kind = str(explicit_kind)
+
+            if explicit_kind not in {
+                "round",
+                "conifer",
+                "park_tree_symbol",
+            }:
+                raise ValueError(
+                    "unsupported explicit tree_kind"
+                )
+
+            return explicit_kind
+
         source = (tree.get("source") or "").lower()
 
         # WorldCover tekil ağaç türü bilgisi sağlamaz.
@@ -374,8 +395,18 @@ class AtlasTreeFoundationBuilder:
     @staticmethod
     def _park_tree_symbol_dimensions(rng):
         return {
-            "height_mm": rng.uniform(1.0, 1.4),
-            "diameter_mm": rng.uniform(0.60, 1.10),
+            "height_mm": rng.uniform(
+                AtlasTreeFoundationBuilder
+                .PARK_TREE_SYMBOL_MIN_HEIGHT_MM,
+                AtlasTreeFoundationBuilder
+                .PARK_TREE_SYMBOL_MAX_HEIGHT_MM,
+            ),
+            "diameter_mm": rng.uniform(
+                AtlasTreeFoundationBuilder
+                .PARK_TREE_SYMBOL_MIN_DIAMETER_MM,
+                AtlasTreeFoundationBuilder
+                .PARK_TREE_SYMBOL_MAX_DIAMETER_MM,
+            ),
         }
 
     @staticmethod

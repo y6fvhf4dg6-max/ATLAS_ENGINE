@@ -4,7 +4,7 @@
 **Date:** 7 August 2026
 **Baseline safe commit:** `50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
 **Previous locked package:** Automatic Print Optimization and Reporting V1
-**Current first step:** 8.7 Avenue Tree Row Engine
+**Current first step:** 8.8 Semantic Surface Texture Engine
 
 ---
 
@@ -1478,18 +1478,32 @@ semantic systems already developed.
 
 # 13. Immediate next action
 
-8.6 Vegetation Composition Engine is complete and ready to lock.
+8.7 Avenue Tree Row Engine is complete and ready to lock.
 
 Final validation:
 
-- focused vegetation resolver: `51 passed in 0.07s`
-- vegetation + engine integration: `57 passed in 0.16s`
-- related regression: `154 passed in 0.36s`
-- full regression: `3217 passed in 12.60s`
+- focused tree-row regression: `70 passed in 0.36s`
+- related vegetation / park / nature / engine regression: `156 passed in 0.35s`
+- full regression: `3267 passed in 12.78s`
+
+Real-data validation:
+
+- Köln Regierungsbezirk:
+  - `7408` real `natural=tree_row` ways
+  - naive current-model members: `88639`
+  - gap-aware members: `83250`
+  - artificial members suppressed: `5389`
+  - affected rows: `363`
+- Köln Pädagogische Fakultät:
+  - `6` real tree rows
+  - `6/6` strong
+  - `58` controlled tree-row members
+  - `0` source gaps
+  - `5/6` valid parallel road/path context matches
 
 The next and only development step is:
 
-## 8.7 — Avenue Tree Row Engine
+## 8.8 — Semantic Surface Texture Engine
 
-8.7 must proceed test-first. Do not start 8.8 or later behavior until
-8.7 is complete.
+8.8 must proceed test-first. Do not start 8.9 or later behavior until
+8.8 is complete.

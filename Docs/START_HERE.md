@@ -1405,6 +1405,58 @@ Doğrulama:
 - related regression: `154 passed in 0.36s`
 - full regression: `3217 passed in 12.60s`
 
+### 8.7 Avenue Tree Row Engine — TAMAMLANDI
+
+8.7 test-first tamamlandı ve production vegetation hattına bağlandı.
+
+Kilitlenen ana davranışlar:
+
+- gerçek OSM `natural=tree_row` way ingestion
+- reader ve nature-provider tree-row evidence merge
+- source geometry, direction ve segment diagnostic çözümü
+- strong / weak evidence classification
+- gerçek iki noktalı OSM tree-row kayıtlarının desteklenmesi
+- OSM way vertexlerinin gerçek tree spacing olarak yorumlanmaması
+- explicit tree spacing desteği
+- product-readability fallback spacing
+- fallback spacing'in fiziksel tree-symbol çapı + nozzle üzerinden çözülmesi
+- deterministic polyline layout
+- controlled `park_tree_symbol` member üretimi
+- deterministic row ordering
+- gerçek XY scale ve nozzle-aware production davranışı
+- nearby parallel road / pedestrian-path context resolution
+- crossing / non-parallel context rejection
+- 20 m adjacency sınırı
+- source-gap diagnostic resolution
+- büyük source gap'lerin yapay ağaçlarla doldurulmaması
+- row context metadata'nın production member kayıtlarına taşınması
+- final engine metadata:
+  - `reader_tree_rows`
+  - `tree_row_members`
+
+Gerçek veri doğrulaması:
+
+- Köln Regierungsbezirk:
+  - `7408` gerçek `natural=tree_row` way
+  - naive current-model members: `88639`
+  - gap-aware members: `83250`
+  - source-gap preservation ile `5389` yapay member bastırıldı
+  - `363` row gerçek üretim davranışında etkilendi
+- Köln Pädagogische Fakultät referans sahnesi:
+  - `6` gerçek tree row
+  - `6/6` strong
+  - `58` controlled tree-row member
+  - `0` source gap
+  - `5/6` row geçerli paralel road/path context ile eşleşti
+  - gerçek STL / Bambu Studio görünümünde formal tree rhythm belirgin biçimde doğrulandı
+
+Doğrulama:
+
+- focused tree-row regression: `70 passed in 0.36s`
+- related vegetation / park / nature / engine regression: `156 passed in 0.35s`
+- full regression: `3267 passed in 12.78s`
+
 ### Sıradaki tek adım
 
-**8.7 Avenue Tree Row Engine**
+**8.8 Semantic Surface Texture Engine**
+

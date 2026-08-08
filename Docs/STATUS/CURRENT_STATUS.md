@@ -2888,3 +2888,109 @@ Doğrulama:
 8.7 test-first yürütülecek. 8.6 yeni davranış eklenmeden önce roadmap ve
 START_HERE güncellemesi, scoped commit, push ve `HEAD == origin/main`
 doğrulamasıyla kilitlenecektir.
+
+## 8 Ağustos 2026 — Urban Fabric 8.7 Avenue Tree Row Engine
+
+8.7 test-first geliştirildi, gerçek OSM verisi üzerinde doğrulandı ve
+production vegetation hattına entegre edildi.
+
+Yeni ana modüller:
+
+- `CORE/atlas_tree_row_resolver.py`
+- `CORE/atlas_tree_row_spacing_resolver.py`
+- `CORE/atlas_tree_row_layout_resolver.py`
+- `CORE/atlas_tree_row_member_producer.py`
+- `CORE/atlas_tree_row_context_resolver.py`
+
+Reader / evidence entegrasyonu:
+
+- `AtlasLocalOSMReader` artık `natural=tree_row` way kayıtlarını okur
+- `read()` sonucu `tree_rows` koleksiyonunu expose eder
+- reader tree rows ile nature-provider tree rows composition hattında birleşir
+- source geometry ve source tags korunur
+
+Tree-row resolution:
+
+- semantic role: `tree_row`
+- representation mode: `ordered_row`
+- source direction ve toplam uzunluk çözülür
+- segment istatistikleri diagnostic olarak korunur
+- OSM way vertex aralıkları gerçek ağaç spacing'i kabul edilmez
+- açık `tree_spacing_m` evidence varsa kullanılır
+- explicit spacing yoksa product-readability fallback kullanılır
+- fallback, fiziksel tree symbol maksimum çapı + nozzle clearance üzerinden çözülür
+- iki noktalı explicit OSM tree-row kayıtları geçerli direction evidence ile strong kabul edilir
+
+Physical representation:
+
+- row members mevcut `AtlasTreeFoundationBuilder` üzerinden üretilir
+- controlled symbol: `park_tree_symbol`
+- physical contract:
+  - diameter: `0.60–1.10 mm`
+  - height: `1.0–1.4 mm`
+- tree-kind explicit override desteklenir
+- deterministic member ids ve ordering korunur
+- production parametresi:
+  - `tree_row_nozzle_diameter_mm=0.4`
+- gerçek resolved XY scale spacing kararına propagate edilir
+
+Urban / landscape context:
+
+- nearby roads ve pedestrian paths değerlendirilir
+- yalnız `<= 20 m` ve direction cosine `>= 0.95` adaylar kabul edilir
+- yakın fakat crossing / non-parallel feature context olarak kabul edilmez
+- deterministic nearest-candidate selection uygulanır
+- context metadata row member tags içine taşınır:
+  - `adjacent_feature_type`
+  - `adjacent_feature_id`
+  - `tree_row_relationship`
+
+Source continuity / gaps:
+
+- segment median değerinin `2.5x` üstündeki büyük segmentler source-gap adayıdır
+- gap metadata resolver sonucunda korunur
+- gap-aware layout büyük source boşluklarının üzerinden yapay tree member üretmez
+- gap olmayan mevcut row davranışı değiştirilmez
+
+Gerçek OSM doğrulaması:
+
+Köln Regierungsbezirk:
+
+- `7408` gerçek `natural=tree_row` way
+- filtered source supporting nodes: `28127`
+- current-model naive members: `88639`
+- gap-aware members: `83250`
+- bastırılan yapay member: `5389`
+- gerçek üretim davranışında etkilenen row: `363`
+
+Köln Pädagogische Fakultät:
+
+- `6` gerçek tree row
+- `6/6` strong
+- `58` controlled member
+- `0` detected source gap
+- `5/6` geçerli parallel road/path context
+- yeni tree-row rhythm gerçek STL / Bambu Studio görünümünde belirgin biçimde doğrulandı
+- formal landscape / avenue okunabilirliğinde görünür premium iyileşme gözlendi
+
+8.7 sınırları:
+
+- source olmayan arbitrary tree row icat edilmez
+- way vertexleri gerçek ağaç pozisyonu veya gerçek spacing sayılmaz
+- crossing path/road context olarak zorlanmaz
+- Bonn/Hofgarten veya Köln'e özel koordinat kuralı eklenmez
+- landmark, LoD, terrain, bridge veya mevcut park geometrisi yeniden yazılmaz
+
+Doğrulama:
+
+- focused tree-row regression: `70 passed in 0.36s`
+- related vegetation / park / nature / engine regression: `156 passed in 0.35s`
+- full regression: `3267 passed in 12.78s`
+
+### Sıradaki tek adım
+
+**8.8 Semantic Surface Texture Engine**
+
+8.8 test-first yürütülecek. 8.7 yeni davranış eklenmeden önce scoped commit,
+push ve `HEAD == origin/main` doğrulamasıyla kilitlenecektir.
+

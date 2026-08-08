@@ -35,6 +35,7 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
 
         self.buildings = []
         self.trees = []
+        self.tree_rows = []
         self.roads = []
         self.pedestrian_paths = []
         self.linear_infrastructure = []
@@ -225,6 +226,10 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             self._read_building(w, tags)
             return
 
+        if tags.get("natural") == "tree_row":
+            self._read_tree_row(w, tags)
+            return
+
         if tags.get("natural") == "coastline":
             self._read_coastline(w, tags)
             return
@@ -277,6 +282,24 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                 "id": w.id,
                 "geometry": geometry,
                 "geometry_type": "way",
+                "tags": tags,
+            }
+        )
+
+    def _read_tree_row(self, w, tags):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 2:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        self.tree_rows.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "tree_type": "tree_row",
                 "tags": tags,
             }
         )
@@ -1349,6 +1372,7 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         return {
             "buildings": reader.buildings,
             "trees": reader.trees,
+            "tree_rows": reader.tree_rows,
             "roads": reader.roads,
             "pedestrian_paths": reader.pedestrian_paths,
             "linear_infrastructure": reader.linear_infrastructure,

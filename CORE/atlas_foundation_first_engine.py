@@ -39,6 +39,18 @@ from CORE.atlas_artwork_foundation_builder import (
 from CORE.atlas_tree_foundation_builder import (
     AtlasTreeFoundationBuilder,
 )
+from CORE.atlas_tree_row_resolver import (
+    AtlasTreeRowResolver,
+)
+from CORE.atlas_tree_row_layout_resolver import (
+    AtlasTreeRowLayoutResolver,
+)
+from CORE.atlas_tree_row_member_producer import (
+    AtlasTreeRowMemberProducer,
+)
+from CORE.atlas_tree_row_context_resolver import (
+    AtlasTreeRowContextResolver,
+)
 from CORE.atlas_forest_canopy_foundation_builder import (
     AtlasForestCanopyFoundationBuilder,
 )
@@ -81,6 +93,75 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 class AtlasFoundationFirstEngine:
     @staticmethod
+    def _resolve_tree_row_members(
+        *,
+        tree_rows,
+        scale_ratio,
+        nozzle_diameter_mm,
+        roads=(),
+        pedestrian_paths=(),
+    ):
+        members = []
+
+        ordered_tree_rows = sorted(
+            tree_rows or (),
+            key=lambda item: (
+                0,
+                item.get("id"),
+            )
+            if isinstance(item.get("id"), int)
+            else (
+                1,
+                str(item.get("id")),
+            ),
+        )
+
+        for tree_row in ordered_tree_rows:
+            profile = AtlasTreeRowResolver.resolve(
+                tree_row,
+                scale_ratio=scale_ratio,
+                nozzle_diameter_mm=nozzle_diameter_mm,
+            )
+
+            layout = AtlasTreeRowLayoutResolver.resolve(
+                row_profile=profile,
+                scale_ratio=scale_ratio,
+            )
+
+            context = AtlasTreeRowContextResolver.resolve(
+                row_profile=profile,
+                roads=roads,
+                pedestrian_paths=pedestrian_paths,
+            )
+
+            row_members = (
+                AtlasTreeRowMemberProducer.build(
+                    layout
+                )
+            )
+
+            for member in row_members:
+                tags = dict(
+                    member.get("tags") or {}
+                )
+
+                tags["adjacent_feature_type"] = (
+                    context["adjacent_feature_type"]
+                )
+                tags["adjacent_feature_id"] = (
+                    context["adjacent_feature_id"]
+                )
+                tags["tree_row_relationship"] = (
+                    context["relationship"]
+                )
+
+                member["tags"] = tags
+
+            members.extend(row_members)
+
+        return members
+
+    @staticmethod
     def _assemble_vegetation_output(
         *,
         tree_meshes,
@@ -111,6 +192,11 @@ class AtlasFoundationFirstEngine:
         coordinate_engine,
         terrain_mesh,
         castle_only,
+        existing_tree_rows=(),
+        roads=(),
+        pedestrian_paths=(),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
         debug=True,
     ):
         if castle_only:
@@ -126,9 +212,14 @@ class AtlasFoundationFirstEngine:
 
         return cls._build_vegetation_meshes(
             existing_trees=existing_trees,
+            existing_tree_rows=existing_tree_rows,
             nature_data=nature_data,
+            roads=roads,
+            pedestrian_paths=pedestrian_paths,
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_mesh,
+            scale_ratio=scale_ratio,
+            nozzle_diameter_mm=nozzle_diameter_mm,
             debug=debug,
         )
 
@@ -141,15 +232,34 @@ class AtlasFoundationFirstEngine:
         nature_data,
         coordinate_engine,
         terrain_mesh,
+        existing_tree_rows=(),
+        roads=(),
+        pedestrian_paths=(),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.4,
         debug=True,
     ):
         composition = cls._resolve_vegetation_composition(
             existing_trees=existing_trees,
+            existing_tree_rows=existing_tree_rows,
             nature_data=nature_data,
         )
 
+        tree_row_members = (
+            cls._resolve_tree_row_members(
+                tree_rows=composition["tree_rows"],
+                roads=roads,
+                pedestrian_paths=pedestrian_paths,
+                scale_ratio=scale_ratio,
+                nozzle_diameter_mm=nozzle_diameter_mm,
+            )
+        )
+
         tree_meshes = AtlasTreeFoundationBuilder.build_trees(
-            trees=composition["tree_input"],
+            trees=[
+                *composition["tree_input"],
+                *tree_row_members,
+            ],
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_mesh,
             debug=debug,
@@ -166,6 +276,8 @@ class AtlasFoundationFirstEngine:
 
         return {
             **composition,
+            "tree_row_members": tuple(tree_row_members),
+            "tree_row_member_count": len(tree_row_members),
             "tree_meshes": tree_meshes,
             "forest_canopy_meshes": forest_canopy_meshes,
         }
@@ -175,10 +287,17 @@ class AtlasFoundationFirstEngine:
         *,
         existing_trees,
         nature_data,
+        existing_tree_rows=(),
     ):
+        merged_nature_data = dict(nature_data or {})
+        merged_nature_data["tree_rows"] = [
+            *(existing_tree_rows or ()),
+            *(merged_nature_data.get("tree_rows", ()) or ()),
+        ]
+
         composition = (
             AtlasVegetationCompositionResolver
-            .compose_nature_data(nature_data)
+            .compose_nature_data(merged_nature_data)
         )
 
         return {
@@ -540,6 +659,7 @@ class AtlasFoundationFirstEngine:
         use_fixed_xy_scale=False,
         include_castle_semantic_architecture=False,
         road_minimum_printable_width_mm=None,
+        tree_row_nozzle_diameter_mm=0.4,
         debug=True,
     ):
         source_bbox = bbox
@@ -578,6 +698,11 @@ class AtlasFoundationFirstEngine:
 
         trees = data.get(
             "trees",
+            [],
+        )
+
+        tree_rows = data.get(
+            "tree_rows",
             [],
         )
 
@@ -983,15 +1108,23 @@ class AtlasFoundationFirstEngine:
             AtlasFoundationFirstEngine
             ._prepare_scene_vegetation(
                 existing_trees=tree_input,
+                existing_tree_rows=tree_rows,
                 nature_data=nature_data,
+                roads=roads,
+                pedestrian_paths=pedestrian_paths,
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_slab,
                 castle_only=castle_only,
+                scale_ratio=xy_scale,
+                nozzle_diameter_mm=tree_row_nozzle_diameter_mm,
                 debug=debug,
             )
         )
 
         tree_meshes = vegetation["tree_meshes"]
+        tree_row_member_count = vegetation[
+            "tree_row_member_count"
+        ]
         forest_canopy_meshes = vegetation[
             "forest_canopy_meshes"
         ]
@@ -1094,6 +1227,10 @@ class AtlasFoundationFirstEngine:
             print(f"Landmark meshes    : " f"{len(landmark_meshes)}")
             print(f"Tree meshes        : " f"{len(tree_meshes)}")
             print(
+                f"Tree row members   : "
+                f"{tree_row_member_count}"
+            )
+            print(
                 f"Forest canopies    : "
                 f"{len(forest_canopy_meshes)}"
             )
@@ -1140,6 +1277,7 @@ class AtlasFoundationFirstEngine:
             "reader_buildings": len(raw_buildings),
             "reader_landmarks": len(landmarks),
             "reader_trees": len(trees),
+            "reader_tree_rows": len(tree_rows),
             "reader_roads": len(roads),
             "reader_pedestrian_paths": len(pedestrian_paths),
             "reader_elevated_areas": len(elevated_areas),
@@ -1157,6 +1295,7 @@ class AtlasFoundationFirstEngine:
             "elevated_area_meshes": len(elevated_area_meshes),
             "artwork_meshes": len(artwork_meshes),
             "landmark_meshes": len(landmark_meshes),
+            "tree_row_members": tree_row_member_count,
             "forest_canopy_meshes": len(
                 forest_canopy_meshes
             ),
