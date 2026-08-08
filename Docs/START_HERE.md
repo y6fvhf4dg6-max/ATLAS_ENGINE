@@ -1342,3 +1342,31 @@ Doğrulama:
 ### Sıradaki tek adım
 
 **8.5 Park & Plaza Semantic Surface Engine**
+
+### 8.5 Park & Plaza Semantic Surface Engine — TAMAMLANDI
+
+8.5 test-first tamamlandı.
+
+Kilitlenen ana davranışlar:
+
+- park / garden / plaza / pedestrian_square / courtyard / grass_area / cemetery / sports_field semantics
+- immutable semantic profile contract
+- distinct ground surface roles
+- profile-aware deterministic composition layers
+- source record enrichment without mutation
+- internal paths / tree rows / vegetation clusters / clearings / borders / edges metadata preservation
+- plaza ve pedestrian-square için park-only composition suppression
+- geometry-derived courtyard semantics
+- reader `pedestrian_paths` koleksiyonundan park içi path çözümü
+- boundary-crossing path rejection
+- internal path deduplication and deterministic ordering
+
+Doğrulama:
+
+- focused: `35 passed in 0.05s`
+- related: `206 passed in 0.24s`
+- full: `3159 passed in 12.98s`
+
+### Sıradaki tek adım
+
+**8.6 Vegetation Composition Engine**

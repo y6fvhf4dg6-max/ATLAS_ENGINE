@@ -4,7 +4,7 @@
 **Date:** 7 August 2026
 **Baseline safe commit:** `50daf58a00e31dd99f403af5eb8a6ac2edef3bba`
 **Previous locked package:** Automatic Print Optimization and Reporting V1
-**Current first step:** 8.5 Park & Plaza Semantic Surface Engine
+**Current first step:** 8.6 Vegetation Composition Engine
 
 ---
 
@@ -1478,17 +1478,17 @@ semantic systems already developed.
 
 # 13. Immediate next action
 
-8.4 Urban Block Resolver is complete and locked.
+8.5 Park & Plaza Semantic Surface Engine is complete and locked.
 
 Final validation:
 
-- focused: `39 passed in 0.06s`
-- related regression: `379 passed in 0.35s`
-- full regression: `3124 passed in 12.86s`
+- focused: `35 passed in 0.05s`
+- related regression: `206 passed in 0.24s`
+- full regression: `3159 passed in 12.98s`
 
 The next and only development step is:
 
-## 8.5 — Park & Plaza Semantic Surface Engine
+## 8.6 — Vegetation Composition Engine
 
-8.5 must proceed test-first. Do not start 8.6 or later behavior until
-8.5 is complete.
+8.6 must proceed test-first. Do not start 8.7 or later behavior until
+8.6 is complete.

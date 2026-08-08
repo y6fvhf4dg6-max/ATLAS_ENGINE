@@ -2745,3 +2745,63 @@ Doğrulama:
 
 8.5 de test-first yürütülecek. 8.4 yeni davranış eklenmeden önce dokümantasyon,
 scoped commit, push ve `HEAD == origin/main` doğrulamasıyla kilitlenecektir.
+
+## 8 Ağustos 2026 — Urban Fabric 8.5 Park & Plaza Semantic Surface Engine
+
+8.5 test-first geliştirildi ve full regression aşamasına ulaştı.
+
+Yeni ana dosyalar:
+
+- `CORE/atlas_park_plaza_semantic_resolver.py`
+- `Test/test_park_plaza_semantic_resolver.py`
+
+Kilitlenen semantic sınıflar:
+
+- park
+- garden
+- plaza
+- pedestrian_square
+- courtyard
+- grass_area
+- cemetery
+- sports_field
+
+Kilitlenen profile/composition davranışları:
+
+- immutable semantic profile contract
+- semantic sınıfa göre distinct ground surface role
+- profile-aware composition capability resolution
+- deterministic `composition_layers`
+- source record enrichment without source mutation
+- internal paths / tree rows / vegetation clusters / clearings / borders / edges metadata preservation
+- plaza ve pedestrian-square yüzeylerinin park-only composition katmanlarını almaması
+- geometry-derived courtyard semantics
+
+Reader entegrasyonu:
+
+- mevcut `AtlasLocalOSMReader` park record yapısı korunur
+- mevcut `pedestrian_paths` koleksiyonu kullanılır
+- tamamen park poligonu içinde kalan pedestrian path'ler `internal_paths` olarak çözülür
+- park sınırını kesip dışarı çıkan path'ler internal path sayılmaz
+- internal path'ler ID üzerinden deduplicate edilir
+- internal path sırası input sırasından bağımsız deterministiktir
+
+8.5 sınırları:
+
+- yeni tree-row producer eklenmedi; 8.7 kapsamına bırakıldı
+- yeni vegetation-cluster producer eklenmedi; 8.6 kapsamına bırakıldı
+- park source geometry'si mutate edilmez
+- Bonn/Hofgarten-specific kural eklenmez
+
+Doğrulama:
+
+- focused 8.5: `35 passed in 0.05s`
+- related regression: `206 passed in 0.24s`
+- full regression: `3159 passed in 12.98s`
+
+### Sıradaki tek adım
+
+**8.6 Vegetation Composition Engine**
+
+8.6 test-first yürütülecek. 8.5 yeni davranış eklenmeden önce dokümantasyon,
+scoped commit, push ve `HEAD == origin/main` doğrulamasıyla kilitlenecektir.
