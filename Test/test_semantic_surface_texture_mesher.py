@@ -363,3 +363,96 @@ def test_semantic_surface_limits_long_interior_edges():
                 long_interior_edges.add(edge)
 
     assert long_interior_edges == set()
+
+
+def test_semantic_surface_avoids_sliver_triangles_on_regular_surface():
+    import math
+
+    result = _build_square()
+
+    triangles = list(result["triangles"])
+    wall_triangle_count = len(result["walls"]) * 2
+    top_triangle_count = (
+        len(triangles) - wall_triangle_count
+    ) // 2
+    top_triangles = triangles[:top_triangle_count]
+
+    def triangle_quality(triangle):
+        points = [
+            (
+                float(point[0]),
+                float(point[1]),
+            )
+            for point in triangle
+        ]
+
+        lengths = (
+            math.hypot(
+                points[1][0] - points[0][0],
+                points[1][1] - points[0][1],
+            ),
+            math.hypot(
+                points[2][0] - points[1][0],
+                points[2][1] - points[1][1],
+            ),
+            math.hypot(
+                points[0][0] - points[2][0],
+                points[0][1] - points[2][1],
+            ),
+        )
+
+        minimum_angle = 180.0
+
+        for index in range(3):
+            adjacent_a = lengths[index]
+            opposite = lengths[(index + 1) % 3]
+            adjacent_b = lengths[(index + 2) % 3]
+
+            cosine = (
+                adjacent_a * adjacent_a
+                + adjacent_b * adjacent_b
+                - opposite * opposite
+            ) / (
+                2.0
+                * adjacent_a
+                * adjacent_b
+            )
+
+            cosine = max(
+                -1.0,
+                min(1.0, cosine),
+            )
+
+            minimum_angle = min(
+                minimum_angle,
+                math.degrees(
+                    math.acos(cosine)
+                ),
+            )
+
+        edge_ratio = (
+            max(lengths)
+            / min(lengths)
+        )
+
+        return (
+            minimum_angle,
+            edge_ratio,
+        )
+
+    qualities = [
+        triangle_quality(triangle)
+        for triangle in top_triangles
+    ]
+
+    minimum_angle = min(
+        quality[0]
+        for quality in qualities
+    )
+    maximum_edge_ratio = max(
+        quality[1]
+        for quality in qualities
+    )
+
+    assert minimum_angle >= 5.0
+    assert maximum_edge_ratio <= 10.0

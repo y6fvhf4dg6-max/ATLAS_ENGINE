@@ -905,21 +905,9 @@ class AtlasSemanticSurfaceTextureMesher:
             )
         )
 
-        interior_points = (
-            cls._interior_grid_points(
-                polygon=polygon,
-                maximum_edge_length_mm=(
-                    maximum_edge_length_mm
-                ),
-            )
-        )
-
         all_points = (
             cls._deduplicate_points(
-                (
-                    *dense_boundary,
-                    *interior_points,
-                )
+                dense_boundary
             )
         )
 
