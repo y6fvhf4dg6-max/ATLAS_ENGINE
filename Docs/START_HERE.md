@@ -1460,3 +1460,116 @@ Doğrulama:
 
 **8.8 Semantic Surface Texture Engine**
 
+
+
+## 9 Ağustos 2026 — Urban Fabric 8.8 + 8.9
+
+Son güvenli ve uzak depoya push edilmiş commit:
+
+- `1607154 Add semantic surfaces and morphology-aware terrain`
+- branch: `main`
+- `HEAD == origin/main`
+
+### 8.8 Semantic Surface Texture Engine — TEKNİK OLARAK YEŞİL / GÖRSEL ACCEPTANCE AÇIK
+
+8.8 kapsamında semantic open-surface fiziksel dili production hattına eklendi.
+
+Ana yetenekler:
+
+- park / grass / plaza / pedestrian-square / garden / cemetery /
+  sports-field / courtyard semantic surface profilleri
+- deterministic shallow-relief pattern üretimi
+- terrain-following semantic surface mesh üretimi
+- Foundation First production entegrasyonu
+- source semantic identity preservation
+- dense boundary contract
+- constrained surface triangulation
+- tolerance-aware shared-edge handling
+- deterministic interior-edge refinement
+
+Gerçek Köln topology problemi çözüldü:
+
+- önceki textured park open edges: `1340`
+- düzeltme sonrası textured park open edges: `0`
+
+Topology fix sonrası görsel olarak tespit edilen uzun radial/fan interior
+triangle problemi ayrıca çözüldü.
+
+Kalıcı regression:
+
+- `test_semantic_surface_limits_long_interior_edges`
+
+Refinement sonrası gerçek Köln:
+
+- city triangles: `43122`
+- preview triangles: `49856`
+- tüm textured park yüzeylerinde `> 2 × pitch`: `0`
+- tüm textured park yüzeylerinde `> 4 × pitch`: `0`
+- textured park open edges: `0`
+
+Son preview:
+
+- `OUTPUT/PREVIEW/koeln_paedagogische_fakultaet_competitor_comparison_v1.png`
+
+8.8 için kalan tek acceptance:
+
+- son `49856` triangle Köln preview'ın nihai görsel değerlendirmesi
+
+Bu nedenle 8.8 henüz LOCK olarak işaretlenmedi.
+
+### 8.9 Morphology-Aware Terrain Product Resolver — TAMAMLANDI
+
+8.9 test-first geliştirildi ve terrain pipeline'a entegre edildi.
+
+Yeni ana modül:
+
+- `CORE/atlas_morphology_aware_terrain_product_resolver.py`
+
+Desteklenen morphology sınıfları:
+
+- `dense_urban`
+- `historic_core`
+- `suburban`
+- `rural`
+- `mountain`
+- `landscape_nature`
+
+Resolver:
+
+- mevcut terrain pipeline'ını terrain truth kaynağı olarak korur
+- source elevation verisini değiştirmez
+- morphology-aware terrain emphasis üretir
+- product size değerini dikkate alır
+- urban density bilgisini taşır
+- landmark presence üzerinden semantic-content protection sinyali üretir
+- fiziksel terrain relief'i printable min/max aralığına resolve eder
+- deterministic product-facing terrain profile üretir
+
+Terrain pipeline entegrasyonu:
+
+- 8.9 parametreleri verilmezse legacy davranış değişmez
+- `delta_height_m` mevcut terrain truth üzerinden alınır
+- fiziksel relief:
+  `delta_height_m / z_scale * 1000`
+- resolver sonucu:
+  `metadata["terrain_product_profile"]`
+- terrain grid değiştirilmez
+- `delta_height_m` değiştirilmez
+- `z_scale` değiştirilmez
+
+Doğrulama:
+
+- resolver focused: `13 passed in 0.02s`
+- resolver + pipeline focused: `16 passed in 0.06s`
+- 8.8 + 8.9 related regression: `102 passed in 2.11s`
+- full regression: `3338 passed in 15.03s`
+
+### Sıradaki tek adım
+
+**8.8 son Köln preview görsel acceptance.**
+
+Bu acceptance tamamlandıktan sonra roadmap sırasındaki:
+
+**8.10 Water & Shoreline Composition Engine**
+
+paketine geçilecek.

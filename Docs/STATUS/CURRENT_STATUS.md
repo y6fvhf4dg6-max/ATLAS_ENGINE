@@ -2994,3 +2994,114 @@ Doğrulama:
 8.8 test-first yürütülecek. 8.7 yeni davranış eklenmeden önce scoped commit,
 push ve `HEAD == origin/main` doğrulamasıyla kilitlenecektir.
 
+
+
+## 9 Ağustos 2026 — Urban Fabric 8.8 + 8.9 Güncel Durum
+
+Son güvenli commit:
+
+- `1607154 Add semantic surfaces and morphology-aware terrain`
+- push başarılı
+- `HEAD == origin/main`
+
+### 8.8 Semantic Surface Texture Engine
+
+Durum:
+
+- teknik implementation: tamamlandı
+- production integration: tamamlandı
+- topology blocker: çözüldü
+- long-interior-edge blocker: çözüldü
+- automated regression: yeşil
+- final visual acceptance: açık
+- LOCK: henüz değil
+
+Ana production davranışı:
+
+- semantic surface resolver
+- deterministic physical pattern
+- shallow printable relief
+- terrain-following meshing
+- Foundation First integration
+- source semantic preservation
+- constrained dense-boundary triangulation
+- shared-edge-safe interior refinement
+
+Gerçek Köln son teknik doğrulama:
+
+- city triangles: `43122`
+- color preview triangles: `49856`
+- textured park open edges: `0`
+- `> 2 × feature_pitch_mm` interior edges: `0`
+- `> 4 × feature_pitch_mm` interior edges: `0`
+
+Son preview:
+
+`OUTPUT/PREVIEW/koeln_paedagogische_fakultaet_competitor_comparison_v1.png`
+
+Kalan acceptance:
+
+- yeni preview'da park / grass yüzeylerinin premium,
+  okunabilir ve fan/radial artefact içermeyen fiziksel dilinin
+  görsel doğrulanması
+
+### 8.9 Morphology-Aware Terrain Product Resolver
+
+Durum:
+
+- resolver contract: tamamlandı
+- deterministic morphology policy: tamamlandı
+- printability resolution: tamamlandı
+- terrain pipeline integration: tamamlandı
+- terrain truth preservation: doğrulandı
+- automated regression: yeşil
+
+Yeni dosyalar:
+
+- `CORE/atlas_morphology_aware_terrain_product_resolver.py`
+- `Test/test_morphology_aware_terrain_product_resolver.py`
+- `Test/test_terrain_pipeline_morphology_product_resolver.py`
+
+Morphology sınıfları:
+
+- dense urban
+- historic core
+- suburban
+- rural
+- mountain
+- landscape / nature
+
+8.9 source elevation data'yı değiştirmez.
+
+Product-facing kararlar metadata profili olarak taşınır:
+
+- terrain emphasis
+- vertical compression policy
+- source elevation range
+- product size
+- urban density pressure
+- landmark / semantic protection
+- physical relief range
+- printable relief resolution
+- relative product relief
+
+Pipeline truth contract:
+
+- terrain grid değişmez
+- `delta_height_m` değişmez
+- `z_scale` değişmez
+
+Doğrulama:
+
+- focused resolver: `13 passed in 0.02s`
+- resolver + pipeline: `16 passed in 0.06s`
+- related 8.8 + 8.9: `102 passed in 2.11s`
+- full regression: `3338 passed in 15.03s`
+
+### Sıradaki tek adım
+
+8.8'in son `49856` triangle Köln preview görsel acceptance'ını tamamla.
+
+Ardından:
+
+**8.10 Water & Shoreline Composition Engine**
