@@ -11,6 +11,9 @@ from CORE.atlas_liedberg_muehlenturm_ruin_top_builder import (
 from CORE.atlas_bridge_landmark_deduplicator import (
     AtlasBridgeLandmarkDeduplicator,
 )
+from CORE.atlas_bridge_urban_integration_resolver import (
+    AtlasBridgeUrbanIntegrationResolver,
+)
 from CORE.atlas_landmark_building_deduplicator import (
     AtlasLandmarkBuildingDeduplicator,
 )
@@ -502,6 +505,92 @@ class AtlasFoundationFirstEngine:
                 castle_geometry
             )
         )
+
+        return result
+
+    @staticmethod
+    def attach_bridge_urban_integration(
+        *,
+        result,
+        landmarks,
+        landmark_meshes,
+    ):
+        source_by_id = {
+            source.get("id"): source
+            for source in landmarks or ()
+            if isinstance(source, dict)
+        }
+
+        records = []
+
+        for mesh in landmark_meshes or ():
+            if not isinstance(
+                mesh,
+                dict,
+            ):
+                continue
+
+            landmark_id = mesh.get(
+                "landmark_id"
+            )
+
+            source = source_by_id.get(
+                landmark_id
+            )
+
+            if source is None:
+                continue
+
+            tags = source.get(
+                "tags",
+                {},
+            ) or {}
+
+            is_bridge = (
+                str(
+                    tags.get(
+                        "bridge",
+                        "",
+                    )
+                ).strip().lower()
+                == "yes"
+                or str(
+                    tags.get(
+                        "man_made",
+                        "",
+                    )
+                ).strip().lower()
+                == "bridge"
+            )
+
+            if not is_bridge:
+                continue
+
+            record = (
+                AtlasBridgeUrbanIntegrationResolver
+                .resolve_integration_record(
+                    bridge_source=source,
+                    bridge_mesh=mesh,
+                )
+            )
+
+            record = {
+                **record,
+                "foundation_z": mesh.get(
+                    "foundation_z"
+                ),
+            }
+
+            records.append(
+                record
+            )
+
+        result[
+            "bridge_urban_integration"
+        ] = tuple(records)
+        result[
+            "bridge_urban_integration_records"
+        ] = len(records)
 
         return result
 
@@ -1647,6 +1736,15 @@ class AtlasFoundationFirstEngine:
             "input_quality_report": input_quality_report,
             "mode": "foundation_first",
         }
+
+        result = (
+            AtlasFoundationFirstEngine
+            .attach_bridge_urban_integration(
+                result=result,
+                landmarks=landmarks,
+                landmark_meshes=landmark_meshes,
+            )
+        )
 
         water_interaction_context = (
             AtlasFoundationFirstEngine
