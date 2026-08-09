@@ -61,6 +61,7 @@ class AtlasFoundationMeshExtruder:
         building,
         coordinate_engine,
         foundation_z,
+        product_height_m=None,
         diagnostics=None,
         debug=False,
     ):
@@ -77,6 +78,7 @@ class AtlasFoundationMeshExtruder:
         height_mm = AtlasFoundationMeshExtruder._calculate_height(
             building,
             coordinate_engine,
+            product_height_m=product_height_m,
         )
 
         base_offset_mm = (
@@ -430,10 +432,43 @@ class AtlasFoundationMeshExtruder:
         return 0.0
 
     @staticmethod
-    def _calculate_height(building, coordinate_engine):
+    def _calculate_height(
+        building,
+        coordinate_engine,
+        product_height_m=None,
+    ):
         resolved_height_m = float(building.estimated_height)
 
         tags = getattr(building, "tags", {}) or {}
+
+        is_castle_building = bool(
+            getattr(
+                building,
+                "is_castle_building",
+                False,
+            )
+        )
+
+        if (
+            product_height_m is not None
+            and not is_castle_building
+        ):
+            parsed_product_height_m = (
+                AtlasFoundationMeshExtruder
+                ._parse_positive_float(
+                    product_height_m
+                )
+            )
+
+            if parsed_product_height_m is None:
+                raise ValueError(
+                    "product_height_m must be "
+                    "positive when provided"
+                )
+
+            resolved_height_m = (
+                parsed_product_height_m
+            )
 
         explicit_total_height_m = (
             AtlasFoundationMeshExtruder
@@ -458,7 +493,7 @@ class AtlasFoundationMeshExtruder:
             resolved_height_m
         )
 
-        if getattr(building, "is_castle_building", False):
+        if is_castle_building:
             castle_profile = getattr(
                 building,
                 "castle_profile",

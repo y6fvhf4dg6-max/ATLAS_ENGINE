@@ -56,6 +56,9 @@ from CORE.atlas_castle_footprint_regularizer import (
 from CORE.atlas_building_part_hierarchy_profiler import (
     AtlasBuildingPartHierarchyProfiler,
 )
+from CORE.atlas_building_height_product_normalizer import (
+    AtlasBuildingHeightProductNormalizer,
+)
 from CORE.atlas_ancient_theatre_profiler import (
     AtlasAncientTheatreProfiler,
 )
@@ -75,6 +78,81 @@ from CORE.atlas_ancient_theatre_upper_gallery_builder import (
 
 class AtlasFoundationSceneBuilder:
     SPECIAL_ARCHITECTURE_CONTAINMENT_RATIO_MINIMUM = 0.995
+
+    @staticmethod
+    def _resolve_building_product_height(
+        *,
+        atlas_building,
+        source_id,
+        scale_ratio,
+        context_by_source_id,
+        minimum_readable_height_mm,
+    ):
+        if getattr(
+            atlas_building,
+            "is_castle_building",
+            False,
+        ):
+            return None
+
+        if getattr(
+            atlas_building,
+            "is_building_part",
+            False,
+        ):
+            return None
+
+        if not context_by_source_id:
+            return None
+
+        context = context_by_source_id.get(
+            source_id
+        )
+
+        if not isinstance(context, dict):
+            return None
+
+        return (
+            AtlasBuildingHeightProductNormalizer
+            .resolve(
+                source_height_m=(
+                    atlas_building.estimated_height
+                ),
+                block_median_height_m=(
+                    context.get(
+                        "block_median_height_m"
+                    )
+                ),
+                scale_ratio=scale_ratio,
+                minimum_readable_height_mm=(
+                    minimum_readable_height_mm
+                ),
+                semantic_importance=(
+                    context.get(
+                        "semantic_importance",
+                        0.0,
+                    )
+                ),
+                is_semantic_landmark=False,
+                landmark_distance_m=(
+                    context.get(
+                        "landmark_distance_m"
+                    )
+                ),
+                landmark_context_distance_m=(
+                    context.get(
+                        "landmark_context_distance_m",
+                        50.0,
+                    )
+                ),
+                maximum_block_height_ratio=(
+                    context.get(
+                        "maximum_block_height_ratio",
+                        2.0,
+                    )
+                ),
+            )
+        )
     """
     ATLAS Foundation Scene Builder v0.3
 
@@ -488,6 +566,8 @@ class AtlasFoundationSceneBuilder:
         min_points=4,
         max_points=300,
         castle_only=False,
+        building_height_context_by_source_id=None,
+        building_minimum_readable_height_mm=2.0,
         debug=True,
     ):
         from CORE.atlas_scene_builder import (
@@ -927,6 +1007,32 @@ class AtlasFoundationSceneBuilder:
                     )
                 )
 
+            height_normalization = (
+                AtlasFoundationSceneBuilder
+                ._resolve_building_product_height(
+                    atlas_building=atlas_building,
+                    source_id=raw_building.get("id"),
+                    scale_ratio=(
+                        z_scale
+                        if z_scale is not None
+                        else xy_scale
+                    ),
+                    context_by_source_id=(
+                        building_height_context_by_source_id
+                        or {}
+                    ),
+                    minimum_readable_height_mm=(
+                        building_minimum_readable_height_mm
+                    ),
+                )
+            )
+
+            product_height_m = (
+                None
+                if height_normalization is None
+                else height_normalization.normalized_height_m
+            )
+
             mesh = AtlasFoundationFirstPipeline.build_building_mesh(
                 building=atlas_building,
                 coordinate_engine=coordinate_engine,
@@ -934,6 +1040,7 @@ class AtlasFoundationSceneBuilder:
                 sample_grid=5,
                 embed_depth_mm=0.30,
                 foundation_z_override=foundation_z_override,
+                product_height_m=product_height_m,
                 diagnostics=building_diagnostics,
                 debug=debug,
             )
@@ -962,6 +1069,24 @@ class AtlasFoundationSceneBuilder:
             mesh["name"] = tags.get("name")
 
             mesh["estimated_height_m"] = atlas_building.estimated_height
+
+            mesh["product_height_m"] = (
+                atlas_building.estimated_height
+                if height_normalization is None
+                else height_normalization.normalized_height_m
+            )
+
+            mesh["height_product_normalization_reason"] = (
+                None
+                if height_normalization is None
+                else height_normalization.reason
+            )
+
+            mesh["height_product_normalization_changed"] = (
+                False
+                if height_normalization is None
+                else height_normalization.changed
+            )
 
             mesh["castle_profile"] = getattr(
                 atlas_building,

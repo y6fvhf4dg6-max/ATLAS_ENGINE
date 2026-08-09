@@ -14,6 +14,9 @@ from CORE.atlas_bridge_landmark_deduplicator import (
 from CORE.atlas_bridge_urban_integration_resolver import (
     AtlasBridgeUrbanIntegrationResolver,
 )
+from CORE.atlas_building_height_product_context_resolver import (
+    AtlasBuildingHeightProductContextResolver,
+)
 from CORE.atlas_landmark_building_deduplicator import (
     AtlasLandmarkBuildingDeduplicator,
 )
@@ -113,6 +116,24 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
+    @staticmethod
+    def _resolve_building_height_product_context(
+        *,
+        buildings,
+        roads,
+        landmarks,
+        coordinate_engine,
+    ):
+        return (
+            AtlasBuildingHeightProductContextResolver
+            .resolve(
+                buildings=buildings,
+                roads=roads,
+                landmarks=landmarks,
+                coordinate_engine=coordinate_engine,
+            )
+        )
+
     @classmethod
     def _apply_semantic_surface_textures(
         cls,
@@ -1008,6 +1029,7 @@ class AtlasFoundationFirstEngine:
         use_fixed_xy_scale=False,
         include_castle_semantic_architecture=False,
         road_minimum_printable_width_mm=None,
+        building_minimum_readable_height_mm=2.0,
         tree_row_nozzle_diameter_mm=0.4,
         terrain_grid_size=25,
         terrain_presentation_regularization_passes=0,
@@ -1347,6 +1369,16 @@ class AtlasFoundationFirstEngine:
             *inland_water_meshes,
         ]
 
+        building_height_product_context = (
+            AtlasFoundationFirstEngine
+            ._resolve_building_height_product_context(
+                buildings=raw_buildings,
+                roads=roads,
+                landmarks=landmarks,
+                coordinate_engine=coordinate_engine,
+            )
+        )
+
         scene = AtlasFoundationSceneBuilder.build_scene(
             raw_buildings=raw_buildings,
             hierarchy_raw_buildings=(
@@ -1366,6 +1398,12 @@ class AtlasFoundationFirstEngine:
             min_points=min_points,
             max_points=max_points,
             castle_only=castle_only,
+            building_height_context_by_source_id=(
+                building_height_product_context
+            ),
+            building_minimum_readable_height_mm=(
+                building_minimum_readable_height_mm
+            ),
             debug=debug,
         )
 

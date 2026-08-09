@@ -245,16 +245,21 @@ class AtlasUrbanBlockResolver:
         if not lines:
             return ()
 
-        merged = linemerge(
-            unary_union(lines)
-        )
+        unioned = unary_union(lines)
 
-        if isinstance(merged, LineString):
-            merged_lines = [merged]
-        elif isinstance(merged, MultiLineString):
-            merged_lines = list(merged.geoms)
+        if isinstance(unioned, LineString):
+            merged_lines = [unioned]
         else:
-            merged_lines = lines
+            merged = linemerge(
+                unioned
+            )
+
+            if isinstance(merged, LineString):
+                merged_lines = [merged]
+            elif isinstance(merged, MultiLineString):
+                merged_lines = list(merged.geoms)
+            else:
+                merged_lines = lines
 
         polygons = list(
             polygonize(merged_lines)

@@ -19,6 +19,7 @@ class AtlasFoundationFirstPipeline:
         sample_grid=5,
         embed_depth_mm=0.30,
         foundation_z_override=None,
+        product_height_m=None,
         diagnostics=None,
         debug=False,
     ):
@@ -90,12 +91,21 @@ class AtlasFoundationFirstPipeline:
             foundation_z=foundation_z,
         )
 
+        extrude_arguments = {
+            "building": building,
+            "coordinate_engine": coordinate_engine,
+            "foundation_z": foundation_z,
+            "diagnostics": diagnostics,
+            "debug": debug,
+        }
+
+        if product_height_m is not None:
+            extrude_arguments[
+                "product_height_m"
+            ] = product_height_m
+
         final_mesh = AtlasFoundationMeshExtruder.extrude(
-            building=building,
-            coordinate_engine=coordinate_engine,
-            foundation_z=foundation_z,
-            diagnostics=diagnostics,
-            debug=debug,
+            **extrude_arguments
         )
 
         if final_mesh is not None:

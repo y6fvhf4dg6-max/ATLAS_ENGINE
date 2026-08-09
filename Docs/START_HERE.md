@@ -2094,3 +2094,243 @@ Primary acceptance principle karşılandı:
 8.11 kapsamında açık teknik iş kalmadı.
 
 **Sıradaki roadmap paketi: 8.12 — Building Height Product Normalizer.**
+
+## 9 Ağustos 2026 — 8.12 FINAL LOCK
+
+**8.12 Building Height Product Normalizer: LOCK**
+
+8.12, 8.0 Bonn Urban Fabric Ground-Truth Audit sonucuna uygun olarak
+tamamlandı.
+
+8.0'da generic building height parser hattında genel bir source/parser bug
+bulunmadığı doğrulanmıştı.
+
+Bu nedenle 8.12:
+
+- source height parser'ını yeniden yazmaz
+- `height`
+- `building:levels`
+- fallback height
+- building-part hierarchy
+- landmark-specific architecture
+- terrain / foundation placement
+
+source truth katmanlarını değiştirmez.
+
+Bunun yerine generic building geometry için ayrı bir product-facing height
+policy oluşturur.
+
+### Eklenen ana modüller
+
+- `CORE/atlas_building_height_product_normalizer.py`
+- `CORE/atlas_building_height_product_context_resolver.py`
+
+Yeni test paketleri:
+
+- `Test/test_building_height_product_normalizer.py`
+- `Test/test_building_height_product_context_resolver.py`
+- `Test/test_foundation_first_building_height_product_context.py`
+- `Test/test_foundation_first_building_height_product_wiring.py`
+- `Test/test_foundation_first_pipeline_product_height.py`
+- `Test/test_foundation_mesh_extruder_product_height.py`
+- `Test/test_foundation_scene_builder_building_height_product.py`
+
+Production entegrasyonu:
+
+- `CORE/atlas_foundation_first_engine.py`
+- `CORE/atlas_foundation_scene_builder.py`
+- `CORE/atlas_foundation_first_pipeline.py`
+- `CORE/atlas_foundation_mesh_extruder.py`
+- `CORE/atlas_urban_block_resolver.py`
+
+### Source truth / product height ayrımı
+
+8.12'nin temel mimari kuralı:
+
+> Source building height truth korunur; product readability için ayrı ve
+> deterministic bir product height üretilebilir.
+
+`AtlasBuilding.estimated_height` değiştirilmez.
+
+Generic extrusion hattına ayrı:
+
+- `product_height_m`
+
+override'ı aktarılabilir.
+
+Final building mesh aynı anda:
+
+- `estimated_height_m`
+- `product_height_m`
+- `height_product_normalization_reason`
+- `height_product_normalization_changed`
+
+bilgilerini taşıyabilir.
+
+Bu nedenle normalization source veriyi overwrite etmez.
+
+### Generic building height normalization
+
+`AtlasBuildingHeightProductNormalizer` aşağıdaki context'i birlikte
+değerlendirir:
+
+- generic source building height
+- local block median height
+- product scale
+- physical minimum readable height
+- excessive background height
+- statistical height outlier
+- landmark proximity
+- semantic building importance
+
+Normal variation keyfi biçimde flatten edilmez.
+
+Aşırı generic background outlier'ları local block context'e göre
+deterministic olarak sınırlandırılabilir.
+
+Fiziksel ölçekte okunamayacak kadar düşük generic building height ise
+minimum readable product height'a yükseltilebilir.
+
+### Local block context
+
+8.12, mevcut 8.4 Urban Block Resolver altyapısını yeniden kullanır.
+
+Yeni context resolver:
+
+- source buildings
+- road-defined blocks
+- block membership
+- local median building height
+- landmark proximity
+
+bilgisinden product-height context üretir.
+
+Block relationships source footprint'i değiştirmez ve building merge
+yapmaz.
+
+### Gerçek metre uzayı
+
+Urban block / landmark proximity height policy için gerçek metre uzayında
+çözülür.
+
+Lat/lon degree değerleri doğrudan metre gibi yorumlanmaz.
+
+`AtlasCoordinateEngine.latlon_to_local_meters(...)` kullanılarak context
+production-scale fiziksel uzaya taşınır.
+
+### Semantic importance
+
+Normalizer yeni ve yapay bir building priority uydurmaz.
+
+Mevcut context varsa:
+
+1. `semantic_importance`
+2. `product_priority`
+3. aksi halde `0.0`
+
+sırasıyla kullanılır.
+
+Yüksek semantic importance taşıyan generic building'lerde moderate gerçek
+height variation korunabilir.
+
+### Landmark proximity
+
+Landmark yakınındaki generic urban fabric'in tamamı kör biçimde aynı yüksekliğe
+çekilmez.
+
+Moderate contextual height variation korunabilir.
+
+Ancak extreme generic background outlier, landmark yakınında olsa dahi
+kontrolsüz biçimde korunmaz.
+
+Bu sayede landmark çevresi düzleştirilmeden semantic landmark dominance
+korunabilir.
+
+### Semantic architecture koruması
+
+Generic product-height normalizer:
+
+- castle architecture
+- building parts
+- semantic landmark architecture
+
+üzerinde generic height policy zorlamaz.
+
+Castle-specific height multipliers / minimums korunur.
+
+Building-part vertical interval contract korunur.
+
+Semantic landmark geometry kendi architecture ve height policy'sini
+kullanmaya devam eder.
+
+### FoundationFirst production wiring
+
+`AtlasFoundationFirstEngine.generate_city_stl()` artık generic building
+product-height context'ini production öncesinde çözebilir.
+
+Context:
+
+`raw buildings + roads + landmarks`
+→ `road-defined urban blocks`
+→ `local block height context`
+→ `building product-height normalization`
+→ `FoundationFirstPipeline`
+→ `FoundationMeshExtruder`
+
+zinciri üzerinden gerçek mesh üretimine ulaşır.
+
+Public production parameter:
+
+- `building_minimum_readable_height_mm`
+
+ile fiziksel minimum product readability kontrol edilebilir.
+
+Normalizasyon context'i olmayan building'lerde legacy extrusion davranışı
+korunur.
+
+### Existing behavior compatibility
+
+8.12 entegrasyonu sırasında iki compatibility sınırı ayrıca doğrulandı:
+
+- tek road segment içeren unrelated scenes Urban Block resolution nedeniyle
+  hata vermez
+- legacy FoundationFirst extruder test doubles, product override yokken eski
+  çağrı contract'ıyla çalışmaya devam eder
+
+Böylece yeni product-height davranışı opt-in / context-driven kalır.
+
+### Roadmap acceptance sonucu
+
+8.12 roadmap maddeleri karşılandı:
+
+- generic building height reasoning
+- local block context
+- product scale
+- physical minimum readable height
+- excessive background height control
+- statistical height outlier handling
+- landmark proximity
+- semantic building importance
+- semantic landmark architecture preservation
+- source height truth preservation
+- non-destructive city-height normalization
+
+Primary acceptance principle karşılandı:
+
+> Generic buildings should form a coherent background height field while
+> meaningful landmarks remain visually dominant.
+
+### Doğrulama
+
+8.12 focused / production integration regression:
+
+- `114 passed in 0.29s`
+
+Full ATLAS regression:
+
+- `3446 passed in 14.60s`
+
+8.12 kapsamında açık teknik iş kalmadı.
+
+**Sıradaki roadmap paketi: 8.13 — Physical Cartographic Exaggeration Resolver.**
+
