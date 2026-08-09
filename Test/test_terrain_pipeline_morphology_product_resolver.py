@@ -164,3 +164,65 @@ def test_pipeline_clamps_product_relief_without_changing_source_truth(
     assert result["metadata"]["z_scale"] == pytest.approx(
         3000.0
     )
+
+
+def test_pipeline_can_enable_presentation_surface_regularization(
+    monkeypatch,
+):
+    source = _source_mesh()
+    source["top_points"] = [
+        [
+            (0.0, 0.0, 1.0),
+            (1.0, 0.0, 1.0),
+            (2.0, 0.0, 1.0),
+        ],
+        [
+            (0.0, 1.0, 1.0),
+            (1.0, 1.0, 2.0),
+            (2.0, 1.0, 1.0),
+        ],
+        [
+            (0.0, 2.0, 1.0),
+            (1.0, 2.0, 1.0),
+            (2.0, 2.0, 1.0),
+        ],
+    ]
+    source["bottom_points"] = [
+        [
+            (0.0, 0.0, 0.0),
+            (1.0, 0.0, 0.0),
+            (2.0, 0.0, 0.0),
+        ],
+        [
+            (0.0, 1.0, 0.0),
+            (1.0, 1.0, 0.0),
+            (2.0, 1.0, 0.0),
+        ],
+        [
+            (0.0, 2.0, 0.0),
+            (1.0, 2.0, 0.0),
+            (2.0, 2.0, 0.0),
+        ],
+    ]
+    source["metadata"]["grid_size"] = 3
+
+    _patch_terrain(
+        monkeypatch,
+        source,
+    )
+
+    result = AtlasTerrainPipeline.build_terrain_slab(
+        bbox=(50.0, 8.0, 50.1, 8.1),
+        target_size_mm=150.0,
+        z_scale=3000.0,
+        base_z=0.80,
+        bottom_z=0.0,
+        grid_size=3,
+        presentation_regularization_passes=1,
+        presentation_regularization_strength=0.50,
+        debug=False,
+    )
+
+    assert result["top_points"] == source["top_points"]
+    assert "presentation_top_points" in result
+    assert result["metadata"]["presentation_regularized"] is True

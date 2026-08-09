@@ -4256,3 +4256,30 @@ Sözleşme:
 alınmadan LOCK değildir.
 
 8.10 Water & Shoreline Composition Engine henüz başlanmayacaktır.
+
+## 9 Ağustos 2026 — 8.9 FINAL LOCK
+
+**8.9 Morphology-Aware Terrain Product Resolver: LOCK**
+
+Tamamlanan final terrain sözleşmesi:
+
+- morphology-aware terrain resolver tamamlandı
+- canonical source elevation truth korunuyor
+- SRTM provider bilinear interpolation kullanıyor
+- OpenTopography/COP30 provider bilinear interpolation kullanıyor
+- `terrain_grid_size` production FoundationFirst zincirinde configurable
+- legacy default `25`
+- Köln production integration reference `97 x 97`
+- visible terrain için deterministic presentation-surface regularization eklendi
+- canonical `grid` değişmiyor
+- canonical `top_points` değişmiyor
+- FoundationSampler terrain truth değişmiyor
+- visible surface ayrı `presentation_top_points` üzerinden üretiliyor
+- presentation regularization default olarak kapalıdır
+- Köln GRID97 A/B Bambu Studio görsel acceptance tamamlandı
+- full regression: `3348 passed in 13.42s`
+
+8.9 kapsamında açık teknik iş kalmadı.
+
+**DURMA NOKTASI:** 8.10 Water & Shoreline Composition Engine henüz
+başlatılmayacak. Kullanıcının sonraki talimatı beklenecek.

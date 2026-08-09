@@ -12,6 +12,9 @@ from CORE.atlas_terrain_surface_texture import (
 from CORE.atlas_morphology_aware_terrain_product_resolver import (
     AtlasMorphologyAwareTerrainProductResolver,
 )
+from CORE.atlas_terrain_presentation_surface_regularizer import (
+    AtlasTerrainPresentationSurfaceRegularizer,
+)
 
 
 class AtlasTerrainPipeline:
@@ -47,6 +50,8 @@ class AtlasTerrainPipeline:
         landmark_present=None,
         terrain_minimum_printable_relief_mm=None,
         terrain_maximum_printable_relief_mm=None,
+        presentation_regularization_passes=0,
+        presentation_regularization_strength=0.50,
         debug=True,
     ):
         if terrace_step_mm is not None:
@@ -124,6 +129,12 @@ class AtlasTerrainPipeline:
                 base_z=base_z,
                 bottom_z=bottom_z,
                 terrace_step_mm=terrace_step_mm,
+            )
+
+            mesh = AtlasTerrainPipeline._apply_presentation_regularization(
+                mesh=mesh,
+                passes=presentation_regularization_passes,
+                strength=presentation_regularization_strength,
             )
 
             return AtlasTerrainPipeline._apply_morphology_product_profile(
@@ -234,6 +245,12 @@ class AtlasTerrainPipeline:
             terrace_step_mm=terrace_step_mm,
         )
 
+        mesh = AtlasTerrainPipeline._apply_presentation_regularization(
+            mesh=mesh,
+            passes=presentation_regularization_passes,
+            strength=presentation_regularization_strength,
+        )
+
         return AtlasTerrainPipeline._apply_morphology_product_profile(
             mesh=mesh,
             target_size_mm=target_size_mm,
@@ -247,6 +264,24 @@ class AtlasTerrainPipeline:
             maximum_printable_relief_mm=(
                 terrain_maximum_printable_relief_mm
             ),
+        )
+
+    @staticmethod
+    def _apply_presentation_regularization(
+        *,
+        mesh,
+        passes,
+        strength,
+    ):
+        passes = int(passes)
+
+        if passes <= 0:
+            return mesh
+
+        return AtlasTerrainPresentationSurfaceRegularizer.regularize(
+            mesh=mesh,
+            passes=passes,
+            strength=strength,
         )
 
     @staticmethod

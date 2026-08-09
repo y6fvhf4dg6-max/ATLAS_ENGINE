@@ -840,6 +840,8 @@ Primary acceptance principle:
 
 ## 8.9 — Morphology-Aware Terrain Product Resolver
 
+**Status: LOCK — 9 August 2026**
+
 Terrain presentation must adapt to the character of the product area.
 
 The existing terrain pipeline remains the source of canonical terrain truth.
@@ -929,13 +931,10 @@ grid requirement. Product grid density must remain configurable.
 
 ### Presentation-surface regularization
 
-The remaining product-facing problem is visible DEM banding/faceting on the
-terrain surface, especially under shallow lighting and in single-color physical
-presentation.
+Visible DEM banding/faceting is regularized only in the product-facing terrain
+surface, without corrupting canonical terrain truth.
 
-This must be solved without corrupting canonical terrain truth.
-
-The architecture must distinguish between:
+The locked architecture distinguishes between:
 
 1. canonical terrain truth used for elevation semantics and foundation
    placement; and
@@ -962,6 +961,28 @@ Additional terrain-surface acceptance principle:
 > Product-facing terrain should read as continuous natural topography rather
 > than as DEM raster structure, while canonical elevation truth remains
 > unchanged.
+
+### 8.9 locked acceptance
+
+Verified implementation:
+
+- morphology-aware terrain product profile is deterministic
+- source DEM elevation truth remains unchanged
+- SRTM raster sampling uses bilinear interpolation
+- OpenTopography/COP30 raster sampling uses bilinear interpolation
+- production `terrain_grid_size` is configurable; legacy default remains `25`
+- Köln full-city integration is verified at `97 x 97`
+- canonical `grid` remains unchanged by presentation regularization
+- canonical `top_points` remain unchanged for foundation sampling
+- `presentation_top_points` carry only the visible regularized surface
+- visible terrain triangles are rebuilt from presentation geometry
+- regularization is deterministic, optional, and disabled by default
+- Köln GRID97 A/B inspection accepted the regularized visible surface
+- full ATLAS regression: `3348 passed in 13.42s`
+
+8.9 is LOCKED.
+
+The next roadmap package is 8.10, but it must not start until explicitly resumed.
 
 
 ## 8.10 — Water & Shoreline Composition Engine

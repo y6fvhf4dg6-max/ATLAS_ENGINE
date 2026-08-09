@@ -117,3 +117,23 @@ def test_foundation_first_engine_forwards_terrain_grid_size(
         )
 
     assert captured["grid_size"] == 97
+
+
+def test_foundation_first_engine_exposes_presentation_regularization():
+    signature = inspect.signature(
+        AtlasFoundationFirstEngine.generate_city_stl
+    )
+
+    assert (
+        signature.parameters[
+            "terrain_presentation_regularization_passes"
+        ].default
+        == 0
+    )
+
+    assert (
+        signature.parameters[
+            "terrain_presentation_regularization_strength"
+        ].default
+        == 0.50
+    )

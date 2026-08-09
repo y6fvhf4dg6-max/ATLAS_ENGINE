@@ -820,6 +820,8 @@ class AtlasFoundationFirstEngine:
         road_minimum_printable_width_mm=None,
         tree_row_nozzle_diameter_mm=0.4,
         terrain_grid_size=25,
+        terrain_presentation_regularization_passes=0,
+        terrain_presentation_regularization_strength=0.50,
         debug=True,
     ):
         source_bbox = bbox
@@ -1029,6 +1031,12 @@ class AtlasFoundationFirstEngine:
             grid_size=terrain_grid_size,
             terrain_provider_name=(terrain_provider_name),
             smoothing_passes=terrain_smoothing_passes,
+            presentation_regularization_passes=(
+                terrain_presentation_regularization_passes
+            ),
+            presentation_regularization_strength=(
+                terrain_presentation_regularization_strength
+            ),
             surface_texture_amplitude_mm=(
                 terrain_surface_texture_amplitude_mm
             ),
