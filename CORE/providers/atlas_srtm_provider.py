@@ -41,28 +41,70 @@ class AtlasSRTMProvider(AtlasTerrainProvider):
         lat_floor = math.floor(lat)
         lon_floor = math.floor(lon)
 
-        row = int(
-            round(
-                (lat_floor + 1.0 - lat)
-                * (tile_size - 1)
-            )
+        row_position = (
+            (lat_floor + 1.0 - lat)
+            * (tile_size - 1)
         )
-        col = int(
-            round(
-                (lon - lon_floor)
-                * (tile_size - 1)
-            )
+        col_position = (
+            (lon - lon_floor)
+            * (tile_size - 1)
         )
 
-        row = max(0, min(tile_size - 1, row))
-        col = max(0, min(tile_size - 1, col))
+        row_position = max(
+            0.0,
+            min(
+                float(tile_size - 1),
+                row_position,
+            ),
+        )
+        col_position = max(
+            0.0,
+            min(
+                float(tile_size - 1),
+                col_position,
+            ),
+        )
 
-        height = data[row, col]
+        row0 = int(math.floor(row_position))
+        col0 = int(math.floor(col_position))
 
-        if height == self.NO_DATA_VALUE:
+        row1 = min(row0 + 1, tile_size - 1)
+        col1 = min(col0 + 1, tile_size - 1)
+
+        ty = row_position - row0
+        tx = col_position - col0
+
+        z00 = data[row0, col0]
+        z10 = data[row0, col1]
+        z01 = data[row1, col0]
+        z11 = data[row1, col1]
+
+        values = (
+            z00,
+            z10,
+            z01,
+            z11,
+        )
+
+        if any(
+            value == self.NO_DATA_VALUE
+            for value in values
+        ):
             return None
 
-        return float(height)
+        z0 = (
+            float(z00) * (1.0 - tx)
+            + float(z10) * tx
+        )
+        z1 = (
+            float(z01) * (1.0 - tx)
+            + float(z11) * tx
+        )
+
+        return (
+            z0 * (1.0 - ty)
+            + z1 * ty
+        )
 
     def _load_tile(self, tile_path):
         if tile_path in self.tile_cache:

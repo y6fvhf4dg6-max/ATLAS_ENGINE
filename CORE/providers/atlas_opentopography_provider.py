@@ -1,5 +1,6 @@
 # CORE/providers/atlas_opentopography_provider.py
 
+import math
 import os
 import urllib.parse
 import urllib.request
@@ -174,21 +175,103 @@ class AtlasOpenTopographyProvider(AtlasTerrainProvider):
         return grid
 
     def _height_from_grid(self, grid, lat, lon):
-        col = round((lon - grid["west"]) / grid["cellsize"])
-        row_from_south = round((lat - grid["south"]) / grid["cellsize"])
+        col_position = (
+            (lon - grid["west"])
+            / grid["cellsize"]
+        )
+        row_from_south_position = (
+            (lat - grid["south"])
+            / grid["cellsize"]
+        )
 
-        col = max(0, min(grid["ncols"] - 1, col))
-        row_from_south = max(0, min(grid["nrows"] - 1, row_from_south))
+        col_position = max(
+            0.0,
+            min(
+                float(grid["ncols"] - 1),
+                col_position,
+            ),
+        )
+        row_from_south_position = max(
+            0.0,
+            min(
+                float(grid["nrows"] - 1),
+                row_from_south_position,
+            ),
+        )
+
+        col0 = int(
+            math.floor(col_position)
+        )
+        col1 = min(
+            col0 + 1,
+            grid["ncols"] - 1,
+        )
+
+        south_row0 = int(
+            math.floor(
+                row_from_south_position
+            )
+        )
+        south_row1 = min(
+            south_row0 + 1,
+            grid["nrows"] - 1,
+        )
+
+        tx = col_position - col0
+        ty = (
+            row_from_south_position
+            - south_row0
+        )
 
         # AAIGrid data rows start from north.
-        row = (grid["nrows"] - 1) - row_from_south
+        row0 = (
+            grid["nrows"] - 1
+            - south_row0
+        )
+        row1 = (
+            grid["nrows"] - 1
+            - south_row1
+        )
 
-        value = grid["values"][row][col]
+        z00 = grid["values"][row0][col0]
+        z10 = grid["values"][row0][col1]
+        z01 = grid["values"][row1][col0]
+        z11 = grid["values"][row1][col1]
 
-        if grid["nodata_value"] is not None and value == grid["nodata_value"]:
+        values = (
+            z00,
+            z10,
+            z01,
+            z11,
+        )
+
+        nodata_value = grid[
+            "nodata_value"
+        ]
+
+        if (
+            nodata_value is not None
+            and any(
+                value == nodata_value
+                for value in values
+            )
+        ):
             return None
 
-        return float(value)
+        south_height = (
+            float(z00) * (1.0 - tx)
+            + float(z10) * tx
+        )
+
+        north_height = (
+            float(z01) * (1.0 - tx)
+            + float(z11) * tx
+        )
+
+        return (
+            south_height * (1.0 - ty)
+            + north_height * ty
+        )
 
     def _cache_path(
         self,

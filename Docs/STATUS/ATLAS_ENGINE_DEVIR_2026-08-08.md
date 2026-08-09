@@ -4187,3 +4187,72 @@ Sonraki güvenli işlem:
 5. commit;
 6. `origin/main` push;
 7. push sonrası `HEAD == origin/main` ve çalışma ağacı durumunu doğrula.
+
+
+## 9 Ağustos 2026 — 8.9 Terrain Sampling / Presentation Devir Güncellemesi
+
+Aktif roadmap paketi:
+
+**8.9 Morphology-Aware Terrain Product Resolver**
+
+8.9 önceki resolver/pipeline aşamasının ötesinde gerçek terrain product
+presentation audit ile genişletildi.
+
+Doğrulanmış bulgular:
+
+1. Canonical FoundationSampler normal terrain'de bilinear interpolation kullanır.
+2. Eski 25 x 25 physical terrain triangulation canonical truth ile birebir aynı
+   yüzey değildir.
+3. Köln 25 x 25 truth/mesh maksimum Z farkı `0.486493 mm` ölçüldü.
+4. 97 x 97 canonical presentation referansında maksimum fark `0.030406 mm`
+   seviyesine düştü.
+5. Köln local SRTM kullanmaz; `N50E006.hgt` mevcut değildir.
+6. Köln production terrain OpenTopography COP30 fallback üzerinden gelir.
+7. OpenTopography provider nearest-neighbor raster sampling kullanıyordu.
+8. Provider test-first bilinear interpolation'a geçirildi.
+9. `terrain_grid_size` FoundationFirst production API'sine eklendi;
+   default `25` korunur.
+10. `terrain_grid_size=97` gerçek FoundationFirst → TerrainPipeline zincirinde
+    propagate edildi ve test edildi.
+11. Gerçek Köln 97 x 97 full-city üretimi başarılı:
+    - city STL: `74762` triangle
+    - preview scene: `81404` triangle
+12. Bambu Studio incelemesinde terrain continuity belirgin biçimde iyileşti;
+    şehir/foundation ilişkisi sağlam kaldı.
+
+Focused doğrulamalar:
+
+- SRTM provider: `2 passed`
+- OpenTopography provider: `1 passed`
+- FoundationFirst terrain-grid integration: `4 passed`
+
+Henüz yapılmayanlar:
+
+- related regression
+- full ATLAS regression
+- scoped commit / push
+- 8.9 final LOCK
+
+Kalan ana teknik problem:
+
+- source DEM raster karakterinden kalan product-facing terrain
+  banding/faceting
+
+Sıradaki tek geliştirme:
+
+**Presentation-Surface Regularization**
+
+Sözleşme:
+
+- canonical terrain truth korunacak
+- foundation Z truth korunacak
+- source DEM elevation değiştirilmeyecek
+- arbitrary terrain feature icat edilmeyecek
+- large-scale morphology korunacak
+- visible product surface deterministic biçimde regularize edilecek
+- test-first ilerlenilecek
+
+8.9 bu paket tamamlanıp related/full regression ve görsel acceptance
+alınmadan LOCK değildir.
+
+8.10 Water & Shoreline Composition Engine henüz başlanmayacaktır.

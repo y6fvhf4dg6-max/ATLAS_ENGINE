@@ -819,6 +819,7 @@ class AtlasFoundationFirstEngine:
         include_castle_semantic_architecture=False,
         road_minimum_printable_width_mm=None,
         tree_row_nozzle_diameter_mm=0.4,
+        terrain_grid_size=25,
         debug=True,
     ):
         source_bbox = bbox
@@ -1025,7 +1026,7 @@ class AtlasFoundationFirstEngine:
             z_scale=z_scale,
             base_z=(AtlasFoundationFirstEngine.BASE_PLATE_HEIGHT_MM),
             bottom_z=0.0,
-            grid_size=25,
+            grid_size=terrain_grid_size,
             terrain_provider_name=(terrain_provider_name),
             smoothing_passes=terrain_smoothing_passes,
             surface_texture_amplitude_mm=(

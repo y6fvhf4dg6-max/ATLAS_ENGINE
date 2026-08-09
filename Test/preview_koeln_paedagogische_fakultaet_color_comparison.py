@@ -88,6 +88,7 @@ def main(argv=None):
         max_points=300,
         z_scale=SCALE_RATIO,
         terrain_provider_name="srtm",
+        terrain_grid_size=97,
         fixed_xy_scale=SCALE_RATIO,
         use_fixed_xy_scale=True,
         debug=False,

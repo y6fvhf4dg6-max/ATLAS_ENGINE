@@ -3105,3 +3105,65 @@ Doğrulama:
 Ardından:
 
 **8.10 Water & Shoreline Composition Engine**
+
+
+## 9 Ağustos 2026 — 8.9 Terrain Sampling / Presentation Current Status
+
+8.9 durumu:
+
+- morphology-aware resolver: yeşil
+- terrain pipeline resolver integration: yeşil
+- provider sampling audit: tamamlandı
+- OpenTopography/COP30 bilinear sampling: yeşil
+- configurable production terrain grid: yeşil
+- Köln 97 x 97 full-city integration: doğrulandı
+- presentation-surface regularization: AÇIK
+- 8.9 LOCK: HAYIR
+
+Köln terrain truth:
+
+- local SRTM tile `N50E006.hgt` mevcut değil
+- gerçek production source:
+  OpenTopography COP30 fallback
+- cache:
+  `CACHE/DEM/COP30_50_930972_6_914474_50_937593_6_924979.asc`
+
+Provider-level bulgular:
+
+- SRTM nearest-neighbor sampling test-first bilinear hale getirildi
+- focused SRTM test: `2 passed`
+- OpenTopography nearest-neighbor sampling test-first bilinear hale getirildi
+- focused OpenTopography test: `1 passed`
+
+Terrain grid integration:
+
+- yeni production parametresi:
+  `terrain_grid_size`
+- default:
+  `25`
+- Köln integration reference:
+  `97`
+- FoundationFirst → TerrainPipeline propagation doğrulandı
+- focused integration:
+  `4 passed`
+
+Köln full-city 97 x 97 sonuç:
+
+- city triangles: `74762`
+- preview triangles: `81404`
+- buildings / roads / parks / vegetation / foundations terrain ile birlikte
+  başarılı üretildi
+- Bambu Studio görsel incelemesinde coarse terrain stepping belirgin biçimde
+  azaldı
+
+Kalan problem:
+
+- single-color / shallow-light görünümünde source DEM raster karakterinden kalan
+  yüzey banding/faceting
+
+Sıradaki tek adım:
+
+**canonical truth'u değiştirmeyen deterministic presentation-surface
+regularization paketini test-first geliştirmek.**
+
+Bu tamamlanmadan 8.10'a geçilmez.

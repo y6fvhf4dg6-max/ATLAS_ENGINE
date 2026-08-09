@@ -842,9 +842,11 @@ Primary acceptance principle:
 
 Terrain presentation must adapt to the character of the product area.
 
-The existing terrain pipeline remains the source of terrain truth.
+The existing terrain pipeline remains the source of canonical terrain truth.
 
-This resolver changes only product-facing terrain emphasis.
+This resolver changes only product-facing terrain emphasis and presentation.
+Canonical source elevations used for terrain semantics and foundation placement
+must remain unchanged.
 
 Candidate morphology behavior:
 
@@ -883,15 +885,83 @@ The resolver must reason about:
 - landmark presence
 - physical relief range
 - printability
+- source DEM spatial resolution
+- terrain sampling density
+- product-facing surface regularization
 
 The resolver must not modify source elevation data.
 
 It must apply a deterministic product-profile transformation.
 
+### Terrain source and sampling requirements
+
+Production terrain must preserve real elevation truth while avoiding avoidable
+sampling artifacts.
+
+The terrain path must support:
+
+- real DEM-backed elevation acquisition
+- provider-level continuous interpolation between raster samples
+- configurable production terrain grid density
+- propagation of terrain grid density through the real city-generation path
+- preservation of the same canonical terrain truth for downstream foundation
+  placement
+
+Increasing mesh sampling density must not be treated as equivalent to increasing
+source DEM resolution. A denser product mesh may represent the available DEM
+more continuously, but it must not invent new topographic information.
+
+### Verified Köln reference
+
+The Köln Pädagogische Fakultät reference scene has established the following
+ground-truth behavior:
+
+- COP30/OpenTopography terrain data is usable as real terrain truth
+- provider-level bilinear interpolation removes nearest-sample stepping
+- `terrain_grid_size` is exposed through the production city-generation path
+- a 97 x 97 terrain grid successfully propagates into the full Köln city scene
+- the resulting city STL remains compatible with buildings, roads, vegetation,
+  and foundation placement
+- increased terrain sampling density materially improves terrain continuity
+
+The 97 x 97 Köln validation is an integration reference, not a universal fixed
+grid requirement. Product grid density must remain configurable.
+
+### Presentation-surface regularization
+
+The remaining product-facing problem is visible DEM banding/faceting on the
+terrain surface, especially under shallow lighting and in single-color physical
+presentation.
+
+This must be solved without corrupting canonical terrain truth.
+
+The architecture must distinguish between:
+
+1. canonical terrain truth used for elevation semantics and foundation
+   placement; and
+2. product-facing terrain presentation geometry used for the visible surface.
+
+Presentation-surface regularization may reduce raster-derived visual banding,
+but it must not:
+
+- move or invalidate building foundations
+- change canonical source elevations
+- invent terrain features unsupported by the DEM
+- erase meaningful large-scale topographic morphology
+- use non-deterministic smoothing
+
+The regularization behavior must be deterministic and developed test-first.
+
 Primary acceptance principle:
 
 > Terrain should support the identity of the place without overpowering the
 > semantic content that matters most for that morphology.
+
+Additional terrain-surface acceptance principle:
+
+> Product-facing terrain should read as continuous natural topography rather
+> than as DEM raster structure, while canonical elevation truth remains
+> unchanged.
 
 
 ## 8.10 — Water & Shoreline Composition Engine

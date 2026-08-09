@@ -1573,3 +1573,97 @@ Bu acceptance tamamlandıktan sonra roadmap sırasındaki:
 **8.10 Water & Shoreline Composition Engine**
 
 paketine geçilecek.
+
+
+## 9 Ağustos 2026 — 8.9 Terrain Sampling & Presentation Update
+
+### 8.9 Morphology-Aware Terrain Product Resolver — AKTİF / LOCK DEĞİL
+
+8.9 terrain incelemesi Köln Pädagogische Fakultät gerçek ürün sahnesi
+üzerinde derinleştirildi.
+
+Önemli mimari bulgular:
+
+- canonical terrain truth ile fiziksel terrain triangulation arasında
+  ölçülebilir Z farkı bulundu
+- mevcut 25 x 25 terrain grid'de:
+  - mean truth/mesh farkı: `0.084182 mm`
+  - p95: `0.241056 mm`
+  - p99: `0.318434 mm`
+  - maksimum: `0.486493 mm`
+- canonical terrain'i daha yoğun presentation grid ile örneklemek bu farkı
+  belirgin biçimde düşürdü
+- 97 x 97 presentation referansında maksimum fark:
+  `0.030406 mm`
+
+Köln terrain kaynağı doğrulandı:
+
+- Köln için local `N50E006.hgt` mevcut değildir
+- production terrain hattı OpenTopography `COP30` fallback kullanır
+- kullanılan gerçek cache:
+  `CACHE/DEM/COP30_50_930972_6_914474_50_937593_6_924979.asc`
+
+Provider sampling bulgusu:
+
+- SRTM provider nearest-neighbor örnekleme kullanıyordu
+- SRTM provider için bilinear interpolation test-first eklendi
+- focused test: `2 passed`
+- Köln sahnesi SRTM kullanmadığı için bu değişiklik Köln çözümünden ayrıdır
+
+OpenTopography / COP30:
+
+- `_height_from_grid()` nearest-neighbor örnekleme kullanıyordu
+- bilinear interpolation için kırmızı regression oluşturuldu
+- önceki sonuç: `300.0`
+- beklenen bilinear sonuç: `250.0`
+- provider bilinear hale getirildi
+- focused test: `1 passed`
+
+Gerçek Köln COP30 doğrulaması:
+
+- bilinear 49 x 49:
+  - triangles: `9600`
+  - elevation delta: `15.97770217888565 m`
+- bilinear 97 x 97:
+  - triangles: `37632`
+  - elevation delta: `16.30764222143206 m`
+- Bambu Studio A/B incelemesinde nearest-neighbor kaynaklı sert
+  basamak/plato karakteri belirgin biçimde azaldı
+
+Production grid sözleşmesi:
+
+- `AtlasFoundationFirstEngine.generate_city_stl()` artık
+  `terrain_grid_size` parametresi expose eder
+- legacy default: `25`
+- değer gerçek production çağrısında
+  `AtlasTerrainPipeline.build_terrain_slab()` içine propagate edilir
+- focused integration: `4 passed`
+
+Gerçek Köln full-city 97 x 97 entegrasyonu:
+
+- city STL: `74762` triangle
+- color preview scene: `81404` triangle
+- binalar, yollar, parklar, vegetation ve foundation yerleşimi görsel olarak
+  sağlam kaldı
+- belirgin floating geometry veya yeni terrain-integration kırılması görülmedi
+
+### Kalan 8.9 işi
+
+Terrain artık daha doğru ve sürekli örnekleniyor; ancak beyaz/single-color yakın
+görünümde kaynak DEM raster yapısından kalan hafif banding/faceting hâlâ
+görülebiliyor.
+
+Sıradaki tek geliştirme:
+
+**deterministic presentation-surface regularization**
+
+Kural:
+
+- canonical terrain truth değişmeyecek
+- foundation placement truth değişmeyecek
+- source DEM elevation değerleri bozulmayacak
+- yeni topoğrafik detay icat edilmeyecek
+- yalnız product-facing visible terrain surface düzenlenecek
+- test-first ilerlenilecek
+
+8.9 bu iş ve ilgili regresyon/görsel acceptance tamamlanmadan LOCK değildir.
