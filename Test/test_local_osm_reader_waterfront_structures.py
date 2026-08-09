@@ -158,3 +158,54 @@ def test_reader_collects_pier_and_marina_without_bridge_pier_confusion():
         "waterfront_pier",
         "marina",
     ]
+
+
+def test_reader_collects_open_linear_waterways_for_product_geometry():
+    reader = AtlasLocalOSMReader(
+        bbox=(
+            49.0,
+            7.0,
+            51.0,
+            9.0,
+        )
+    )
+
+    for way_id, waterway in (
+        (1101, "stream"),
+        (1102, "river"),
+        (1103, "canal"),
+    ):
+        reader.way(
+            _Way(
+                way_id,
+                {
+                    "waterway": waterway,
+                    "width": "1.5",
+                },
+                (
+                    (50.0, 8.0),
+                    (50.0, 8.1),
+                ),
+            )
+        )
+
+    assert [
+        item["id"]
+        for item in reader.waters
+    ] == [
+        1101,
+        1102,
+        1103,
+    ]
+
+    assert [
+        item["tags"]["waterway"]
+        for item in reader.waters
+    ] == [
+        "stream",
+        "river",
+        "canal",
+    ]
+
+    for item in reader.waters:
+        assert len(item["geometry"]) == 2

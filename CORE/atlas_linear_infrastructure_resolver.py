@@ -4,6 +4,9 @@ from dataclasses import dataclass
 import math
 
 from CORE.atlas_urban_road_hierarchy_resolver import AtlasUrbanRoadHierarchyResolver
+from CORE.atlas_physical_cartographic_exaggeration_resolver import (
+    AtlasPhysicalCartographicExaggerationResolver,
+)
 
 @dataclass(frozen=True, slots=True)
 class AtlasLinearInfrastructureProfile:
@@ -214,6 +217,9 @@ class AtlasLinearInfrastructureResolver:
         minimum_printable_width_mm,
         line_width_mm,
         minimum_gap_mm,
+        cartographic_product_size_mm=None,
+        cartographic_nozzle_diameter_mm=None,
+        cartographic_lod_level=None,
     ) -> AtlasLinearInfrastructureProfile | None:
         tags = tags or {}
 
@@ -227,6 +233,7 @@ class AtlasLinearInfrastructureResolver:
         )
 
         source_width = tags.get("width")
+        real_width_m = None
 
         try:
             candidate = source_width
@@ -249,7 +256,7 @@ class AtlasLinearInfrastructureResolver:
             TypeError,
             ValueError,
         ):
-            pass
+            real_width_m = None
         else:
             physical_width_mm = cls.resolve_physical_width_mm(
                 real_width_m=real_width_m,
@@ -307,6 +314,77 @@ class AtlasLinearInfrastructureResolver:
 
         if visual_priority is None:
             return None
+
+        cartographic_arguments = (
+            cartographic_product_size_mm,
+            cartographic_nozzle_diameter_mm,
+            cartographic_lod_level,
+        )
+
+        cartographic_enabled = all(
+            value is not None
+            for value in cartographic_arguments
+        )
+
+        cartographic_partially_configured = any(
+            value is not None
+            for value in cartographic_arguments
+        )
+
+        if (
+            cartographic_partially_configured
+            and not cartographic_enabled
+        ):
+            raise ValueError(
+                "cartographic exaggeration requires "
+                "product size, nozzle diameter and LoD level"
+            )
+
+        if (
+            cartographic_enabled
+            and real_width_m is not None
+        ):
+            cartographic_semantic_class = {
+                "cycle_corridor": "cycleway",
+            }.get(
+                semantic_class,
+                semantic_class,
+            )
+
+            if (
+                cartographic_semantic_class
+                in AtlasPhysicalCartographicExaggerationResolver
+                .SUPPORTED_SEMANTIC_CLASSES
+            ):
+                exaggeration = (
+                    AtlasPhysicalCartographicExaggerationResolver
+                    .resolve(
+                        semantic_class=(
+                            cartographic_semantic_class
+                        ),
+                        source_width_m=real_width_m,
+                        scale_ratio=scale_ratio,
+                        product_size_mm=(
+                            cartographic_product_size_mm
+                        ),
+                        nozzle_diameter_mm=(
+                            cartographic_nozzle_diameter_mm
+                        ),
+                        minimum_printable_width_mm=(
+                            minimum_printable_width_mm
+                        ),
+                        semantic_priority=(
+                            visual_priority
+                        ),
+                        lod_level=(
+                            cartographic_lod_level
+                        ),
+                    )
+                )
+
+                physical_width_mm = (
+                    exaggeration.physical_width_mm
+                )
 
         return AtlasLinearInfrastructureProfile(
             semantic_class=semantic_class,

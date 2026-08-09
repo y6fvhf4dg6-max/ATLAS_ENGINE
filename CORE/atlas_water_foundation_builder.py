@@ -23,6 +23,15 @@ from CORE.atlas_water_surface_texture import (
 from CORE.atlas_water_textured_solid_mesher import (
     AtlasWaterTexturedSolidMesher,
 )
+from CORE.atlas_terrain_contour_band_builder import (
+    AtlasTerrainContourBandBuilder,
+)
+from CORE.atlas_linear_infrastructure_solid_builder import (
+    AtlasLinearInfrastructureSolidBuilder,
+)
+from CORE.atlas_water_shoreline_composition_resolver import (
+    AtlasWaterShorelineCompositionResolver,
+)
 
 
 class AtlasWaterFoundationBuilder:
@@ -121,6 +130,201 @@ class AtlasWaterFoundationBuilder:
             print("")
 
         return meshes
+
+    @staticmethod
+    def build_narrow_waterway_meshes(
+        waters,
+        coordinate_engine,
+        terrain_mesh,
+        minimum_printable_width_mm,
+        cartographic_product_size_mm,
+        cartographic_nozzle_diameter_mm,
+        cartographic_lod_level,
+        debug=True,
+    ):
+        meshes = []
+        skipped = 0
+
+        for water in waters or ():
+            tags = water.get("tags", {}) or {}
+
+            waterway_type = str(
+                tags.get("waterway", "")
+            ).strip().lower()
+
+            if waterway_type not in {
+                "river",
+                "stream",
+                "canal",
+            }:
+                skipped += 1
+                continue
+
+            geometry = water.get("geometry", ())
+
+            if len(geometry) < 2:
+                skipped += 1
+                continue
+
+            source_width = tags.get("width")
+
+            try:
+                candidate = source_width
+
+                if isinstance(candidate, str):
+                    candidate = (
+                        candidate
+                        .replace("m", "")
+                        .strip()
+                    )
+
+                source_width_m = float(candidate)
+
+                if source_width_m <= 0.0:
+                    raise ValueError
+            except (
+                TypeError,
+                ValueError,
+            ):
+                skipped += 1
+                continue
+
+            exaggeration = (
+                AtlasWaterShorelineCompositionResolver
+                .resolve_cartographic_exaggeration(
+                    semantic_class="narrow_waterway",
+                    source_width_m=source_width_m,
+                    scale_ratio=(
+                        coordinate_engine.xy_scale
+                    ),
+                    product_size_mm=(
+                        cartographic_product_size_mm
+                    ),
+                    nozzle_diameter_mm=(
+                        cartographic_nozzle_diameter_mm
+                    ),
+                    minimum_printable_width_mm=(
+                        minimum_printable_width_mm
+                    ),
+                    semantic_priority=0.80,
+                    lod_level=(
+                        cartographic_lod_level
+                    ),
+                )
+            )
+
+            mesh = (
+                AtlasWaterFoundationBuilder
+                ._build_narrow_waterway_mesh(
+                    geometry=geometry,
+                    coordinate_engine=coordinate_engine,
+                    terrain_mesh=terrain_mesh,
+                    width_mm=(
+                        exaggeration.physical_width_mm
+                    ),
+                    waterway_type=waterway_type,
+                    source_id=water.get("id"),
+                )
+            )
+
+            if mesh is None:
+                skipped += 1
+                continue
+
+            meshes.append(mesh)
+
+        if debug:
+            print("")
+            print("=" * 70)
+            print(
+                "ATLAS NARROW WATERWAY "
+                "FOUNDATION BUILDER"
+            )
+            print("=" * 70)
+            print(
+                f"Input waters      : "
+                f"{len(waters or ())}"
+            )
+            print(
+                f"Accepted waterways: "
+                f"{len(meshes)}"
+            )
+            print(
+                f"Skipped waterways : "
+                f"{skipped}"
+            )
+            print("=" * 70)
+            print("")
+
+        return meshes
+
+    @staticmethod
+    def _build_narrow_waterway_mesh(
+        *,
+        geometry,
+        coordinate_engine,
+        terrain_mesh,
+        width_mm,
+        waterway_type,
+        source_id,
+    ):
+        width_mm = float(width_mm)
+
+        if width_mm <= 0.0:
+            raise ValueError(
+                "width_mm must be greater than zero"
+            )
+
+        points = (
+            coordinate_engine
+            .geometry_to_stl_mm(
+                geometry
+            )
+        )
+
+        if len(points) < 2:
+            return None
+
+        footprint = (
+            AtlasTerrainContourBandBuilder
+            .build_band(
+                polyline=points,
+                half_width_mm=(
+                    width_mm / 2.0
+                ),
+            )
+        )
+
+        if len(footprint) < 3:
+            return None
+
+        mesh = (
+            AtlasLinearInfrastructureSolidBuilder
+            .build_polygon_solid(
+                points=footprint,
+                terrain_mesh=terrain_mesh,
+                height_mm=(
+                    AtlasWaterFoundationBuilder
+                    .WATER_HEIGHT_MM
+                ),
+            )
+        )
+
+        if mesh is None:
+            return None
+
+        return {
+            **mesh,
+            "type": (
+                "narrow_waterway_foundation"
+            ),
+            "waterway_type": waterway_type,
+            "source_id": source_id,
+            "physical_width_mm": width_mm,
+            "placement_mode": (
+                "terrain_following"
+            ),
+        }
 
     @staticmethod
     def build_inland_water_meshes(

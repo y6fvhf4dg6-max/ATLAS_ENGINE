@@ -16,6 +16,9 @@ import math
 import random
 
 from CORE.atlas_foundation_sampler import AtlasFoundationSampler
+from CORE.atlas_physical_cartographic_exaggeration_resolver import (
+    AtlasPhysicalCartographicExaggerationResolver,
+)
 
 
 class AtlasTreeFoundationBuilder:
@@ -31,6 +34,9 @@ class AtlasTreeFoundationBuilder:
         trees,
         coordinate_engine,
         terrain_mesh,
+        cartographic_product_size_mm=None,
+        cartographic_nozzle_diameter_mm=None,
+        cartographic_lod_level=None,
         debug=True,
     ):
         meshes = []
@@ -43,6 +49,15 @@ class AtlasTreeFoundationBuilder:
                 index=index,
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_mesh,
+                cartographic_product_size_mm=(
+                    cartographic_product_size_mm
+                ),
+                cartographic_nozzle_diameter_mm=(
+                    cartographic_nozzle_diameter_mm
+                ),
+                cartographic_lod_level=(
+                    cartographic_lod_level
+                ),
             )
 
             if mesh:
@@ -66,7 +81,15 @@ class AtlasTreeFoundationBuilder:
         return meshes
 
     @staticmethod
-    def _build_tree_mesh(tree, index, coordinate_engine, terrain_mesh):
+    def _build_tree_mesh(
+        tree,
+        index,
+        coordinate_engine,
+        terrain_mesh,
+        cartographic_product_size_mm=None,
+        cartographic_nozzle_diameter_mm=None,
+        cartographic_lod_level=None,
+    ):
         lat = tree.get("lat")
         lon = tree.get("lon")
 
@@ -96,12 +119,45 @@ class AtlasTreeFoundationBuilder:
                 rng=rng,
             )
         elif tree_kind == "park_tree_symbol":
-            triangles = AtlasTreeFoundationBuilder._build_park_tree_symbol(
-                x=x,
-                y=y,
-                base_z=base_z,
-                rng=rng,
+            cartographic_context_complete = (
+                cartographic_product_size_mm is not None
+                and cartographic_nozzle_diameter_mm is not None
+                and cartographic_lod_level is not None
             )
+
+            if cartographic_context_complete:
+                triangles = (
+                    AtlasTreeFoundationBuilder
+                    ._build_park_tree_symbol(
+                        x=x,
+                        y=y,
+                        base_z=base_z,
+                        rng=rng,
+                        tree=tree,
+                        scale_ratio=(
+                            coordinate_engine.xy_scale
+                        ),
+                        product_size_mm=(
+                            cartographic_product_size_mm
+                        ),
+                        nozzle_diameter_mm=(
+                            cartographic_nozzle_diameter_mm
+                        ),
+                        lod_level=(
+                            cartographic_lod_level
+                        ),
+                    )
+                )
+            else:
+                triangles = (
+                    AtlasTreeFoundationBuilder
+                    ._build_park_tree_symbol(
+                        x=x,
+                        y=y,
+                        base_z=base_z,
+                        rng=rng,
+                    )
+                )
         else:
             triangles = AtlasTreeFoundationBuilder._build_round_tree(
                 x=x,
@@ -393,20 +449,127 @@ class AtlasTreeFoundationBuilder:
         ]
 
     @staticmethod
-    def _park_tree_symbol_dimensions(rng):
+    def _resolve_park_tree_symbol_diameter_mm(
+        *,
+        source_diameter_m,
+        scale_ratio,
+        product_size_mm,
+        nozzle_diameter_mm,
+        minimum_printable_width_mm,
+        lod_level,
+    ):
+        return (
+            AtlasPhysicalCartographicExaggerationResolver
+            .resolve(
+                semantic_class="vegetation_element",
+                source_width_m=source_diameter_m,
+                scale_ratio=scale_ratio,
+                product_size_mm=product_size_mm,
+                nozzle_diameter_mm=nozzle_diameter_mm,
+                minimum_printable_width_mm=(
+                    minimum_printable_width_mm
+                ),
+                semantic_priority=0.50,
+                lod_level=lod_level,
+            )
+        )
+
+    @staticmethod
+    def _park_tree_symbol_dimensions(
+        rng,
+        *,
+        tree=None,
+        scale_ratio=None,
+        product_size_mm=None,
+        nozzle_diameter_mm=None,
+        lod_level=None,
+    ):
+        height_mm = rng.uniform(
+            AtlasTreeFoundationBuilder
+            .PARK_TREE_SYMBOL_MIN_HEIGHT_MM,
+            AtlasTreeFoundationBuilder
+            .PARK_TREE_SYMBOL_MAX_HEIGHT_MM,
+        )
+
+        diameter_mm = rng.uniform(
+            AtlasTreeFoundationBuilder
+            .PARK_TREE_SYMBOL_MIN_DIAMETER_MM,
+            AtlasTreeFoundationBuilder
+            .PARK_TREE_SYMBOL_MAX_DIAMETER_MM,
+        )
+
+        tags = (
+            tree.get("tags", {})
+            if isinstance(tree, dict)
+            else {}
+        )
+
+        source_diameter = tags.get(
+            "diameter_crown"
+        )
+
+        if (
+            source_diameter is not None
+            and scale_ratio is not None
+            and product_size_mm is not None
+            and nozzle_diameter_mm is not None
+            and lod_level is not None
+        ):
+            try:
+                candidate = source_diameter
+
+                if isinstance(candidate, str):
+                    candidate = (
+                        candidate
+                        .replace("m", "")
+                        .strip()
+                    )
+
+                source_diameter_m = float(
+                    candidate
+                )
+
+                if (
+                    not math.isfinite(
+                        source_diameter_m
+                    )
+                    or source_diameter_m <= 0.0
+                ):
+                    raise ValueError
+            except (
+                TypeError,
+                ValueError,
+            ):
+                pass
+            else:
+                exaggeration = (
+                    AtlasTreeFoundationBuilder
+                    ._resolve_park_tree_symbol_diameter_mm(
+                        source_diameter_m=(
+                            source_diameter_m
+                        ),
+                        scale_ratio=scale_ratio,
+                        product_size_mm=(
+                            product_size_mm
+                        ),
+                        nozzle_diameter_mm=(
+                            nozzle_diameter_mm
+                        ),
+                        minimum_printable_width_mm=(
+                            AtlasTreeFoundationBuilder
+                            .PARK_TREE_SYMBOL_MIN_DIAMETER_MM
+                        ),
+                        lod_level=lod_level,
+                    )
+                )
+
+                diameter_mm = (
+                    exaggeration.physical_width_mm
+                )
+
         return {
-            "height_mm": rng.uniform(
-                AtlasTreeFoundationBuilder
-                .PARK_TREE_SYMBOL_MIN_HEIGHT_MM,
-                AtlasTreeFoundationBuilder
-                .PARK_TREE_SYMBOL_MAX_HEIGHT_MM,
-            ),
-            "diameter_mm": rng.uniform(
-                AtlasTreeFoundationBuilder
-                .PARK_TREE_SYMBOL_MIN_DIAMETER_MM,
-                AtlasTreeFoundationBuilder
-                .PARK_TREE_SYMBOL_MAX_DIAMETER_MM,
-            ),
+            "height_mm": height_mm,
+            "diameter_mm": diameter_mm,
         }
 
     @staticmethod
@@ -415,10 +578,22 @@ class AtlasTreeFoundationBuilder:
         y,
         base_z,
         rng,
+        tree=None,
+        scale_ratio=None,
+        product_size_mm=None,
+        nozzle_diameter_mm=None,
+        lod_level=None,
     ):
         dimensions = (
             AtlasTreeFoundationBuilder
-            ._park_tree_symbol_dimensions(rng)
+            ._park_tree_symbol_dimensions(
+                rng,
+                tree=tree,
+                scale_ratio=scale_ratio,
+                product_size_mm=product_size_mm,
+                nozzle_diameter_mm=nozzle_diameter_mm,
+                lod_level=lod_level,
+            )
         )
         profile = (
             AtlasTreeFoundationBuilder

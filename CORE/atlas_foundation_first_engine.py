@@ -109,6 +109,10 @@ from CORE.atlas_water_foundation_builder import (
 from CORE.atlas_water_shoreline_composition_resolver import (
     AtlasWaterShorelineCompositionResolver,
 )
+from CORE.atlas_lod_level_catalog import (
+    AtlasLoDLevel,
+    AtlasLoDLevelCatalog,
+)
 from CORE.atlas_input_quality_report import (
     AtlasInputQualityReport,
 )
@@ -383,6 +387,8 @@ class AtlasFoundationFirstEngine:
         pedestrian_paths=(),
         scale_ratio=5500.0,
         nozzle_diameter_mm=0.4,
+        cartographic_product_size_mm=None,
+        cartographic_lod_level=None,
         debug=True,
     ):
         if castle_only:
@@ -406,6 +412,12 @@ class AtlasFoundationFirstEngine:
             terrain_mesh=terrain_mesh,
             scale_ratio=scale_ratio,
             nozzle_diameter_mm=nozzle_diameter_mm,
+            cartographic_product_size_mm=(
+                cartographic_product_size_mm
+            ),
+            cartographic_lod_level=(
+                cartographic_lod_level
+            ),
             debug=debug,
         )
 
@@ -423,6 +435,8 @@ class AtlasFoundationFirstEngine:
         pedestrian_paths=(),
         scale_ratio=5500.0,
         nozzle_diameter_mm=0.4,
+        cartographic_product_size_mm=None,
+        cartographic_lod_level=None,
         debug=True,
     ):
         composition = cls._resolve_vegetation_composition(
@@ -441,14 +455,39 @@ class AtlasFoundationFirstEngine:
             )
         )
 
-        tree_meshes = AtlasTreeFoundationBuilder.build_trees(
-            trees=[
+        tree_build_kwargs = {
+            "trees": [
                 *composition["tree_input"],
                 *tree_row_members,
             ],
-            coordinate_engine=coordinate_engine,
-            terrain_mesh=terrain_mesh,
-            debug=debug,
+            "coordinate_engine": coordinate_engine,
+            "terrain_mesh": terrain_mesh,
+            "debug": debug,
+        }
+
+        if (
+            cartographic_product_size_mm is not None
+            and cartographic_lod_level is not None
+        ):
+            tree_build_kwargs.update(
+                {
+                    "cartographic_product_size_mm": (
+                        cartographic_product_size_mm
+                    ),
+                    "cartographic_nozzle_diameter_mm": (
+                        nozzle_diameter_mm
+                    ),
+                    "cartographic_lod_level": (
+                        cartographic_lod_level
+                    ),
+                }
+            )
+
+        tree_meshes = (
+            AtlasTreeFoundationBuilder
+            .build_trees(
+                **tree_build_kwargs
+            )
         )
 
         forest_canopy_meshes = (
@@ -1031,6 +1070,8 @@ class AtlasFoundationFirstEngine:
         road_minimum_printable_width_mm=None,
         building_minimum_readable_height_mm=2.0,
         tree_row_nozzle_diameter_mm=0.4,
+        cartographic_nozzle_diameter_mm=0.4,
+        cartographic_lod_level=None,
         terrain_grid_size=25,
         terrain_presentation_regularization_passes=0,
         terrain_presentation_regularization_strength=0.50,
@@ -1229,6 +1270,23 @@ class AtlasFoundationFirstEngine:
 
         xy_scale = scale_result["xy_scale"]
 
+        resolved_cartographic_lod_level = None
+
+        if cartographic_lod_level is not None:
+            if isinstance(
+                cartographic_lod_level,
+                AtlasLoDLevel,
+            ):
+                resolved_cartographic_lod_level = (
+                    cartographic_lod_level
+                )
+            else:
+                resolved_cartographic_lod_level = (
+                    AtlasLoDLevelCatalog.resolve(
+                        cartographic_lod_level
+                    )
+                )
+
         if fixed_scale_mode:
             size_x_mm = scale_result["size_x_mm"]
             size_y_mm = scale_result["size_y_mm"]
@@ -1364,9 +1422,39 @@ class AtlasFoundationFirstEngine:
             )
         )
 
+        narrow_waterway_meshes = []
+
+        if (
+            not castle_only
+            and road_minimum_printable_width_mm is not None
+            and resolved_cartographic_lod_level is not None
+        ):
+            narrow_waterway_meshes = (
+                AtlasWaterFoundationBuilder
+                .build_narrow_waterway_meshes(
+                    waters=waters,
+                    coordinate_engine=coordinate_engine,
+                    terrain_mesh=terrain_slab,
+                    minimum_printable_width_mm=(
+                        road_minimum_printable_width_mm
+                    ),
+                    cartographic_product_size_mm=(
+                        target_size_mm
+                    ),
+                    cartographic_nozzle_diameter_mm=(
+                        cartographic_nozzle_diameter_mm
+                    ),
+                    cartographic_lod_level=(
+                        resolved_cartographic_lod_level
+                    ),
+                    debug=debug,
+                )
+            )
+
         water_meshes = [
             *coastline_water_meshes,
             *inland_water_meshes,
+            *narrow_waterway_meshes,
         ]
 
         building_height_product_context = (
@@ -1428,6 +1516,15 @@ class AtlasFoundationFirstEngine:
             terrain_mesh=terrain_slab,
             minimum_printable_width_mm=(
                 road_minimum_printable_width_mm
+            ),
+            cartographic_product_size_mm=(
+                target_size_mm
+            ),
+            cartographic_nozzle_diameter_mm=(
+                cartographic_nozzle_diameter_mm
+            ),
+            cartographic_lod_level=(
+                resolved_cartographic_lod_level
             ),
             debug=debug,
         )
@@ -1533,6 +1630,12 @@ class AtlasFoundationFirstEngine:
                 castle_only=castle_only,
                 scale_ratio=xy_scale,
                 nozzle_diameter_mm=tree_row_nozzle_diameter_mm,
+                cartographic_product_size_mm=(
+                    target_size_mm
+                ),
+                cartographic_lod_level=(
+                    resolved_cartographic_lod_level
+                ),
                 debug=debug,
             )
         )

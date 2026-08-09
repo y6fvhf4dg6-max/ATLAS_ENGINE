@@ -315,14 +315,36 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
     def _read_water(self, w, tags):
         geometry = self._extract_way_geometry(w)
 
-        if len(geometry) < 3:
+        waterway = str(
+            tags.get("waterway", "")
+        ).strip().lower()
+
+        is_linear_waterway = waterway in {
+            "river",
+            "stream",
+            "canal",
+        }
+
+        minimum_points = (
+            2
+            if is_linear_waterway
+            else 3
+        )
+
+        if len(geometry) < minimum_points:
             return
 
         if not self._any_point_inside_bbox(geometry):
             return
 
-        if geometry[0] == geometry[-1]:
+        if (
+            len(geometry) >= 2
+            and geometry[0] == geometry[-1]
+        ):
             geometry.pop()
+
+        if len(geometry) < minimum_points:
+            return
 
         self.waters.append(
             {
@@ -513,14 +535,36 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
     def _read_water(self, w, tags):
         geometry = self._extract_way_geometry(w)
 
-        if len(geometry) < 3:
+        waterway = str(
+            tags.get("waterway", "")
+        ).strip().lower()
+
+        is_linear_waterway = waterway in {
+            "river",
+            "stream",
+            "canal",
+        }
+
+        minimum_points = (
+            2
+            if is_linear_waterway
+            else 3
+        )
+
+        if len(geometry) < minimum_points:
             return
 
         if not self._any_point_inside_bbox(geometry):
             return
 
-        if geometry[0] == geometry[-1]:
+        if (
+            len(geometry) >= 2
+            and geometry[0] == geometry[-1]
+        ):
             geometry.pop()
+
+        if len(geometry) < minimum_points:
+            return
 
         self.waters.append(
             {

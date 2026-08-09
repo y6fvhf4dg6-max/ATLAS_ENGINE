@@ -3,6 +3,10 @@ from dataclasses import dataclass
 
 from shapely.geometry import LineString, Polygon
 
+from CORE.atlas_physical_cartographic_exaggeration_resolver import (
+    AtlasPhysicalCartographicExaggerationResolver,
+)
+
 
 @dataclass(frozen=True, slots=True)
 class AtlasWaterShorelineCompositionProfile:
@@ -17,6 +21,44 @@ class AtlasWaterShorelineCompositionProfile:
 
 
 class AtlasWaterShorelineCompositionResolver:
+    @staticmethod
+    def resolve_cartographic_exaggeration(
+        *,
+        semantic_class,
+        source_width_m,
+        scale_ratio,
+        product_size_mm,
+        nozzle_diameter_mm,
+        minimum_printable_width_mm,
+        semantic_priority,
+        lod_level,
+    ):
+        if semantic_class not in {
+            "narrow_waterway",
+            "shoreline_edge",
+        }:
+            raise ValueError(
+                "water/shoreline cartographic exaggeration "
+                "supports only narrow_waterway and "
+                "shoreline_edge"
+            )
+
+        return (
+            AtlasPhysicalCartographicExaggerationResolver
+            .resolve(
+                semantic_class=semantic_class,
+                source_width_m=source_width_m,
+                scale_ratio=scale_ratio,
+                product_size_mm=product_size_mm,
+                nozzle_diameter_mm=nozzle_diameter_mm,
+                minimum_printable_width_mm=(
+                    minimum_printable_width_mm
+                ),
+                semantic_priority=semantic_priority,
+                lod_level=lod_level,
+            )
+        )
+
     @staticmethod
     def _source_shape(source):
         if not isinstance(source, Mapping):

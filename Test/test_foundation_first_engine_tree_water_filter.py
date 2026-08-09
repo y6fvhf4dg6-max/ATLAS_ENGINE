@@ -923,3 +923,76 @@ def test_engine_semantic_surface_textures_use_dense_terrain_following_mesh():
         mesh["semantic_surface_texture"]["texture_language"]
         == "paving"
     )
+
+
+def test_build_vegetation_meshes_passes_cartographic_context_to_tree_builder(
+    monkeypatch,
+):
+    from CORE.atlas_lod_level_catalog import (
+        AtlasLoDLevelCatalog,
+    )
+
+    captured = {}
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasTreeFoundationBuilder.build_trees",
+        lambda **kwargs: (
+            captured.update(kwargs)
+            or []
+        ),
+    )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasForestCanopyFoundationBuilder.build",
+        lambda **kwargs: [],
+    )
+
+    lod_level = AtlasLoDLevelCatalog.resolve(2)
+
+    AtlasFoundationFirstEngine._build_vegetation_meshes(
+        existing_trees=[
+            {
+                "id": 9100,
+                "lat": 50.0,
+                "lon": 7.0,
+                "tree_type": "tree",
+                "tree_kind": "park_tree_symbol",
+                "tags": {
+                    "natural": "tree",
+                    "diameter_crown": "1.5",
+                },
+            },
+        ],
+        existing_tree_rows=[],
+        nature_data={
+            "trees": [],
+            "tree_rows": [],
+            "forests": [],
+        },
+        roads=[],
+        pedestrian_paths=[],
+        coordinate_engine=_VegetationCoordinateEngine(),
+        terrain_mesh=object(),
+        scale_ratio=5500.0,
+        nozzle_diameter_mm=0.60,
+        cartographic_product_size_mm=150.0,
+        cartographic_lod_level=lod_level,
+        debug=False,
+    )
+
+    assert captured[
+        "cartographic_product_size_mm"
+    ] == 150.0
+
+    assert captured[
+        "cartographic_nozzle_diameter_mm"
+    ] == 0.60
+
+    assert (
+        captured[
+            "cartographic_lod_level"
+        ]
+        is lod_level
+    )

@@ -4,6 +4,9 @@ from CORE.atlas_road_foundation_extruder import AtlasRoadFoundationExtruder
 from CORE.atlas_urban_road_hierarchy_resolver import (
     AtlasUrbanRoadHierarchyResolver,
 )
+from CORE.atlas_physical_cartographic_exaggeration_resolver import (
+    AtlasPhysicalCartographicExaggerationResolver,
+)
 
 
 class AtlasRoadFoundationBuilder:
@@ -34,6 +37,9 @@ class AtlasRoadFoundationBuilder:
         coordinate_engine,
         terrain_mesh,
         minimum_printable_width_mm=None,
+        cartographic_product_size_mm=None,
+        cartographic_nozzle_diameter_mm=None,
+        cartographic_lod_level=None,
         debug=True,
     ):
         meshes = []
@@ -61,13 +67,19 @@ class AtlasRoadFoundationBuilder:
                     width_m
                 )
             else:
+                tags = road.get(
+                    "tags",
+                    {},
+                )
+
+                source_width = tags.get(
+                    "width"
+                )
+
                 profile = (
                     AtlasUrbanRoadHierarchyResolver.resolve_profile(
                         highway=road_type,
-                        source_width=road.get(
-                            "tags",
-                            {},
-                        ).get("width"),
+                        source_width=source_width,
                         scale_ratio=coordinate_engine.xy_scale,
                         minimum_printable_width_mm=(
                             minimum_printable_width_mm
@@ -80,6 +92,64 @@ class AtlasRoadFoundationBuilder:
                     continue
 
                 width_mm = profile.physical_width_mm
+
+                use_cartographic_exaggeration = (
+                    cartographic_product_size_mm is not None
+                    and cartographic_nozzle_diameter_mm is not None
+                    and cartographic_lod_level is not None
+                )
+
+                if use_cartographic_exaggeration:
+                    default_width_m = (
+                        AtlasUrbanRoadHierarchyResolver
+                        .default_width_m(
+                            road_type
+                        )
+                    )
+
+                    if default_width_m is None:
+                        skipped += 1
+                        continue
+
+                    source_width_m = (
+                        AtlasUrbanRoadHierarchyResolver
+                        .resolve_source_width_m(
+                            source_width=source_width,
+                            default_width_m=default_width_m,
+                        )
+                    )
+
+                    exaggeration = (
+                        AtlasPhysicalCartographicExaggerationResolver
+                        .resolve(
+                            semantic_class=(
+                                profile.semantic_class
+                            ),
+                            source_width_m=source_width_m,
+                            scale_ratio=(
+                                coordinate_engine.xy_scale
+                            ),
+                            product_size_mm=(
+                                cartographic_product_size_mm
+                            ),
+                            nozzle_diameter_mm=(
+                                cartographic_nozzle_diameter_mm
+                            ),
+                            minimum_printable_width_mm=(
+                                minimum_printable_width_mm
+                            ),
+                            semantic_priority=(
+                                profile.semantic_priority
+                            ),
+                            lod_level=(
+                                cartographic_lod_level
+                            ),
+                        )
+                    )
+
+                    width_mm = (
+                        exaggeration.physical_width_mm
+                    )
 
             mesh = AtlasRoadFoundationBuilder._build_polyline_mesh(
                 geometry=geometry,

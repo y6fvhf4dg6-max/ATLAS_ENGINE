@@ -4923,3 +4923,263 @@ Full ATLAS regression:
 
 **Sıradaki roadmap paketi: 8.13 — Physical Cartographic Exaggeration Resolver.**
 
+
+
+## 9 Ağustos 2026 — 8.13 FINAL LOCK
+
+**8.13 Physical Cartographic Exaggeration Resolver: LOCK**
+
+8.13, strict real-world scale altında fiziksel olarak kaybolabilecek önemli
+cartographic feature'ları kontrollü biçimde okunabilir tutan genel product
+resolution katmanı olarak tamamlandı.
+
+Yeni ana resolver:
+
+- `CORE/atlas_physical_cartographic_exaggeration_resolver.py`
+
+Ana contract:
+
+- `AtlasPhysicalCartographicExaggeration`
+- `AtlasPhysicalCartographicExaggerationResolver`
+
+### Temel 8.13 ilkesi
+
+Sistem source truth'u değiştirmez.
+
+Her desteklenen feature için iki değer ayrı tutulabilir:
+
+- strict-scale physical width
+- product geometry physical width
+
+Strict-scale değer fiziksel olarak okunabiliyorsa aynen korunur.
+
+Okunamıyorsa product geometry yalnız deterministic physical minimum seviyesine
+çıkarılır.
+
+Bu nedenle davranış arbitrary enlargement değildir.
+
+Resolution mantığı:
+
+`source width`
+→ `strict scale width`
+→ `printable / nozzle minimum`
+→ `controlled physical exaggeration`
+
+### Resolver context
+
+8.13 resolver şu bilgileri birlikte kullanabilir:
+
+- semantic feature class
+- source width
+- product scale
+- physical product size
+- nozzle diameter
+- explicit minimum printable width
+- semantic priority
+- LoD level
+
+Resolver sonucu ayrıca:
+
+- strict-scale width
+- final physical width
+- effective physical minimum
+- exaggeration applied / not applied
+- resolution reason
+
+bilgisini taşır.
+
+### Desteklenen semantic kapsam
+
+8.13 genel resolver contract'ı şu feature family'lerini destekler:
+
+- major road
+- local road
+- service road
+- pedestrian path
+- cycleway
+- railway
+- light rail
+- tram
+- narrow waterway
+- shoreline edge
+- vegetation element
+
+### Road integration
+
+Mevcut `AtlasRoadFoundationBuilder` yeniden yazılmadı.
+
+8.13 mevcut road hierarchy / source-width davranışına optional cartographic
+context bağlar.
+
+Road source width strict scale altında yeterince okunabiliyorsa gerçek ölçek
+korunur.
+
+Fiziksel minimumun altındaysa:
+
+- nozzle diameter
+- explicit printable minimum
+
+birlikte değerlendirilerek deterministic product width uygulanabilir.
+
+Mevcut road hierarchy korunur:
+
+`major road > local road > service road > pedestrian path`
+
+Legacy behavior korunur; cartographic context yoksa mevcut road üretimi
+sessizce değiştirilmez.
+
+### Linear infrastructure integration
+
+Mevcut:
+
+- `AtlasLinearInfrastructureResolver`
+- `AtlasLinearInfrastructureGeometryBuilder`
+- `AtlasLinearInfrastructureSolidBuilder`
+
+mimarisi korunur.
+
+8.13 physical exaggeration desteği:
+
+- railway
+- light rail
+- tram
+- diğer uygun linear infrastructure width kaynakları
+
+için mevcut source-width çözümüne bağlandı.
+
+Rail / tram geometry veya vertical-treatment sistemi yeniden yazılmadı.
+
+Strict-scale width okunabilir olduğunda aynen korunur.
+
+### Water / shoreline integration
+
+`AtlasWaterShorelineCompositionResolver` artık gerektiğinde 8.13 general
+cartographic exaggeration resolver'ını kullanabilir.
+
+Desteklenen fiziksel resolution semantics:
+
+- `narrow_waterway`
+- `shoreline_edge`
+
+Water source truth ve shoreline composition contract korunur.
+
+### Narrow waterway production
+
+Açık line-based:
+
+- `waterway=river`
+- `waterway=stream`
+- `waterway=canal`
+
+source geometry artık reader tarafından korunabilir.
+
+`AtlasLocalOSMReader` bu feature'lar için iki veya daha fazla noktalı açık
+geometry'yi `waters` koleksiyonuna taşıyabilir.
+
+Surface-water polygon davranışı ayrıca korunur.
+
+Yeni narrow-waterway production hattı:
+
+`OSM open waterway`
+→ `reader waters`
+→ `physical cartographic exaggeration`
+→ `terrain contour band`
+→ `terrain-following closed solid`
+
+şeklindedir.
+
+Yeni geometry-specific landmark hack eklenmedi.
+
+Mevcut genel builder'lar yeniden kullanılır:
+
+- `AtlasTerrainContourBandBuilder`
+- `AtlasLinearInfrastructureSolidBuilder`
+
+### Vegetation integration
+
+`park_tree_symbol` için source crown diameter mevcutsa:
+
+- `diameter_crown`
+
+gerçek-metre source truth olarak kullanılabilir.
+
+Bu değer product scale'e çevrilir ve 8.13 physical exaggeration resolver
+üzerinden fiziksel tree-symbol diameter'a dönüştürülebilir.
+
+Zincir:
+
+`FoundationFirst vegetation`
+→ `AtlasTreeFoundationBuilder.build_trees`
+→ `_build_tree_mesh`
+→ `_build_park_tree_symbol`
+→ `_park_tree_symbol_dimensions`
+→ `AtlasPhysicalCartographicExaggerationResolver`
+
+Source crown diameter yoksa mevcut legacy randomized symbol-dimension davranışı
+korunur.
+
+### FoundationFirst production integration
+
+`AtlasFoundationFirstEngine.generate_city_stl()` 8.13 cartographic context'i
+production zincirine taşıyabilir.
+
+Public optional context:
+
+- `cartographic_nozzle_diameter_mm`
+- `cartographic_lod_level`
+
+Product size mevcut `target_size_mm` değerinden,
+scale ise gerçek resolved `xy_scale` değerinden alınır.
+
+Bu context gerektiğinde:
+
+- roads
+- narrow waterways
+- vegetation
+
+production yollarına aktarılır.
+
+Cartographic LoD değeri mevcut `AtlasLoDLevelCatalog` üzerinden resolve edilir;
+yeni paralel LoD sistemi oluşturulmaz.
+
+8.13 davranışı context-driven / backward-compatible kalır.
+
+### Source truth ve hierarchy koruması
+
+8.13 şu prensipleri LOCK eder:
+
+- source geometry değiştirilmez
+- strict scale değeri kaybedilmez
+- okunabilir feature gereksiz yere büyütülmez
+- semantic hierarchy korunur
+- physical minimum deterministic uygulanır
+- landmark-specific hack eklenmez
+- mevcut LoD architecture yeniden yazılmaz
+- existing road / rail / water / vegetation systems yeniden yazılmaz
+
+Primary acceptance principle karşılandı:
+
+> Features that matter to city readability should remain physically visible
+> without destroying their relative hierarchy or spatial relationships.
+
+### Doğrulama
+
+8.13 combined cartographic focused regression:
+
+- `67 passed in 0.18s`
+
+FoundationFirst / runtime integration regression:
+
+- `53 passed in 0.26s`
+
+Expanded related regression:
+
+- `200 passed in 0.40s`
+
+Full ATLAS regression:
+
+- `3503 passed in 14.59s`
+
+8.13 kapsamında açık teknik iş kalmadı.
+
+**Sıradaki roadmap paketi: 8.14 — City Composition LoD.**
