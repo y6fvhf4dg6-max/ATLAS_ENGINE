@@ -9,6 +9,9 @@ from CORE.atlas_terrain_terrace_builder import AtlasTerrainTerraceBuilder
 from CORE.atlas_terrain_surface_texture import (
     AtlasTerrainSurfaceTexture,
 )
+from CORE.atlas_morphology_aware_terrain_product_resolver import (
+    AtlasMorphologyAwareTerrainProductResolver,
+)
 
 
 class AtlasTerrainPipeline:
@@ -39,6 +42,11 @@ class AtlasTerrainPipeline:
         surface_texture_wavelength_x_mm=28.0,
         surface_texture_wavelength_y_mm=37.0,
         surface_texture_edge_fade_mm=8.0,
+        scene_morphology=None,
+        urban_density=None,
+        landmark_present=None,
+        terrain_minimum_printable_relief_mm=None,
+        terrain_maximum_printable_relief_mm=None,
         debug=True,
     ):
         if terrace_step_mm is not None:
@@ -111,11 +119,26 @@ class AtlasTerrainPipeline:
                 edge_fade_mm=surface_texture_edge_fade_mm,
             )
 
-            return AtlasTerrainPipeline._apply_terracing(
+            mesh = AtlasTerrainPipeline._apply_terracing(
                 mesh=mesh,
                 base_z=base_z,
                 bottom_z=bottom_z,
                 terrace_step_mm=terrace_step_mm,
+            )
+
+            return AtlasTerrainPipeline._apply_morphology_product_profile(
+                mesh=mesh,
+                target_size_mm=target_size_mm,
+                z_scale=z_scale,
+                scene_morphology=scene_morphology,
+                urban_density=urban_density,
+                landmark_present=landmark_present,
+                minimum_printable_relief_mm=(
+                    terrain_minimum_printable_relief_mm
+                ),
+                maximum_printable_relief_mm=(
+                    terrain_maximum_printable_relief_mm
+                ),
             )
 
         if provider_name != "srtm":
@@ -204,12 +227,120 @@ class AtlasTerrainPipeline:
             edge_fade_mm=surface_texture_edge_fade_mm,
         )
 
-        return AtlasTerrainPipeline._apply_terracing(
+        mesh = AtlasTerrainPipeline._apply_terracing(
             mesh=mesh,
             base_z=base_z,
             bottom_z=bottom_z,
             terrace_step_mm=terrace_step_mm,
         )
+
+        return AtlasTerrainPipeline._apply_morphology_product_profile(
+            mesh=mesh,
+            target_size_mm=target_size_mm,
+            z_scale=z_scale,
+            scene_morphology=scene_morphology,
+            urban_density=urban_density,
+            landmark_present=landmark_present,
+            minimum_printable_relief_mm=(
+                terrain_minimum_printable_relief_mm
+            ),
+            maximum_printable_relief_mm=(
+                terrain_maximum_printable_relief_mm
+            ),
+        )
+
+    @staticmethod
+    def _apply_morphology_product_profile(
+        *,
+        mesh,
+        target_size_mm,
+        z_scale,
+        scene_morphology,
+        urban_density,
+        landmark_present,
+        minimum_printable_relief_mm,
+        maximum_printable_relief_mm,
+    ):
+        if scene_morphology is None:
+            return mesh
+
+        if urban_density is None:
+            raise ValueError(
+                "urban_density is required when "
+                "scene_morphology is enabled"
+            )
+
+        if minimum_printable_relief_mm is None:
+            raise ValueError(
+                "terrain_minimum_printable_relief_mm is required "
+                "when scene_morphology is enabled"
+            )
+
+        if maximum_printable_relief_mm is None:
+            raise ValueError(
+                "terrain_maximum_printable_relief_mm is required "
+                "when scene_morphology is enabled"
+            )
+
+        metadata = dict(mesh.get("metadata", {}))
+        grid = mesh.get("grid", {})
+
+        delta_height_m = metadata.get(
+            "delta_height_m",
+            grid.get("delta_height_m"),
+        )
+
+        if delta_height_m is None:
+            raise ValueError(
+                "terrain product profile requires "
+                "delta_height_m terrain truth"
+            )
+
+        terrain_z_scale = float(
+            metadata.get("z_scale", z_scale)
+        )
+
+        if terrain_z_scale <= 0.0:
+            raise ValueError(
+                "terrain z_scale must be positive"
+            )
+
+        source_elevation_range_m = float(
+            delta_height_m
+        )
+
+        physical_relief_range_mm = (
+            source_elevation_range_m
+            / terrain_z_scale
+            * 1000.0
+        )
+
+        profile = (
+            AtlasMorphologyAwareTerrainProductResolver.resolve(
+                scene_morphology=scene_morphology,
+                source_elevation_range_m=(
+                    source_elevation_range_m
+                ),
+                product_size_mm=target_size_mm,
+                urban_density=urban_density,
+                landmark_present=landmark_present,
+                physical_relief_range_mm=(
+                    physical_relief_range_mm
+                ),
+                minimum_printable_relief_mm=(
+                    minimum_printable_relief_mm
+                ),
+                maximum_printable_relief_mm=(
+                    maximum_printable_relief_mm
+                ),
+            )
+        )
+
+        result = dict(mesh)
+        metadata["terrain_product_profile"] = profile
+        result["metadata"] = metadata
+
+        return result
 
     @staticmethod
     def _build_closed_mesh(

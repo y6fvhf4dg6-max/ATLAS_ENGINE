@@ -111,8 +111,23 @@ class AtlasMeshValidator:
             "type",
         )
 
+        boundary_top = mesh.get(
+            "boundary_top"
+        )
+
         if (
             mesh_type != "road_foundation"
+            and boundary_top is not None
+            and len(walls) != len(boundary_top)
+        ):
+            return {
+                "structure_valid": False,
+                "reason": "wall_count_mismatch",
+            }
+
+        if (
+            mesh_type != "road_foundation"
+            and boundary_top is None
             and len(walls) != len(bottom)
         ):
             return {

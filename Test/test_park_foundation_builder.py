@@ -228,3 +228,28 @@ def test_park_crossing_boundary_builds_from_clipped_polygon():
         (40.0, 80.0, 2.30),
         (0.0, 80.0, 2.30),
     ]
+
+
+def test_park_mesh_preserves_source_identity_for_semantic_processing():
+    park = {
+        "id": 8801,
+        "geometry": [
+            (20.0, 20.0),
+            (40.0, 20.0),
+            (40.0, 40.0),
+            (20.0, 40.0),
+        ],
+        "park_type": "leisure:park",
+        "tags": {
+            "leisure": "park",
+        },
+    }
+
+    mesh = AtlasParkFoundationBuilder._build_park_mesh(
+        park=park,
+        coordinate_engine=PassthroughCoordinateEngineStub(),
+        terrain_mesh=_flat_terrain(),
+    )
+
+    assert mesh is not None
+    assert mesh["source_id"] == 8801

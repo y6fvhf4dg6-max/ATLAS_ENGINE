@@ -30,6 +30,21 @@ from CORE.atlas_road_foundation_builder import (
 from CORE.atlas_park_foundation_builder import (
     AtlasParkFoundationBuilder,
 )
+from CORE.atlas_park_plaza_semantic_resolver import (
+    AtlasParkPlazaSemanticResolver,
+)
+from CORE.atlas_semantic_surface_texture_applier import (
+    AtlasSemanticSurfaceTextureApplier,
+)
+from CORE.atlas_semantic_surface_texture_mesher import (
+    AtlasSemanticSurfaceTextureMesher,
+)
+from CORE.atlas_semantic_surface_texture_pattern import (
+    AtlasSemanticSurfaceTexturePattern,
+)
+from CORE.atlas_semantic_surface_texture_resolver import (
+    AtlasSemanticSurfaceTextureResolver,
+)
 from CORE.atlas_elevated_area_foundation_builder import (
     AtlasElevatedAreaFoundationBuilder,
 )
@@ -92,6 +107,150 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
+    @classmethod
+    def _apply_semantic_surface_textures(
+        cls,
+        *,
+        park_meshes,
+        parks,
+        pedestrian_paths=(),
+        terrain_mesh=None,
+        lod_level=None,
+    ):
+        source_by_id = {
+            park.get("id"): park
+            for park in parks or ()
+            if park.get("id") is not None
+        }
+
+        textured_meshes = []
+
+        for mesh in park_meshes or ():
+            source_id = mesh.get("source_id")
+            source = source_by_id.get(source_id)
+
+            if source is None:
+                textured_meshes.append(mesh)
+                continue
+
+            semantic = (
+                AtlasParkPlazaSemanticResolver
+                .resolve_surface_record(
+                    source,
+                    pedestrian_paths=pedestrian_paths,
+                )
+            )
+
+            if semantic is None:
+                textured_meshes.append(mesh)
+                continue
+
+            surface_role = semantic.get(
+                "ground_surface_role"
+            )
+
+            profile = (
+                AtlasSemanticSurfaceTextureResolver
+                .resolve(
+                    surface_role=surface_role,
+                )
+            )
+
+            if profile is None:
+                textured_meshes.append(mesh)
+                continue
+
+            if (
+                lod_level is not None
+                and lod_level.level
+                < profile["lod_min_level"]
+            ):
+                textured_meshes.append(mesh)
+                continue
+
+            if terrain_mesh is None:
+                textured_meshes.append(
+                    AtlasSemanticSurfaceTextureApplier.apply(
+                        mesh=mesh,
+                        surface_role=surface_role,
+                        lod_level=lod_level,
+                    )
+                )
+                continue
+
+            boundary_points = tuple(
+                (
+                    float(point[0]),
+                    float(point[1]),
+                )
+                for point in mesh.get("top", ())
+            )
+
+            if len(boundary_points) < 3:
+                textured_meshes.append(mesh)
+                continue
+
+            pattern = AtlasSemanticSurfaceTexturePattern(
+                texture_language=profile[
+                    "texture_language"
+                ],
+                relief_depth_mm=profile[
+                    "relief_depth_mm"
+                ],
+                feature_pitch_mm=profile[
+                    "feature_pitch_mm"
+                ],
+            )
+
+            dense = (
+                AtlasSemanticSurfaceTextureMesher
+                .build_terrain_following(
+                    boundary_points=boundary_points,
+                    terrain_mesh=terrain_mesh,
+                    foundation_height_mm=0.30,
+                    pattern=pattern,
+                    maximum_edge_length_mm=profile[
+                        "feature_pitch_mm"
+                    ],
+                )
+            )
+
+            dense["type"] = mesh.get(
+                "type",
+                "park_foundation",
+            )
+            dense["source_id"] = source_id
+            dense["park_type"] = mesh.get(
+                "park_type"
+            )
+
+            dense["semantic_surface_texture"] = {
+                "surface_role": surface_role,
+                "texture_language": profile[
+                    "texture_language"
+                ],
+                "relief_depth_mm": profile[
+                    "relief_depth_mm"
+                ],
+                "feature_pitch_mm": profile[
+                    "feature_pitch_mm"
+                ],
+                "lod_min_level": profile[
+                    "lod_min_level"
+                ],
+                "applied_lod_level": (
+                    None
+                    if lod_level is None
+                    else lod_level.level
+                ),
+            }
+
+            textured_meshes.append(
+                dense
+            )
+
+        return textured_meshes
+
     @staticmethod
     def _resolve_tree_row_members(
         *,
@@ -1031,6 +1190,16 @@ class AtlasFoundationFirstEngine:
             coordinate_engine=coordinate_engine,
             terrain_mesh=terrain_slab,
             debug=debug,
+        )
+
+        park_meshes = (
+            AtlasFoundationFirstEngine
+            ._apply_semantic_surface_textures(
+                park_meshes=park_meshes,
+                parks=park_input,
+                pedestrian_paths=pedestrian_paths,
+                terrain_mesh=terrain_slab,
+            )
         )
 
         elevated_area_meshes = (

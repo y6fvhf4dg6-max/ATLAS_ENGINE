@@ -181,6 +181,7 @@ class AtlasParkFoundationBuilder:
 
         return {
             "type": "park_foundation",
+            "source_id": park.get("id"),
             "park_type": park.get(
                 "park_type",
                 "green_area",

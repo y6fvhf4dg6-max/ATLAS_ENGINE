@@ -742,3 +742,184 @@ def test_build_vegetation_meshes_routes_road_context_to_tree_row_members():
             member["tags"]["adjacent_feature_id"]
             == 2300
         )
+
+
+def test_engine_applies_semantic_surface_texture_by_park_source_identity():
+    parks = [
+        {
+            "id": 8101,
+            "geometry": [
+                (20.0, 20.0),
+                (21.35, 20.0),
+                (21.35, 21.35),
+                (20.0, 21.35),
+            ],
+            "park_type": "place:square",
+            "tags": {
+                "place": "square",
+            },
+        },
+        {
+            "id": 8102,
+            "geometry": [
+                (30.0, 30.0),
+                (31.35, 30.0),
+                (31.35, 31.35),
+                (30.0, 31.35),
+            ],
+            "park_type": "natural:scrub",
+            "tags": {
+                "natural": "scrub",
+            },
+        },
+    ]
+
+    park_meshes = [
+        {
+            "type": "park_foundation",
+            "source_id": 8102,
+            "bottom": [
+                (30.0, 30.0, 1.0),
+                (31.35, 30.0, 1.0),
+                (31.35, 31.35, 1.0),
+                (30.0, 31.35, 1.0),
+            ],
+            "top": [
+                (30.0, 30.0, 1.3),
+                (31.35, 30.0, 1.3),
+                (31.35, 31.35, 1.3),
+                (30.0, 31.35, 1.3),
+            ],
+            "walls": [],
+            "triangles": [],
+        },
+        {
+            "type": "park_foundation",
+            "source_id": 8101,
+            "bottom": [
+                (20.0, 20.0, 1.0),
+                (21.35, 20.0, 1.0),
+                (21.35, 21.35, 1.0),
+                (20.0, 21.35, 1.0),
+            ],
+            "top": [
+                (20.0, 20.0, 1.3),
+                (21.35, 20.0, 1.3),
+                (21.35, 21.35, 1.3),
+                (20.0, 21.35, 1.3),
+            ],
+            "walls": [],
+            "triangles": [],
+        },
+    ]
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._apply_semantic_surface_textures(
+            park_meshes=park_meshes,
+            parks=parks,
+            pedestrian_paths=[],
+        )
+    )
+
+    by_id = {
+        mesh["source_id"]: mesh
+        for mesh in result
+    }
+
+    assert (
+        by_id[8101]["semantic_surface_texture"]
+        ["surface_role"]
+        == "plaza_ground"
+    )
+
+    assert (
+        by_id[8101]["semantic_surface_texture"]
+        ["texture_language"]
+        == "paving"
+    )
+
+    assert (
+        "semantic_surface_texture"
+        not in by_id[8102]
+    )
+
+
+def test_engine_semantic_surface_textures_use_dense_terrain_following_mesh():
+    parks = [
+        {
+            "id": 9101,
+            "geometry": [
+                (20.0, 20.0),
+                (32.0, 20.0),
+                (32.0, 32.0),
+                (20.0, 32.0),
+            ],
+            "park_type": "place:square",
+            "tags": {
+                "place": "square",
+            },
+        },
+    ]
+
+    park_meshes = [
+        {
+            "type": "park_foundation",
+            "source_id": 9101,
+            "bottom": [
+                (20.0, 20.0, 1.0),
+                (32.0, 20.0, 1.0),
+                (32.0, 32.0, 1.0),
+                (20.0, 32.0, 1.0),
+            ],
+            "top": [
+                (20.0, 20.0, 1.30),
+                (32.0, 20.0, 1.30),
+                (32.0, 32.0, 1.30),
+                (20.0, 32.0, 1.30),
+            ],
+            "walls": [],
+            "triangles": [],
+        },
+    ]
+
+    terrain_mesh = {
+        "top_points": [
+            [
+                (0.0, 0.0, 1.0),
+                (200.0, 0.0, 1.0),
+            ],
+            [
+                (0.0, 200.0, 1.0),
+                (200.0, 200.0, 1.0),
+            ],
+        ],
+        "metadata": {
+            "size_x_mm": 200.0,
+            "size_y_mm": 200.0,
+            "size_mm": 200.0,
+        },
+    }
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._apply_semantic_surface_textures(
+            park_meshes=park_meshes,
+            parks=parks,
+            pedestrian_paths=[],
+            terrain_mesh=terrain_mesh,
+        )
+    )
+
+    assert len(result) == 1
+
+    mesh = result[0]
+
+    assert mesh["source_id"] == 9101
+    assert mesh["surface_texture_enabled"] is True
+    assert len(mesh["top"]) > 4
+    assert mesh["placement_mode"] == "terrain_following"
+    assert (
+        mesh["semantic_surface_texture"]["texture_language"]
+        == "paving"
+    )
