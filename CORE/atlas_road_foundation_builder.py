@@ -160,6 +160,7 @@ class AtlasRoadFoundationBuilder:
             )
 
             if mesh:
+                mesh["source_id"] = road.get("id")
                 meshes.append(mesh)
                 accepted += 1
             else:

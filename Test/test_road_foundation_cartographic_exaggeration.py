@@ -197,3 +197,58 @@ def test_road_foundation_keeps_legacy_behavior_without_8_13_context(
     assert captured["width_mm"] == pytest.approx(
         0.40
     )
+
+
+def test_road_foundation_mesh_preserves_source_id(monkeypatch):
+    class CoordinateEngine:
+        xy_scale = 5500.0
+
+        @staticmethod
+        def geometry_to_stl_mm(geometry):
+            return [
+                (0.0, 0.0),
+                (10.0, 0.0),
+            ]
+
+        @staticmethod
+        def height_to_stl_mm(value):
+            return float(value) / 5.5
+
+    monkeypatch.setattr(
+        "CORE.atlas_road_foundation_builder."
+        "AtlasRoadFoundationExtruder.build_segment",
+        lambda **kwargs: {
+            "bottom": (),
+            "top": (),
+            "walls": (),
+            "triangles": (
+                (
+                    (0.0, 0.0, 0.0),
+                    (1.0, 0.0, 0.0),
+                    (0.0, 1.0, 0.0),
+                ),
+            ),
+        },
+    )
+
+    meshes = AtlasRoadFoundationBuilder.build_roads(
+        roads=[
+            {
+                "id": 12345,
+                "road_type": "residential",
+                "geometry": (
+                    (50.0, 8.0),
+                    (50.1, 8.1),
+                ),
+                "tags": {
+                    "highway": "residential",
+                },
+            },
+        ],
+        coordinate_engine=CoordinateEngine(),
+        terrain_mesh=object(),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+    assert meshes[0]["source_id"] == 12345

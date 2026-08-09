@@ -2594,3 +2594,343 @@ Full ATLAS regression:
 8.13 kapsamında açık teknik iş kalmadı.
 
 **Sıradaki roadmap paketi: 8.14 — City Composition LoD.**
+
+
+## 9 Ağustos 2026 — 8.14 FINAL LOCK
+
+**8.14 City Composition LoD: LOCK**
+
+8.14, mevcut ATLAS LoD mimarisini yeniden yazmadan LoD kararını tekil mesh
+karmaşıklığından bütün şehir kompozisyonu ve narrative hierarchy seviyesine
+genişletti.
+
+Yeni ana bileşenler:
+
+- `CORE/atlas_city_composition_lod_resolver.py`
+- `CORE/atlas_city_composition_scene_adapter.py`
+- `CORE/atlas_city_composition_mesh_filter.py`
+
+### Temel 8.14 ilkesi
+
+City Composition LoD, yalnız triangle count azaltmaya çalışan paralel bir LoD
+sistemi değildir.
+
+Mevcut:
+
+- `AtlasLoDLevel`
+- `AtlasLoDLevelCatalog`
+- `AtlasLoDResolver`
+- `AtlasLoDResolutionResult`
+- component-level LoD / mesh-filter architecture
+
+korunur.
+
+8.14 bu sistemin resolved LoD level bilgisini şehir semantiğiyle birlikte
+kullanır.
+
+Primary acceptance principle:
+
+> LoD must control the narrative hierarchy of the city, not only triangle
+> count.
+
+### City Composition LoD karar contract'ı
+
+`AtlasCityCompositionLoDResolver` karar verirken şu girdileri birlikte
+kullanabilir:
+
+- semantic importance
+- product priority
+- physical product size
+- scene morphology
+- landmark proximity
+- printability
+- existing ATLAS LoD level
+
+Her karar şu bilgileri taşıyabilir:
+
+- retain
+- simplify
+- narrative priority
+- representation mode
+- decision reason
+- resolved LoD level
+
+### Semantic narrative hierarchy
+
+8.14 deterministic city-level semantic priority sistemi oluşturur.
+
+Yüksek narrative priority örnekleri:
+
+- landmark
+- major road
+- railway
+- light rail
+- tram
+- water
+- park
+
+Orta / background composition örnekleri:
+
+- urban block
+- generic building
+- isolated building
+- tree row
+- vegetation
+
+Düşük-priority detail örnekleri:
+
+- service road
+- pedestrian path
+- minor path
+
+Bu hierarchy sayesinde landmark / major infrastructure / park / water yapısı,
+minor background detail ile aynı karar seviyesinde değerlendirilmez.
+
+### Product-scale davranışı
+
+Physical product size artık composition kararına aktif olarak katılır.
+
+Örneğin küçük ürün ve düşük LoD kombinasyonunda çok minor pedestrian detail
+suppress edilebilirken, daha büyük ürün aynı source detail'i koruyabilir.
+
+Bu davranış source geometry'yi değiştirmez; yalnız product representation
+kararını değiştirir.
+
+### Scene morphology
+
+Scene morphology composition kararına aktif olarak katılır.
+
+Örneğin dense urban morphology içinde yoğun vegetation detail daha agresif
+generalization adayı olabilirken suburban morphology aynı vegetation detail'i
+koruyabilir.
+
+### Landmark proximity
+
+Landmark yakınlığı background context için ek narrative protection sağlar.
+
+Bu sayede landmark çevresindeki generic urban context tamamen rastgele
+silinmez; yakın çevre şehir anlatısının parçası olarak daha yüksek priority
+alabilir.
+
+### Representation modes
+
+8.14 aşağıdaki semantic representation kararlarını tanımlar:
+
+- `source_detail`
+- `suppressed`
+- `simplified_mass`
+- `generalized_row`
+- `canopy_or_cluster`
+
+Bu contract'lar sonraki geometry-level generalization sistemleri tarafından
+kullanılabilir.
+
+8.14 kapsamında gerçek final-STL composition application doğrudan
+`retain=False` suppression kararını uygular.
+
+`generalized_row`, `canopy_or_cluster` ve `simplified_mass` şu aşamada
+deterministic composition decision contract'larıdır; yeni geometry
+reconstruction sistemi bu paket içinde icat edilmemiştir.
+
+### Existing LoD architecture reuse
+
+`resolve_from_lod_result(...)` adapter'ı mevcut
+`AtlasLoDResolutionResult` değerini yeniden hesaplamadan kullanır.
+
+Böylece:
+
+`AtlasLoDResolver`
+→ `AtlasLoDResolutionResult`
+→ existing `AtlasLoDLevel`
+→ `AtlasCityCompositionLoDResolver`
+
+zinciri korunur.
+
+Yeni paralel LoD level/catalog/filter architecture oluşturulmaz.
+
+### Urban Fabric Scene integration
+
+8.14 mevcut:
+
+- `AtlasUrbanFabricElement`
+- `AtlasUrbanFabricScene`
+
+contract'larını reuse eder.
+
+`AtlasCityCompositionSceneAdapter` FoundationFirst source koleksiyonlarını ince
+bir semantic adapter üzerinden mevcut Urban Fabric Scene modeline taşır.
+
+Desteklenen source family'ler:
+
+- landmarks
+- roads / pedestrian paths
+- generic buildings
+- parks
+- waters
+- linear infrastructure
+
+Adapter:
+
+- source identity'yi korur
+- source geometry'yi değiştirmez
+- semantic class atar
+- narrative product priority atar
+
+### Urban block integration
+
+Mevcut `AtlasUrbanBlockProfile.composition_lod_level` contract'ı korunur.
+
+`resolve_urban_block_profile(...)`:
+
+- block density
+- nearest landmark distance
+- existing composition LoD level
+
+bilgisini kullanarak urban block için city-composition kararı üretebilir.
+
+Urban Block Resolver yeniden yazılmamıştır.
+
+### Vegetation composition
+
+Mevcut vegetation architecture korunur:
+
+- isolated trees
+- tree rows
+- controlled clusters
+- forest canopies
+
+City Composition LoD:
+
+- tree row için `generalized_row`
+- dense urban vegetation için `canopy_or_cluster`
+- uygun daha açık morphology için `source_detail`
+
+representation kararları üretebilir.
+
+Yeni vegetation geometry engine oluşturulmamıştır.
+
+### Major city structure preservation
+
+Scene-level acceptance testleri aynı sahnede:
+
+- landmark
+- railway
+- park
+- water
+
+yapılarının korunabildiğini,
+
+generic / isolated building background'un sadeleştirme adayı olduğunu ve minor
+detail'in suppress edilebildiğini doğrular.
+
+Narrative priority sırası major city structure lehine korunur.
+
+### Road source provenance
+
+8.14 final STL application için road mesh provenance eksikliği kapatıldı.
+
+`AtlasRoadFoundationBuilder` artık road mesh'e:
+
+- `source_id`
+
+metadata'sını koruyarak aktarır.
+
+Bu değişiklik geometry veya road hierarchy davranışını değiştirmez.
+
+### Final mesh application
+
+`AtlasCityCompositionMeshFilter` source identity üzerinden final mesh
+gruplarına composition kararlarını uygular.
+
+Şu gruplar source identity ile eşleştirilebilir:
+
+- roads
+- buildings
+- parks
+- waters
+- landmarks
+
+`retain=False` kararı verilen source mesh final product composition'dan
+çıkarılabilir.
+
+Unmapped veya unrelated mesh grupları korunur.
+
+### FoundationFirst production wiring
+
+`AtlasFoundationFirstEngine.generate_city_stl()` yeni optional context alır:
+
+- `city_composition_lod_level`
+- `scene_morphology`
+
+City Composition LoD opt-in'dir.
+
+`city_composition_lod_level=None` olduğunda legacy STL composition davranışı
+korunur.
+
+Context aktif olduğunda production zinciri:
+
+`FoundationFirst source collections`
+→ `AtlasCityCompositionSceneAdapter`
+→ `AtlasUrbanFabricScene`
+→ `AtlasCityCompositionLoDResolver`
+→ `AtlasCityCompositionMeshFilter`
+→ final mesh assembly
+→ `AtlasSTLWriter`
+
+şeklindedir.
+
+Composition filter artık STL yazımından **önce** çalışır.
+
+Runtime regression, düşük LoD / küçük dense-urban ürün context'inde minor
+pedestrian source mesh'inin gerçek final STL mesh listesinden çıkarıldığını
+doğrular.
+
+Result metadata ayrıca:
+
+- `city_composition_scene`
+- `city_composition_lod`
+- `city_composition_suppressed_meshes`
+
+bilgilerini taşır.
+
+### Roadmap acceptance sonucu
+
+8.14 kapsamında doğrulanan davranışlar:
+
+- landmarks retain higher narrative priority
+- generic urban fabric can be marked for simplification
+- minor paths can be suppressed at constrained product scale
+- major road hierarchy receives higher narrative priority
+- tree rows can receive generalized-row composition decisions
+- excessive dense vegetation can receive canopy/cluster decisions
+- isolated buildings can receive simplified-mass decisions
+- important railway corridors remain protected
+- major park and water structure remain protected
+- product scale affects composition
+- morphology affects composition
+- landmark proximity affects composition
+- printability affects composition
+- existing ATLAS LoD architecture is reused
+- final STL composition can be changed by City Composition LoD
+
+### Doğrulama
+
+8.14 focused / production wiring regression:
+
+- `44 passed in 0.09s`
+
+8.14 real FoundationFirst runtime suppression regression:
+
+- `6 passed in 0.15s`
+
+Expanded related regression:
+
+- `193 passed in 0.34s`
+
+Full ATLAS regression:
+
+- `3549 passed in 14.66s`
+
+8.14 kapsamında açık blocker kalmadı.
+
+**Sıradaki roadmap paketi: 8.15.**

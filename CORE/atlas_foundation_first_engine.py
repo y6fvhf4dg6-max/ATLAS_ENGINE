@@ -109,6 +109,15 @@ from CORE.atlas_water_foundation_builder import (
 from CORE.atlas_water_shoreline_composition_resolver import (
     AtlasWaterShorelineCompositionResolver,
 )
+from CORE.atlas_city_composition_scene_adapter import (
+    AtlasCityCompositionSceneAdapter,
+)
+from CORE.atlas_city_composition_lod_resolver import (
+    AtlasCityCompositionLoDResolver,
+)
+from CORE.atlas_city_composition_mesh_filter import (
+    AtlasCityCompositionMeshFilter,
+)
 from CORE.atlas_lod_level_catalog import (
     AtlasLoDLevel,
     AtlasLoDLevelCatalog,
@@ -1072,6 +1081,8 @@ class AtlasFoundationFirstEngine:
         tree_row_nozzle_diameter_mm=0.4,
         cartographic_nozzle_diameter_mm=0.4,
         cartographic_lod_level=None,
+        city_composition_lod_level=None,
+        scene_morphology=None,
         terrain_grid_size=25,
         terrain_presentation_regularization_passes=0,
         terrain_presentation_regularization_strength=0.50,
@@ -1286,6 +1297,33 @@ class AtlasFoundationFirstEngine:
                         cartographic_lod_level
                     )
                 )
+
+        resolved_city_composition_lod_level = None
+
+        if city_composition_lod_level is not None:
+            if isinstance(
+                city_composition_lod_level,
+                AtlasLoDLevel,
+            ):
+                resolved_city_composition_lod_level = (
+                    city_composition_lod_level
+                )
+            else:
+                resolved_city_composition_lod_level = (
+                    AtlasLoDLevelCatalog.resolve(
+                        city_composition_lod_level
+                    )
+                )
+
+        if (
+            resolved_city_composition_lod_level
+            is not None
+            and scene_morphology is None
+        ):
+            raise ValueError(
+                "scene_morphology is required when "
+                "city_composition_lod_level is provided"
+            )
 
         if fixed_scale_mode:
             size_x_mm = scale_result["size_x_mm"]
@@ -1693,20 +1731,6 @@ class AtlasFoundationFirstEngine:
             debug=debug,
         )
 
-        meshes = [terrain_slab]
-
-        meshes.extend(building_meshes)
-
-        meshes.extend(road_meshes)
-
-        meshes.extend(park_meshes)
-
-        meshes.extend(elevated_area_meshes)
-
-        meshes.extend(artwork_meshes)
-
-        meshes.extend(landmark_meshes)
-
         vegetation_output = (
             AtlasFoundationFirstEngine
             ._assemble_vegetation_output(
@@ -1715,17 +1739,151 @@ class AtlasFoundationFirstEngine:
             )
         )
 
-        meshes.extend(
-            vegetation_output["meshes"]
+        city_composition_scene = None
+        city_composition_lod = None
+
+        if (
+            resolved_city_composition_lod_level
+            is not None
+        ):
+            city_composition_scene = (
+                AtlasCityCompositionSceneAdapter
+                .build_scene(
+                    landmarks=(
+                        ()
+                        if castle_only
+                        else landmarks
+                    ),
+                    roads=(
+                        ()
+                        if castle_only
+                        else (
+                            *roads,
+                            *pedestrian_paths,
+                        )
+                    ),
+                    buildings=(
+                        ()
+                        if castle_only
+                        else raw_buildings
+                    ),
+                    parks=(
+                        ()
+                        if castle_only
+                        else parks
+                    ),
+                    waters=(
+                        ()
+                        if castle_only
+                        else waters
+                    ),
+                    linear_infrastructure=(
+                        ()
+                        if castle_only
+                        else linear_infrastructure
+                    ),
+                )
+            )
+
+            city_composition_lod = (
+                AtlasCityCompositionLoDResolver
+                .resolve_urban_fabric_scene(
+                    scene=city_composition_scene,
+                    product_size_mm=target_size_mm,
+                    scene_morphology=scene_morphology,
+                    lod_level=(
+                        resolved_city_composition_lod_level
+                    ),
+                )
+            )
+
+        mesh_groups = {
+            "terrain": [terrain_slab],
+            "buildings": building_meshes,
+            "roads": road_meshes,
+            "parks": park_meshes,
+            "elevated_areas": elevated_area_meshes,
+            "artworks": artwork_meshes,
+            "landmarks": landmark_meshes,
+            "trees": (
+                vegetation_output["mesh_groups"]["trees"]
+            ),
+            "forest_canopies": (
+                vegetation_output[
+                    "mesh_groups"
+                ]["forest_canopies"]
+            ),
+            "waters": water_meshes,
+            "castle_walls": castle_wall_meshes,
+            "castle_shells": castle_shell_meshes,
+            "castle_tower_caps": castle_tower_cap_meshes,
+        }
+
+        city_composition_mesh_filter_result = {
+            "mesh_groups": mesh_groups,
+            "suppressed_mesh_count": 0,
+        }
+
+        if city_composition_lod is not None:
+            city_composition_mesh_filter_result = (
+                AtlasCityCompositionMeshFilter.filter(
+                    mesh_groups=mesh_groups,
+                    decisions=(
+                        city_composition_lod[
+                            "decisions"
+                        ]
+                    ),
+                )
+            )
+
+        mesh_groups = (
+            city_composition_mesh_filter_result[
+                "mesh_groups"
+            ]
         )
 
-        meshes.extend(water_meshes)
+        building_meshes = mesh_groups["buildings"]
+        road_meshes = mesh_groups["roads"]
+        park_meshes = mesh_groups["parks"]
+        elevated_area_meshes = mesh_groups[
+            "elevated_areas"
+        ]
+        artwork_meshes = mesh_groups["artworks"]
+        landmark_meshes = mesh_groups["landmarks"]
+        tree_meshes = mesh_groups["trees"]
+        forest_canopy_meshes = mesh_groups[
+            "forest_canopies"
+        ]
+        water_meshes = mesh_groups["waters"]
+        castle_wall_meshes = mesh_groups[
+            "castle_walls"
+        ]
+        castle_shell_meshes = mesh_groups[
+            "castle_shells"
+        ]
+        castle_tower_cap_meshes = mesh_groups[
+            "castle_tower_caps"
+        ]
 
-        meshes.extend(castle_wall_meshes)
-
-        meshes.extend(castle_shell_meshes)
-
-        meshes.extend(castle_tower_cap_meshes)
+        meshes = [
+            mesh
+            for group_name in (
+                "terrain",
+                "buildings",
+                "roads",
+                "parks",
+                "elevated_areas",
+                "artworks",
+                "landmarks",
+                "trees",
+                "forest_canopies",
+                "waters",
+                "castle_walls",
+                "castle_shells",
+                "castle_tower_caps",
+            )
+            for mesh in mesh_groups[group_name]
+        ]
 
         triangle_count = AtlasDebugReporter.count_triangles(meshes)
 
@@ -1791,8 +1949,77 @@ class AtlasFoundationFirstEngine:
             {},
         )
 
+        city_composition_scene = None
+        city_composition_lod = None
+
+        if (
+            resolved_city_composition_lod_level
+            is not None
+        ):
+            city_composition_scene = (
+                AtlasCityCompositionSceneAdapter
+                .build_scene(
+                    landmarks=(
+                        ()
+                        if castle_only
+                        else landmarks
+                    ),
+                    roads=(
+                        ()
+                        if castle_only
+                        else (
+                            *roads,
+                            *pedestrian_paths,
+                        )
+                    ),
+                    buildings=(
+                        ()
+                        if castle_only
+                        else raw_buildings
+                    ),
+                    parks=(
+                        ()
+                        if castle_only
+                        else parks
+                    ),
+                    waters=(
+                        ()
+                        if castle_only
+                        else waters
+                    ),
+                    linear_infrastructure=(
+                        ()
+                        if castle_only
+                        else linear_infrastructure
+                    ),
+                )
+            )
+
+            city_composition_lod = (
+                AtlasCityCompositionLoDResolver
+                .resolve_urban_fabric_scene(
+                    scene=city_composition_scene,
+                    product_size_mm=target_size_mm,
+                    scene_morphology=scene_morphology,
+                    lod_level=(
+                        resolved_city_composition_lod_level
+                    ),
+                )
+            )
+
         result = {
             "output_path": output_path,
+            "city_composition_scene": (
+                city_composition_scene
+            ),
+            "city_composition_lod": (
+                city_composition_lod
+            ),
+            "city_composition_suppressed_meshes": (
+                city_composition_mesh_filter_result[
+                    "suppressed_mesh_count"
+                ]
+            ),
             "reader_buildings": len(raw_buildings),
             "reader_landmarks": len(landmarks),
             "reader_trees": len(trees),
@@ -1822,27 +2049,7 @@ class AtlasFoundationFirstEngine:
             "castle_shell_meshes": len(castle_shell_meshes),
             "castle_tower_cap_meshes": len(castle_tower_cap_meshes),
             "meshes": len(meshes),
-            "mesh_groups": {
-                "terrain": [terrain_slab],
-                "buildings": building_meshes,
-                "roads": road_meshes,
-                "parks": park_meshes,
-                "elevated_areas": elevated_area_meshes,
-                "artworks": artwork_meshes,
-                "landmarks": landmark_meshes,
-                "trees": (
-                    vegetation_output["mesh_groups"]["trees"]
-                ),
-                "forest_canopies": (
-                    vegetation_output[
-                        "mesh_groups"
-                    ]["forest_canopies"]
-                ),
-                "waters": water_meshes,
-                "castle_walls": (castle_wall_meshes),
-                "castle_shells": (castle_shell_meshes),
-                "castle_tower_caps": (castle_tower_cap_meshes),
-            },
+            "mesh_groups": mesh_groups,
             "triangles": triangle_count,
             "xy_scale": xy_scale,
             "source_bbox": source_bbox,
