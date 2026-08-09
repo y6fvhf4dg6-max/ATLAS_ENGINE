@@ -100,6 +100,9 @@ from CORE.atlas_inland_water_polygon_builder import (
 from CORE.atlas_water_foundation_builder import (
     AtlasWaterFoundationBuilder,
 )
+from CORE.atlas_water_shoreline_composition_resolver import (
+    AtlasWaterShorelineCompositionResolver,
+)
 from CORE.atlas_input_quality_report import (
     AtlasInputQualityReport,
 )
@@ -503,6 +506,104 @@ class AtlasFoundationFirstEngine:
         return result
 
     @staticmethod
+    def _resolve_water_shoreline_interaction_context(
+        *,
+        landmarks,
+        roads,
+        linear_infrastructure,
+    ):
+        bridges = []
+
+        for landmark in landmarks or ():
+            tags = landmark.get(
+                "tags",
+                {},
+            )
+
+            if (
+                str(
+                    tags.get("bridge", "")
+                ).strip().lower()
+                == "yes"
+                or str(
+                    tags.get("man_made", "")
+                ).strip().lower()
+                == "bridge"
+            ):
+                bridges.append(landmark)
+
+        for road in roads or ():
+            tags = road.get(
+                "tags",
+                {},
+            )
+
+            if (
+                str(
+                    tags.get("bridge", "")
+                ).strip().lower()
+                == "yes"
+            ):
+                bridges.append(road)
+
+        rail_semantic_classes = {
+            "railway",
+            "light_rail",
+            "tram",
+        }
+
+        railways = [
+            item
+            for item in linear_infrastructure or ()
+            if str(
+                item.get(
+                    "semantic_class",
+                    "",
+                )
+            ).strip().lower()
+            in rail_semantic_classes
+        ]
+
+        return {
+            "bridges": tuple(bridges),
+            "roads": tuple(roads or ()),
+            "railways": tuple(railways),
+        }
+
+    @staticmethod
+    def attach_water_shoreline_composition(
+        *,
+        result,
+        waters,
+        coastlines,
+        waterfront_structures,
+        bridges=(),
+        roads=(),
+        railways=(),
+    ):
+        records = (
+            AtlasWaterShorelineCompositionResolver
+            .resolve_scene_records(
+                waters=waters,
+                coastlines=coastlines,
+                waterfront_structures=waterfront_structures,
+                bridges=bridges,
+                roads=roads,
+                railways=railways,
+            )
+        )
+
+        result["reader_waterfront_structures"] = len(
+            waterfront_structures or ()
+        )
+        result["water_shoreline_composition"] = records
+        result["water_shoreline_composition_records"] = len(
+            records
+        )
+
+        return result
+
+    @staticmethod
     def _build_water_polygon_groups(
         waters,
         coastlines,
@@ -878,6 +979,11 @@ class AtlasFoundationFirstEngine:
             [],
         )
 
+        linear_infrastructure = data.get(
+            "linear_infrastructure",
+            [],
+        )
+
         elevated_areas = data.get(
             "elevated_areas",
             [],
@@ -900,6 +1006,11 @@ class AtlasFoundationFirstEngine:
 
         coastlines = data.get(
             "coastlines",
+            [],
+        )
+
+        waterfront_structures = data.get(
+            "waterfront_structures",
             [],
         )
 
@@ -1536,6 +1647,28 @@ class AtlasFoundationFirstEngine:
             "input_quality_report": input_quality_report,
             "mode": "foundation_first",
         }
+
+        water_interaction_context = (
+            AtlasFoundationFirstEngine
+            ._resolve_water_shoreline_interaction_context(
+                landmarks=landmarks,
+                roads=roads,
+                linear_infrastructure=linear_infrastructure,
+            )
+        )
+
+        result = (
+            AtlasFoundationFirstEngine
+            .attach_water_shoreline_composition(
+                result=result,
+                waters=waters,
+                coastlines=coastlines,
+                waterfront_structures=waterfront_structures,
+                bridges=water_interaction_context["bridges"],
+                roads=water_interaction_context["roads"],
+                railways=water_interaction_context["railways"],
+            )
+        )
 
         return (
             AtlasFoundationFirstEngine

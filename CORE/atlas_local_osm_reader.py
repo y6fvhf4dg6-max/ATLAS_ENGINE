@@ -44,6 +44,7 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
         self.parks = []
         self.waters = []
         self.coastlines = []
+        self.waterfront_structures = []
         self.castles = []
         self.castle_metadata = []
         self.castle_walls = []
@@ -238,6 +239,13 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             self._read_water(w, tags)
             return
 
+        if self._waterfront_structure_type(tags) is not None:
+            self._read_waterfront_structure(
+                w,
+                tags,
+            )
+            return
+
         if self._is_elevated_area(tags):
             self._read_elevated_area(w, tags)
             return
@@ -363,6 +371,44 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
                 "id": w.id,
                 "geometry": geometry,
                 "tags": tags,
+            }
+        )
+
+    def _read_waterfront_structure(
+        self,
+        w,
+        tags,
+    ):
+        geometry = self._extract_way_geometry(w)
+
+        if len(geometry) < 2:
+            return
+
+        if not self._any_point_inside_bbox(geometry):
+            return
+
+        waterfront_type = (
+            self._waterfront_structure_type(
+                tags
+            )
+        )
+
+        if waterfront_type is None:
+            return
+
+        if (
+            len(geometry) >= 3
+            and geometry[0] == geometry[-1]
+        ):
+            geometry.pop()
+
+        self.waterfront_structures.append(
+            {
+                "id": w.id,
+                "geometry": geometry,
+                "geometry_type": "way",
+                "tags": tags,
+                "waterfront_type": waterfront_type,
             }
         )
 
@@ -648,6 +694,30 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             return "natural:water"
 
         return "water"
+
+    @staticmethod
+    def _waterfront_structure_type(tags):
+        tags = tags or {}
+
+        man_made = str(
+            tags.get("man_made", "")
+        ).strip().lower()
+
+        if man_made == "quay":
+            return "quay"
+
+        if man_made == "pier":
+            return "waterfront_pier"
+
+        if (
+            str(
+                tags.get("leisure", "")
+            ).strip().lower()
+            == "marina"
+        ):
+            return "marina"
+
+        return None
 
     @staticmethod
     def _is_park_or_green_area(tags):
@@ -1381,6 +1451,9 @@ class AtlasLocalOSMReader(osmium.SimpleHandler):
             "parks": reader.parks,
             "waters": reader.waters,
             "coastlines": reader.coastlines,
+            "waterfront_structures": (
+                reader.waterfront_structures
+            ),
             "castles": reader.castles,
             "castle_metadata": reader.castle_metadata,
             "castle_walls": reader.castle_walls,

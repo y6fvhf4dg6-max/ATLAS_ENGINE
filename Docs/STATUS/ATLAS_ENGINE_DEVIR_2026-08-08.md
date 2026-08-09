@@ -4283,3 +4283,215 @@ Tamamlanan final terrain sözleşmesi:
 
 **DURMA NOKTASI:** 8.10 Water & Shoreline Composition Engine henüz
 başlatılmayacak. Kullanıcının sonraki talimatı beklenecek.
+
+## 9 Ağustos 2026 — 8.10 FINAL LOCK
+
+**8.10 Water & Shoreline Composition Engine: LOCK**
+
+8.10 genel, source-preserving ve product-facing water / shoreline
+composition katmanı olarak tamamlandı.
+
+### Tamamlanan genel semantic kapsam
+
+Desteklenen temel sınıflar:
+
+- river
+- canal
+- lake
+- coastline
+- island
+- embankment
+- quay
+- waterfront_pier
+- marina
+
+Water surface ve shoreline structure birbirinden semantic olarak ayrılır.
+
+Ek composition rolleri:
+
+- `water_surface`
+- `shoreline_structure`
+- `land_within_water`
+
+### First-class scene contract
+
+Water / shoreline kayıtları artık şu ortak product contract bilgilerini taşır:
+
+- `semantic_class`
+- `composition_role`
+- `first_class_scene_layer`
+- `lod_eligible`
+- `preserves_source_geometry`
+- `physical_separation_role`
+- `product_scale_simplification`
+- `shoreline_treatment`
+
+Temel kurallar:
+
+- source geometry korunur
+- artificial shoreline detail üretilmez
+- unknown semantics için yapay class üretilmez
+- water surface continuity açık contract olarak taşınır
+- shoreline readability açık contract olarak taşınır
+- water fiziksel olarak raised / separated product solid olarak temsil edilebilir
+- shoreline structures ayrı structural-edge semantiği taşır
+- islands land-within-water morphology olarak ayrılır
+
+### Waterfront reader extraction
+
+`AtlasLocalOSMReader` artık ayrı:
+
+`waterfront_structures`
+
+output katmanı üretir.
+
+Test-first desteklenen source tipleri:
+
+- `man_made=quay` → `quay`
+- `man_made=pier` → `waterfront_pier`
+- `leisure=marina` → `marina`
+
+Bridge pier metadata ile gerçek waterfront pier birbirine karıştırılmaz.
+
+Source:
+
+- id
+- geometry
+- tags
+- geometry type
+
+korunur.
+
+### Scene-level composition
+
+Reader'dan gelen:
+
+- waters
+- coastlines
+- waterfront structures
+- embankments
+
+ortak `water_shoreline_composition` kayıtlarına resolve edilir.
+
+FoundationFirst final result artık:
+
+- `reader_waterfront_structures`
+- `water_shoreline_composition`
+- `water_shoreline_composition_records`
+
+alanlarını taşır.
+
+Mevcut inland-water ve coastline foundation geometry hattı yeniden
+yazılmamıştır.
+
+### Bridge / road / rail interaction
+
+Water / shoreline source geometry ile gerçek scene context arasındaki
+intersection deterministic olarak resolve edilir.
+
+Taşınan interaction flag'leri:
+
+- `bridge_interaction`
+- `road_interaction`
+- `rail_interaction`
+
+Kurallar:
+
+- yalnız gerçek geometry intersection kullanılır
+- proximity buffer kullanılmaz
+- tahmini ilişki icat edilmez
+- invalid / eksik geometry interaction üretmez
+- source geometry mutate edilmez
+
+FoundationFirst scene context'i gerçek:
+
+- bridge landmark
+- bridge road
+- road
+- railway / light rail / tram
+
+kaynaklarından oluşturulur.
+
+### Embankment ve island tamamlaması
+
+8.10 final closure öncesinde iki açık contract da kapatıldı:
+
+- `place=island` → `island`
+- linear `embankment` source → shoreline composition
+
+Böylece roadmap'in water / shoreline morphology kapsamındaki zorunlu
+sınıfları semantic contract düzeyinde tamamlandı.
+
+### Galata gerçek sahne acceptance
+
+Gerçek benchmark:
+
+`Data/OSM/galata-bridge-test.osm.pbf`
+
+Galata Köprüsü — Eminönü / Karaköy sahnesi:
+
+- ürün alanı: `220 × 220 mm`
+- ölçek: `1:5500`
+- final scene: `1459` mesh
+- final scene triangles: `65832`
+- Galata prototype: `7` mesh / `100` triangle
+- retained road meshes: `193`
+- water meshes: `1`
+- water triangles: `15886`
+
+Renkli acceptance preview:
+
+`OUTPUT/PREVIEW/galata_bridge_8_10_color_acceptance.png`
+
+Renkli interactive OBJ / MTL:
+
+- `OUTPUT/PREVIEW/galata_bridge_8_10_color_acceptance.obj`
+- `OUTPUT/PREVIEW/galata_bridge_8_10_color_acceptance.mtl`
+
+OBJ / MTL acceptance scene:
+
+`65832` triangle
+
+Final STL ile birebir triangle parity doğrulandı.
+
+Görsel acceptance sonucunda:
+
+- water first-class morphology layer olarak açık okunuyor
+- iki kıyı water body tarafından net ayrılıyor
+- Galata Köprüsü water üzerinde doğru urban connector olarak okunuyor
+- bridge / road / waterfront ilişkisi korunuyor
+- water surface texture bilinçli dalga presentation'ıdır
+- worship / church fallback landmark blokları 8.10 kapsamı değildir
+
+### Doğrulama
+
+Final 8.10 focused regression:
+
+`49 passed in 0.23s`
+
+Full regression:
+
+`3387 passed in 13.53s`
+
+### Mimari sınır
+
+8.10:
+
+- bridge engine'i yeniden yazmaz
+- terrain truth'u değiştirmez
+- source shoreline detail icat etmez
+- worship / church landmark geometry kalitesini çözmeye çalışmaz
+- yalnız water / shoreline semantic composition ve scene interaction
+  contract'ını sağlar
+
+### Sonuç
+
+**8.10 Water & Shoreline Composition Engine tamamlandı ve LOCK edildi.**
+
+8.10 kapsamında açık teknik iş kalmadı.
+
+Sıradaki roadmap paketi:
+
+**8.11 — Bridge / Infrastructure Urban Integration**
+
+8.11 henüz başlatılmamıştır.

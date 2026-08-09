@@ -987,6 +987,8 @@ The next roadmap package is 8.10, but it must not start until explicitly resumed
 
 ## 8.10 — Water & Shoreline Composition Engine
 
+**Durum: LOCK — 9 Ağustos 2026**
+
 Create a general product-composition system for water and waterfront structure.
 
 The engine must support at least:
