@@ -16,6 +16,19 @@ class AtlasWallCollectionMulticolorSTLExporter:
         "water": "blue",
     }
 
+    BATCH_TO_SEMANTIC_ROLE = {
+        "frame": "frame",
+        "terrain": "terrain",
+        "building_walls": "generic_building",
+        "building_roofs": "generic_building_roof",
+        "parks": "vegetation",
+        "trees": "vegetation",
+        "water": "water",
+        "label_plate": "label_plate",
+        "label_text": "label_text",
+        "roads": "roads_hardscape",
+    }
+
     COLOR_ORDER = (
         "white",
         "red",
@@ -42,12 +55,30 @@ class AtlasWallCollectionMulticolorSTLExporter:
         scene: dict,
         output_directory,
         product_name: str,
+        maximum_physical_color_count=None,
     ) -> dict:
         output_directory = Path(output_directory)
         product_name = str(product_name).strip()
 
         if not product_name:
             raise ValueError("product_name must not be empty")
+
+        if maximum_physical_color_count is not None:
+            if (
+                isinstance(
+                    maximum_physical_color_count,
+                    bool,
+                )
+                or not isinstance(
+                    maximum_physical_color_count,
+                    int,
+                )
+                or maximum_physical_color_count <= 0
+            ):
+                raise ValueError(
+                    "maximum_physical_color_count "
+                    "must be a positive integer"
+                )
 
         output_directory.mkdir(
             parents=True,
@@ -59,17 +90,7 @@ class AtlasWallCollectionMulticolorSTLExporter:
             {},
         )
 
-        color_groups = OrderedDict(
-            (
-                color_name,
-                {
-                    "rgb": None,
-                    "meshes": [],
-                    "source_batches": [],
-                },
-            )
-            for color_name in cls.COLOR_ORDER
-        )
+        color_groups = OrderedDict()
 
         for batch_name, batch in material_batches.items():
             meshes = list(batch.get("meshes", []))
@@ -77,41 +98,155 @@ class AtlasWallCollectionMulticolorSTLExporter:
             if not meshes:
                 continue
 
-            color_name = cls._resolve_color_name(
+            batch_name = str(batch_name)
+            legacy_color_name = cls._resolve_color_name(
                 batch_name=batch_name,
             )
+
+            physical_material = str(
+                batch.get(
+                    "physical_material",
+                    "",
+                )
+            ).strip()
+
+            if physical_material:
+                group_key = (
+                    "physical_material",
+                    physical_material,
+                )
+            else:
+                group_key = (
+                    "legacy_color",
+                    legacy_color_name,
+                )
+
+            group = color_groups.setdefault(
+                group_key,
+                {
+                    "rgb": None,
+                    "meshes": [],
+                    "source_batches": [],
+                    "semantic_roles": [],
+                    "legacy_color_names": [],
+                    "physical_material": (
+                        physical_material or None
+                    ),
+                },
+            )
+
             rgb = tuple(batch["rgb"])
-            group = color_groups[color_name]
 
             if group["rgb"] is None:
                 group["rgb"] = rgb
             elif group["rgb"] != rgb:
                 raise ValueError(
-                    f"{color_name} batches use conflicting RGB values"
+                    "physical material batches use "
+                    "conflicting RGB values"
                 )
 
             group["meshes"].extend(meshes)
             group["source_batches"].append(
-                str(batch_name)
+                batch_name
+            )
+
+            if (
+                legacy_color_name
+                not in group["legacy_color_names"]
+            ):
+                group["legacy_color_names"].append(
+                    legacy_color_name
+                )
+
+            semantic_role = batch.get(
+                "semantic_role"
+            )
+
+            if semantic_role is None:
+                semantic_role = (
+                    cls.BATCH_TO_SEMANTIC_ROLE.get(
+                        batch_name
+                    )
+                )
+
+            if (
+                semantic_role is not None
+                and semantic_role
+                not in group["semantic_roles"]
+            ):
+                group["semantic_roles"].append(
+                    semantic_role
+                )
+
+        physical_color_count = sum(
+            1
+            for group in color_groups.values()
+            if group["meshes"]
+        )
+
+        if (
+            maximum_physical_color_count is not None
+            and physical_color_count
+            > maximum_physical_color_count
+        ):
+            raise ValueError(
+                "physical color count exceeds "
+                "maximum_physical_color_count"
             )
 
         parts = {}
+        used_part_names = set()
 
-        for color_name in cls.COLOR_ORDER:
-            group = color_groups[color_name]
-
+        for group in color_groups.values():
             if not group["meshes"]:
                 continue
+
+            legacy_color_names = tuple(
+                group["legacy_color_names"]
+            )
+
+            if len(legacy_color_names) == 1:
+                part_name = legacy_color_names[0]
+            elif group["physical_material"]:
+                part_name = group[
+                    "physical_material"
+                ]
+            else:
+                part_name = "material"
+
+            part_name = "".join(
+                character
+                if (
+                    character.isalnum()
+                    or character in {"_", "-"}
+                )
+                else "_"
+                for character in str(part_name)
+            ).strip("_")
+
+            if not part_name:
+                part_name = "material"
+
+            base_part_name = part_name
+            suffix = 2
+
+            while part_name in used_part_names:
+                part_name = (
+                    f"{base_part_name}_{suffix}"
+                )
+                suffix += 1
+
+            used_part_names.add(part_name)
 
             rgb = group["rgb"]
             output_path = (
                 output_directory
-                / f"{product_name}__{color_name}.stl"
+                / f"{product_name}__{part_name}.stl"
             )
 
             solid_name = (
                 "ATLAS_WALL_COLLECTION_"
-                f"{color_name.upper()}"
+                f"{part_name.upper()}"
             )
 
             merged_triangles = []
@@ -146,12 +281,19 @@ class AtlasWallCollectionMulticolorSTLExporter:
                 solid_name=solid_name,
             )
 
-            parts[color_name] = {
+            parts[part_name] = {
                 "rgb": rgb,
+                "physical_material": (
+                    group["physical_material"]
+                    or part_name
+                ),
                 "output_path": output_path,
                 "mesh_count": len(group["meshes"]),
                 "source_batches": tuple(
                     group["source_batches"]
+                ),
+                "semantic_roles": tuple(
+                    group["semantic_roles"]
                 ),
             }
 
@@ -161,6 +303,10 @@ class AtlasWallCollectionMulticolorSTLExporter:
             ),
             "profile_name": scene.get("profile_name"),
             "color_count": len(parts),
+            "physical_color_count": len(parts),
+            "maximum_physical_color_count": (
+                maximum_physical_color_count
+            ),
             "part_count": len(parts),
             "parts": parts,
         }

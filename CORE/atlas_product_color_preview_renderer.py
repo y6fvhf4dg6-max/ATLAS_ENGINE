@@ -9,6 +9,9 @@ from CORE.atlas_label_text_spec import AtlasLabelTextSpec
 from CORE.atlas_product_preview_material_profile import (
     AtlasProductPreviewMaterialProfile,
 )
+from CORE.atlas_semantic_material_hierarchy import (
+    AtlasSemanticMaterialHierarchy,
+)
 from CORE.atlas_polygon_triangulator import (
     AtlasPolygonTriangulator,
 )
@@ -1263,6 +1266,17 @@ class AtlasProductColorPreviewRenderer:
             frame_depth_mm=frame_depth_mm,
         )
 
+        semantic_material_hierarchy = (
+            AtlasSemanticMaterialHierarchy.resolve(
+                material_profile=material_profile,
+                maximum_physical_color_count=None,
+            )
+        )
+
+        semantic_roles = (
+            semantic_material_hierarchy["roles"]
+        )
+
         material_batches = {
             "frame": {
                 "rgb": material_profile.frame_rgb,
@@ -1313,6 +1327,50 @@ class AtlasProductColorPreviewRenderer:
                 "meshes": [],
             },
         }
+
+        batch_to_semantic_role = {
+            "frame": "frame",
+            "terrain": "terrain",
+            "buildings": "generic_building",
+            "landmarks": "landmark_wall",
+            "building_walls": "generic_building",
+            "building_roofs": "generic_building_roof",
+            "roads": "roads_hardscape",
+            "parks": "vegetation",
+            "trees": "vegetation",
+            "water": "water",
+            "label_plate": "label_plate",
+            "label_text": "label_text",
+        }
+
+        for batch_name, semantic_role in (
+            batch_to_semantic_role.items()
+        ):
+            role = semantic_roles[
+                semantic_role
+            ]
+
+            material_batches[
+                batch_name
+            ].update(
+                {
+                    "semantic_role": (
+                        role["semantic_role"]
+                    ),
+                    "physical_material": (
+                        role["physical_material"]
+                    ),
+                    "surface_treatment": (
+                        role["surface_treatment"]
+                    ),
+                    "relief_priority": (
+                        role["relief_priority"]
+                    ),
+                    "readability_priority": (
+                        role["readability_priority"]
+                    ),
+                }
+            )
 
         mesh_groups = city_result.get("mesh_groups", {})
 
@@ -1518,6 +1576,9 @@ class AtlasProductColorPreviewRenderer:
         return {
             "type": "product_color_preview_scene",
             "profile_name": material_profile.name,
+            "semantic_material_hierarchy": (
+                semantic_material_hierarchy
+            ),
             "outer_width_mm": frame_spec.outer_width_mm,
             "outer_height_mm": frame_spec.outer_height_mm,
             "opening_width_mm": frame_spec.inner_width_mm,

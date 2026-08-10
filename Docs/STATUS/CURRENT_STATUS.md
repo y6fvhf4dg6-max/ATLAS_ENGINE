@@ -4913,3 +4913,301 @@ Full ATLAS regression:
 8.16 kapsamında açık blocker kalmadı.
 
 **Sıradaki roadmap paketi: 8.17 — Semantic Color / Material Hierarchy.**
+
+
+## 10 Ağustos 2026 — 8.17 FINAL LOCK
+
+**8.17 Semantic Color / Material Hierarchy: LOCK**
+
+8.17, urban product scene içinde renk ve fiziksel material kullanımını yalnız
+dekorasyon olarak değil, semantic scene hierarchy'nin üretim katmanı olarak
+çözen sistem olarak tamamlandı.
+
+Yeni ana bileşen:
+
+- `CORE/atlas_semantic_material_hierarchy.py`
+
+Güncellenen ana production bileşenleri:
+
+- `CORE/atlas_product_color_preview_renderer.py`
+- `CORE/atlas_wall_collection_multicolor_stl_exporter.py`
+
+### Temel 8.17 ilkesi
+
+Color / material hierarchy semantic role üzerinden tanımlanır.
+
+Fiziksel filament rengi semantic identity değildir.
+
+Örneğin aynı fiziksel beyaz material şu semantic rolleri aynı anda
+taşıyabilir:
+
+- generic building
+- terrain
+- roads / hardscape
+- label plate
+
+Bu roller aynı RGB / filament altında birleşse bile semantic kimliklerini
+kaybetmez.
+
+Primary acceptance principle:
+
+> Materials should reinforce scene hierarchy while preserving ATLAS product
+> identity and production constraints.
+
+### Semantic material roles
+
+İlk product-level hierarchy şu rolleri destekler:
+
+- `generic_building`
+- `generic_building_roof`
+- `landmark_wall`
+- `landmark_roof`
+- `vegetation`
+- `water`
+- `roads_hardscape`
+- `terrain`
+- `frame`
+- `label_plate`
+- `label_text`
+
+Generic building roof ile landmark roof semantic olarak ayrı rollerdir.
+
+Aynı fiziksel roof material'ını paylaşmaları mümkündür.
+
+### Existing material profiles preserved
+
+8.17 mevcut:
+
+- `AtlasProductPreviewMaterialProfile`
+
+altyapısını yeniden yazmaz.
+
+Mevcut product profile RGB değerleri reuse edilir.
+
+Özellikle:
+
+- `KOELN_PREMIUM_V1`
+- `DALYAN_KAUNOS_PREMIUM_V1`
+- existing comparison / preview profiles
+
+korunur.
+
+Lichtbild veya başka competitor palette'i production standardı olarak
+hard-code edilmemiştir.
+
+### Physical material grouping
+
+Semantic role ile physical material birbirinden ayrılmıştır.
+
+Her semantic role:
+
+- semantic role
+- RGB
+- physical material
+- surface treatment
+- relief priority
+- readability priority
+
+metadata'sını taşıyabilir.
+
+Aynı RGB kullanan semantic roller aynı physical material altında birleşebilir.
+
+### Readability contract
+
+Birden fazla semantic role aynı fiziksel filament rengini kullandığında
+readability yalnız renk farkına bağlı değildir.
+
+Hierarchy ayrıca:
+
+- `surface_treatment`
+- `relief_priority`
+- `readability_priority`
+
+contract'larını taşır.
+
+Örneğin:
+
+- terrain → terrain relief treatment
+- roads → hardscape linear treatment
+- generic building → building mass treatment
+- landmark wall → landmark wall treatment
+- landmark roof → landmark roof treatment
+- vegetation → vegetation texture
+- water → water surface
+
+gibi semantic presentation davranışları ayrıdır.
+
+Landmark wall / roof readability priority değerleri generic building
+counterpart'larından daha yüksektir.
+
+### Preview integration
+
+`AtlasProductColorPreviewRenderer.build_scene()` artık semantic material
+hierarchy üretir.
+
+Preview result:
+
+- `semantic_material_hierarchy`
+
+metadata'sını taşır.
+
+Material batches ayrıca:
+
+- `semantic_role`
+- `physical_material`
+- `surface_treatment`
+- `relief_priority`
+- `readability_priority`
+
+alanlarını taşır.
+
+Preview renderer fiziksel AMS / filament limitini kendi başına zorlamaz.
+
+Bu ayrım kasıtlıdır:
+
+- digital preview semantic/material richness gösterebilir
+- physical production limit ayrı production boundary'de uygulanır
+
+### Preview batch semantic mapping
+
+Mevcut preview batch contract şu semantic rollere bağlandı:
+
+- `frame` → frame
+- `terrain` → terrain
+- `buildings` / `building_walls` → generic building
+- `building_roofs` → generic building roof
+- `landmarks` → landmark wall
+- `roads` → roads / hardscape
+- `parks` / `trees` → vegetation
+- `water` → water
+- `label_plate` → label plate
+- `label_text` → label text
+
+### Multicolor exporter semantic provenance
+
+`AtlasWallCollectionMulticolorSTLExporter` artık fiziksel STL part metadata'sında:
+
+- source batches
+- semantic roles
+- physical material
+- RGB
+
+bilgilerini korur.
+
+Bu sayede fiziksel olarak aynı STL / filament altında birleştirilen semantic
+roller production provenance içinde kaybolmaz.
+
+### Profile-driven physical grouping
+
+Exporter artık yalnız:
+
+`batch name → hard-coded color name`
+
+mantığına bağımlı değildir.
+
+Bir material batch explicit:
+
+- `physical_material`
+
+taşıyorsa fiziksel grouping bu identity üzerinden yapılır.
+
+Bu sayede farklı product family / production profile'ları kendi material
+stratejilerini kullanabilir.
+
+Legacy scene metadata'sında `physical_material` yoksa mevcut batch/color
+behavior korunur.
+
+### Köln Premium V1 compatibility
+
+Mevcut Köln Premium V1 production hattı korunmuştur.
+
+Legacy fiziksel renk stratejisi:
+
+- white
+- red
+- green
+- black
+- blue
+
+çalışmaya devam eder.
+
+Mevcut multicolor STL filename / grouping behavior için backward compatibility
+korunmuştur.
+
+### Production physical color limit
+
+Preview ve production color constraint ayrılmıştır.
+
+`AtlasWallCollectionMulticolorSTLExporter.export_scene(...)` artık opsiyonel:
+
+- `maximum_physical_color_count`
+
+production constraint'ını destekler.
+
+Limit verilirse physical STL part sayısı export başlamadan önce doğrulanır.
+
+Limit aşılırsa export reddedilir.
+
+Limit içindeki paketler:
+
+- `physical_color_count`
+- `maximum_physical_color_count`
+
+metadata'sını taşır.
+
+Legacy caller'lar için limit verilmezse mevcut behavior korunur.
+
+### Source / semantic truth preservation
+
+8.17:
+
+- source geometry'yi değiştirmez
+- OSM semantics'i değiştirmez
+- morphology classification'ı değiştirmez
+- City Composition LoD kararlarını değiştirmez
+
+Yalnız bu semantic product hierarchy'nin preview ve physical material
+representation katmanını tanımlar.
+
+### Roadmap acceptance sonucu
+
+8.17 kapsamında doğrulanan davranışlar:
+
+- product-level semantic material roles
+- generic building / landmark semantic distinction
+- generic roof / landmark roof distinction
+- configurable product material profiles
+- no Lichtbild palette hard-code
+- shared physical filament with preserved semantic identity
+- surface-treatment readability contract
+- relief-priority contract
+- readability-priority contract
+- preview semantic hierarchy metadata
+- preview material-batch semantic metadata
+- multicolor semantic provenance
+- profile-driven physical material grouping
+- legacy Köln Premium V1 compatibility
+- configurable production physical color limit
+
+Primary acceptance principle karşılandı:
+
+> Materials should reinforce scene hierarchy while preserving ATLAS product
+> identity and production constraints.
+
+### Doğrulama
+
+8.17 focused core / preview / exporter:
+
+- `42 passed in 0.17s`
+
+Expanded related regression:
+
+- `84 passed in 0.24s`
+
+Full ATLAS regression:
+
+- `3603 passed in 15.30s`
+
+8.17 kapsamında açık blocker kalmadı.
+
+**Sıradaki roadmap paketi: 8.18 — Customer Preview Parity.**

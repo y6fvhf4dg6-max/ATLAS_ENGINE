@@ -1471,3 +1471,92 @@ def test_renderer_places_forest_canopy_meshes_in_tree_material_batch():
     assert scene["material_batches"]["trees"]["rgb"] == (
         profile.tree_rgb
     )
+
+
+def test_preview_scene_exposes_semantic_material_hierarchy_metadata():
+    profile = (
+        AtlasProductPreviewMaterialProfile
+        .koeln_premium_v1()
+    )
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result={
+            "terrain_size_x_mm": 150.0,
+            "terrain_size_y_mm": 150.0,
+            "mesh_groups": {
+                "terrain": [],
+                "buildings": [],
+                "roads": [],
+                "parks": [],
+                "elevated_areas": [],
+                "artworks": [],
+                "landmarks": [],
+                "trees": [],
+                "forest_canopies": [],
+                "waters": [],
+                "castle_walls": [],
+                "castle_shells": [],
+                "castle_tower_caps": [],
+            },
+        },
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    assert (
+        scene["semantic_material_hierarchy"][
+            "profile_name"
+        ]
+        == "KOELN_PREMIUM_V1"
+    )
+
+    batches = scene["material_batches"]
+
+    assert (
+        batches["terrain"]["semantic_role"]
+        == "terrain"
+    )
+    assert (
+        batches["building_walls"]["semantic_role"]
+        == "generic_building"
+    )
+    assert (
+        batches["building_roofs"]["semantic_role"]
+        == "generic_building_roof"
+    )
+    assert (
+        batches["roads"]["semantic_role"]
+        == "roads_hardscape"
+    )
+    assert (
+        batches["parks"]["semantic_role"]
+        == "vegetation"
+    )
+    assert (
+        batches["trees"]["semantic_role"]
+        == "vegetation"
+    )
+    assert (
+        batches["water"]["semantic_role"]
+        == "water"
+    )
+
+    assert (
+        batches["terrain"]["physical_material"]
+        == batches["building_walls"][
+            "physical_material"
+        ]
+        == batches["roads"]["physical_material"]
+    )
+
+    assert (
+        batches["terrain"]["surface_treatment"]
+        != batches["building_walls"][
+            "surface_treatment"
+        ]
+    )
