@@ -1634,6 +1634,20 @@ class AtlasFoundationFirstEngine:
             cartographic_lod_level=(
                 resolved_cartographic_lod_level
             ),
+            clip_bounds=(
+                0.0,
+                (
+                    float(size_x_mm)
+                    if size_x_mm is not None
+                    else float(target_size_mm)
+                ),
+                0.0,
+                (
+                    float(size_y_mm)
+                    if size_y_mm is not None
+                    else float(target_size_mm)
+                ),
+            ),
             debug=debug,
         )
 

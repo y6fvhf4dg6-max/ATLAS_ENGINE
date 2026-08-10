@@ -127,3 +127,97 @@ def test_road_builder_preserves_legacy_behavior_without_semantic_minimum(
     assert captured == [
         ("residential", pytest.approx(1.25)),
     ]
+
+
+def test_road_builder_clips_crossing_polyline_before_extrusion(
+    monkeypatch,
+):
+    from CORE.atlas_foundation_sampler import (
+        AtlasFoundationSampler,
+    )
+    from CORE.atlas_mesh_validator import (
+        AtlasMeshValidator,
+    )
+
+    class CoordinateEngine:
+        xy_scale = 1000.0
+
+        @staticmethod
+        def geometry_to_stl_mm(geometry):
+            return [
+                (
+                    float(point[0]),
+                    float(point[1]),
+                )
+                for point in geometry
+            ]
+
+        @staticmethod
+        def height_to_stl_mm(value):
+            return float(value)
+
+    monkeypatch.setattr(
+        AtlasFoundationSampler,
+        "terrain_z_at_xy",
+        staticmethod(
+            lambda **kwargs: 0.0
+        ),
+    )
+
+    meshes = AtlasRoadFoundationBuilder.build_roads(
+        roads=[
+            {
+                "id": 987654,
+                "road_type": "residential",
+                "geometry": (
+                    (-20.0, 50.0),
+                    (120.0, 50.0),
+                ),
+                "tags": {
+                    "highway": "residential",
+                },
+            },
+        ],
+        coordinate_engine=CoordinateEngine(),
+        terrain_mesh=object(),
+        clip_bounds=(
+            0.0,
+            100.0,
+            0.0,
+            100.0,
+        ),
+        debug=False,
+    )
+
+    assert len(meshes) == 1
+
+    mesh = meshes[0]
+
+    assert mesh["source_id"] == 987654
+
+    vertices = [
+        point
+        for triangle in mesh["triangles"]
+        for point in triangle
+    ]
+
+    xs = [
+        float(point[0])
+        for point in vertices
+    ]
+    ys = [
+        float(point[1])
+        for point in vertices
+    ]
+
+    assert min(xs) >= 0.0
+    assert max(xs) <= 100.0
+    assert min(ys) >= 0.0
+    assert max(ys) <= 100.0
+
+    report = AtlasMeshValidator.report(mesh)
+
+    assert report["valid"] is True
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0
+

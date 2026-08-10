@@ -40,6 +40,7 @@ class AtlasRoadFoundationBuilder:
         cartographic_product_size_mm=None,
         cartographic_nozzle_diameter_mm=None,
         cartographic_lod_level=None,
+        clip_bounds=None,
         debug=True,
     ):
         meshes = []
@@ -151,12 +152,19 @@ class AtlasRoadFoundationBuilder:
                         exaggeration.physical_width_mm
                     )
 
+            mesh_kwargs = {
+                "geometry": geometry,
+                "coordinate_engine": coordinate_engine,
+                "terrain_mesh": terrain_mesh,
+                "width_mm": width_mm,
+                "road_type": road_type,
+            }
+
+            if clip_bounds is not None:
+                mesh_kwargs["clip_bounds"] = clip_bounds
+
             mesh = AtlasRoadFoundationBuilder._build_polyline_mesh(
-                geometry=geometry,
-                coordinate_engine=coordinate_engine,
-                terrain_mesh=terrain_mesh,
-                width_mm=width_mm,
-                road_type=road_type,
+                **mesh_kwargs
             )
 
             if mesh:
@@ -190,17 +198,157 @@ class AtlasRoadFoundationBuilder:
         terrain_mesh,
         width_mm,
         road_type,
+        clip_bounds=None,
     ):
-        points = coordinate_engine.geometry_to_stl_mm(geometry)
-        points = AtlasRoadFoundationBuilder._clip_points_to_bounds(
-            points=points,
-            min_x=0.0,
-            max_x=200.0,
-            min_y=0.0,
-            max_y=200.0,
+        points = coordinate_engine.geometry_to_stl_mm(
+            geometry
         )
 
-        if len(points) < 2:
+        segment_records = []
+
+        if clip_bounds is None:
+            # Preserve legacy direct-builder behavior.
+            points = (
+                AtlasRoadFoundationBuilder
+                ._clip_points_to_bounds(
+                    points=points,
+                    min_x=0.0,
+                    max_x=200.0,
+                    min_y=0.0,
+                    max_y=200.0,
+                )
+            )
+
+            for index in range(
+                len(points) - 1
+            ):
+                segment_records.append(
+                    (
+                        index,
+                        points[index],
+                        points[index + 1],
+                    )
+                )
+
+        else:
+            if len(clip_bounds) != 4:
+                raise ValueError(
+                    "clip_bounds must contain "
+                    "(min_x, max_x, min_y, max_y)"
+                )
+
+            (
+                min_x,
+                max_x,
+                min_y,
+                max_y,
+            ) = (
+                float(value)
+                for value in clip_bounds
+            )
+
+            if (
+                max_x <= min_x
+                or max_y <= min_y
+            ):
+                raise ValueError(
+                    "clip_bounds must have "
+                    "positive area"
+                )
+
+            half_width = (
+                float(width_mm) / 2.0
+            )
+
+            for index in range(
+                len(points) - 1
+            ):
+                p1 = points[index]
+                p2 = points[index + 1]
+
+                dx = (
+                    float(p2[0])
+                    - float(p1[0])
+                )
+                dy = (
+                    float(p2[1])
+                    - float(p1[1])
+                )
+
+                length = (
+                    dx * dx
+                    + dy * dy
+                ) ** 0.5
+
+                if length <= 1e-12:
+                    continue
+
+                normal_x = (
+                    -dy / length
+                )
+                normal_y = (
+                    dx / length
+                )
+
+                # Clip the centerline against bounds
+                # inset by this segment's perpendicular
+                # half-width. Therefore the extruded
+                # road solid, not only its centerline,
+                # remains inside the product rectangle.
+                inset_x = (
+                    abs(normal_x)
+                    * half_width
+                )
+                inset_y = (
+                    abs(normal_y)
+                    * half_width
+                )
+
+                segment_min_x = (
+                    min_x + inset_x
+                )
+                segment_max_x = (
+                    max_x - inset_x
+                )
+                segment_min_y = (
+                    min_y + inset_y
+                )
+                segment_max_y = (
+                    max_y - inset_y
+                )
+
+                if (
+                    segment_max_x
+                    <= segment_min_x
+                    or segment_max_y
+                    <= segment_min_y
+                ):
+                    continue
+
+                clipped = (
+                    AtlasRoadFoundationBuilder
+                    ._clip_segment_to_bounds(
+                        p1=p1,
+                        p2=p2,
+                        min_x=segment_min_x,
+                        max_x=segment_max_x,
+                        min_y=segment_min_y,
+                        max_y=segment_max_y,
+                    )
+                )
+
+                if clipped is None:
+                    continue
+
+                segment_records.append(
+                    (
+                        index,
+                        clipped[0],
+                        clipped[1],
+                    )
+                )
+
+        if not segment_records:
             return None
 
         bottom = []
@@ -208,50 +356,102 @@ class AtlasRoadFoundationBuilder:
         walls = []
         triangles = []
 
-        for index in range(len(points) - 1):
-            p1 = points[index]
-            p2 = points[index + 1]
+        for record_index, (
+            source_index,
+            p1,
+            p2,
+        ) in enumerate(segment_records):
+            start_is_straight_join = False
+            end_is_straight_join = False
 
-            start_is_straight_join = (
-                index > 0
-                and AtlasRoadFoundationBuilder
-                ._segments_continue_straight(
-                    points[index - 1],
-                    points[index],
-                    points[index + 1],
+            if record_index > 0:
+                (
+                    previous_source_index,
+                    previous_p1,
+                    previous_p2,
+                ) = segment_records[
+                    record_index - 1
+                ]
+
+                if (
+                    previous_source_index
+                    == source_index - 1
+                    and AtlasRoadFoundationBuilder
+                    ._points_match(
+                        previous_p2,
+                        p1,
+                    )
+                ):
+                    start_is_straight_join = (
+                        AtlasRoadFoundationBuilder
+                        ._segments_continue_straight(
+                            previous_p1,
+                            p1,
+                            p2,
+                        )
+                    )
+
+            if (
+                record_index
+                < len(segment_records) - 1
+            ):
+                (
+                    next_source_index,
+                    next_p1,
+                    next_p2,
+                ) = segment_records[
+                    record_index + 1
+                ]
+
+                if (
+                    next_source_index
+                    == source_index + 1
+                    and AtlasRoadFoundationBuilder
+                    ._points_match(
+                        p2,
+                        next_p1,
+                    )
+                ):
+                    end_is_straight_join = (
+                        AtlasRoadFoundationBuilder
+                        ._segments_continue_straight(
+                            p1,
+                            p2,
+                            next_p2,
+                        )
+                    )
+
+            segment = (
+                AtlasRoadFoundationExtruder
+                .build_segment(
+                    p1=p1,
+                    p2=p2,
+                    terrain_mesh=terrain_mesh,
+                    width_mm=width_mm,
+                    include_start_cap=(
+                        not start_is_straight_join
+                    ),
+                    include_end_cap=(
+                        not end_is_straight_join
+                    ),
                 )
-            )
-
-            end_is_straight_join = (
-                index < len(points) - 2
-                and AtlasRoadFoundationBuilder
-                ._segments_continue_straight(
-                    points[index],
-                    points[index + 1],
-                    points[index + 2],
-                )
-            )
-
-            segment = AtlasRoadFoundationExtruder.build_segment(
-                p1=p1,
-                p2=p2,
-                terrain_mesh=terrain_mesh,
-                width_mm=width_mm,
-                include_start_cap=(
-                    not start_is_straight_join
-                ),
-                include_end_cap=(
-                    not end_is_straight_join
-                ),
             )
 
             if not segment:
                 continue
 
-            bottom.extend(segment["bottom"])
-            top.extend(segment["top"])
-            walls.extend(segment["walls"])
-            triangles.extend(segment["triangles"])
+            bottom.extend(
+                segment["bottom"]
+            )
+            top.extend(
+                segment["top"]
+            )
+            walls.extend(
+                segment["walls"]
+            )
+            triangles.extend(
+                segment["triangles"]
+            )
 
         triangles = (
             AtlasRoadFoundationBuilder
@@ -272,6 +472,113 @@ class AtlasRoadFoundationBuilder:
             "road_type": road_type,
             "placement_mode": "foundation_first",
         }
+
+    @staticmethod
+    def _clip_segment_to_bounds(
+        p1,
+        p2,
+        min_x,
+        max_x,
+        min_y,
+        max_y,
+        tolerance=1e-12,
+    ):
+        x1 = float(p1[0])
+        y1 = float(p1[1])
+        x2 = float(p2[0])
+        y2 = float(p2[1])
+
+        dx = x2 - x1
+        dy = y2 - y1
+
+        if (
+            abs(dx) <= tolerance
+            and abs(dy) <= tolerance
+        ):
+            return None
+
+        lower = 0.0
+        upper = 1.0
+
+        constraints = (
+            (-dx, x1 - float(min_x)),
+            (dx, float(max_x) - x1),
+            (-dy, y1 - float(min_y)),
+            (dy, float(max_y) - y1),
+        )
+
+        for direction, distance in constraints:
+            if abs(direction) <= tolerance:
+                if distance < -tolerance:
+                    return None
+
+                continue
+
+            ratio = (
+                distance / direction
+            )
+
+            if direction < 0.0:
+                if ratio > upper:
+                    return None
+
+                lower = max(
+                    lower,
+                    ratio,
+                )
+
+            else:
+                if ratio < lower:
+                    return None
+
+                upper = min(
+                    upper,
+                    ratio,
+                )
+
+        if upper < lower:
+            return None
+
+        start = (
+            x1 + lower * dx,
+            y1 + lower * dy,
+        )
+        end = (
+            x1 + upper * dx,
+            y1 + upper * dy,
+        )
+
+        if (
+            abs(end[0] - start[0])
+            <= tolerance
+            and abs(end[1] - start[1])
+            <= tolerance
+        ):
+            return None
+
+        return (
+            start,
+            end,
+        )
+
+    @staticmethod
+    def _points_match(
+        first,
+        second,
+        tolerance=1e-9,
+    ):
+        return (
+            abs(
+                float(first[0])
+                - float(second[0])
+            )
+            <= tolerance
+            and abs(
+                float(first[1])
+                - float(second[1])
+            )
+            <= tolerance
+        )
 
     @staticmethod
     def _segments_continue_straight(

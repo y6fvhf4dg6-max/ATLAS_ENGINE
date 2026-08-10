@@ -7050,3 +7050,65 @@ Temel ilke doğrulandı:
 **Urban Fabric & Product Composition V1 — 8.0–8.20 tamamlandı.**
 
 Sonraki ürün/production roadmap paketi ayrı olarak kilitlenecektir.
+
+---
+
+## 8.20 Sonrası Aktif Çalışma — Road Boundary Clipping
+
+8.20 tamamlandıktan sonra Erkelenz / Reeser Straße 17 yakın-plan fiziksel ürün testi sırasında yeni bir production bug bulundu.
+
+Son güvenli ve push edilmiş baseline:
+
+- Commit: `c7771ca5368f275280fecbdf2a70fab7029c3087`
+- Commit mesajı: `Lock multi-morphology acceptance benchmarks`
+- Full regression: `3645 passed`
+
+### Aktif ve henüz commit edilmemiş çalışma
+
+Tracked değişiklikler:
+
+- `CORE/atlas_foundation_first_engine.py`
+- `CORE/atlas_road_foundation_builder.py`
+- `Test/test_road_foundation_builder_urban_hierarchy.py`
+
+Problem:
+
+Gerçek source veride bulunan yollar, ürün sınırını kesen road polyline geometrileri nedeniyle küçük ölçekli sahnede final STL'den kaybolabiliyordu.
+
+Genel çözüm:
+
+- road centerline geometrisi extrusion öncesinde gerçek product bounds'a clip ediliyor;
+- FoundationFirst gerçek product bounds bilgisini road builder'a iletiyor;
+- çözüm lokasyona veya belirli OSM ID'lerine özel değildir.
+
+Test-first doğrulama:
+
+- yeni crossing-road regresyon testi RED → GREEN
+- road-related regression: `13 passed in 0.30s`
+
+Gerçek Erkelenz fresh production doğrulaması:
+
+- road meshes: `2`
+- her iki road mesh:
+  - `valid=True`
+  - `open_edge_count=0`
+  - `non_manifold_edge_count=0`
+
+### Yakın-plan fiziksel ürün bulgusu
+
+Road bug fix'inden ayrı olarak, yaklaşık `1:496` gibi yakın ölçeklerde mevcut semantic vegetation / park / forest-canopy geometrisinin premium fiziksel görünüm için yetersiz kaldığı gözlendi.
+
+Özellikle mevcut forest-canopy hattı fiziksel olarak gerçek canopy/ağaç hacmi değil, terrain-following ince semantic surface üretmektedir.
+
+Bu ikinci konu henüz çözülmemiştir ve ayrı bir sonraki production-readability problemi olarak ele alınmalıdır.
+
+### Çalışma ağacı notu
+
+Aşağıdaki untracked dosyalar bu aktif çalışmayla ilgili değildir ve dokunulmamalıdır:
+
+- `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-01.md`
+- `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-04.md`
+- `Test/preview_church_semantic_surfaces.py`
+
+Yeni pencere açıldığında `c7771ca` son güvenli baseline kabul edilmeli; yukarıdaki üç tracked road-clipping değişikliği silinmemeli veya resetlenmemelidir.
+
