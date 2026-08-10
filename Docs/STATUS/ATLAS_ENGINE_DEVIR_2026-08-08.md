@@ -7112,3 +7112,178 @@ Aşağıdaki untracked dosyalar bu aktif çalışmayla ilgili değildir ve dokun
 
 Yeni pencere açıldığında `c7771ca` son güvenli baseline kabul edilmeli; yukarıdaki üç tracked road-clipping değişikliği silinmemeli veya resetlenmemelidir.
 
+---
+
+## 8.20 Sonrası Güncel Production Checkpoint — 11 Ağustos 2026
+
+Önceki `c7771ca` checkpoint kaydı artık tarihsel referanstır ve aşağıdaki
+durum tarafından supersede edilmiştir.
+
+### Son güvenli ve push edilmiş commit
+
+- Commit: `768fa05c25017d2fa3bf644182f0018d736dc60d`
+- Kısa hash: `768fa05`
+- Commit mesajı: `Add canonical tree product geometry`
+- Branch: `main`
+- `HEAD == origin/main`
+- Tracked çalışma ağacı temiz
+
+Bilinen unrelated untracked dosyalar:
+
+- `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-01.md`
+- `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-04.md`
+- `Test/preview_church_semantic_surfaces.py`
+
+Bu dosyalara dokunulmamalı ve toplu stage edilmemelidir.
+
+### 8.20 sonrası tamamlanan commit zinciri
+
+1. `ae129c8` — `Clip roads to product bounds`
+2. `9925553` — `Preserve elevated dome part height intervals`
+3. `768fa05` — `Add canonical tree product geometry`
+
+### Road boundary clipping
+
+Ürün sınırını kesen gerçek source road geometrileri extrusion öncesinde
+product bounds'a clip edilir.
+
+Erkelenz gerçek production doğrulamasında crossing-road geometrileri
+korunmuş, final road mesh'ler manifold kalmıştır.
+
+### Elevated dome part height interval düzeltmesi
+
+Elevated architectural dome/building-part geometrilerinde source
+`min_height` / yükseklik interval bilgisinin product geometry zincirinde
+kaybolması engellenmiştir.
+
+Bu düzeltme genel architectural pipeline seviyesindedir; landmark veya
+lokasyon özel kural içermez.
+
+### Canonical Tree V1
+
+Eski ayrı runtime ağaç formları:
+
+- `round`
+- `conifer`
+- `park_tree_symbol`
+
+ürün hattında tek bir canonical fiziksel ağaç geometrisine indirgenmiştir.
+
+Canonical Tree V1 fiziksel sözleşmesi:
+
+- total height: `2.15 mm`
+- trunk height: `0.80 mm`
+- trunk diameter: `0.45 mm`
+- crown height: `1.35 mm`
+- default crown diameter: `1.55 mm`
+- minimum cartographic crown diameter: `0.60 mm`
+- deterministic geometry
+- visible trunk + crown
+- terrain-following foundation placement
+
+Explicit source `diameter_crown` mevcutsa Physical Cartographic
+Exaggeration Resolver üzerinden fiziksel crown çapına taşınabilir.
+
+### Terrain boundary güvenliği
+
+Tree center'ın yalnız product içine düşmesi artık yeterli değildir.
+
+Canonical crown'un tamamı gerçek terrain XY bounds içinde kalmak zorundadır.
+Böylece ürün/terrain dışına taşan ağaç geometrileri final sahneye girmez.
+
+Bonn gerçek sahne doğrulamasında bu clipping sonrası:
+
+- trees: `158`
+- forest canopies: `14`
+
+### Canonical tree-row spacing
+
+Tree-row member üretimi artık `tree_kind=canonical` kullanır.
+
+Tree-row spacing fiziksel minimumu:
+
+`canonical crown diameter + nozzle clearance`
+
+olarak uygulanır.
+
+Default `1.55 mm` crown ve `0.40 mm` nozzle için minimum spacing:
+
+- `1.95 mm`
+
+Bu nedenle strict-scale spacing fiziksel crown overlap üretecekse
+`enlarge` kararı uygulanır.
+
+### Building exclusion
+
+Canonical tree crown, gerçek building footprint ile çakışıyorsa ağaç final
+scene'den çıkarılır.
+
+Building footprint kaynağı doğrudan final building mesh'in `bottom`
+geometrisidir; convex-hull tahmini kullanılmaz.
+
+Bonn gerçek scene etkisi:
+
+- trees: `155 -> 153`
+- triangles: `65,606 -> 65,126`
+
+### Road exclusion
+
+Canonical tree crown, gerçek road surface ile çakışıyorsa ağaç final
+scene'den çıkarılır.
+
+Road mesh `top` verisinin tek polygon olmadığı, her road mesh içinde ardışık
+4 noktalı surface segmentlerinin tutulduğu gerçek Bonn probe ile
+doğrulanmıştır.
+
+İlk tek-polygon yaklaşımı gerçek sahnede etkisiz kalmıştır.
+
+Düzeltilmiş V2 filtre:
+
+- `top` verisini 4 noktalı road surface segmentlerine ayırır;
+- her segmenti ayrı polygon olarak değerlendirir;
+- canonical crown radius kadar exclusion uygular.
+
+Bonn gerçek scene V2 etkisi:
+
+- trees: `153 -> 150`
+- tree-row members: `36`
+- forest canopies: `14`
+- triangles: `65,126 -> 64,406`
+
+Görsel doğrulamada road ve building crown overlap problemleri kabul edilebilir
+seviyede temizlenmiştir.
+
+### Test doğrulaması
+
+Canonical tree / tree-row / vegetation related regression:
+
+- `71 passed in 0.37s`
+
+Foundation tree-water/building/road filter regression:
+
+- `23 passed in 0.17s`
+
+Full ATLAS regression:
+
+- `3645 passed in 16.20s`
+
+`git diff --check` temizdir.
+
+### Güncel açık vegetation konusu
+
+Canonical Tree V1 ve building/road exclusion tamamlanmıştır.
+
+Açık kalan vegetation konusu artık fiziksel collision değil, kompozisyon ve
+forest-canopy temsilidir.
+
+Özellikle:
+
+- bazı tree-row dizilimleri görsel olarak fazla mekanik olabilir;
+- mevcut forest-canopy hattı halen gerçek canopy hacmi yerine
+  terrain-following semantic surface karakterindedir;
+- park / canopy / canonical-tree ilişkisi premium fiziksel ürün görünümü
+  açısından ayrı bir sonraki çalışma konusu olarak ele alınmalıdır.
+
+Yeni çalışma bu checkpoint'ten başlatılmalıdır:
+
+`768fa05c25017d2fa3bf644182f0018d736dc60d`
