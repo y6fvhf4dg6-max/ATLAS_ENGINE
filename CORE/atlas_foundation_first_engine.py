@@ -130,6 +130,9 @@ from CORE.atlas_scene_morphology_mesh_area_resolver import (
 from CORE.atlas_morphology_composition_policy import (
     AtlasMorphologyCompositionPolicy,
 )
+from CORE.atlas_urban_fabric_quality_report import (
+    AtlasUrbanFabricQualityReport,
+)
 from CORE.atlas_lod_level_catalog import (
     AtlasLoDLevel,
     AtlasLoDLevelCatalog,
@@ -2255,7 +2258,7 @@ class AtlasFoundationFirstEngine:
             )
         )
 
-        return (
+        result = (
             AtlasFoundationFirstEngine
             .attach_castle_semantic_architecture(
                 result=result,
@@ -2265,3 +2268,11 @@ class AtlasFoundationFirstEngine:
                 ),
             )
         )
+
+        result["urban_fabric_quality_report"] = (
+            AtlasUrbanFabricQualityReport.build(
+                scene_result=result,
+            )
+        )
+
+        return result

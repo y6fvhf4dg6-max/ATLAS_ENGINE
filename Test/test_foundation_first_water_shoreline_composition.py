@@ -301,12 +301,26 @@ def test_generate_city_result_exposes_water_shoreline_composition(
     def capture_attachment(**kwargs):
         result = original_attach(**kwargs)
         captured.update(result)
-        raise StopAfterResult
+        return result
 
     monkeypatch.setattr(
         AtlasFoundationFirstEngine,
         "attach_water_shoreline_composition",
         staticmethod(capture_attachment),
+    )
+
+    quality_report_input = {}
+
+    def capture_quality_report(*, scene_result):
+        quality_report_input.update(
+            scene_result
+        )
+        raise StopAfterResult
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasUrbanFabricQualityReport.build",
+        capture_quality_report,
     )
 
     try:
@@ -328,8 +342,24 @@ def test_generate_city_result_exposes_water_shoreline_composition(
         pass
     else:
         raise AssertionError(
-            "Water/shoreline composition attachment was not reached"
+            "Urban Fabric quality report build was not reached"
         )
+
+    assert quality_report_input
+    assert (
+        quality_report_input[
+            "water_shoreline_composition_records"
+        ]
+        == 2
+    )
+    assert (
+        quality_report_input[
+            "water_shoreline_composition"
+        ]
+        == captured[
+            "water_shoreline_composition"
+        ]
+    )
 
     assert captured["reader_waterfront_structures"] == 1
     assert captured["water_shoreline_composition_records"] == 2

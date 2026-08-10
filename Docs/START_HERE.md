@@ -4009,4 +4009,274 @@ Full ATLAS regression:
 
 8.18 kapsamında açık blocker kalmadı.
 
-**Sıradaki roadmap paketi: 8.19 — Urban Fabric Quality Report.**
+## 8.19 — Urban Fabric Quality Report — LOCK
+
+Urban Fabric kompozisyonunun yalnız görsel incelemeye bağlı kalmadan,
+deterministik ve tekrar üretilebilir kalite metrikleriyle ölçülmesi için:
+
+- `CORE/atlas_urban_fabric_quality_report.py`
+- `Test/test_urban_fabric_quality_report.py`
+- `Test/test_foundation_first_urban_fabric_quality_report_wiring.py`
+
+eklendi.
+
+### Read-only quality report contract
+
+Yeni:
+
+- `AtlasUrbanFabricQualityReport`
+
+final production scene/result üzerinde read-only kalite raporu üretir.
+
+Rapor:
+
+- geometry değiştirmez
+- feature suppress etmez
+- building height normalize etmez
+- LoD kararı değiştirmez
+- material assignment değiştirmez
+
+Aynı scene input için deterministik sonuç üretir.
+
+### Morphology ve composition metrikleri
+
+Mevcut production metadata reuse edilerek raporlanan temel metrikler:
+
+- building density
+- road density
+- block compactness
+- vegetation coverage
+- forest coverage
+- water coverage
+- railway presence
+- terrain relief
+- landmark density
+
+Bu değerler yeni paralel analiz sistemiyle yeniden hesaplanmaz;
+mevcut scene morphology evidence source-of-truth olarak kullanılır.
+
+### City Composition LoD istatistikleri
+
+`city_composition_lod` kararlarından:
+
+- decision count
+- retained count / ratio
+- suppressed count / ratio
+- simplified count / ratio
+
+ölçülür.
+
+### Vegetation composition quality
+
+Mevcut vegetation composition metadata üzerinden:
+
+- isolated tree count
+- tree-row count
+- forest canopy count
+- tree-row member count
+- vegetation mode distribution
+- isolated-tree clutter ratio
+
+raporlanır.
+
+### Building height quality
+
+Mevcut building-height normalization metadata üzerinden:
+
+- `building_height_outlier_count`
+
+ölçülür.
+
+Yeni height normalizer veya ikinci bir outlier sistemi oluşturulmamıştır.
+
+### Terrain prominence
+
+Mevcut morphology composition policy içindeki:
+
+- `terrain_emphasis`
+
+değeri:
+
+- `terrain_prominence_ratio`
+
+olarak quality report'a taşınır.
+
+### Landmark-to-background prominence
+
+City Composition LoD içindeki mevcut:
+
+- semantic class
+- narrative priority
+
+metadata reuse edilerek:
+
+- landmark narrative priority
+- background narrative priority
+- landmark-to-background prominence ratio
+
+hesaplanır.
+
+### Road continuity
+
+Final production result'a attach edilen:
+
+- `bridge_urban_integration`
+
+kayıtlarından:
+
+- bridge record count
+- continuous bridge count
+- major-road continuity ratio
+
+ölçülür.
+
+Approach-road continuity mevcut production geometry/integration
+metadata'sından okunur; quality report geometry oluşturmaz.
+
+### Water completeness ve continuity
+
+Final production result içindeki:
+
+- `water_shoreline_composition`
+
+kayıtlarından:
+
+- composition record count
+- continuous surface record count
+- water completeness ratio
+
+ölçülür.
+
+`supports_water_surface_continuity` mevcut shoreline composition
+contract'ından doğrudan reuse edilir.
+
+### Road hierarchy coverage
+
+Final:
+
+- `city_composition_scene`
+
+içindeki gerçek semantic class kayıtlarından:
+
+- major-road count
+- local-road count
+- service-road count
+- pedestrian-path count
+- represented hierarchy class count
+- road hierarchy coverage ratio
+
+ölçülür.
+
+### Semantic surface coverage
+
+Final park meshleri üzerinde mevcut:
+
+- `semantic_surface_texture`
+
+metadata'sı kullanılarak:
+
+- eligible surface count
+- textured surface count
+- semantic surface coverage ratio
+
+hesaplanır.
+
+### Forest continuity signal
+
+Final:
+
+- `mesh_groups["forest_canopies"]`
+
+üzerinden:
+
+- forest canopy mesh count
+- forest canopy presence
+
+raporlanır.
+
+Gerçek production contract henüz daha güçlü bir forest-continuity oranı
+taşımadığı için sahte bir continuity ratio üretilmemiştir.
+
+### Issue reporting
+
+Quality report iki temel problem sınıfını ayırt eder:
+
+- missing semantic content
+- visually weak but technically present content
+
+Doğrulanan issue örnekleri:
+
+- missing park content
+- missing water content
+- missing railway content
+- weak road presence
+- weak vegetation presence
+- weak major-road continuity
+- weak water-surface continuity
+
+### Production wiring
+
+`AtlasFoundationFirstEngine.generate_city_stl()` final result zincirine
+quality report bağlandı.
+
+Sıra:
+
+- production scene oluşturulur
+- City Composition LoD uygulanır
+- bridge urban integration metadata eklenir
+- water / shoreline composition metadata eklenir
+- castle semantic architecture tamamlanır
+- `AtlasUrbanFabricQualityReport.build(scene_result=result)` çağrılır
+- final result içinde `urban_fabric_quality_report` döner
+
+Böylece report ara veya eksik scene'i değil, final production result'ı ölçer.
+
+Mevcut water/shoreline FoundationFirst fixture'ı quality-report build
+aşamasına kadar genişletildi ve gerçek final-result metadata akışı
+davranışsal olarak doğrulandı.
+
+### Bilinçli kapsam sınırı
+
+Roadmap'te candidate metric olarak bulunan:
+
+- urban-block continuity
+
+şu anda final FoundationFirst `city_composition_scene` içine gerçek
+urban-block profile/relationship metadata'sı taşınmadığı için uydurma bir
+metrikle raporlanmamıştır.
+
+Aynı prensip daha güçlü forest continuity ölçümü için de uygulanmıştır:
+source-of-truth production metadata yoksa heuristic kalite metriği
+icat edilmemiştir.
+
+### Roadmap acceptance sonucu
+
+8.19 kapsamında doğrulanan temel davranış:
+
+> Urban Fabric quality must become measurable enough that regressions can be
+> detected before relying only on visual inspection.
+
+Quality report artık final production scene üzerinde objektif,
+deterministik ve read-only ölçümler üretmektedir.
+
+### Doğrulama
+
+Focused Urban Fabric Quality Report:
+
+- `14 passed in 0.02s`
+
+FoundationFirst behavior / wiring:
+
+- `23 passed in 0.26s`
+
+Expanded related regression:
+
+- `103 passed in 0.30s`
+
+Full ATLAS regression:
+
+- `3629 passed in 15.25s`
+
+8.19 kapsamında açık blocker kalmadı.
+
+**Sıradaki roadmap paketi: 8.20 — Multi-Morphology Acceptance Benchmarks.**
