@@ -260,6 +260,18 @@ def test_engine_builds_tree_and_canopy_meshes_from_composition():
             ((0.0, 0.0, 0.0), (10.0, 0.0, 0.0)),
             ((0.0, 10.0, 0.0), (10.0, 10.0, 0.0)),
         ),
+        "triangles": [
+            (
+                (0.0, 0.0, 0.0),
+                (10.0, 0.0, 0.0),
+                (10.0, 10.0, 0.0),
+            ),
+            (
+                (0.0, 0.0, 0.0),
+                (10.0, 10.0, 0.0),
+                (0.0, 10.0, 0.0),
+            ),
+        ],
     }
 
     result = AtlasFoundationFirstEngine._build_vegetation_meshes(
@@ -316,6 +328,18 @@ def test_engine_prepares_scene_vegetation_and_respects_castle_only():
             ((0.0, 0.0, 0.0), (10.0, 0.0, 0.0)),
             ((0.0, 10.0, 0.0), (10.0, 10.0, 0.0)),
         ),
+        "triangles": [
+            (
+                (0.0, 0.0, 0.0),
+                (10.0, 0.0, 0.0),
+                (10.0, 10.0, 0.0),
+            ),
+            (
+                (0.0, 0.0, 0.0),
+                (10.0, 10.0, 0.0),
+                (0.0, 10.0, 0.0),
+            ),
+        ],
     }
 
     normal = AtlasFoundationFirstEngine._prepare_scene_vegetation(
@@ -446,7 +470,7 @@ def test_engine_resolves_tree_rows_into_controlled_tree_members():
     assert len(result) >= 2
 
     assert all(
-        item["tree_kind"] == "park_tree_symbol"
+        item["tree_kind"] == "canonical"
         for item in result
     )
 
@@ -996,3 +1020,193 @@ def test_build_vegetation_meshes_passes_cartographic_context_to_tree_builder(
         ]
         is lod_level
     )
+
+
+def test_tree_crown_overlapping_building_footprint_is_rejected():
+    tree_mesh = {
+        "type": "tree_foundation",
+        "tree_type": "canonical",
+        "source": "osm",
+        "triangles": (
+            (
+                (9.225, 10.0, 1.0),
+                (10.775, 10.0, 1.0),
+                (10.0, 10.0, 3.15),
+            ),
+        ),
+    }
+
+    building_mesh = {
+        "type": "building",
+        "bottom": (
+            (10.60, 9.0, 1.0),
+            (12.00, 9.0, 1.0),
+            (12.00, 11.0, 1.0),
+            (10.60, 11.0, 1.0),
+        ),
+        "triangles": (),
+    }
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._remove_tree_meshes_overlapping_buildings(
+            tree_meshes=[tree_mesh],
+            building_meshes=[building_mesh],
+            clearance_mm=0.0,
+        )
+    )
+
+    assert result == []
+
+
+def test_tree_crown_clear_of_building_footprint_is_retained():
+    tree_mesh = {
+        "type": "tree_foundation",
+        "tree_type": "canonical",
+        "source": "osm",
+        "triangles": (
+            (
+                (9.225, 10.0, 1.0),
+                (10.775, 10.0, 1.0),
+                (10.0, 10.0, 3.15),
+            ),
+        ),
+    }
+
+    building_mesh = {
+        "type": "building",
+        "bottom": (
+            (11.00, 9.0, 1.0),
+            (12.00, 9.0, 1.0),
+            (12.00, 11.0, 1.0),
+            (11.00, 11.0, 1.0),
+        ),
+        "triangles": (),
+    }
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._remove_tree_meshes_overlapping_buildings(
+            tree_meshes=[tree_mesh],
+            building_meshes=[building_mesh],
+            clearance_mm=0.0,
+        )
+    )
+
+    assert result == [tree_mesh]
+
+
+def test_tree_crown_overlapping_road_surface_is_rejected():
+    tree_mesh = {
+        "type": "tree_foundation",
+        "tree_type": "canonical",
+        "source": "osm",
+        "triangles": (
+            (
+                (9.225, 10.0, 1.0),
+                (10.775, 10.0, 1.0),
+                (10.0, 10.0, 3.15),
+            ),
+        ),
+    }
+
+    road_mesh = {
+        "type": "road_foundation",
+        "top": (
+            (10.60, 9.0, 1.0),
+            (12.00, 9.0, 1.0),
+            (12.00, 11.0, 1.0),
+            (10.60, 11.0, 1.0),
+        ),
+        "triangles": (),
+    }
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._remove_tree_meshes_overlapping_roads(
+            tree_meshes=[tree_mesh],
+            road_meshes=[road_mesh],
+            clearance_mm=0.0,
+        )
+    )
+
+    assert result == []
+
+
+def test_tree_crown_clear_of_road_surface_is_retained():
+    tree_mesh = {
+        "type": "tree_foundation",
+        "tree_type": "canonical",
+        "source": "osm",
+        "triangles": (
+            (
+                (9.225, 10.0, 1.0),
+                (10.775, 10.0, 1.0),
+                (10.0, 10.0, 3.15),
+            ),
+        ),
+    }
+
+    road_mesh = {
+        "type": "road_foundation",
+        "top": (
+            (11.00, 9.0, 1.0),
+            (12.00, 9.0, 1.0),
+            (12.00, 11.0, 1.0),
+            (11.00, 11.0, 1.0),
+        ),
+        "triangles": (),
+    }
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._remove_tree_meshes_overlapping_roads(
+            tree_meshes=[tree_mesh],
+            road_meshes=[road_mesh],
+            clearance_mm=0.0,
+        )
+    )
+
+    assert result == [tree_mesh]
+
+
+def test_tree_crown_overlapping_later_road_segment_is_rejected():
+    tree_mesh = {
+        "type": "tree_foundation",
+        "tree_type": "canonical",
+        "source": "osm",
+        "triangles": (
+            (
+                (19.225, 20.0, 1.0),
+                (20.775, 20.0, 1.0),
+                (20.0, 20.0, 3.15),
+            ),
+        ),
+    }
+
+    road_mesh = {
+        "type": "road_foundation",
+        "top": (
+            (0.0, 0.0, 1.0),
+            (4.0, 0.0, 1.0),
+            (4.0, 2.0, 1.0),
+            (0.0, 2.0, 1.0),
+
+            (20.60, 19.0, 1.0),
+            (22.00, 19.0, 1.0),
+            (22.00, 21.0, 1.0),
+            (20.60, 21.0, 1.0),
+        ),
+        "triangles": (),
+    }
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._remove_tree_meshes_overlapping_roads(
+            tree_meshes=[tree_mesh],
+            road_meshes=[road_mesh],
+            clearance_mm=0.0,
+        )
+    )
+
+    assert result == []

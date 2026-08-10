@@ -218,9 +218,9 @@ def test_resolver_uses_explicit_tree_spacing_evidence_for_product_spacing():
 
     assert spacing["evidence_source"] == "explicit_tree_spacing"
     assert spacing["source_spacing_m"] == pytest.approx(5.0)
-    assert spacing["action"] == "preserve"
+    assert spacing["action"] == "enlarge"
     assert spacing["resolved_spacing_mm"] == pytest.approx(
-        5.0 * 1000.0 / 5500.0
+        1.55 + 0.40
     )
 
 
@@ -245,7 +245,7 @@ def test_resolver_does_not_infer_tree_spacing_from_geometry_vertices():
 
     assert spacing["evidence_source"] == "product_readability"
     assert spacing["action"] == "fallback"
-    assert spacing["resolved_spacing_mm"] == pytest.approx(1.50)
+    assert spacing["resolved_spacing_mm"] == pytest.approx(1.95)
     assert "source_spacing_m" not in spacing
 
 
@@ -333,7 +333,7 @@ def test_resolver_uses_product_readability_fallback_when_spacing_is_missing():
 
     assert spacing["action"] == "fallback"
     assert spacing["evidence_source"] == "product_readability"
-    assert spacing["resolved_spacing_mm"] == pytest.approx(1.50)
+    assert spacing["resolved_spacing_mm"] == pytest.approx(1.95)
 
 
 def test_explicit_two_point_osm_tree_row_is_strong_evidence():

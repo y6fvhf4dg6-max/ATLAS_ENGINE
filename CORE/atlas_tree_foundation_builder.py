@@ -24,6 +24,8 @@ from CORE.atlas_physical_cartographic_exaggeration_resolver import (
 class AtlasTreeFoundationBuilder:
     TREE_SEGMENTS = 12
 
+    CANONICAL_TREE_MIN_CROWN_DIAMETER_MM = 0.60
+
     PARK_TREE_SYMBOL_MIN_HEIGHT_MM = 1.0
     PARK_TREE_SYMBOL_MAX_HEIGHT_MM = 1.4
     PARK_TREE_SYMBOL_MIN_DIAMETER_MM = 0.60
@@ -98,7 +100,59 @@ class AtlasTreeFoundationBuilder:
 
         x, y = coordinate_engine.latlon_to_stl_mm(lat, lon)
 
-        if not (0.0 <= x <= 200.0 and 0.0 <= y <= 200.0):
+        terrain_bounds = (
+            AtlasTreeFoundationBuilder
+            ._terrain_xy_bounds(
+                terrain_mesh
+            )
+        )
+
+        if terrain_bounds is None:
+            return None
+
+        (
+            terrain_min_x,
+            terrain_max_x,
+            terrain_min_y,
+            terrain_max_y,
+        ) = terrain_bounds
+
+        canonical_dimensions = (
+            AtlasTreeFoundationBuilder
+            ._canonical_tree_dimensions(
+                tree=tree,
+                scale_ratio=getattr(
+                    coordinate_engine,
+                    "xy_scale",
+                    None,
+                ),
+                product_size_mm=(
+                    cartographic_product_size_mm
+                ),
+                nozzle_diameter_mm=(
+                    cartographic_nozzle_diameter_mm
+                ),
+                lod_level=(
+                    cartographic_lod_level
+                ),
+            )
+        )
+
+        crown_radius_mm = (
+            canonical_dimensions[
+                "crown_diameter_mm"
+            ]
+            / 2.0
+        )
+
+        if not (
+            terrain_min_x + crown_radius_mm
+            <= x
+            <= terrain_max_x - crown_radius_mm
+            and terrain_min_y + crown_radius_mm
+            <= y
+            <= terrain_max_y - crown_radius_mm
+        ):
             return None
 
         base_z = AtlasFoundationSampler.terrain_z_at_xy(
@@ -109,62 +163,36 @@ class AtlasTreeFoundationBuilder:
 
         rng = random.Random(tree.get("id", index))
 
-        tree_kind = AtlasTreeFoundationBuilder._select_tree_kind(tree, rng)
+        tree_kind = AtlasTreeFoundationBuilder._select_tree_kind(
+            tree,
+            rng,
+        )
 
-        if tree_kind == "conifer":
-            triangles = AtlasTreeFoundationBuilder._build_conifer(
+        canonical_tree = (
+            AtlasTreeFoundationBuilder
+            ._build_canonical_tree(
                 x=x,
                 y=y,
                 base_z=base_z,
-                rng=rng,
+                tree=tree,
+                scale_ratio=getattr(
+                    coordinate_engine,
+                    "xy_scale",
+                    None,
+                ),
+                product_size_mm=(
+                    cartographic_product_size_mm
+                ),
+                nozzle_diameter_mm=(
+                    cartographic_nozzle_diameter_mm
+                ),
+                lod_level=(
+                    cartographic_lod_level
+                ),
             )
-        elif tree_kind == "park_tree_symbol":
-            cartographic_context_complete = (
-                cartographic_product_size_mm is not None
-                and cartographic_nozzle_diameter_mm is not None
-                and cartographic_lod_level is not None
-            )
+        )
 
-            if cartographic_context_complete:
-                triangles = (
-                    AtlasTreeFoundationBuilder
-                    ._build_park_tree_symbol(
-                        x=x,
-                        y=y,
-                        base_z=base_z,
-                        rng=rng,
-                        tree=tree,
-                        scale_ratio=(
-                            coordinate_engine.xy_scale
-                        ),
-                        product_size_mm=(
-                            cartographic_product_size_mm
-                        ),
-                        nozzle_diameter_mm=(
-                            cartographic_nozzle_diameter_mm
-                        ),
-                        lod_level=(
-                            cartographic_lod_level
-                        ),
-                    )
-                )
-            else:
-                triangles = (
-                    AtlasTreeFoundationBuilder
-                    ._build_park_tree_symbol(
-                        x=x,
-                        y=y,
-                        base_z=base_z,
-                        rng=rng,
-                    )
-                )
-        else:
-            triangles = AtlasTreeFoundationBuilder._build_round_tree(
-                x=x,
-                y=y,
-                base_z=base_z,
-                rng=rng,
-            )
+        triangles = canonical_tree["triangles"]
 
         tags = dict(tree.get("tags") or {})
 
@@ -182,301 +210,49 @@ class AtlasTreeFoundationBuilder:
         }
 
     @staticmethod
-    def _select_tree_kind(tree, rng):
-        explicit_kind = tree.get("tree_kind")
+    def _terrain_xy_bounds(terrain_mesh):
+        if not isinstance(terrain_mesh, dict):
+            return None
 
-        if explicit_kind is not None:
-            explicit_kind = str(explicit_kind)
-
-            if explicit_kind not in {
-                "round",
-                "conifer",
-                "park_tree_symbol",
-            }:
-                raise ValueError(
-                    "unsupported explicit tree_kind"
-                )
-
-            return explicit_kind
-
-        source = (tree.get("source") or "").lower()
-
-        # WorldCover tekil ağaç türü bilgisi sağlamaz.
-        # Bu nedenle WorldCover örnekleri mevcut yuvarlak taçlı
-        # ATLAS ağacıyla üretilir.
-        tags = tree.get("tags", {})
-
-        source = (tree.get("source") or tags.get("source") or "").lower()
-
-        if source == "worldcover":
-            return "park_tree_symbol"
-
-        leaf_type = tags.get("leaf_type")
-        genus = (tags.get("genus") or "").lower()
-        species = (tags.get("species") or "").lower()
-
-        conifer_words = {
-            "needleleaved",
-            "conifer",
-            "pinus",
-            "pine",
-            "cedrus",
-            "cypress",
-            "cupressus",
-            "fir",
-            "abies",
-            "spruce",
-            "picea",
-        }
-
-        tag_text = f"{leaf_type} {genus} {species}".lower()
-
-        if any(word in tag_text for word in conifer_words):
-            return "conifer"
-
-        if rng.random() < 0.25:
-            return "conifer"
-
-        return "round"
-
-    @staticmethod
-    def _build_round_tree(x, y, base_z, rng):
-        n = AtlasTreeFoundationBuilder.TREE_SEGMENTS
-
-        trunk_r = 0.20 * rng.uniform(0.90, 1.15)
-        trunk_h = 0.45 * rng.uniform(0.85, 1.15)
-
-        crown_r = 0.72 * rng.uniform(0.85, 1.18)
-        crown_h = 0.78 * rng.uniform(0.85, 1.18)
-
-        crown_offset_x = rng.uniform(-0.10, 0.10)
-        crown_offset_y = rng.uniform(-0.10, 0.10)
-
-        trunk_bottom = []
-        trunk_top = []
-        crown_low = []
-        crown_mid = []
-        crown_high = []
-
-        for i in range(n):
-            a = 2.0 * math.pi * i / n
-
-            trunk_bottom.append(
-                (
-                    x + math.cos(a) * trunk_r,
-                    y + math.sin(a) * trunk_r,
-                    base_z,
-                )
-            )
-
-            trunk_top.append(
-                (
-                    x + math.cos(a) * trunk_r,
-                    y + math.sin(a) * trunk_r,
-                    base_z + trunk_h,
-                )
-            )
-
-            cx = x + crown_offset_x
-            cy = y + crown_offset_y
-
-            crown_low.append(
-                (
-                    cx + math.cos(a) * crown_r * 0.72,
-                    cy + math.sin(a) * crown_r * 0.72,
-                    base_z + trunk_h + crown_h * 0.15,
-                )
-            )
-
-            crown_mid.append(
-                (
-                    cx + math.cos(a) * crown_r,
-                    cy + math.sin(a) * crown_r,
-                    base_z + trunk_h + crown_h * 0.50,
-                )
-            )
-
-            crown_high.append(
-                (
-                    cx + math.cos(a) * crown_r * 0.55,
-                    cy + math.sin(a) * crown_r * 0.55,
-                    base_z + trunk_h + crown_h * 0.82,
-                )
-            )
-
-        top = (
-            x + crown_offset_x,
-            y + crown_offset_y,
-            base_z + trunk_h + crown_h,
+        triangles = terrain_mesh.get(
+            "triangles",
+            (),
         )
 
-        triangles = []
-
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, trunk_bottom, trunk_top)
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, trunk_top, crown_low)
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, crown_low, crown_mid)
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, crown_mid, crown_high)
-        AtlasTreeFoundationBuilder._ring_to_tip(triangles, crown_high, top)
-        AtlasTreeFoundationBuilder._cap_bottom(triangles, trunk_bottom, (x, y, base_z))
-
-        return triangles
-
-    @staticmethod
-    def _build_conifer(x, y, base_z, rng):
-        n = AtlasTreeFoundationBuilder.TREE_SEGMENTS
-
-        trunk_r = 0.16 * rng.uniform(0.90, 1.15)
-        trunk_h = 0.35 * rng.uniform(0.85, 1.15)
-
-        lower_r = 0.75 * rng.uniform(0.85, 1.15)
-        mid_r = lower_r * 0.58
-        high_r = lower_r * 0.28
-
-        total_h = 1.45 * rng.uniform(0.90, 1.15)
-
-        trunk_bottom = []
-        trunk_top = []
-        lower = []
-        mid = []
-        high = []
-
-        for i in range(n):
-            a = 2.0 * math.pi * i / n
-
-            trunk_bottom.append(
-                (
-                    x + math.cos(a) * trunk_r,
-                    y + math.sin(a) * trunk_r,
-                    base_z,
-                )
-            )
-
-            trunk_top.append(
-                (
-                    x + math.cos(a) * trunk_r,
-                    y + math.sin(a) * trunk_r,
-                    base_z + trunk_h,
-                )
-            )
-
-            lower.append(
-                (
-                    x + math.cos(a) * lower_r,
-                    y + math.sin(a) * lower_r,
-                    base_z + trunk_h + total_h * 0.10,
-                )
-            )
-
-            mid.append(
-                (
-                    x + math.cos(a) * mid_r,
-                    y + math.sin(a) * mid_r,
-                    base_z + trunk_h + total_h * 0.50,
-                )
-            )
-
-            high.append(
-                (
-                    x + math.cos(a) * high_r,
-                    y + math.sin(a) * high_r,
-                    base_z + trunk_h + total_h * 0.78,
-                )
-            )
-
-        top = (x, y, base_z + trunk_h + total_h)
-
-        triangles = []
-
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, trunk_bottom, trunk_top)
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, trunk_top, lower)
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, lower, mid)
-        AtlasTreeFoundationBuilder._ring_to_ring(triangles, mid, high)
-        AtlasTreeFoundationBuilder._ring_to_tip(triangles, high, top)
-        AtlasTreeFoundationBuilder._cap_bottom(triangles, trunk_bottom, (x, y, base_z))
-
-        return triangles
-
-    @staticmethod
-    def _round_crown_profile(
-        crown_radius,
-        crown_height,
-    ):
-        del crown_radius, crown_height
-
-        return [
-            (0.00, 0.28),
-            (0.16, 0.68),
-            (0.38, 1.00),
-            (0.64, 0.82),
-            (0.84, 0.46),
-            (1.00, 0.00),
+        points = [
+            point
+            for triangle in triangles
+            for point in triangle
+            if len(point) >= 2
         ]
 
-    @staticmethod
-    def _round_crown_lobes(rng):
-        lobes = []
+        if not points:
+            return None
 
-        for angle_index in range(4):
-            angle = (
-                2.0
-                * math.pi
-                * angle_index
-                / 4.0
-                + rng.uniform(-0.30, 0.30)
-            )
-
-            offset = rng.uniform(0.06, 0.18)
-
-            lobes.append(
-                {
-                    "offset_x": math.cos(angle) * offset,
-                    "offset_y": math.sin(angle) * offset,
-                    "radius_scale": rng.uniform(0.82, 1.12),
-                    "height_scale": rng.uniform(0.88, 1.10),
-                }
-            )
-
-        return lobes
-
-    @staticmethod
-    def _park_tree_symbol_profile():
-        return [
-            (0.00, 0.52),
-            (0.22, 0.78),
-            (0.52, 1.00),
-            (0.78, 0.64),
-            (1.00, 0.00),
+        xs = [
+            float(point[0])
+            for point in points
+        ]
+        ys = [
+            float(point[1])
+            for point in points
         ]
 
-    @staticmethod
-    def _resolve_park_tree_symbol_diameter_mm(
-        *,
-        source_diameter_m,
-        scale_ratio,
-        product_size_mm,
-        nozzle_diameter_mm,
-        minimum_printable_width_mm,
-        lod_level,
-    ):
         return (
-            AtlasPhysicalCartographicExaggerationResolver
-            .resolve(
-                semantic_class="vegetation_element",
-                source_width_m=source_diameter_m,
-                scale_ratio=scale_ratio,
-                product_size_mm=product_size_mm,
-                nozzle_diameter_mm=nozzle_diameter_mm,
-                minimum_printable_width_mm=(
-                    minimum_printable_width_mm
-                ),
-                semantic_priority=0.50,
-                lod_level=lod_level,
-            )
+            min(xs),
+            max(xs),
+            min(ys),
+            max(ys),
         )
 
     @staticmethod
-    def _park_tree_symbol_dimensions(
-        rng,
+    def _select_tree_kind(tree, rng):
+        del tree, rng
+
+        return "canonical"
+
+    @staticmethod
+    def _canonical_tree_dimensions(
         *,
         tree=None,
         scale_ratio=None,
@@ -484,19 +260,7 @@ class AtlasTreeFoundationBuilder:
         nozzle_diameter_mm=None,
         lod_level=None,
     ):
-        height_mm = rng.uniform(
-            AtlasTreeFoundationBuilder
-            .PARK_TREE_SYMBOL_MIN_HEIGHT_MM,
-            AtlasTreeFoundationBuilder
-            .PARK_TREE_SYMBOL_MAX_HEIGHT_MM,
-        )
-
-        diameter_mm = rng.uniform(
-            AtlasTreeFoundationBuilder
-            .PARK_TREE_SYMBOL_MIN_DIAMETER_MM,
-            AtlasTreeFoundationBuilder
-            .PARK_TREE_SYMBOL_MAX_DIAMETER_MM,
-        )
+        crown_diameter_mm = 1.55
 
         tags = (
             tree.get("tags", {})
@@ -508,13 +272,15 @@ class AtlasTreeFoundationBuilder:
             "diameter_crown"
         )
 
-        if (
+        context_complete = (
             source_diameter is not None
             and scale_ratio is not None
             and product_size_mm is not None
             and nozzle_diameter_mm is not None
             and lod_level is not None
-        ):
+        )
+
+        if context_complete:
             try:
                 candidate = source_diameter
 
@@ -544,7 +310,7 @@ class AtlasTreeFoundationBuilder:
             else:
                 exaggeration = (
                     AtlasTreeFoundationBuilder
-                    ._resolve_park_tree_symbol_diameter_mm(
+                    ._resolve_canonical_tree_diameter_mm(
                         source_diameter_m=(
                             source_diameter_m
                         ),
@@ -557,27 +323,30 @@ class AtlasTreeFoundationBuilder:
                         ),
                         minimum_printable_width_mm=(
                             AtlasTreeFoundationBuilder
-                            .PARK_TREE_SYMBOL_MIN_DIAMETER_MM
+                            .CANONICAL_TREE_MIN_CROWN_DIAMETER_MM
                         ),
                         lod_level=lod_level,
                     )
                 )
 
-                diameter_mm = (
+                crown_diameter_mm = (
                     exaggeration.physical_width_mm
                 )
 
         return {
-            "height_mm": height_mm,
-            "diameter_mm": diameter_mm,
+            "total_height_mm": 2.15,
+            "trunk_height_mm": 0.80,
+            "trunk_diameter_mm": 0.45,
+            "crown_height_mm": 1.35,
+            "crown_diameter_mm": crown_diameter_mm,
         }
 
     @staticmethod
-    def _build_park_tree_symbol(
+    def _build_canonical_tree(
+        *,
         x,
         y,
         base_z,
-        rng,
         tree=None,
         scale_ratio=None,
         product_size_mm=None,
@@ -586,8 +355,7 @@ class AtlasTreeFoundationBuilder:
     ):
         dimensions = (
             AtlasTreeFoundationBuilder
-            ._park_tree_symbol_dimensions(
-                rng,
+            ._canonical_tree_dimensions(
                 tree=tree,
                 scale_ratio=scale_ratio,
                 product_size_mm=product_size_mm,
@@ -595,68 +363,217 @@ class AtlasTreeFoundationBuilder:
                 lod_level=lod_level,
             )
         )
-        profile = (
+
+        segment_count = (
             AtlasTreeFoundationBuilder
-            ._park_tree_symbol_profile()
+            .TREE_SEGMENTS
         )
 
-        height = dimensions["height_mm"]
-        radius = dimensions["diameter_mm"] / 2.0
-        segment_count = AtlasTreeFoundationBuilder.TREE_SEGMENTS
+        trunk_height = dimensions[
+            "trunk_height_mm"
+        ]
+        trunk_radius = (
+            dimensions["trunk_diameter_mm"]
+            / 2.0
+        )
+        crown_height = dimensions[
+            "crown_height_mm"
+        ]
+        crown_radius = (
+            dimensions["crown_diameter_mm"]
+            / 2.0
+        )
 
-        rings = []
+        trunk_bottom_z = float(base_z)
+        trunk_top_z = (
+            trunk_bottom_z
+            + trunk_height
+        )
+        crown_bottom_z = trunk_top_z
+        top_z = (
+            trunk_bottom_z
+            + dimensions["total_height_mm"]
+        )
 
-        for height_scale, radius_scale in profile:
-            if radius_scale <= 0.0:
-                continue
-
-            ring = []
-
-            for index in range(segment_count):
-                angle = (
-                    2.0
-                    * math.pi
-                    * index
-                    / segment_count
-                )
-
-                ring.append(
-                    (
-                        x + math.cos(angle) * radius * radius_scale,
-                        y + math.sin(angle) * radius * radius_scale,
-                        base_z + height * height_scale,
+        def ring(
+            radius,
+            z,
+            offset_x=0.0,
+            offset_y=0.0,
+        ):
+            return [
+                (
+                    float(x)
+                    + offset_x
+                    + math.cos(
+                        2.0
+                        * math.pi
+                        * index
+                        / segment_count
                     )
+                    * radius,
+                    float(y)
+                    + offset_y
+                    + math.sin(
+                        2.0
+                        * math.pi
+                        * index
+                        / segment_count
+                    )
+                    * radius,
+                    float(z),
                 )
+                for index in range(
+                    segment_count
+                )
+            ]
 
-            rings.append(ring)
+        trunk_bottom = ring(
+            trunk_radius,
+            trunk_bottom_z,
+        )
+        trunk_top = ring(
+            trunk_radius,
+            trunk_top_z,
+        )
+
+        crown_rings = [
+            ring(
+                crown_radius * 0.48,
+                crown_bottom_z,
+                -0.02,
+                0.00,
+            ),
+            ring(
+                crown_radius * 0.76,
+                crown_bottom_z
+                + crown_height * 0.12,
+                -0.03,
+                0.01,
+            ),
+            ring(
+                crown_radius * 0.96,
+                crown_bottom_z
+                + crown_height * 0.28,
+                -0.02,
+                0.02,
+            ),
+            ring(
+                crown_radius,
+                crown_bottom_z
+                + crown_height * 0.46,
+                0.01,
+                0.02,
+            ),
+            ring(
+                crown_radius * 0.96,
+                crown_bottom_z
+                + crown_height * 0.62,
+                0.03,
+                0.00,
+            ),
+            ring(
+                crown_radius * 0.78,
+                crown_bottom_z
+                + crown_height * 0.78,
+                0.03,
+                -0.02,
+            ),
+            ring(
+                crown_radius * 0.48,
+                crown_bottom_z
+                + crown_height * 0.91,
+                0.01,
+                -0.02,
+            ),
+            ring(
+                crown_radius * 0.18,
+                top_z,
+                0.00,
+                -0.01,
+            ),
+        ]
 
         triangles = []
 
-        for lower, upper in zip(rings, rings[1:]):
+        AtlasTreeFoundationBuilder._ring_to_ring(
+            triangles,
+            trunk_bottom,
+            trunk_top,
+        )
+
+        AtlasTreeFoundationBuilder._ring_to_ring(
+            triangles,
+            trunk_top,
+            crown_rings[0],
+        )
+
+        for lower, upper in zip(
+            crown_rings,
+            crown_rings[1:],
+        ):
             AtlasTreeFoundationBuilder._ring_to_ring(
                 triangles,
                 lower,
                 upper,
             )
 
-        tip = (
-            x,
-            y,
-            base_z + height,
+        top_center = (
+            float(x) + 0.01,
+            float(y) - 0.01,
+            top_z,
+        )
+
+        AtlasTreeFoundationBuilder._cap_bottom(
+            triangles,
+            trunk_bottom,
+            (
+                float(x),
+                float(y),
+                trunk_bottom_z,
+            ),
         )
 
         AtlasTreeFoundationBuilder._ring_to_tip(
             triangles,
-            rings[-1],
-            tip,
-        )
-        AtlasTreeFoundationBuilder._cap_bottom(
-            triangles,
-            rings[0],
-            (x, y, base_z),
+            crown_rings[-1],
+            top_center,
         )
 
-        return triangles
+        return {
+            "triangles": triangles,
+            "dimensions": dimensions,
+            "trunk_bottom_z": trunk_bottom_z,
+            "trunk_top_z": trunk_top_z,
+            "crown_bottom_z": crown_bottom_z,
+            "top_z": top_z,
+        }
+
+    @staticmethod
+    def _resolve_canonical_tree_diameter_mm(
+        *,
+        source_diameter_m,
+        scale_ratio,
+        product_size_mm,
+        nozzle_diameter_mm,
+        minimum_printable_width_mm,
+        lod_level,
+    ):
+        return (
+            AtlasPhysicalCartographicExaggerationResolver
+            .resolve(
+                semantic_class="vegetation_element",
+                source_width_m=source_diameter_m,
+                scale_ratio=scale_ratio,
+                product_size_mm=product_size_mm,
+                nozzle_diameter_mm=nozzle_diameter_mm,
+                minimum_printable_width_mm=(
+                    minimum_printable_width_mm
+                ),
+                semantic_priority=0.50,
+                lod_level=lod_level,
+            )
+        )
 
     @staticmethod
     def _resolve_source(tree):

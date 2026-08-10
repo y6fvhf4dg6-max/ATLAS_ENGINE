@@ -974,6 +974,209 @@ class AtlasFoundationFirstEngine:
         )
 
     @classmethod
+    def _remove_tree_meshes_overlapping_roads(
+        cls,
+        tree_meshes,
+        road_meshes,
+        clearance_mm=0.0,
+    ):
+        clearance_mm = float(clearance_mm)
+
+        if clearance_mm < 0.0:
+            raise ValueError(
+                "clearance_mm must be non-negative"
+            )
+
+        road_polygons = []
+
+        for road_mesh in road_meshes or ():
+            top = (
+                tuple(road_mesh.get("top", ()))
+                if isinstance(road_mesh, dict)
+                else ()
+            )
+
+            for start in range(0, len(top), 4):
+                segment = top[start:start + 4]
+
+                if len(segment) != 4:
+                    continue
+
+                footprint = [
+                    (
+                        float(point[0]),
+                        float(point[1]),
+                    )
+                    for point in segment
+                    if len(point) >= 2
+                ]
+
+                if len(footprint) != 4:
+                    continue
+
+                polygon = Polygon(footprint)
+
+                if (
+                    polygon.is_empty
+                    or not polygon.is_valid
+                    or polygon.area <= 0.0
+                ):
+                    continue
+
+                road_polygons.append(polygon)
+
+        if not road_polygons:
+            return list(tree_meshes or ())
+
+        retained = []
+
+        dimensions = (
+            AtlasTreeFoundationBuilder
+            ._canonical_tree_dimensions()
+        )
+
+        crown_radius_mm = (
+            float(
+                dimensions[
+                    "crown_diameter_mm"
+                ]
+            )
+            / 2.0
+        )
+
+        exclusion_radius_mm = (
+            crown_radius_mm
+            + clearance_mm
+        )
+
+        buffered_roads = [
+            polygon.buffer(
+                exclusion_radius_mm
+            )
+            for polygon in road_polygons
+        ]
+
+        for tree_mesh in tree_meshes or ():
+            center = cls._tree_mesh_base_center(
+                tree_mesh
+            )
+
+            if center is None:
+                retained.append(tree_mesh)
+                continue
+
+            point = Point(
+                float(center[0]),
+                float(center[1]),
+            )
+
+            overlaps_road = any(
+                polygon.covers(point)
+                for polygon in buffered_roads
+            )
+
+            if not overlaps_road:
+                retained.append(tree_mesh)
+
+        return retained
+
+    @classmethod
+    def _remove_tree_meshes_overlapping_buildings(
+        cls,
+        tree_meshes,
+        building_meshes,
+        clearance_mm=0.0,
+    ):
+        clearance_mm = float(clearance_mm)
+
+        if clearance_mm < 0.0:
+            raise ValueError(
+                "clearance_mm must be non-negative"
+            )
+
+        building_polygons = []
+
+        for building_mesh in building_meshes or ():
+            bottom = (
+                building_mesh.get("bottom", ())
+                if isinstance(building_mesh, dict)
+                else ()
+            )
+
+            footprint = [
+                (
+                    float(point[0]),
+                    float(point[1]),
+                )
+                for point in bottom
+                if len(point) >= 2
+            ]
+
+            if len(footprint) < 3:
+                continue
+
+            polygon = Polygon(footprint)
+
+            if (
+                polygon.is_empty
+                or not polygon.is_valid
+                or polygon.area <= 0.0
+            ):
+                continue
+
+            building_polygons.append(polygon)
+
+        if not building_polygons:
+            return list(tree_meshes or ())
+
+        retained = []
+
+        for tree_mesh in tree_meshes or ():
+            center = cls._tree_mesh_base_center(
+                tree_mesh
+            )
+
+            if center is None:
+                retained.append(tree_mesh)
+                continue
+
+            dimensions = (
+                AtlasTreeFoundationBuilder
+                ._canonical_tree_dimensions()
+            )
+
+            crown_radius_mm = (
+                float(
+                    dimensions[
+                        "crown_diameter_mm"
+                    ]
+                )
+                / 2.0
+            )
+
+            exclusion_radius_mm = (
+                crown_radius_mm
+                + clearance_mm
+            )
+
+            point = Point(
+                float(center[0]),
+                float(center[1]),
+            )
+
+            overlaps_building = any(
+                polygon
+                .buffer(exclusion_radius_mm)
+                .covers(point)
+                for polygon in building_polygons
+            )
+
+            if not overlaps_building:
+                retained.append(tree_mesh)
+
+        return retained
+
+    @classmethod
     def _remove_tree_meshes_inside_water_polygons(
         cls,
         tree_meshes,
@@ -1778,6 +1981,24 @@ class AtlasFoundationFirstEngine:
                     *water_polygon_groups["inland"],
                 ],
                 coordinate_engine=coordinate_engine,
+            )
+        )
+
+        tree_meshes = (
+            AtlasFoundationFirstEngine
+            ._remove_tree_meshes_overlapping_buildings(
+                tree_meshes=tree_meshes,
+                building_meshes=building_meshes,
+                clearance_mm=0.0,
+            )
+        )
+
+        tree_meshes = (
+            AtlasFoundationFirstEngine
+            ._remove_tree_meshes_overlapping_roads(
+                tree_meshes=tree_meshes,
+                road_meshes=road_meshes,
+                clearance_mm=0.0,
             )
         )
 

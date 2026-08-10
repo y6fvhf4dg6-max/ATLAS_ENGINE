@@ -1,137 +1,13 @@
 import random
 
+import pytest
+
 from CORE.atlas_tree_foundation_builder import (
     AtlasTreeFoundationBuilder,
 )
 
 
-def test_round_tree_builds_closed_printable_mesh():
-    triangles = AtlasTreeFoundationBuilder._build_round_tree(
-        x=10.0,
-        y=20.0,
-        base_z=3.0,
-        rng=random.Random(1234),
-    )
-
-    assert triangles
-    assert len(triangles) > 0
-
-    z_values = [
-        point[2]
-        for triangle in triangles
-        for point in triangle
-    ]
-
-    assert min(z_values) == 3.0
-    assert max(z_values) > 3.0
-
-
-def test_round_tree_is_deterministic_for_same_seed():
-    first = AtlasTreeFoundationBuilder._build_round_tree(
-        x=10.0,
-        y=20.0,
-        base_z=3.0,
-        rng=random.Random(1234),
-    )
-
-    second = AtlasTreeFoundationBuilder._build_round_tree(
-        x=10.0,
-        y=20.0,
-        base_z=3.0,
-        rng=random.Random(1234),
-    )
-
-    assert first == second
-
-
-def test_round_crown_profile_has_natural_tapered_silhouette():
-    profile = (
-        AtlasTreeFoundationBuilder
-        ._round_crown_profile(
-            crown_radius=1.0,
-            crown_height=2.0,
-        )
-    )
-
-    assert profile == [
-        (0.00, 0.28),
-        (0.16, 0.68),
-        (0.38, 1.00),
-        (0.64, 0.82),
-        (0.84, 0.46),
-        (1.00, 0.00),
-    ]
-
-
-def test_round_crown_profile_is_monotonic_in_height():
-    profile = (
-        AtlasTreeFoundationBuilder
-        ._round_crown_profile(
-            crown_radius=1.5,
-            crown_height=3.0,
-        )
-    )
-
-    heights = [height for height, _radius in profile]
-
-    assert heights == sorted(heights)
-    assert heights[0] == 0.0
-    assert heights[-1] == 1.0
-
-
-def test_round_tree_crown_uses_deterministic_asymmetric_lobes():
-    lobes = AtlasTreeFoundationBuilder._round_crown_lobes(
-        rng=random.Random(1234),
-    )
-
-    assert len(lobes) == 4
-
-    assert lobes == (
-        AtlasTreeFoundationBuilder._round_crown_lobes(
-            rng=random.Random(1234),
-        )
-    )
-
-    assert any(
-        abs(lobe["offset_x"]) > 0.0
-        or abs(lobe["offset_y"]) > 0.0
-        for lobe in lobes
-    )
-
-    assert len({
-        round(lobe["radius_scale"], 6)
-        for lobe in lobes
-    }) > 1
-
-
-def test_park_tree_symbol_profile_is_compact_and_grounded():
-    profile = (
-        AtlasTreeFoundationBuilder
-        ._park_tree_symbol_profile()
-    )
-
-    assert profile == [
-        (0.00, 0.52),
-        (0.22, 0.78),
-        (0.52, 1.00),
-        (0.78, 0.64),
-        (1.00, 0.00),
-    ]
-
-
-def test_park_tree_symbol_uses_printable_dimensions():
-    dimensions = (
-        AtlasTreeFoundationBuilder
-        ._park_tree_symbol_dimensions(
-            rng=random.Random(1234),
-        )
-    )
-
-    assert 1.0 <= dimensions["height_mm"] <= 1.4
-    assert 0.60 <= dimensions["diameter_mm"] <= 1.10
-
-
-def test_worldcover_tree_selects_park_tree_symbol():
+def test_worldcover_tree_selects_canonical_tree():
     tree = {
         "id": "worldcover_1",
         "lat": 50.0,
@@ -146,48 +22,7 @@ def test_worldcover_tree_selects_park_tree_symbol():
         rng=random.Random(1234),
     )
 
-    assert result == "park_tree_symbol"
-
-
-def test_park_tree_symbol_builds_grounded_single_piece_mesh():
-    triangles = (
-        AtlasTreeFoundationBuilder
-        ._build_park_tree_symbol(
-            x=10.0,
-            y=20.0,
-            base_z=3.0,
-            rng=random.Random(1234),
-        )
-    )
-
-    assert triangles
-
-    z_values = [
-        point[2]
-        for triangle in triangles
-        for point in triangle
-    ]
-
-    assert min(z_values) == 3.0
-    assert 4.0 <= max(z_values) <= 4.4
-
-
-def test_park_tree_symbol_is_deterministic():
-    first = AtlasTreeFoundationBuilder._build_park_tree_symbol(
-        x=10.0,
-        y=20.0,
-        base_z=3.0,
-        rng=random.Random(1234),
-    )
-
-    second = AtlasTreeFoundationBuilder._build_park_tree_symbol(
-        x=10.0,
-        y=20.0,
-        base_z=3.0,
-        rng=random.Random(1234),
-    )
-
-    assert first == second
+    assert result == "canonical"
 
 
 def test_tree_mesh_preserves_source_metadata():
@@ -266,7 +101,7 @@ def test_known_generated_tree_source_is_preserved():
     assert source == "osm_green_area_fill"
 
 
-def test_tree_kind_explicit_override_selects_controlled_row_symbol():
+def test_tree_kind_override_still_resolves_to_canonical_tree():
     tree = {
         "id": "formal_row_1_0",
         "lat": 50.0,
@@ -282,27 +117,218 @@ def test_tree_kind_explicit_override_selects_controlled_row_symbol():
         rng=random.Random(1234),
     )
 
-    assert result == "park_tree_symbol"
+    assert result == "canonical"
 
 
-def test_park_tree_symbol_exposes_physical_dimension_contract():
-    assert (
-        AtlasTreeFoundationBuilder
-        .PARK_TREE_SYMBOL_MIN_DIAMETER_MM
-        == 0.60
+def test_all_tree_sources_resolve_to_single_canonical_tree_kind():
+    sources = (
+        {
+            "id": "osm_tree",
+            "tree_type": "tree",
+            "tags": {
+                "natural": "tree",
+            },
+        },
+        {
+            "id": "worldcover_tree",
+            "tree_type": "tree",
+            "tags": {
+                "source": "worldcover",
+            },
+        },
+        {
+            "id": "conifer_tagged_tree",
+            "tree_type": "tree",
+            "tags": {
+                "natural": "tree",
+                "leaf_type": "needleleaved",
+            },
+        },
+        {
+            "id": "tree_row_member",
+            "tree_type": "tree",
+            "tree_kind": "park_tree_symbol",
+            "tags": {
+                "source": "osm_tree_row",
+            },
+        },
     )
-    assert (
+
+    resolved = {
+        AtlasTreeFoundationBuilder._select_tree_kind(
+            tree=tree,
+            rng=random.Random(1234),
+        )
+        for tree in sources
+    }
+
+    assert resolved == {"canonical"}
+
+
+def test_canonical_tree_exposes_single_printable_dimension_contract():
+    dimensions = (
         AtlasTreeFoundationBuilder
-        .PARK_TREE_SYMBOL_MAX_DIAMETER_MM
-        == 1.10
+        ._canonical_tree_dimensions()
     )
+
+    assert dimensions["total_height_mm"] > 0.0
+    assert dimensions["trunk_height_mm"] > 0.0
+    assert dimensions["trunk_diameter_mm"] > 0.0
+    assert dimensions["crown_height_mm"] > 0.0
+    assert dimensions["crown_diameter_mm"] > 0.0
+
     assert (
-        AtlasTreeFoundationBuilder
-        .PARK_TREE_SYMBOL_MIN_HEIGHT_MM
-        == 1.0
+        dimensions["trunk_height_mm"]
+        + dimensions["crown_height_mm"]
+        == pytest.approx(
+            dimensions["total_height_mm"]
+        )
     )
+
     assert (
-        AtlasTreeFoundationBuilder
-        .PARK_TREE_SYMBOL_MAX_HEIGHT_MM
-        == 1.4
+        dimensions["trunk_diameter_mm"]
+        < dimensions["crown_diameter_mm"]
     )
+
+
+def test_canonical_tree_has_visible_trunk_and_crown_above_ground():
+    base_z = 3.0
+
+    result = (
+        AtlasTreeFoundationBuilder
+        ._build_canonical_tree(
+            x=10.0,
+            y=20.0,
+            base_z=base_z,
+        )
+    )
+
+    assert result["triangles"]
+
+    dimensions = result["dimensions"]
+
+    assert result["trunk_bottom_z"] == base_z
+    assert (
+        result["trunk_top_z"]
+        == base_z + dimensions["trunk_height_mm"]
+    )
+    assert result["crown_bottom_z"] >= result["trunk_top_z"]
+    assert result["crown_bottom_z"] > base_z
+    assert (
+        result["top_z"]
+        == base_z + dimensions["total_height_mm"]
+    )
+
+
+def test_canonical_tree_geometry_is_deterministic():
+    first = (
+        AtlasTreeFoundationBuilder
+        ._build_canonical_tree(
+            x=10.0,
+            y=20.0,
+            base_z=3.0,
+        )
+    )
+
+    second = (
+        AtlasTreeFoundationBuilder
+        ._build_canonical_tree(
+            x=10.0,
+            y=20.0,
+            base_z=3.0,
+        )
+    )
+
+    assert first == second
+
+
+def test_tree_outside_actual_terrain_bounds_is_rejected(monkeypatch):
+    class CoordinateEngineStub:
+        xy_scale = 3000.0
+
+        @staticmethod
+        def latlon_to_stl_mm(lat, lon):
+            return 160.0, 75.0
+
+    terrain_mesh = {
+        "triangles": [
+            (
+                (0.0, 0.0, 1.0),
+                (150.0, 0.0, 1.0),
+                (150.0, 150.0, 1.0),
+            ),
+            (
+                (0.0, 0.0, 1.0),
+                (150.0, 150.0, 1.0),
+                (0.0, 150.0, 1.0),
+            ),
+        ],
+    }
+
+    monkeypatch.setattr(
+        "CORE.atlas_tree_foundation_builder."
+        "AtlasFoundationSampler.terrain_z_at_xy",
+        lambda **kwargs: 1.0,
+    )
+
+    result = AtlasTreeFoundationBuilder._build_tree_mesh(
+        tree={
+            "id": "outside_terrain",
+            "lat": 50.0,
+            "lon": 7.0,
+            "tags": {
+                "natural": "tree",
+            },
+        },
+        index=0,
+        coordinate_engine=CoordinateEngineStub(),
+        terrain_mesh=terrain_mesh,
+    )
+
+    assert result is None
+
+
+def test_tree_crown_must_fit_inside_actual_terrain_bounds(monkeypatch):
+    class CoordinateEngineStub:
+        xy_scale = 3000.0
+
+        @staticmethod
+        def latlon_to_stl_mm(lat, lon):
+            return 149.5, 75.0
+
+    terrain_mesh = {
+        "triangles": [
+            (
+                (0.0, 0.0, 1.0),
+                (150.0, 0.0, 1.0),
+                (150.0, 150.0, 1.0),
+            ),
+            (
+                (0.0, 0.0, 1.0),
+                (150.0, 150.0, 1.0),
+                (0.0, 150.0, 1.0),
+            ),
+        ],
+    }
+
+    monkeypatch.setattr(
+        "CORE.atlas_tree_foundation_builder."
+        "AtlasFoundationSampler.terrain_z_at_xy",
+        lambda **kwargs: 1.0,
+    )
+
+    result = AtlasTreeFoundationBuilder._build_tree_mesh(
+        tree={
+            "id": "crown_over_edge",
+            "lat": 50.0,
+            "lon": 7.0,
+            "tags": {
+                "natural": "tree",
+            },
+        },
+        index=0,
+        coordinate_engine=CoordinateEngineStub(),
+        terrain_mesh=terrain_mesh,
+    )
+
+    assert result is None

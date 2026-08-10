@@ -19,9 +19,15 @@ class AtlasTreeRowSpacingResolver:
                 "nozzle_diameter_mm must be positive"
             )
 
-        tree_symbol_max_diameter_mm = (
+        canonical_dimensions = (
             AtlasTreeFoundationBuilder
-            .PARK_TREE_SYMBOL_MAX_DIAMETER_MM
+            ._canonical_tree_dimensions()
+        )
+
+        tree_symbol_max_diameter_mm = (
+            canonical_dimensions[
+                "crown_diameter_mm"
+            ]
         )
 
         return {
@@ -51,15 +57,47 @@ class AtlasTreeRowSpacingResolver:
             detail_type="tree_row_spacing",
         )
 
+        canonical_dimensions = (
+            AtlasTreeFoundationBuilder
+            ._canonical_tree_dimensions()
+        )
+
+        canonical_minimum_spacing_mm = (
+            canonical_dimensions[
+                "crown_diameter_mm"
+            ]
+            + float(nozzle_diameter_mm)
+        )
+
+        if decision.action == "omit":
+            resolved_spacing_mm = 0.0
+            resolved_action = "omit"
+        else:
+            resolved_spacing_mm = max(
+                decision.resolved_size_mm,
+                canonical_minimum_spacing_mm,
+            )
+
+            if (
+                resolved_spacing_mm
+                > decision.resolved_size_mm
+            ):
+                resolved_action = "enlarge"
+            else:
+                resolved_action = decision.action
+
         return {
-            "action": decision.action,
+            "action": resolved_action,
             "source_spacing_m": float(source_spacing_m),
             "scaled_spacing_mm": decision.scaled_size_mm,
             "minimum_printable_mm": (
                 decision.minimum_printable_mm
             ),
             "resolved_spacing_mm": (
-                decision.resolved_size_mm
+                resolved_spacing_mm
+            ),
+            "canonical_minimum_spacing_mm": (
+                canonical_minimum_spacing_mm
             ),
             "scale_factor": decision.scale_factor,
         }

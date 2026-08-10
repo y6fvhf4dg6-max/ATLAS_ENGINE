@@ -28,7 +28,7 @@ class AtlasTreeRowMemberProducer:
                     "lat": float(lat),
                     "lon": float(lon),
                     "tree_type": "tree",
-                    "tree_kind": "park_tree_symbol",
+                    "tree_kind": "canonical",
                     "tags": {
                         "source": "osm_tree_row",
                         "source_tree_row_id": source_id,

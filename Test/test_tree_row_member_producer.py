@@ -26,7 +26,7 @@ def test_producer_builds_controlled_tree_inputs_from_layout():
     )
 
     assert all(
-        item["tree_kind"] == "park_tree_symbol"
+        item["tree_kind"] == "canonical"
         for item in result
     )
 
@@ -115,7 +115,7 @@ def test_produced_row_members_build_controlled_tree_meshes():
     assert len(meshes) == 3
 
     assert all(
-        mesh["tree_type"] == "park_tree_symbol"
+        mesh["tree_type"] == "canonical"
         for mesh in meshes
     )
 
