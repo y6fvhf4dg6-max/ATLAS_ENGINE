@@ -4434,3 +4434,281 @@ Full ATLAS regression:
 8.14 kapsamında açık blocker kalmadı.
 
 **Sıradaki roadmap paketi: 8.15.**
+
+
+## 10 Ağustos 2026 — 8.15 FINAL LOCK
+
+**8.15 Scene Morphology Classifier: LOCK**
+
+8.15, product scene'in dominant urban / landscape karakterini deterministic ve
+evidence-driven biçimde sınıflandıran genel morphology katmanı olarak
+tamamlandı.
+
+Yeni ana bileşenler:
+
+- `CORE/atlas_scene_morphology_classifier.py`
+- `CORE/atlas_scene_morphology_evidence_resolver.py`
+- `CORE/atlas_scene_morphology_mesh_area_resolver.py`
+
+### Temel 8.15 ilkesi
+
+Classifier location identity kullanmaz.
+
+Özellikle:
+
+- şehir adı
+- landmark adı
+- lokasyon shortcut'ı
+- hard-coded geographic identity
+
+classification girdisi değildir.
+
+Sistem scene morphology'yi kaynak evidence üzerinden çözer.
+
+Primary acceptance principle:
+
+> Two geographically different areas with similar morphology should resolve to
+> similar composition behavior.
+
+### Initial morphology classes
+
+Desteklenen morphology sınıfları:
+
+- `dense_urban`
+- `historic_core`
+- `suburban`
+- `rural`
+- `forest`
+- `river_city`
+- `coastal`
+- `mountain`
+- `mixed`
+
+### Evidence contract
+
+Classifier şu normalized evidence alanlarını kullanabilir:
+
+- building density
+- road density
+- block compactness
+- vegetation coverage
+- forest coverage
+- water coverage
+- railway presence
+- terrain relief
+- landmark density
+
+Evidence değerleri deterministic olarak normalize edilir.
+
+### Scene Morphology Evidence Resolver
+
+`AtlasSceneMorphologyEvidenceResolver` fiziksel/product scene ölçülerini
+classifier contract'ına dönüştürür.
+
+Desteklenen production ölçüleri:
+
+- product area
+- building projected footprint area
+- road projected surface area
+- vegetation projected area
+- forest projected area
+- water projected area
+- railway count
+- terrain relief
+- terrain reference height
+- landmark count
+- building count
+- existing urban block density profiles
+
+Urban Block Resolver yeniden yazılmamıştır.
+
+Mevcut `AtlasUrbanBlockProfile.density_ratio` değerleri block compactness
+evidence olarak reuse edilebilir.
+
+### Projected XY area resolver
+
+Morphology coverage hesabında raw triangle-area toplamı kullanılmaz.
+
+Yeni:
+
+- `AtlasSceneMorphologyMeshAreaResolver`
+
+mesh triangle'larının XY projection'ını polygon olarak çözer ve Shapely union
+üzerinden gerçek projected footprint alanını hesaplar.
+
+Bu sayede kapalı solid meshlerde aynı footprint'i temsil eden:
+
+- top surface
+- bottom surface
+
+ayrı ayrı sayılmaz.
+
+Overlapping XY projection deterministic olarak tek footprint alanına
+dissolve edilir.
+
+### Classification scoring
+
+Classifier semantic/evidence scoring kullanır.
+
+Örneğin:
+
+- yüksek building + road + compact block → `dense_urban`
+- yüksek forest coverage → `forest`
+- güçlü water dominance + urban fabric → `river_city`
+- düşük building / road ve açık vegetation → `rural`
+- yüksek terrain relief → `mountain`
+
+Water-dominance scoring gerçek normalized coverage evidence'ına dayanır;
+location-specific waterbody veya city shortcut'ı kullanılmaz.
+
+### Determinism
+
+Aynı evidence girdisi tekrar verildiğinde aynı morphology sonucu üretilir.
+
+Tie / weak-dominance durumlarında `mixed` kullanılabilir.
+
+Result ayrıca:
+
+- resolved morphology
+- confidence
+- per-class scores
+- normalized evidence
+
+bilgilerini taşır.
+
+### FoundationFirst production integration
+
+`AtlasFoundationFirstEngine.generate_city_stl()` artık final composition
+öncesindeki scene mesh gruplarından morphology evidence üretir.
+
+Production zinciri:
+
+`FoundationFirst source data`
+→ scene meshes
+→ projected XY morphology measurements
+→ normalized morphology evidence
+→ `AtlasSceneMorphologyClassifier`
+→ `resolved_scene_morphology`
+
+şeklindedir.
+
+Result metadata artık şunları taşır:
+
+- `scene_morphology_evidence`
+- `scene_morphology_classification`
+- `resolved_scene_morphology`
+- `effective_scene_morphology`
+
+### Explicit morphology override
+
+Mevcut public:
+
+- `scene_morphology`
+
+parametresi korunur.
+
+Explicit morphology verilirse classifier sonucu metadata'da yine hesaplanır,
+ancak composition için explicit değer kullanılır.
+
+Helper:
+
+- `_select_scene_morphology(...)`
+
+şu davranışı kilitler:
+
+`explicit morphology`
+→ varsa preserve
+
+aksi durumda:
+
+`classified morphology`
+→ effective morphology
+
+### City Composition LoD integration
+
+8.15, mevcut 8.14 City Composition LoD mimarisini yeniden yazmaz.
+
+Doğru production sırası artık:
+
+`mesh groups`
+→ morphology evidence
+→ morphology classifier
+→ effective morphology
+→ City Composition LoD
+→ City Composition Mesh Filter
+→ final STL
+
+şeklindedir.
+
+8.14'ten kalan eski:
+
+`city_composition_lod_level provided`
+→ `scene_morphology explicitly required`
+
+guard'ı kaldırıldı.
+
+Böylece:
+
+`scene_morphology=None`
+→ automatic classifier
+→ effective morphology
+→ existing City Composition LoD
+
+zinciri production runtime'da çalışır.
+
+Explicit `scene_morphology` verilmişse mevcut override behavior korunur.
+
+### Compatibility cleanup
+
+8.15 geliştirmesi sırasında 8.14'ten kalan geç City Composition metadata
+recalculation bloğu tespit edildi ve kaldırıldı.
+
+City Composition resolution artık yalnız doğru yerde:
+
+- final mesh filtering öncesinde
+
+çalışır.
+
+### Roadmap acceptance sonucu
+
+8.15 kapsamında doğrulanan davranışlar:
+
+- deterministic morphology classification
+- evidence-driven classification
+- no location-name shortcuts
+- building density evidence
+- road density evidence
+- block compactness evidence contract
+- vegetation coverage evidence
+- forest coverage evidence
+- water coverage evidence
+- railway presence evidence
+- terrain relief evidence
+- landmark density evidence
+- projected-area double-count prevention
+- explicit morphology override preservation
+- automatic morphology resolution
+- automatic 8.14 City Composition LoD integration
+
+Primary acceptance principle karşılandı:
+
+> Two geographically different areas with similar morphology should resolve to
+> similar composition behavior.
+
+### Doğrulama
+
+8.15 morphology core + production integration:
+
+- `27 passed in 0.21s`
+
+Expanded related regression:
+
+- `105 passed in 0.27s`
+
+Full ATLAS regression:
+
+- `3570 passed in 15.07s`
+
+8.15 kapsamında açık blocker kalmadı.
+
+**Sıradaki roadmap paketi: 8.16 — Morphology Composition Policy.**
