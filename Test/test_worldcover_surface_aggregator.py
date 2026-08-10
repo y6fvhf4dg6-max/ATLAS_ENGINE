@@ -301,7 +301,7 @@ def test_dissolve_can_remove_tiny_components():
     assert result[0]["cell_count"] == 2
 
 
-def test_dissolve_rejects_polygons_with_holes_by_default():
+def test_dissolve_decomposes_polygons_with_holes_without_losing_cells():
     cells = [
         _cell(0, 0, class_id=30),
         _cell(0, 1, class_id=30),
@@ -318,4 +318,9 @@ def test_dissolve_rejects_polygons_with_holes_by_default():
         surface_type="grass",
     )
 
-    assert result == []
+    assert result
+    assert len(result) > 1
+    assert sum(
+        item["cell_count"]
+        for item in result
+    ) == len(cells)

@@ -233,7 +233,7 @@ class AtlasBuildingHeightProductContextResolver:
         )
 
     @classmethod
-    def resolve(
+    def _resolve_context_and_profiles(
         cls,
         *,
         buildings,
@@ -251,25 +251,19 @@ class AtlasBuildingHeightProductContextResolver:
             source_height_by_id,
         ) = cls._prepare_buildings(
             buildings=buildings,
-            coordinate_engine=(
-                coordinate_engine
-            ),
+            coordinate_engine=coordinate_engine,
         )
 
         prepared_landmarks = (
             cls._prepare_landmarks(
                 landmarks=landmarks,
-                coordinate_engine=(
-                    coordinate_engine
-                ),
+                coordinate_engine=coordinate_engine,
             )
         )
 
         road_segments = cls._prepare_roads(
             roads=roads,
-            coordinate_engine=(
-                coordinate_engine
-            ),
+            coordinate_engine=coordinate_engine,
         )
 
         blocks = (
@@ -355,4 +349,39 @@ class AtlasBuildingHeightProductContextResolver:
                 ),
             }
 
-        return context
+        return {
+            "context_by_source_id": context,
+            "block_profiles": tuple(profiles),
+        }
+
+    @classmethod
+    def resolve_with_profiles(
+        cls,
+        *,
+        buildings,
+        roads,
+        landmarks,
+        coordinate_engine,
+    ):
+        return cls._resolve_context_and_profiles(
+            buildings=buildings,
+            roads=roads,
+            landmarks=landmarks,
+            coordinate_engine=coordinate_engine,
+        )
+
+    @classmethod
+    def resolve(
+        cls,
+        *,
+        buildings,
+        roads,
+        landmarks,
+        coordinate_engine,
+    ):
+        return cls._resolve_context_and_profiles(
+            buildings=buildings,
+            roads=roads,
+            landmarks=landmarks,
+            coordinate_engine=coordinate_engine,
+        )["context_by_source_id"]

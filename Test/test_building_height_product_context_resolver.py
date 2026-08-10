@@ -326,3 +326,103 @@ def test_preserves_source_height_truth_in_context():
     assert context[100][
         "source_height_m"
     ] == pytest.approx(24.0)
+
+
+def test_resolve_with_profiles_exposes_same_context_and_real_block_profiles():
+    coordinate_engine = _coordinate_engine()
+
+    buildings = (
+        {
+            "id": 100,
+            "geometry": (
+                (50.00010, 8.00010),
+                (50.00010, 8.00020),
+                (50.00020, 8.00020),
+                (50.00020, 8.00010),
+            ),
+            "tags": {
+                "building": "yes",
+                "height": "10",
+            },
+        },
+        {
+            "id": 101,
+            "geometry": (
+                (50.00030, 8.00010),
+                (50.00030, 8.00020),
+                (50.00040, 8.00020),
+                (50.00040, 8.00010),
+            ),
+            "tags": {
+                "building": "yes",
+                "height": "14",
+            },
+        },
+    )
+
+    roads = (
+        {
+            "id": 1,
+            "geometry": (
+                (50.00000, 8.00000),
+                (50.00000, 8.00100),
+            ),
+            "tags": {"highway": "residential"},
+        },
+        {
+            "id": 2,
+            "geometry": (
+                (50.00000, 8.00100),
+                (50.00100, 8.00100),
+            ),
+            "tags": {"highway": "residential"},
+        },
+        {
+            "id": 3,
+            "geometry": (
+                (50.00100, 8.00100),
+                (50.00100, 8.00000),
+            ),
+            "tags": {"highway": "residential"},
+        },
+        {
+            "id": 4,
+            "geometry": (
+                (50.00100, 8.00000),
+                (50.00000, 8.00000),
+            ),
+            "tags": {"highway": "residential"},
+        },
+    )
+
+    existing_context = (
+        AtlasBuildingHeightProductContextResolver.resolve(
+            buildings=buildings,
+            roads=roads,
+            landmarks=(),
+            coordinate_engine=coordinate_engine,
+        )
+    )
+
+    result = (
+        AtlasBuildingHeightProductContextResolver
+        .resolve_with_profiles(
+            buildings=buildings,
+            roads=roads,
+            landmarks=(),
+            coordinate_engine=coordinate_engine,
+        )
+    )
+
+    assert result["context_by_source_id"] == existing_context
+
+    profiles = result["block_profiles"]
+
+    assert len(profiles) == 1
+    assert profiles[0].density_ratio > 0.0
+    assert set(
+        profiles[0].member_element_ids
+    ) == {
+        "building_100",
+        "building_101",
+    }

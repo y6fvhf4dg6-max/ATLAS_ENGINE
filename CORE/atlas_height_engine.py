@@ -27,8 +27,14 @@ class AtlasHeightEngine:
         if building.height is not None:
             return building.height
 
-        if building.levels is not None:
-            return building.levels * AtlasHeightEngine.DEFAULT_LEVEL_HEIGHT_M
+        if (
+            building.levels is not None
+            and building.levels > 0
+        ):
+            return (
+                building.levels
+                * AtlasHeightEngine.DEFAULT_LEVEL_HEIGHT_M
+            )
 
         building_type = building.building_type
 

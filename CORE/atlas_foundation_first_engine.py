@@ -197,6 +197,24 @@ class AtlasFoundationFirstEngine:
             )
         )
 
+    @staticmethod
+    def _resolve_building_height_product_context_with_profiles(
+        *,
+        buildings,
+        roads,
+        landmarks,
+        coordinate_engine,
+    ):
+        return (
+            AtlasBuildingHeightProductContextResolver
+            .resolve_with_profiles(
+                buildings=buildings,
+                roads=roads,
+                landmarks=landmarks,
+                coordinate_engine=coordinate_engine,
+            )
+        )
+
     @classmethod
     def _apply_semantic_surface_textures(
         cls,
@@ -1535,14 +1553,26 @@ class AtlasFoundationFirstEngine:
             *narrow_waterway_meshes,
         ]
 
-        building_height_product_context = (
+        building_height_product_context_result = (
             AtlasFoundationFirstEngine
-            ._resolve_building_height_product_context(
+            ._resolve_building_height_product_context_with_profiles(
                 buildings=raw_buildings,
                 roads=roads,
                 landmarks=landmarks,
                 coordinate_engine=coordinate_engine,
             )
+        )
+
+        building_height_product_context = (
+            building_height_product_context_result[
+                "context_by_source_id"
+            ]
+        )
+
+        block_profiles = (
+            building_height_product_context_result[
+                "block_profiles"
+            ]
         )
 
         scene = AtlasFoundationSceneBuilder.build_scene(
@@ -1906,7 +1936,7 @@ class AtlasFoundationFirstEngine:
                 ),
                 landmark_count=len(landmarks),
                 building_count=len(raw_buildings),
-                block_profiles=(),
+                block_profiles=block_profiles,
             )
         )
 

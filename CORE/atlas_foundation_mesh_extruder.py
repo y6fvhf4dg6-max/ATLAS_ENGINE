@@ -398,6 +398,26 @@ class AtlasFoundationMeshExtruder:
             print("=" * 70)
             print("")
 
+            return AtlasFoundationMeshExtruder._reject(
+                diagnostics,
+                "invalid_mesh_topology",
+                triangle_count=report.get(
+                    "triangles",
+                    len(triangles),
+                ),
+                open_edge_count=report.get(
+                    "open_edge_count",
+                    0,
+                ),
+                non_manifold_edge_count=report.get(
+                    "non_manifold_edge_count",
+                    0,
+                ),
+                topology_reason=report.get(
+                    "reason",
+                ),
+            )
+
         return mesh
 
     @staticmethod

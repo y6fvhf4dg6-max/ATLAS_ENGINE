@@ -23,6 +23,9 @@ from CORE.atlas_building_apse_gabled_roof_builder import (
 from CORE.atlas_foundation_first_pipeline import (
     AtlasFoundationFirstPipeline,
 )
+from CORE.atlas_mesh_validator import (
+    AtlasMeshValidator,
+)
 from CORE.atlas_castle_roof_builder import (
     AtlasCastleRoofBuilder,
 )
@@ -1320,6 +1323,25 @@ class AtlasFoundationSceneBuilder:
                         "top_points:",
                         len(mesh.get("top", [])),
                     )
+
+            final_topology_report = (
+                AtlasMeshValidator.report(mesh)
+            )
+
+            if not final_topology_report.get(
+                "valid",
+                False,
+            ):
+                skipped_buildings += 1
+
+                if is_building_part:
+                    rejected_building_parts += 1
+
+                record_building_rejection(
+                    "invalid_final_mesh_topology"
+                )
+
+                continue
 
             scene.add_building_mesh(mesh)
 

@@ -996,3 +996,55 @@ def test_relation_building_extrusion_preserves_inner_courtyard():
     assert report["valid"]
     assert report["open_edge_count"] == 0
     assert report["non_manifold_edge_count"] == 0
+
+
+def test_invalid_final_topology_is_rejected_instead_of_returned(
+    monkeypatch,
+):
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 8.0),
+            (6.0, 8.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=8.0,
+    )
+
+    diagnostics = {}
+
+    def invalid_report(mesh):
+        return {
+            "valid": False,
+            "reason": "open_edges",
+            "triangles": len(
+                mesh.get("triangles", ())
+            ),
+            "open_edge_count": 8,
+            "non_manifold_edge_count": 0,
+            "sample_open_edges": [],
+            "sample_non_manifold_edges": [],
+        }
+
+    monkeypatch.setattr(
+        AtlasMeshValidator,
+        "report",
+        invalid_report,
+    )
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=1.25,
+        diagnostics=diagnostics,
+        debug=False,
+    )
+
+    assert mesh is None
+    assert diagnostics["accepted"] is False
+    assert (
+        diagnostics["reason"]
+        == "invalid_mesh_topology"
+    )
+    assert diagnostics["open_edge_count"] == 8
+    assert diagnostics["non_manifold_edge_count"] == 0

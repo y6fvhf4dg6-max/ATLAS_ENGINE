@@ -158,57 +158,104 @@ class AtlasSceneMorphologyClassifier:
             e["water_coverage"] / 0.30,
         )
 
+        landmark_presence = min(
+            1.0,
+            e["landmark_density"] / 0.08,
+        )
+
+        developed_presence = (
+            0.50
+            * min(
+                1.0,
+                e["building_density"] / 0.30,
+            )
+            + 0.50
+            * min(
+                1.0,
+                e["road_density"] / 0.20,
+            )
+        )
+
+        vegetation_presence = min(
+            1.0,
+            e["vegetation_coverage"] / 0.40,
+        )
+
+        moderate_urban_character = max(
+            0.0,
+            1.0
+            - abs(urban - 0.35) / 0.35,
+        )
+
+        excessive_density = min(
+            1.0,
+            max(
+                e["building_density"],
+                e["road_density"],
+            )
+            / 0.80,
+        )
+
         return {
             "dense_urban": (
-                0.50 * urban
-                + 0.15 * (
+                0.70 * urban
+                + 0.10 * (
                     1.0
                     - e["vegetation_coverage"]
                 )
-                + 0.10 * (
+                + 0.05 * (
                     1.0
                     - e["water_coverage"]
                 )
-                + 0.10 * (
+                + 0.05 * (
                     1.0
                     - e["terrain_relief"]
                 )
-                + 0.15 * float(
+                + 0.10 * float(
                     e["railway_presence"]
                 )
             ),
             "historic_core": (
-                0.38 * urban
-                + 0.32 * e["landmark_density"]
-                + 0.20 * e["block_compactness"]
+                0.20 * urban
+                + 0.40 * landmark_presence
+                + 0.30 * e["block_compactness"]
                 + 0.10 * (
+                    1.0
+                    - excessive_density
+                )
+                + 0.06 * moderate_urban_character
+            ),
+            "suburban": (
+                0.40 * developed_presence
+                + 0.35 * (
+                    developed_presence
+                    * vegetation_presence
+                )
+                + 0.15 * vegetation_presence
+                + 0.05 * (
+                    1.0
+                    - e["block_compactness"]
+                )
+                + 0.05 * (
                     1.0
                     - e["terrain_relief"]
                 )
             ),
-            "suburban": (
-                0.28 * e["building_density"]
-                + 0.22 * e["road_density"]
-                + 0.30 * e["vegetation_coverage"]
-                + 0.20 * (
-                    1.0
-                    - e["block_compactness"]
-                )
-            ),
             "rural": (
-                0.35 * (
+                0.25 * (
                     1.0
                     - e["building_density"]
                 )
-                + 0.25 * (
+                + 0.15 * (
                     1.0
                     - e["road_density"]
                 )
-                + 0.25 * open_vegetation
+                + 0.35 * open_vegetation
                 + 0.15 * (
                     1.0
                     - e["block_compactness"]
                 )
+                + 0.10 * e["terrain_relief"]
             ),
             "forest": (
                 0.65 * e["forest_coverage"]

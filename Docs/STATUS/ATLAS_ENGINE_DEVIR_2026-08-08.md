@@ -6868,4 +6868,185 @@ Full ATLAS regression:
 
 8.19 kapsamında açık blocker kalmadı.
 
-**Sıradaki roadmap paketi: 8.20 — Multi-Morphology Acceptance Benchmarks.**
+## 8.20 — Multi-Morphology Acceptance Benchmarks — LOCK
+
+Urban Fabric & Product Composition V1'in son acceptance paketi
+tamamlandı.
+
+Amaç Bonn üzerinde çalışan sistemleri Bonn'a özel kabul etmek değil,
+aynı genel production mimarisinin birbirinden belirgin biçimde farklı
+şehir ve peyzaj morfolojilerinde doğru davranmasını kanıtlamaktı.
+
+### Acceptance mimarisi
+
+Fresh doğrulamalar eski STL çıktıları reuse edilmeden güncel:
+
+`FoundationFirst → morphology evidence/classification → morphology
+composition policy → City Composition LoD → quality report`
+
+production zincirinden yeniden üretildi.
+
+Lokasyon adı veya coordinate-specific exception classifier/policy
+girdisi olarak kullanılmadı.
+
+### Fresh production acceptance matrix
+
+Beş zorunlu morfoloji ailesi gerçek source verisiyle yeniden üretildi:
+
+| Scene | Accepted morphology | Confidence | Final building topology |
+|---|---:|---:|---:|
+| Galata Tower | `dense_urban` | 0.515931 | 0 invalid / 0 open / 0 non-manifold |
+| Sultanahmet | `historic_core` | 0.492700 | 0 invalid / 0 open / 0 non-manifold |
+| Galata Bridge | `river_city` | 0.795935 | 0 invalid / 0 open / 0 non-manifold |
+| Real WorldCover forest fixture | `forest` | 0.794195 | 0 invalid / 0 open / 0 non-manifold |
+| Erkelenz Reeser Straße | `rural` | 0.470798 | 0 invalid / 0 open / 0 non-manifold |
+
+Sonuç:
+
+**5/5 required morphology families passed.**
+
+Fresh üretim triangle sonuçları:
+
+- Galata Tower: `18,490`
+- Sultanahmet: `65,996`
+- Galata Bridge: `51,534`
+- forest fixture: `12,364`
+- Erkelenz: `21,052`
+
+Bunlar audit kanıtıdır; exact triangle sayıları kalıcı regression
+contract'ında kırılgan acceptance şartı yapılmamıştır.
+
+### Steinbach kararı
+
+WorldCover surface düzeltmesinden sonra Steinbach'ın gerçek vegetation /
+forest evidence'i yükseldi ve sahne artık `rural` yerine `mixed`
+çözülmektedir.
+
+Classifier Steinbach'ı zorla `rural` yapmak için değiştirilmedi.
+
+Bu, 8.20'nin overfit önleme ilkesine uygun olarak kabul edildi.
+Gerçek production zincirinde kararlı biçimde `rural` kalan Erkelenz,
+rural acceptance benchmark'ı olarak kullanıldı.
+
+### 8.20 sırasında bulunan ve genel mimaride kapatılan production açıkları
+
+1. **Geçersiz source building level değeri**
+
+   `building:levels=0` daha önce `0.0 m` height üretip downstream product
+   normalization'ı bozabiliyordu.
+
+   Non-positive level değerleri artık geçerli kat yüksekliği olarak
+   kullanılmıyor ve mevcut building-type/default height fallback zincirine
+   düşüyor.
+
+2. **Gerçek urban-block profile'larının morphology zincirinde kaybolması**
+
+   Building-height context resolver gerçek road-defined block profile'larını
+   zaten üretiyor fakat FoundationFirst morphology evidence'e taşımıyordu.
+
+   Resolver backward-compatible biçimde profile-aware sonuç verecek şekilde
+   genişletildi ve FoundationFirst gerçek block profile'larını morphology
+   evidence resolver'a bağladı.
+
+3. **Morphology classifier acceptance coverage açığı**
+
+   `historic_core` ve `suburban` için canonical acceptance coverage eklendi
+   ve scoring genel morphology sinyalleri üzerinden yeniden dengelendi.
+
+   Lokasyon ismi veya coordinate-specific rule eklenmedi.
+
+4. **WorldCover polygon-hole veri kaybı**
+
+   `AtlasWorldCoverSurfaceAggregator.dissolve()` içinde interior ring taşıyan
+   polygonların tamamı discard ediliyordu.
+
+   Gerçek forest fixture'da 17,030 WorldCover tree-cover hücresinin yalnız
+   37'si korunuyor, yaklaşık `%99.78` source evidence kayboluyordu.
+
+   Hole içeren connected component'ler artık gerçek source cell merkezleri
+   üzerinden deterministik, hole-free surface parçalarına ayrılıyor.
+
+   Aynı fixture'da sonuç:
+
+   - input cells: `17,030`
+   - represented cells: `17,030`
+   - retained ratio: `1.0`
+   - forest morphology confidence: `0.794195`
+
+5. **Post-processing sonrası final building topology gate eksikliği**
+
+   Foundation extrusion topology validation yapmasına rağmen roof / minaret /
+   dome / castle post-processing sonrasında mesh tekrar validate edilmeden
+   final scene'e eklenebiliyordu.
+
+   İki seviyeli güvenlik kuruldu:
+
+   - invalid topology artık `AtlasFoundationMeshExtruder` sınırında reject edilir;
+   - bütün architectural post-processing tamamlandıktan sonra
+     `AtlasFoundationSceneBuilder` final building topology'yi yeniden validate
+     eder ve invalid mesh'i scene'e kabul etmez.
+
+   Gerçek Sultanahmet doğrulamasında daha önce final scene'de kalan iki invalid
+   building mesh kaldırıldı:
+
+   - önce: `2 invalid`, `16 open edges`
+   - sonra: `0 invalid`, `0 open edges`, `0 non-manifold edges`
+
+### Kalıcı acceptance regression contract
+
+Yeni:
+
+`Test/test_multi_morphology_acceptance_benchmarks.py`
+
+fresh production audit'inde ölçülen evidence snapshot'larını kullanarak aynı
+genel architecture üzerinde:
+
+- deterministic morphology classification
+- doğru required morphology family
+- morphology composition policy
+- distinct composition priorities
+- read-only/deterministic Urban Fabric Quality Report parity
+
+davranışlarını kalıcı olarak kilitler.
+
+Required families:
+
+- `dense_urban`
+- `historic_core`
+- `river_city`
+- `forest`
+- `rural`
+
+Kalıcı acceptance contract:
+
+- `7 passed in 0.03s`
+
+### Regression doğrulaması
+
+8.20 focused genel düzeltme paketi:
+
+- `68 passed in 0.23s`
+
+Expanded related regression:
+
+- `138 passed in 0.38s`
+
+Full ATLAS regression:
+
+- `3645 passed in 15.23s`
+
+### Roadmap acceptance sonucu
+
+8.20 acceptance, Urban Fabric V1'in Bonn veya tek bir morphology üzerinde
+overfit olmadığını gerçek üretim verileriyle doğruladı.
+
+Temel ilke doğrulandı:
+
+> Urban Fabric V1 is complete only when the same general architecture
+> improves multiple fundamentally different city and landscape types.
+
+8.20 kapsamında açık teknik blocker kalmadı.
+
+**Urban Fabric & Product Composition V1 — 8.0–8.20 tamamlandı.**
+
+Sonraki ürün/production roadmap paketi ayrı olarak kilitlenecektir.

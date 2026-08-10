@@ -14,7 +14,7 @@ Davranış:
 
 import math
 
-from shapely.geometry import box
+from shapely.geometry import Point, box
 from shapely.ops import unary_union
 
 
@@ -231,14 +231,101 @@ class AtlasWorldCoverSurfaceAggregator:
         candidates = []
 
         for polygon in polygons:
-            if reject_holes and polygon.interiors:
-                continue
-
             cell_count = int(
                 round(polygon.area)
             )
 
             if cell_count < min_cell_count:
+                continue
+
+            if reject_holes and polygon.interiors:
+                component_cells = [
+                    indexed_cells[(row, column)]
+                    for row, column in sorted(
+                        indexed_cells
+                    )
+                    if polygon.covers(
+                        Point(
+                            column,
+                            row,
+                        )
+                    )
+                ]
+
+                decomposed_surfaces = (
+                    AtlasWorldCoverSurfaceAggregator
+                    .aggregate(
+                        cells=component_cells,
+                        surface_type=surface_type,
+                        grid_step_degrees=step,
+                    )
+                )
+
+                for surface in decomposed_surfaces:
+                    geometry = list(
+                        surface["geometry"]
+                    )
+
+                    if len(geometry) < 3:
+                        continue
+
+                    latitudes = [
+                        point[0]
+                        for point in geometry
+                    ]
+                    longitudes = [
+                        point[1]
+                        for point in geometry
+                    ]
+
+                    decomposed_cell_count = int(
+                        surface["cell_count"]
+                    )
+
+                    candidates.append(
+                        {
+                            "surface_type": surface_type,
+                            "source": "worldcover",
+                            "cell_count": (
+                                decomposed_cell_count
+                            ),
+                            "resolution_m": 10,
+                            "park_type": (
+                                f"worldcover:{surface_type}"
+                            ),
+                            "geometry": geometry,
+                            "tags": {
+                                "source": "worldcover",
+                                "class_id": class_id,
+                                "surface_type": (
+                                    surface_type
+                                ),
+                                "cell_count": (
+                                    decomposed_cell_count
+                                ),
+                            },
+                            "_sort_key": (
+                                round(
+                                    min(latitudes),
+                                    12,
+                                ),
+                                round(
+                                    min(longitudes),
+                                    12,
+                                ),
+                                round(
+                                    max(latitudes),
+                                    12,
+                                ),
+                                round(
+                                    max(longitudes),
+                                    12,
+                                ),
+                                decomposed_cell_count,
+                            ),
+                        }
+                    )
+
                 continue
 
             coordinates = list(

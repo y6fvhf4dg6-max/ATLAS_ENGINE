@@ -249,6 +249,16 @@ def test_scene_builder_build_scene_propagates_normalized_product_height(
             passthrough_mesh,
         )
 
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_scene_builder."
+        "AtlasMeshValidator.report",
+        lambda mesh: {
+            "valid": True,
+            "open_edge_count": 0,
+            "non_manifold_edge_count": 0,
+        },
+    )
+
     scene = AtlasFoundationSceneBuilder.build_scene(
         raw_buildings=(raw_building,),
         coordinate_engine=object(),

@@ -312,3 +312,172 @@ def test_pipeline_uses_explicit_foundation_z_override(monkeypatch):
     } == {
         7.25,
     }
+
+
+def test_scene_rejects_invalid_final_topology_after_post_processing(
+    monkeypatch,
+):
+    raw_building = {
+        "id": 303,
+        "geometry": [
+            (41.0, 29.0),
+            (41.0, 29.1),
+            (41.1, 29.1),
+            (41.1, 29.0),
+        ],
+        "tags": {
+            "building": "yes",
+        },
+    }
+
+    atlas_building = SimpleNamespace(
+        estimated_height=9.0,
+        is_castle_building=False,
+        castle_profile=None,
+        castle_roof_profile=None,
+        is_building_part=False,
+    )
+
+    monkeypatch.setattr(
+        AtlasSceneBuilder,
+        "_is_raw_building_usable",
+        staticmethod(lambda *args, **kwargs: True),
+    )
+
+    monkeypatch.setattr(
+        AtlasSceneBuilder,
+        "_to_atlas_building",
+        staticmethod(lambda raw: atlas_building),
+    )
+
+    monkeypatch.setattr(
+        AtlasCastleFootprintRegularizer,
+        "prepare",
+        staticmethod(
+            lambda raw_building, castles: raw_building
+        ),
+    )
+
+    monkeypatch.setattr(
+        AtlasCastleBuildingProfiler,
+        "apply_to_building",
+        staticmethod(
+            lambda atlas_building, raw_building, castles: (
+                atlas_building
+            )
+        ),
+    )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_scene_builder."
+        "AtlasAncientTheatreProfiler.apply_to_building",
+        lambda **kwargs: kwargs["atlas_building"],
+    )
+
+    def fake_build(**kwargs):
+        return {
+            "type": "building",
+            "triangles": (
+                (
+                    (0.0, 0.0, 0.0),
+                    (1.0, 0.0, 0.0),
+                    (0.0, 1.0, 0.0),
+                ),
+            ),
+            "foundation_z": 0.0,
+            "is_castle_building": False,
+        }
+
+    monkeypatch.setattr(
+        AtlasFoundationFirstPipeline,
+        "build_building_mesh",
+        staticmethod(fake_build),
+    )
+
+    monkeypatch.setattr(
+        AtlasFoundationSceneBuilder,
+        "_attach_building_roof_metadata",
+        staticmethod(
+            lambda **kwargs: kwargs["mesh"]
+        ),
+    )
+
+    def passthrough_mesh(*args, **kwargs):
+        if "mesh" in kwargs:
+            return kwargs["mesh"]
+
+        if "minaret_mesh" in kwargs:
+            return kwargs["minaret_mesh"]
+
+        if args:
+            return args[0]
+
+        raise AssertionError(
+            "post-processing passthrough received no mesh"
+        )
+
+    for name in (
+        "AtlasBuildingGableRoofBuilder",
+        "AtlasBuildingHippedRoofBuilder",
+        "AtlasBuildingPyramidalRoofBuilder",
+        "AtlasBuildingSkillionRoofBuilder",
+        "AtlasBuildingApseGabledRoofBuilder",
+        "AtlasMinaretRoofBuilder",
+        "AtlasMonumentDomeRoofBuilder",
+        "AtlasCastleRoofBuilder",
+        "AtlasCastleGableRoofBuilder",
+        "AtlasCastleMultiGableRoofBuilder",
+    ):
+        monkeypatch.setattr(
+            f"CORE.atlas_foundation_scene_builder."
+            f"{name}.apply",
+            passthrough_mesh,
+        )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_scene_builder."
+        "AtlasMinaretBalconyBuilder.attach",
+        passthrough_mesh,
+    )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_scene_builder."
+        "AtlasLiedbergGateTowerBuilder.build",
+        lambda **kwargs: None,
+    )
+
+    def invalid_final_report(mesh):
+        return {
+            "valid": False,
+            "structure_valid": True,
+            "triangles": len(
+                mesh.get("triangles", ())
+            ),
+            "open_edge_count": 8,
+            "non_manifold_edge_count": 0,
+            "sample_open_edges": [],
+            "sample_non_manifold_edges": [],
+        }
+
+    monkeypatch.setattr(
+        "CORE.atlas_mesh_validator."
+        "AtlasMeshValidator.report",
+        invalid_final_report,
+    )
+
+    scene = AtlasFoundationSceneBuilder.build_scene(
+        raw_buildings=[raw_building],
+        coordinate_engine=object(),
+        terrain_mesh=object(),
+        castles=[],
+        debug=False,
+    )
+
+    report = scene.metadata["building_report"]
+
+    assert scene.layers["buildings"] == []
+    assert report["accepted"] == 0
+    assert report["skipped"] == 1
+    assert report["rejection_counts"] == {
+        "invalid_final_mesh_topology": 1,
+    }

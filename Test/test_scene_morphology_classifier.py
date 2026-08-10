@@ -118,3 +118,43 @@ def test_scene_morphology_classifier_does_not_accept_location_identity():
             landmark_density=0.05,
             location_name="Bonn",
         )
+
+
+def test_scene_morphology_classifier_resolves_historic_core_character():
+    evidence = {
+        "building_density": 0.42,
+        "road_density": 0.28,
+        "block_compactness": 0.68,
+        "vegetation_coverage": 0.10,
+        "forest_coverage": 0.02,
+        "water_coverage": 0.02,
+        "railway_presence": False,
+        "terrain_relief": 0.06,
+        "landmark_density": 0.32,
+    }
+
+    result = AtlasSceneMorphologyClassifier.resolve(
+        **evidence,
+    )
+
+    assert result["morphology"] == "historic_core"
+
+
+def test_scene_morphology_classifier_resolves_suburban_character():
+    evidence = {
+        "building_density": 0.24,
+        "road_density": 0.18,
+        "block_compactness": 0.22,
+        "vegetation_coverage": 0.42,
+        "forest_coverage": 0.12,
+        "water_coverage": 0.01,
+        "railway_presence": False,
+        "terrain_relief": 0.08,
+        "landmark_density": 0.03,
+    }
+
+    result = AtlasSceneMorphologyClassifier.resolve(
+        **evidence,
+    )
+
+    assert result["morphology"] == "suburban"
