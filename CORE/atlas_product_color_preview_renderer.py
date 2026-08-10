@@ -1247,6 +1247,9 @@ class AtlasProductColorPreviewRenderer:
             )
         }
 
+        applied_highlighted_building_source_ids = set()
+        applied_highlighted_landmark_ids = set()
+
         terrain_size_x_mm = float(city_result["terrain_size_x_mm"])
         terrain_size_y_mm = float(city_result["terrain_size_y_mm"])
 
@@ -1495,6 +1498,9 @@ class AtlasProductColorPreviewRenderer:
                                 city_offset_y_mm,
                             )
                         )
+                        applied_highlighted_building_source_ids.add(
+                            str(source_id)
+                        )
                         continue
 
                     material_batches[
@@ -1545,6 +1551,17 @@ class AtlasProductColorPreviewRenderer:
                             city_offset_y_mm,
                         )
                     )
+
+                    if is_highlighted_building_component:
+                        applied_highlighted_building_source_ids.add(
+                            str(source_id)
+                        )
+
+                    if is_highlighted_landmark:
+                        applied_highlighted_landmark_ids.add(
+                            str(landmark_id)
+                        )
+
                     continue
 
                 material_batches[batch_name]["meshes"].append(
@@ -1579,6 +1596,54 @@ class AtlasProductColorPreviewRenderer:
             "semantic_material_hierarchy": (
                 semantic_material_hierarchy
             ),
+            "resolved_scene_morphology": (
+                city_result.get(
+                    "resolved_scene_morphology"
+                )
+            ),
+            "effective_scene_morphology": (
+                city_result.get(
+                    "effective_scene_morphology"
+                )
+            ),
+            "morphology_composition_policy": (
+                city_result.get(
+                    "morphology_composition_policy"
+                )
+            ),
+            "city_composition_lod": (
+                city_result.get(
+                    "city_composition_lod"
+                )
+            ),
+            "city_composition_suppressed_meshes": (
+                city_result.get(
+                    "city_composition_suppressed_meshes",
+                    0,
+                )
+            ),
+            "highlighting": {
+                "requested_building_source_ids": tuple(
+                    sorted(
+                        highlighted_building_source_ids
+                    )
+                ),
+                "applied_building_source_ids": tuple(
+                    sorted(
+                        applied_highlighted_building_source_ids
+                    )
+                ),
+                "requested_landmark_ids": tuple(
+                    sorted(
+                        highlighted_landmark_ids
+                    )
+                ),
+                "applied_landmark_ids": tuple(
+                    sorted(
+                        applied_highlighted_landmark_ids
+                    )
+                ),
+            },
             "outer_width_mm": frame_spec.outer_width_mm,
             "outer_height_mm": frame_spec.outer_height_mm,
             "opening_width_mm": frame_spec.inner_width_mm,

@@ -6300,3 +6300,302 @@ Full ATLAS regression:
 8.17 kapsamında açık blocker kalmadı.
 
 **Sıradaki roadmap paketi: 8.18 — Customer Preview Parity.**
+
+
+## 10 Ağustos 2026 — 8.18 FINAL LOCK
+
+**8.18 Customer Preview Parity: LOCK**
+
+8.18, customer-facing preview ile physical production scene arasında semantic
+composition parity sağlayan ve bu parity'yi read-only olarak doğrulayan katman
+olarak tamamlandı.
+
+Yeni ana bileşen:
+
+- `CORE/atlas_customer_preview_parity.py`
+
+Güncellenen preview bileşenleri:
+
+- `CORE/atlas_product_color_preview_renderer.py`
+- `CORE/atlas_product_color_preview_png_renderer.py`
+
+### Temel 8.18 ilkesi
+
+Customer preview ayrı bir scene composition sistemi kullanmaz.
+
+Preview:
+
+- production geometry'yi yeniden üretmez
+- morphology'yi yeniden çözmez
+- City Composition LoD kararlarını yeniden hesaplamaz
+- suppressed geometry'yi geri getirmez
+- production material hierarchy'den bağımsız yeni semantic hierarchy üretmez
+
+Production tarafında çözülen scene hierarchy preview tarafından reuse edilir.
+
+Primary acceptance principle:
+
+> The customer should receive a physical product whose composition matches the
+> scene hierarchy shown in the preview.
+
+### Shared production scene
+
+Mevcut Wall Collection akışında aynı:
+
+- `city_result`
+
+hem physical product export'una hem customer color preview renderer'a verilir.
+
+Bu sayede preview temel geometry kaynağı production scene ile aynıdır.
+
+Preview renderer doğrudan:
+
+- `city_result["mesh_groups"]`
+
+üzerinden çalışır.
+
+City Composition Mesh Filter tarafından production için suppression uygulanmış
+geometry preview tarafından yeniden eklenmez.
+
+### Production composition metadata passthrough
+
+Preview scene artık production result içindeki şu metadata'yı aynen taşır:
+
+- `resolved_scene_morphology`
+- `effective_scene_morphology`
+- `morphology_composition_policy`
+- `city_composition_lod`
+- `city_composition_suppressed_meshes`
+
+Bu alanlar preview tarafında yeniden hesaplanmaz.
+
+### Production-filtered geometry parity
+
+Davranış testiyle doğrulandı:
+
+- retained production mesh preview'de bulunur
+- suppressed production mesh preview'de bulunmaz
+- City Composition LoD'da retain=false olan fakat final mesh_groups içinde
+  bulunmayan geometry preview tarafından geri oluşturulmaz
+
+Bu özellikle road / generic urban detail suppression parity'sini korur.
+
+### Product-size awareness
+
+Preview scene zaten:
+
+- outer width
+- outer height
+- opening width
+- opening height
+
+bilgilerini taşır.
+
+City Composition LoD içindeki:
+
+- `product_size_mm`
+
+ile preview opening size parity resolver tarafından karşılaştırılabilir.
+
+### Consistent camera framing
+
+Mevcut PNG preview camera davranışı değiştirilmeden contract haline getirildi.
+
+Camera:
+
+- elevation: `58.0°`
+- azimuth: `-58.0°`
+
+olarak deterministic kalır.
+
+Framing doğrudan product outer dimensions üzerinden çözülür:
+
+- x min/max
+- y min/max
+- outer width
+- outer height
+
+PNG result metadata artık:
+
+- `camera`
+- `framing`
+
+alanlarını taşır.
+
+Bu sayede aynı product geometry için framing davranışı test edilebilir ve
+tekrarlanabilir hale geldi.
+
+### Semantic material parity
+
+8.17 Semantic Color / Material Hierarchy doğrudan reuse edilir.
+
+Preview scene:
+
+- `semantic_material_hierarchy`
+
+metadata'sını taşımaya devam eder.
+
+Customer Preview Parity resolver gerekli temel semantic rollerin preview
+hierarchy içinde bulunduğunu doğrulayabilir:
+
+- generic building
+- landmark wall
+- vegetation
+- water
+- roads / hardscape
+- terrain
+
+Yeni parallel material resolver oluşturulmamıştır.
+
+### Landmark / building highlighting parity
+
+Mevcut highlight sistemi korunmuştur.
+
+Preview yalnız production-filtered mesh_groups içinde gerçekten bulunan:
+
+- building
+- building component
+- landmark
+
+geometry'sini highlight edebilir.
+
+Requested fakat production scene içinde bulunmayan / suppressed edilmiş
+landmark preview'ye eklenmez.
+
+Preview result artık:
+
+- requested building source IDs
+- applied building source IDs
+- requested landmark IDs
+- applied landmark IDs
+
+bilgilerini `highlighting` metadata'sında taşır.
+
+Böylece customer preview'nin production scene'de olmayan bir landmark'ı
+highlight ederek yanlış vaat vermesi engellenir.
+
+### Customer Preview Parity resolver
+
+Yeni:
+
+- `AtlasCustomerPreviewParity`
+
+read-only parity resolver olarak eklendi.
+
+Resolver production result ile preview scene arasında şu kontrolleri yapar:
+
+- scene morphology parity
+- morphology composition policy parity
+- City Composition LoD parity
+- suppressed mesh count parity
+- product-size parity
+- required semantic material role coverage
+
+Resolver geometry veya metadata değiştirmez.
+
+Result:
+
+- `matches`
+- `checks`
+- `mismatches`
+
+alanlarını taşır.
+
+### LoD parity
+
+Preview, production:
+
+- `city_composition_lod`
+
+metadata'sını doğrudan taşır.
+
+Parity resolver LoD kararlarının preview tarafında değiştirilip
+değiştirilmediğini tespit eder.
+
+Örneğin production'da:
+
+- retain=true
+
+olan road preview metadata'sında:
+
+- retain=false
+
+olarak değiştirilirse parity başarısız olur.
+
+### Morphology composition parity
+
+Production:
+
+- `effective_scene_morphology`
+- `morphology_composition_policy`
+
+preview tarafından aynen taşınır.
+
+Road emphasis, landmark emphasis, terrain emphasis, vegetation emphasis,
+water emphasis ve diğer 8.16 policy değerlerinde preview-side sapma parity
+failure olarak raporlanabilir.
+
+### Rendering-specific freedom
+
+8.18 rendering-specific visual teknikleri yasaklamaz.
+
+Preview renderer:
+
+- camera
+- lighting
+- background
+- raster rendering
+
+gibi presentation teknikleri kullanabilir.
+
+Ancak bunlar production'da olmayan:
+
+- geometry
+- hierarchy
+- semantic importance
+- LoD detail
+- material role
+
+vaat edemez.
+
+### Roadmap acceptance sonucu
+
+8.18 kapsamında doğrulanan davranışlar:
+
+- same production scene source
+- production-filtered geometry reuse
+- no suppressed-geometry reintroduction
+- morphology metadata parity
+- morphology composition policy parity
+- City Composition LoD parity
+- product-size awareness
+- semantic material hierarchy parity
+- landmark / building highlight provenance
+- suppressed highlight protection
+- deterministic camera
+- product-aware framing
+- read-only centralized parity validation
+- real preview renderer output accepted by parity resolver
+
+Primary acceptance principle karşılandı:
+
+> The customer should receive a physical product whose composition matches the
+> scene hierarchy shown in the preview.
+
+### Doğrulama
+
+8.18 focused customer preview parity:
+
+- `51 passed in 0.29s`
+
+Expanded related regression:
+
+- `118 passed in 0.35s`
+
+Full ATLAS regression:
+
+- `3611 passed in 15.17s`
+
+8.18 kapsamında açık blocker kalmadı.
+
+**Sıradaki roadmap paketi: 8.19 — Urban Fabric Quality Report.**

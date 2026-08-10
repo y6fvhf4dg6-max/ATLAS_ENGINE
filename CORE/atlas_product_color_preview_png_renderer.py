@@ -134,4 +134,16 @@ class AtlasProductColorPreviewPNGRenderer:
             "image_width_px": int(image_width_px),
             "image_height_px": int(image_height_px),
             "triangle_count": len(triangles),
+            "camera": {
+                "elevation_deg": 58.0,
+                "azimuth_deg": -58.0,
+            },
+            "framing": {
+                "outer_width_mm": outer_width_mm,
+                "outer_height_mm": outer_height_mm,
+                "x_min_mm": -half_width,
+                "x_max_mm": half_width,
+                "y_min_mm": -half_height,
+                "y_max_mm": half_height,
+            },
         }

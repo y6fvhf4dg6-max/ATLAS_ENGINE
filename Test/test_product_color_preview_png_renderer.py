@@ -78,3 +78,36 @@ def test_png_renderer_writes_valid_image(tmp_path):
     with Image.open(output_path) as image:
         assert image.format == "PNG"
         assert image.size == (640, 640)
+
+
+def test_png_preview_reports_consistent_product_aware_camera_framing(
+    tmp_path,
+):
+    scene = {
+        "type": "product_color_preview_scene",
+        "profile_name": "CAMERA_PARITY_TEST",
+        "outer_width_mm": 170.0,
+        "outer_height_mm": 170.0,
+        "material_batches": {},
+    }
+
+    result = AtlasProductColorPreviewPNGRenderer.render(
+        scene=scene,
+        output_path=tmp_path / "camera_parity.png",
+        image_width_px=800,
+        image_height_px=600,
+    )
+
+    assert result["camera"] == {
+        "elevation_deg": 58.0,
+        "azimuth_deg": -58.0,
+    }
+
+    assert result["framing"] == {
+        "outer_width_mm": 170.0,
+        "outer_height_mm": 170.0,
+        "x_min_mm": -85.0,
+        "x_max_mm": 85.0,
+        "y_min_mm": -85.0,
+        "y_max_mm": 85.0,
+    }

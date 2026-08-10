@@ -1560,3 +1560,256 @@ def test_preview_scene_exposes_semantic_material_hierarchy_metadata():
             "surface_treatment"
         ]
     )
+
+
+def test_preview_scene_preserves_production_composition_metadata():
+    profile = (
+        AtlasProductPreviewMaterialProfile
+        .koeln_premium_v1()
+    )
+
+    city_result = {
+        "terrain_size_x_mm": 150.0,
+        "terrain_size_y_mm": 150.0,
+        "mesh_groups": {
+            "terrain": [],
+            "buildings": [],
+            "roads": [],
+            "parks": [],
+            "elevated_areas": [],
+            "artworks": [],
+            "landmarks": [],
+            "trees": [],
+            "forest_canopies": [],
+            "waters": [],
+            "castle_walls": [],
+            "castle_shells": [],
+            "castle_tower_caps": [],
+        },
+        "resolved_scene_morphology": "dense_urban",
+        "effective_scene_morphology": "historic_core",
+        "morphology_composition_policy": {
+            "road_emphasis": 0.90,
+            "landmark_emphasis": 1.00,
+        },
+        "city_composition_lod": {
+            "scene_morphology": "historic_core",
+            "product_size_mm": 150.0,
+            "decisions": {
+                "road_1": {
+                    "retain": True,
+                },
+            },
+        },
+        "city_composition_suppressed_meshes": 3,
+    }
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    assert (
+        scene["resolved_scene_morphology"]
+        == city_result["resolved_scene_morphology"]
+    )
+
+    assert (
+        scene["effective_scene_morphology"]
+        == city_result["effective_scene_morphology"]
+    )
+
+    assert (
+        scene["morphology_composition_policy"]
+        is city_result["morphology_composition_policy"]
+    )
+
+    assert (
+        scene["city_composition_lod"]
+        is city_result["city_composition_lod"]
+    )
+
+    assert (
+        scene["city_composition_suppressed_meshes"]
+        == 3
+    )
+
+
+def test_preview_uses_production_filtered_mesh_groups_without_reintroducing_suppressed_geometry():
+    profile = (
+        AtlasProductPreviewMaterialProfile
+        .koeln_premium_v1()
+    )
+
+    retained_road = {
+        "type": "road_foundation",
+        "source_id": 1001,
+        "triangles": [
+            (
+                (0.0, 0.0, 0.2),
+                (1.0, 0.0, 0.2),
+                (0.0, 1.0, 0.2),
+            ),
+        ],
+    }
+
+    city_result = {
+        "terrain_size_x_mm": 150.0,
+        "terrain_size_y_mm": 150.0,
+        "mesh_groups": {
+            "terrain": [],
+            "buildings": [],
+            "roads": [retained_road],
+            "parks": [],
+            "elevated_areas": [],
+            "artworks": [],
+            "landmarks": [],
+            "trees": [],
+            "forest_canopies": [],
+            "waters": [],
+            "castle_walls": [],
+            "castle_shells": [],
+            "castle_tower_caps": [],
+        },
+        "city_composition_lod": {
+            "decisions": {
+                "road_1001": {
+                    "retain": True,
+                },
+                "road_2002": {
+                    "retain": False,
+                },
+            },
+        },
+        "city_composition_suppressed_meshes": 1,
+    }
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    preview_roads = scene[
+        "material_batches"
+    ]["roads"]["meshes"]
+
+    assert len(preview_roads) == 1
+    assert (
+        preview_roads[0]["source_id"]
+        == 1001
+    )
+
+    assert all(
+        mesh.get("source_id") != 2002
+        for batch in scene["material_batches"].values()
+        for mesh in batch["meshes"]
+        if isinstance(mesh, dict)
+    )
+
+
+def test_preview_highlighting_reports_only_geometry_present_in_production_scene():
+    profile = (
+        AtlasProductPreviewMaterialProfile
+        .koeln_premium_v1()
+    )
+
+    retained_landmark_id = 101
+    suppressed_landmark_id = 202
+
+    city_result = {
+        "terrain_size_x_mm": 150.0,
+        "terrain_size_y_mm": 150.0,
+        "mesh_groups": {
+            "terrain": [],
+            "buildings": [],
+            "roads": [],
+            "parks": [],
+            "elevated_areas": [],
+            "artworks": [],
+            "landmarks": [
+                {
+                    "type": "tower",
+                    "landmark_id": retained_landmark_id,
+                    "triangles": [
+                        (
+                            (10.0, 10.0, 1.0),
+                            (11.0, 10.0, 1.0),
+                            (10.0, 11.0, 2.0),
+                        ),
+                    ],
+                },
+            ],
+            "trees": [],
+            "forest_canopies": [],
+            "waters": [],
+            "castle_walls": [],
+            "castle_shells": [],
+            "castle_tower_caps": [],
+        },
+        "city_composition_lod": {
+            "decisions": {
+                "landmark_101": {
+                    "retain": True,
+                },
+                "landmark_202": {
+                    "retain": False,
+                },
+            },
+        },
+        "city_composition_suppressed_meshes": 1,
+    }
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+        highlighted_landmark_ids={
+            retained_landmark_id,
+            suppressed_landmark_id,
+        },
+    )
+
+    highlighting = scene["highlighting"]
+
+    assert set(
+        highlighting["requested_landmark_ids"]
+    ) == {
+        str(retained_landmark_id),
+        str(suppressed_landmark_id),
+    }
+
+    assert highlighting[
+        "applied_landmark_ids"
+    ] == (
+        str(retained_landmark_id),
+    )
+
+    assert (
+        str(suppressed_landmark_id)
+        not in highlighting["applied_landmark_ids"]
+    )
+
+    assert all(
+        mesh.get("landmark_id")
+        != suppressed_landmark_id
+        for batch in scene["material_batches"].values()
+        for mesh in batch["meshes"]
+        if isinstance(mesh, dict)
+    )
