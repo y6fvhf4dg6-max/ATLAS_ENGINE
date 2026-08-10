@@ -499,10 +499,23 @@ class AtlasFoundationMeshExtruder:
             ._parse_positive_float(tags.get("roof:height"))
         )
 
+        explicit_min_height_m = (
+            AtlasFoundationMeshExtruder
+            ._parse_positive_float(tags.get("min_height"))
+        )
+
+        is_elevated_dome_part = (
+            tags.get("building:part") is not None
+            and str(tags.get("roof:shape", "")).strip().lower()
+            == "dome"
+            and explicit_min_height_m is not None
+        )
+
         if (
             explicit_total_height_m is not None
             and explicit_roof_height_m is not None
             and explicit_roof_height_m < explicit_total_height_m
+            and not is_elevated_dome_part
         ):
             resolved_height_m = (
                 explicit_total_height_m

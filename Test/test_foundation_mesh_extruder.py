@@ -879,6 +879,44 @@ def test_explicit_total_height_excludes_roof_height_from_building_body():
     assert mesh["top_z"] == pytest.approx(9.0)
 
 
+def test_elevated_dome_part_preserves_min_height_to_total_height_interval():
+    building = DummyBuilding(
+        geometry=[
+            (0.0, 0.0),
+            (0.0, 6.0),
+            (6.0, 6.0),
+            (6.0, 0.0),
+        ],
+        estimated_height=56.0,
+        is_building_part=True,
+        tags={
+            "building:part": "yes",
+            "height": "56",
+            "min_height": "40",
+            "roof:height": "16",
+            "roof:shape": "dome",
+        },
+        min_height=40.0,
+    )
+
+    diagnostics = {}
+
+    mesh = AtlasFoundationMeshExtruder.extrude(
+        building=building,
+        coordinate_engine=DummyCoordinateEngine(),
+        foundation_z=0.0,
+        diagnostics=diagnostics,
+    )
+
+    assert mesh is not None
+    assert diagnostics["accepted"] is True
+    assert mesh["bottom_z"] == pytest.approx(40.0)
+    assert mesh["top_z"] == pytest.approx(56.0)
+    assert mesh["vertical_part_thickness_mm"] == pytest.approx(16.0)
+    assert mesh["vertical_part_thickness_adjusted"] is False
+
+
+
 def test_elevated_roof_only_pyramidal_part_keeps_printable_support_slab():
     building = DummyBuilding(
         geometry=[
