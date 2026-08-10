@@ -667,3 +667,129 @@ def test_city_composition_lod_preserves_city_narrative_hierarchy():
         > result["decisions"]["building_1"]["narrative_priority"]
         > result["decisions"]["path_1"]["narrative_priority"]
     )
+
+
+def test_city_composition_lod_applies_morphology_policy_to_narrative_priority():
+    lod_level = AtlasLoDLevelCatalog.resolve(2)
+
+    baseline = AtlasCityCompositionLoDResolver.resolve(
+        semantic_class="major_road",
+        product_priority=0.50,
+        product_size_mm=150.0,
+        scene_morphology="dense_urban",
+        landmark_proximity_m=100.0,
+        printable=True,
+        lod_level=lod_level,
+    )
+
+    emphasized = AtlasCityCompositionLoDResolver.resolve(
+        semantic_class="major_road",
+        product_priority=0.50,
+        product_size_mm=150.0,
+        scene_morphology="dense_urban",
+        landmark_proximity_m=100.0,
+        printable=True,
+        lod_level=lod_level,
+        composition_policy={
+            "road_emphasis": 1.00,
+        },
+    )
+
+    de_emphasized = AtlasCityCompositionLoDResolver.resolve(
+        semantic_class="major_road",
+        product_priority=0.50,
+        product_size_mm=150.0,
+        scene_morphology="dense_urban",
+        landmark_proximity_m=100.0,
+        printable=True,
+        lod_level=lod_level,
+        composition_policy={
+            "road_emphasis": 0.50,
+        },
+    )
+
+    assert (
+        emphasized["narrative_priority"]
+        >= baseline["narrative_priority"]
+    )
+
+    assert (
+        de_emphasized["narrative_priority"]
+        < baseline["narrative_priority"]
+    )
+
+    assert emphasized[
+        "composition_emphasis"
+    ] == pytest.approx(1.00)
+
+    assert de_emphasized[
+        "composition_emphasis"
+    ] == pytest.approx(0.50)
+
+
+def test_city_composition_lod_scene_applies_policy_by_semantic_class():
+    scene = AtlasUrbanFabricScene(
+        elements=(
+            AtlasUrbanFabricElement(
+                element_id="landmark_1",
+                semantic_class="landmark",
+                product_priority=0.80,
+            ),
+            AtlasUrbanFabricElement(
+                element_id="road_1",
+                semantic_class="major_road",
+                product_priority=0.50,
+            ),
+            AtlasUrbanFabricElement(
+                element_id="water_1",
+                semantic_class="water",
+                product_priority=0.50,
+            ),
+        ),
+    )
+
+    result = (
+        AtlasCityCompositionLoDResolver
+        .resolve_urban_fabric_scene(
+            scene=scene,
+            product_size_mm=150.0,
+            scene_morphology="river_city",
+            lod_level=AtlasLoDLevelCatalog.resolve(2),
+            composition_policy={
+                "road_emphasis": 0.70,
+                "water_emphasis": 1.00,
+                "landmark_emphasis": 0.85,
+            },
+        )
+    )
+
+    assert (
+        result["decisions"]["water_1"][
+            "composition_emphasis"
+        ]
+        == pytest.approx(1.00)
+    )
+
+    assert (
+        result["decisions"]["road_1"][
+            "composition_emphasis"
+        ]
+        == pytest.approx(0.70)
+    )
+
+    assert (
+        result["decisions"]["landmark_1"][
+            "composition_emphasis"
+        ]
+        == pytest.approx(0.85)
+    )
+
+    assert (
+        result["decisions"]["water_1"][
+            "narrative_priority"
+        ]
+        >
+        result["decisions"]["road_1"][
+            "narrative_priority"
+        ]
+    )

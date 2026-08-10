@@ -5801,3 +5801,204 @@ Full ATLAS regression:
 8.15 kapsamında açık blocker kalmadı.
 
 **Sıradaki roadmap paketi: 8.16 — Morphology Composition Policy.**
+
+
+## 10 Ağustos 2026 — 8.16 FINAL LOCK
+
+**8.16 Morphology Composition Policy: LOCK**
+
+8.16, 8.15 tarafından çözülen scene morphology bilgisini product-level
+composition emphasis policy'ye dönüştüren deterministic ve profile-driven
+katman olarak tamamlandı.
+
+Yeni ana bileşen:
+
+- `CORE/atlas_morphology_composition_policy.py`
+
+### Temel 8.16 ilkesi
+
+Morphology Composition Policy source truth'ü değiştirmez.
+
+Policy:
+
+- source geometry'yi yeniden yazmaz
+- OSM semantic truth'ü değiştirmez
+- landmark identity değiştirmez
+- yeni paralel LoD sistemi oluşturmaz
+
+Yalnız mevcut product composition zincirinde semantic katmanların relative
+emphasis değerlerini çözer.
+
+Primary acceptance principle:
+
+> Scene composition should reflect the dominant physical character of the
+> place instead of applying one universal visual recipe everywhere.
+
+### Named morphology profiles
+
+Deterministic named profiller:
+
+- `dense_urban`
+- `historic_core`
+- `suburban`
+- `forest`
+- `rural`
+- `river_city`
+- `coastal`
+- `mountain`
+- `mixed`
+
+Policy şu semantic emphasis alanlarını üretir:
+
+- `terrain_emphasis`
+- `road_emphasis`
+- `urban_block_emphasis`
+- `vegetation_emphasis`
+- `water_emphasis`
+- `infrastructure_emphasis`
+- `landmark_emphasis`
+
+### Morphology davranışı
+
+`dense_urban`:
+- terrain prominence düşürülür
+- road hierarchy ve urban-block readability güçlendirilir
+- vegetation clutter sınırlandırılır
+- important infrastructure ve landmark dominance korunur
+
+`historic_core`:
+- street structure ve compact urban fabric güçlendirilir
+- landmark emphasis maksimum tutulur
+- generic vegetation ve terrain prominence sınırlandırılır
+
+`suburban`:
+- buildings, roads, vegetation ve moderate terrain dengelenir
+
+`forest`:
+- canopy / vegetation en yüksek emphasis'i alır
+- terrain güçlü tutulur
+- urban-block prominence azaltılır
+- önemli paths / roads korunur
+
+`rural`:
+- terrain ve landcover structure öne çıkarılır
+- gereksiz urban-style detail azaltılır
+- settlement structure korunur
+
+`river_city` / `coastal`:
+- water emphasis maksimumdur
+- shoreline / bridge / embankment / waterfront infrastructure için
+  infrastructure emphasis yüksektir
+
+`mountain`:
+- terrain dominance maksimumdur
+- secondary urban detail daha düşük emphasis alır
+
+### Mixed morphology
+
+`mixed` universal sabit recipe kullanmaz.
+
+`scene_evidence` mevcutsa:
+
+- building density
+- road density
+- block compactness
+- vegetation coverage
+- forest coverage
+- water coverage
+- railway presence
+- terrain relief
+- landmark density
+
+üzerinden deterministic evidence blend üretilir.
+
+Result:
+
+- named morphology → `profile_source = named_profile`
+- mixed evidence blend → `profile_source = evidence_blend`
+
+Evidence yoksa safe named-profile fallback korunur.
+
+### City Composition LoD integration
+
+8.16 mevcut `AtlasCityCompositionLoDResolver` mimarisini reuse eder.
+
+`composition_policy` opsiyonel olarak:
+
+- `resolve(...)`
+- `resolve_scene(...)`
+- `resolve_urban_fabric_scene(...)`
+
+zincirinden geçirilir.
+
+`composition_policy=None` olduğunda legacy 8.14 behavior korunur.
+
+Semantic mapping:
+
+- terrain → terrain emphasis
+- roads / paths → road emphasis
+- urban block / generic building / isolated building → urban-block emphasis
+- tree row / vegetation / park → vegetation emphasis
+- water → water emphasis
+- railway / light rail / tram / infrastructure corridor → infrastructure emphasis
+- landmark → landmark emphasis
+
+Existing semantic narrative priority korunur.
+
+Morphology policy base narrative priority üzerinde relative emphasis uygular.
+
+Decision metadata artık:
+
+- `composition_emphasis`
+
+alanını da taşır.
+
+### FoundationFirst production wiring
+
+Production zinciri:
+
+`scene evidence`
+→ `resolved_scene_morphology`
+→ `effective_scene_morphology`
+→ `AtlasMorphologyCompositionPolicy`
+→ `morphology_composition_policy`
+→ `AtlasCityCompositionLoDResolver`
+→ narrative priority decisions
+→ existing City Composition Mesh Filter
+→ final STL
+
+şeklindedir.
+
+Result metadata ayrıca:
+
+- `morphology_composition_policy`
+
+bilgisini taşır.
+
+### Source truth preservation
+
+8.16 kapsamında:
+
+- source feature existence değiştirilmez
+- source geometry yeniden üretilmez
+- OSM semantic classification değiştirilmez
+- location-specific shortcut kullanılmaz
+- morphology yalnız relative product emphasis üretir
+
+### Doğrulama
+
+8.16 policy + City Composition integration:
+
+- `43 passed in 0.07s`
+
+Expanded related regression:
+
+- `82 passed in 0.35s`
+
+Full ATLAS regression:
+
+- `3590 passed in 15.09s`
+
+8.16 kapsamında açık blocker kalmadı.
+
+**Sıradaki roadmap paketi: 8.17 — Semantic Color / Material Hierarchy.**

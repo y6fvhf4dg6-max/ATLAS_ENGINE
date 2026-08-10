@@ -127,6 +127,73 @@ class AtlasCityCompositionLoDResolver:
         return value
 
     @classmethod
+    def _resolve_composition_emphasis(
+        cls,
+        *,
+        semantic_class,
+        composition_policy,
+    ) -> float:
+        if composition_policy is None:
+            return 1.0
+
+        if not isinstance(
+            composition_policy,
+            dict,
+        ):
+            raise TypeError(
+                "composition_policy must be a dictionary"
+            )
+
+        mapping = {
+            "terrain": "terrain_emphasis",
+            "major_road": "road_emphasis",
+            "service_road": "road_emphasis",
+            "pedestrian_path": "road_emphasis",
+            "minor_path": "road_emphasis",
+            "urban_block": "urban_block_emphasis",
+            "generic_building": "urban_block_emphasis",
+            "isolated_building": "urban_block_emphasis",
+            "tree_row": "vegetation_emphasis",
+            "vegetation": "vegetation_emphasis",
+            "park": "vegetation_emphasis",
+            "water": "water_emphasis",
+            "railway": "infrastructure_emphasis",
+            "light_rail": "infrastructure_emphasis",
+            "tram": "infrastructure_emphasis",
+            "infrastructure_corridor": "infrastructure_emphasis",
+            "landmark": "landmark_emphasis",
+        }
+
+        key = mapping.get(
+            semantic_class
+        )
+
+        if key is None:
+            return 1.0
+
+        value = composition_policy.get(
+            key,
+            1.0,
+        )
+
+        try:
+            value = float(value)
+        except (TypeError, ValueError) as exc:
+            raise TypeError(
+                f"{key} must be numeric"
+            ) from exc
+
+        if (
+            not math.isfinite(value)
+            or not 0.0 <= value <= 1.0
+        ):
+            raise ValueError(
+                f"{key} must be finite and within 0..1"
+            )
+
+        return value
+
+    @classmethod
     def resolve(
         cls,
         *,
@@ -137,6 +204,7 @@ class AtlasCityCompositionLoDResolver:
         landmark_proximity_m,
         printable,
         lod_level,
+        composition_policy=None,
     ):
         semantic_class = cls._normalize_identifier(
             semantic_class,
@@ -224,10 +292,20 @@ class AtlasCityCompositionLoDResolver:
             ),
         )
 
-        if semantic_class == "landmark":
-            narrative_priority = 1.0
+        composition_emphasis = (
+            cls._resolve_composition_emphasis(
+                semantic_class=semantic_class,
+                composition_policy=composition_policy,
+            )
+        )
 
-        elif (
+        narrative_priority = min(
+            1.0,
+            narrative_priority
+            * composition_emphasis,
+        )
+
+        if (
             landmark_proximity_m <= 25.0
             and retain
         ):
@@ -276,6 +354,9 @@ class AtlasCityCompositionLoDResolver:
             "simplify": simplify,
             "narrative_priority": (
                 narrative_priority
+            ),
+            "composition_emphasis": (
+                composition_emphasis
             ),
             "reason": reason,
             "representation_mode": (
@@ -388,6 +469,7 @@ class AtlasCityCompositionLoDResolver:
         lod_level,
         printability_by_element_id=None,
         landmark_proximity_by_element_id=None,
+        composition_policy=None,
     ):
         from CORE.atlas_urban_fabric_scene_contract import (
             AtlasUrbanFabricScene,
@@ -412,6 +494,7 @@ class AtlasCityCompositionLoDResolver:
             landmark_proximity_by_element_id=(
                 landmark_proximity_by_element_id
             ),
+            composition_policy=composition_policy,
         )
 
         return {
@@ -429,6 +512,7 @@ class AtlasCityCompositionLoDResolver:
         lod_level,
         printability_by_element_id=None,
         landmark_proximity_by_element_id=None,
+        composition_policy=None,
     ):
         from CORE.atlas_urban_fabric_scene_contract import (
             AtlasUrbanFabricElement,
@@ -500,6 +584,7 @@ class AtlasCityCompositionLoDResolver:
                     "narrative_priority": (
                         element.product_priority
                     ),
+                    "composition_emphasis": 1.0,
                     "reason": (
                         "lod_ineligible_preserved"
                     ),
@@ -533,6 +618,9 @@ class AtlasCityCompositionLoDResolver:
                         )
                     ),
                     lod_level=lod_level,
+                    composition_policy=(
+                        composition_policy
+                    ),
                 )
 
             decisions[element_id] = decision

@@ -127,6 +127,9 @@ from CORE.atlas_scene_morphology_classifier import (
 from CORE.atlas_scene_morphology_mesh_area_resolver import (
     AtlasSceneMorphologyMeshAreaResolver,
 )
+from CORE.atlas_morphology_composition_policy import (
+    AtlasMorphologyCompositionPolicy,
+)
 from CORE.atlas_lod_level_catalog import (
     AtlasLoDLevel,
     AtlasLoDLevelCatalog,
@@ -1928,6 +1931,13 @@ class AtlasFoundationFirstEngine:
             )
         )
 
+        morphology_composition_policy = (
+            AtlasMorphologyCompositionPolicy.resolve(
+                morphology=effective_scene_morphology,
+                scene_evidence=scene_morphology_evidence,
+            )
+        )
+
         city_composition_scene = None
         city_composition_lod = None
 
@@ -1984,6 +1994,9 @@ class AtlasFoundationFirstEngine:
                     ),
                     lod_level=(
                         resolved_city_composition_lod_level
+                    ),
+                    composition_policy=(
+                        morphology_composition_policy
                     ),
                 )
             )
@@ -2131,6 +2144,9 @@ class AtlasFoundationFirstEngine:
             ),
             "effective_scene_morphology": (
                 effective_scene_morphology
+            ),
+            "morphology_composition_policy": (
+                morphology_composition_policy
             ),
             "city_composition_scene": (
                 city_composition_scene
