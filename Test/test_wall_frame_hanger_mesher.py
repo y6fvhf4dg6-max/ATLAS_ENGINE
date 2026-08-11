@@ -98,3 +98,47 @@ def test_wall_frame_with_hidden_hangers_is_closed_and_manifold():
 
     assert topology["open_edge_count"] == 0
     assert topology["non_manifold_edge_count"] == 0
+
+def test_wall_frame_can_build_closed_front_label_recess():
+    frame_spec = AtlasWallFrameSpec(
+        outer_width_mm=170.0,
+        outer_height_mm=170.0,
+        frame_width_mm=10.0,
+    )
+    hanger_spec = AtlasWallHangerSpec.for_product_size(
+        outer_width_mm=170.0,
+        outer_height_mm=170.0,
+        frame_width_mm=10.0,
+        frame_depth_mm=6.0,
+    )
+
+    recess_ring = (
+        (-59.0, -84.5),
+        (59.0, -84.5),
+        (59.0, -75.5),
+        (-59.0, -75.5),
+    )
+
+    mesh = AtlasWallFrameHangerMesher.build(
+        frame_spec=frame_spec,
+        hanger_spec=hanger_spec,
+        frame_depth_mm=6.0,
+        front_recess_ring=recess_ring,
+        front_recess_depth_mm=1.0,
+    )
+
+    assert mesh["front_recess_depth_mm"] == pytest.approx(1.0)
+
+    vertices = _all_vertices(mesh)
+
+    assert any(
+        z == pytest.approx(5.0)
+        and -59.0 <= x <= 59.0
+        and -84.5 <= y <= -75.5
+        for x, y, z in vertices
+    )
+
+    topology = AtlasMeshValidator._topology_report(mesh)
+
+    assert topology["open_edge_count"] == 0
+    assert topology["non_manifold_edge_count"] == 0

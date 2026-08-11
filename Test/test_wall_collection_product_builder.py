@@ -143,8 +143,8 @@ def test_wall_collection_adds_optional_integrated_label_plate_without_moving_cit
     assert max(x for x, _, _ in vertices) == pytest.approx(59.0)
     assert min(y for _, y, _ in vertices) == pytest.approx(-75.0)
     assert max(y for _, y, _ in vertices) == pytest.approx(-67.0)
-    assert min(z for _, _, z in vertices) == pytest.approx(6.0)
-    assert max(z for _, _, z in vertices) == pytest.approx(7.2)
+    assert min(z for _, _, z in vertices) == pytest.approx(5.0)
+    assert max(z for _, _, z in vertices) == pytest.approx(6.2)
 
 
 def test_wall_collection_adds_two_line_label_text_on_front_of_plate():
@@ -188,10 +188,10 @@ def test_wall_collection_adds_two_line_label_text_on_front_of_plate():
     primary_vertices = _all_vertices(primary_mesh)
     secondary_vertices = _all_vertices(secondary_mesh)
 
-    assert min(z for _, _, z in primary_vertices) == pytest.approx(7.2)
-    assert max(z for _, _, z in primary_vertices) == pytest.approx(7.8)
-    assert min(z for _, _, z in secondary_vertices) == pytest.approx(7.2)
-    assert max(z for _, _, z in secondary_vertices) == pytest.approx(7.8)
+    assert min(z for _, _, z in primary_vertices) == pytest.approx(6.2)
+    assert max(z for _, _, z in primary_vertices) == pytest.approx(6.8)
+    assert min(z for _, _, z in secondary_vertices) == pytest.approx(6.2)
+    assert max(z for _, _, z in secondary_vertices) == pytest.approx(6.8)
 
     assert min(y for _, y, _ in primary_vertices) > max(
         y for _, y, _ in secondary_vertices
@@ -261,8 +261,8 @@ def test_wall_collection_adds_graduation_cap_at_right_side_of_label():
     assert min(y for _, y, _ in cap_vertices) >= -75.0
     assert max(y for _, y, _ in cap_vertices) <= -67.0
 
-    assert min(z for _, _, z in cap_vertices) == pytest.approx(7.2)
-    assert max(z for _, _, z in cap_vertices) == pytest.approx(7.8)
+    assert min(z for _, _, z in cap_vertices) == pytest.approx(6.2)
+    assert max(z for _, _, z in cap_vertices) == pytest.approx(6.8)
 
     assert cap_mesh in product["meshes"]
 
@@ -340,7 +340,143 @@ def test_wall_collection_adds_birthday_cake_at_right_side_of_label():
     assert min(y for _, y, _ in cake_vertices) >= -75.0
     assert max(y for _, y, _ in cake_vertices) <= -67.0
 
-    assert min(z for _, _, z in cake_vertices) == pytest.approx(7.2)
-    assert max(z for _, _, z in cake_vertices) == pytest.approx(7.8)
+    assert min(z for _, _, z in cake_vertices) == pytest.approx(6.2)
+    assert max(z for _, _, z in cake_vertices) == pytest.approx(6.8)
 
     assert cake_mesh in product["meshes"]
+
+def test_wall_collection_embeds_label_plate_into_frame_recess():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+
+    city_result = _city_result()
+    city_result["terrain_size_x_mm"] = 150.0
+    city_result["terrain_size_y_mm"] = 150.0
+
+    frame_spec = AtlasWallFrameSpec(
+        outer_width_mm=170.0,
+        outer_height_mm=170.0,
+        frame_width_mm=10.0,
+    )
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=city_result,
+        frame_spec=frame_spec,
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=9.0,
+            depth_mm=1.2,
+        ),
+    )
+
+    frame_mesh = product["frame_meshes"][0]
+    label_mesh = product["label_plate_meshes"][0]
+
+    assert frame_mesh["front_recess_depth_mm"] == pytest.approx(1.0)
+
+    label_vertices = _all_vertices(label_mesh)
+
+    assert min(
+        z for _, _, z in label_vertices
+    ) == pytest.approx(5.0)
+
+    assert max(
+        z for _, _, z in label_vertices
+    ) == pytest.approx(6.2)
+
+def test_wall_collection_adds_home_icon_on_embedded_label_surface():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=8.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="ZUHAUSE",
+            secondary_text="KÖLN",
+            primary_height_mm=4.2,
+            secondary_height_mm=2.8,
+            depth_mm=0.6,
+            max_width_mm=96.0,
+            home=True,
+        ),
+    )
+
+    assert len(product["label_home_meshes"]) == 1
+
+    home_mesh = product["label_home_meshes"][0]
+    home_vertices = _all_vertices(home_mesh)
+
+    assert home_mesh["type"] == "label_home"
+
+    assert min(
+        z for _, _, z in home_vertices
+    ) == pytest.approx(6.2)
+
+    assert max(
+        z for _, _, z in home_vertices
+    ) == pytest.approx(6.8)
+
+def test_wall_collection_matches_rounded_label_and_frame_recess_outline():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+
+    city_result = _city_result()
+    city_result["terrain_size_x_mm"] = 150.0
+    city_result["terrain_size_y_mm"] = 150.0
+
+    frame_spec = AtlasWallFrameSpec(
+        outer_width_mm=170.0,
+        outer_height_mm=170.0,
+        frame_width_mm=10.0,
+    )
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=city_result,
+        frame_spec=frame_spec,
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=9.0,
+            depth_mm=1.2,
+            corner_radius_mm=2.0,
+        ),
+    )
+
+    frame_mesh = product["frame_meshes"][0]
+    label_mesh = product["label_plate_meshes"][0]
+
+    recess_ring = frame_mesh["front_recess_ring"]
+    label_outline = label_mesh["outline"]
+
+    assert len(recess_ring) == len(label_outline)
+    assert len(recess_ring) > 4
+
+    label_center_y_mm = (
+        -(frame_spec.outer_height_mm / 2.0)
+        + (frame_spec.frame_width_mm / 2.0)
+    )
+
+    translated_label_outline = tuple(
+        (
+            float(x),
+            float(y) + label_center_y_mm,
+        )
+        for x, y in label_outline
+    )
+
+    for actual_point, expected_point in zip(
+        recess_ring,
+        translated_label_outline,
+    ):
+        assert actual_point[0] == pytest.approx(
+            expected_point[0]
+        )
+        assert actual_point[1] == pytest.approx(
+            expected_point[1]
+        )

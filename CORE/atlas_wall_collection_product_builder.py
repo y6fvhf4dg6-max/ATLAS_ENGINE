@@ -104,10 +104,41 @@ class AtlasWallCollectionProductBuilder:
             frame_depth_mm=frame_depth_mm,
         )
 
+        label_center_y_mm = None
+        label_recess_ring = None
+        label_recess_depth_mm = None
+
+        if label_plate_spec is not None:
+            label_center_y_mm = (
+                -(frame_spec.outer_height_mm / 2.0)
+                + (frame_spec.frame_width_mm / 2.0)
+            )
+
+            label_outline = (
+                AtlasLabelPlateMesher._rounded_outline(
+                    width_mm=label_plate_spec.width_mm,
+                    height_mm=label_plate_spec.height_mm,
+                    corner_radius_mm=(
+                        label_plate_spec.corner_radius_mm
+                    ),
+                )
+            )
+
+            label_recess_ring = tuple(
+                (
+                    float(x),
+                    float(y) + label_center_y_mm,
+                )
+                for x, y in label_outline
+            )
+            label_recess_depth_mm = 1.0
+
         frame_mesh = AtlasWallFrameHangerMesher.build(
             frame_spec=frame_spec,
             hanger_spec=hanger_spec,
             frame_depth_mm=frame_depth_mm,
+            front_recess_ring=label_recess_ring,
+            front_recess_depth_mm=label_recess_depth_mm,
         )
 
         frame_meshes = [frame_mesh]
@@ -137,11 +168,6 @@ class AtlasWallCollectionProductBuilder:
                     "label plate height exceeds frame band"
                 )
 
-            label_center_y_mm = (
-                -(frame_spec.outer_height_mm / 2.0)
-                + (frame_spec.frame_width_mm / 2.0)
-            )
-
             label_plate_mesh = AtlasLabelPlateMesher.build(
                 spec=label_plate_spec,
             )
@@ -150,7 +176,10 @@ class AtlasWallCollectionProductBuilder:
                     label_plate_mesh,
                     0.0,
                     label_center_y_mm,
-                    float(frame_depth_mm),
+                    (
+                        float(frame_depth_mm)
+                        - float(label_recess_depth_mm)
+                    ),
                 )
             )
 
@@ -169,6 +198,7 @@ class AtlasWallCollectionProductBuilder:
 
                 text_front_z_mm = (
                     float(frame_depth_mm)
+                    - float(label_recess_depth_mm)
                     + label_plate_spec.depth_mm
                 )
 
@@ -346,6 +376,9 @@ class AtlasWallCollectionProductBuilder:
             ),
             "label_birthday_cake_meshes": (
                 label_birthday_cake_meshes
+            ),
+            "label_home_meshes": (
+                label_home_meshes
             ),
             "meshes": meshes,
         }

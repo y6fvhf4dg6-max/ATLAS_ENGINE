@@ -80,8 +80,53 @@ class AtlasWallFrameHangerMesher:
         frame_spec: AtlasWallFrameSpec,
         hanger_spec: AtlasWallHangerSpec,
         frame_depth_mm: float,
+        front_recess_ring=None,
+        front_recess_depth_mm=None,
     ) -> dict:
         frame_depth_mm = float(frame_depth_mm)
+
+        if (
+            front_recess_ring is None
+            and front_recess_depth_mm is not None
+        ):
+            raise ValueError(
+                "front_recess_depth_mm requires front_recess_ring"
+            )
+
+        if (
+            front_recess_ring is not None
+            and front_recess_depth_mm is None
+        ):
+            raise ValueError(
+                "front_recess_ring requires front_recess_depth_mm"
+            )
+
+        if front_recess_ring is not None:
+            front_recess_ring = tuple(
+                (
+                    float(point[0]),
+                    float(point[1]),
+                )
+                for point in front_recess_ring
+            )
+
+            if len(front_recess_ring) < 3:
+                raise ValueError(
+                    "front_recess_ring must contain at least 3 points"
+                )
+
+            front_recess_depth_mm = float(
+                front_recess_depth_mm
+            )
+
+            if (
+                front_recess_depth_mm <= 0.0
+                or front_recess_depth_mm >= frame_depth_mm
+            ):
+                raise ValueError(
+                    "front_recess_depth_mm must be positive "
+                    "and smaller than frame_depth_mm"
+                )
 
         expected_depth_mm = (
             hanger_spec.recess_depth_mm
@@ -126,10 +171,17 @@ class AtlasWallFrameHangerMesher:
             for profile in hanger_profiles
         ]
 
+        front_inner_rings = [inner_ring]
+
+        if front_recess_ring is not None:
+            front_inner_rings.append(
+                front_recess_ring
+            )
+
         front_triangles_2d = (
             AtlasCastleShellTriangulator.triangulate(
                 outer_ring=outer_ring,
-                inner_rings=[inner_ring],
+                inner_rings=front_inner_rings,
             )
         )
 
@@ -182,6 +234,39 @@ class AtlasWallFrameHangerMesher:
             )
         )
 
+        if front_recess_ring is not None:
+            recess_floor_z_mm = (
+                frame_depth_mm
+                - front_recess_depth_mm
+            )
+
+            recess_floor_triangles_2d = (
+                AtlasCastleShellTriangulator.triangulate(
+                    outer_ring=front_recess_ring,
+                )
+            )
+
+            if not recess_floor_triangles_2d:
+                raise ValueError(
+                    "front recess floor triangulation failed"
+                )
+
+            triangles.extend(
+                cls._lift_triangles(
+                    recess_floor_triangles_2d,
+                    z_mm=recess_floor_z_mm,
+                )
+            )
+
+            triangles.extend(
+                cls._connect_ring(
+                    front_recess_ring,
+                    z_bottom_mm=recess_floor_z_mm,
+                    z_top_mm=frame_depth_mm,
+                    reverse=True,
+                )
+            )
+
         for hanger_ring in hanger_rings:
             floor_triangles_2d = (
                 AtlasCastleShellTriangulator.triangulate(
@@ -226,6 +311,16 @@ class AtlasWallFrameHangerMesher:
             "recess_depth_mm": hanger_spec.recess_depth_mm,
             "front_wall_thickness_mm": (
                 hanger_spec.front_wall_thickness_mm
+            ),
+            "front_recess_depth_mm": (
+                front_recess_depth_mm
+                if front_recess_ring is not None
+                else None
+            ),
+            "front_recess_ring": (
+                front_recess_ring
+                if front_recess_ring is not None
+                else None
             ),
             "triangles": triangles,
         }
