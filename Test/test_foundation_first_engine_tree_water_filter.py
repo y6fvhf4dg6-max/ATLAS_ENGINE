@@ -282,8 +282,22 @@ def test_engine_builds_tree_and_canopy_meshes_from_composition():
         debug=False,
     )
 
-    assert len(result["tree_meshes"]) == 1
+    assert result["forest_canopy_tree_samples"] > 0
+    assert len(result["tree_meshes"]) == (
+        1
+        + result["forest_canopy_tree_samples"]
+    )
     assert len(result["forest_canopy_meshes"]) == 1
+
+    assert any(
+        mesh.get("source") == "osm"
+        for mesh in result["tree_meshes"]
+    )
+    assert any(
+        mesh.get("source")
+        == "worldcover_forest_canopy_fill"
+        for mesh in result["tree_meshes"]
+    )
 
     assert (
         result["forest_canopy_meshes"][0]["type"]
@@ -359,8 +373,22 @@ def test_engine_prepares_scene_vegetation_and_respects_castle_only():
         debug=False,
     )
 
-    assert len(normal["tree_meshes"]) == 1
+    assert normal["forest_canopy_tree_samples"] > 0
+    assert len(normal["tree_meshes"]) == (
+        1
+        + normal["forest_canopy_tree_samples"]
+    )
     assert len(normal["forest_canopy_meshes"]) == 1
+
+    assert any(
+        mesh.get("source") == "osm"
+        for mesh in normal["tree_meshes"]
+    )
+    assert any(
+        mesh.get("source")
+        == "worldcover_forest_canopy_fill"
+        for mesh in normal["tree_meshes"]
+    )
 
     castle = AtlasFoundationFirstEngine._prepare_scene_vegetation(
         existing_trees=[],
@@ -1210,3 +1238,245 @@ def test_tree_crown_overlapping_later_road_segment_is_rejected():
     )
 
     assert result == []
+
+
+def test_engine_samples_controlled_trees_from_forest_canopy_surfaces():
+    surfaces = (
+        {
+            "id": "forest_surface_1",
+            "surface_type": "forest",
+            "source": "worldcover",
+            "cell_count": 16,
+            "geometry": (
+                (50.0000, 8.0000),
+                (50.0000, 8.0010),
+                (50.0010, 8.0010),
+                (50.0010, 8.0000),
+            ),
+        },
+    )
+
+    first = (
+        AtlasFoundationFirstEngine
+        ._sample_forest_canopy_trees(
+            forest_canopy_surfaces=surfaces,
+            existing_trees=(),
+            max_trees=20,
+        )
+    )
+
+    second = (
+        AtlasFoundationFirstEngine
+        ._sample_forest_canopy_trees(
+            forest_canopy_surfaces=surfaces,
+            existing_trees=(),
+            max_trees=20,
+        )
+    )
+
+    assert first
+    assert first == second
+    assert len(first) <= 20
+
+    for tree in first:
+        assert 50.0000 < tree["lat"] < 50.0010
+        assert 8.0000 < tree["lon"] < 8.0010
+        assert tree["tree_type"] == "tree"
+        assert tree["tree_kind"] == "canonical"
+        assert (
+            tree["tags"]["source"]
+            == "worldcover_forest_canopy_fill"
+        )
+        assert (
+            tree["tags"]["forest_surface_id"]
+            == "forest_surface_1"
+        )
+
+
+def test_build_vegetation_meshes_adds_forest_canopy_sampled_trees(
+    monkeypatch,
+):
+    captured = {}
+
+    monkeypatch.setattr(
+        AtlasFoundationFirstEngine,
+        "_sample_forest_canopy_trees",
+        staticmethod(
+            lambda **kwargs: [
+                {
+                    "id": "forest_fill_1",
+                    "lat": 5.0,
+                    "lon": 5.0,
+                    "tree_type": "tree",
+                    "tree_kind": "canonical",
+                    "tags": {
+                        "source": (
+                            "worldcover_forest_canopy_fill"
+                        ),
+                        "forest_surface_id": (
+                            "forest_surface_1"
+                        ),
+                    },
+                },
+            ]
+        ),
+    )
+
+    def fake_build_trees(**kwargs):
+        captured["trees"] = list(kwargs["trees"])
+        return []
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasTreeFoundationBuilder.build_trees",
+        fake_build_trees,
+    )
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasForestCanopyFoundationBuilder.build",
+        lambda **kwargs: [],
+    )
+
+    nature_data = {
+        "trees": [],
+        "tree_rows": [],
+        "forests": [
+            {
+                "id": "forest_cell_1",
+                "lat": 5.0,
+                "lon": 5.0,
+                "class_id": 10,
+                "source": "worldcover",
+                "resolution_m": 10,
+            },
+        ],
+    }
+
+    result = AtlasFoundationFirstEngine._build_vegetation_meshes(
+        existing_trees=[],
+        nature_data=nature_data,
+        coordinate_engine=_VegetationCoordinateEngine(),
+        terrain_mesh={
+            "metadata": {
+                "size_x_mm": 10.0,
+                "size_y_mm": 10.0,
+            },
+            "triangles": [
+                (
+                    (0.0, 0.0, 0.0),
+                    (10.0, 0.0, 0.0),
+                    (10.0, 10.0, 0.0),
+                ),
+                (
+                    (0.0, 0.0, 0.0),
+                    (10.0, 10.0, 0.0),
+                    (0.0, 10.0, 0.0),
+                ),
+            ],
+        },
+        debug=False,
+    )
+
+    forest_inputs = [
+        tree
+        for tree in captured["trees"]
+        if (
+            tree.get("tags", {}).get("source")
+            == "worldcover_forest_canopy_fill"
+        )
+    ]
+
+    assert len(forest_inputs) == 1
+    assert result["forest_canopy_tree_samples"] == 1
+
+
+def test_forest_canopy_tree_sampling_breaks_regular_grid_deterministically(
+    monkeypatch,
+):
+    raw_points = (
+        (50.00025, 8.00025),
+        (50.00025, 8.00075),
+        (50.00075, 8.00025),
+        (50.00075, 8.00075),
+    )
+
+    def fake_sample(**kwargs):
+        return [
+            {
+                "id": f"sample_{index}",
+                "lat": lat,
+                "lon": lon,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "osm_green_area_fill",
+                    "park_id": "forest_surface_1",
+                    "park_type": "landuse:forest",
+                },
+            }
+            for index, (lat, lon) in enumerate(
+                raw_points
+            )
+        ]
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasGreenAreaTreeSampler.sample",
+        fake_sample,
+    )
+
+    surfaces = (
+        {
+            "id": "forest_surface_1",
+            "surface_type": "forest",
+            "source": "worldcover",
+            "geometry": (
+                (50.0000, 8.0000),
+                (50.0000, 8.0010),
+                (50.0010, 8.0010),
+                (50.0010, 8.0000),
+            ),
+        },
+    )
+
+    first = (
+        AtlasFoundationFirstEngine
+        ._sample_forest_canopy_trees(
+            forest_canopy_surfaces=surfaces,
+            existing_trees=(),
+            max_trees=20,
+        )
+    )
+
+    second = (
+        AtlasFoundationFirstEngine
+        ._sample_forest_canopy_trees(
+            forest_canopy_surfaces=surfaces,
+            existing_trees=(),
+            max_trees=20,
+        )
+    )
+
+    assert first == second
+    assert len(first) == len(raw_points)
+
+    resolved_points = tuple(
+        (tree["lat"], tree["lon"])
+        for tree in first
+    )
+
+    assert resolved_points != raw_points
+
+    for lat, lon in resolved_points:
+        assert 50.0000 < lat < 50.0010
+        assert 8.0000 < lon < 8.0010
+
+    assert len({
+        round(tree["lat"], 8)
+        for tree in first
+    }) > 2
+
+    assert len({
+        round(tree["lon"], 8)
+        for tree in first
+    }) > 2

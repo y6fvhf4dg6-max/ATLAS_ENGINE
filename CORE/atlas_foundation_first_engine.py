@@ -1,5 +1,7 @@
 # CORE/atlas_foundation_first_engine.py
 
+import hashlib
+
 from shapely.geometry import Point
 from shapely.geometry import Polygon
 
@@ -75,6 +77,9 @@ from CORE.atlas_tree_row_context_resolver import (
 from CORE.atlas_forest_canopy_foundation_builder import (
     AtlasForestCanopyFoundationBuilder,
 )
+from CORE.atlas_green_area_tree_sampler import (
+    AtlasGreenAreaTreeSampler,
+)
 from CORE.atlas_nature_pipeline import AtlasNaturePipeline
 from CORE.atlas_vegetation_composition_resolver import (
     AtlasVegetationCompositionResolver,
@@ -144,6 +149,7 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasFoundationFirstEngine:
+    FOREST_CANOPY_TREE_SAMPLE_LIMIT = 80
     @staticmethod
     def _select_scene_morphology(
         *,
@@ -532,10 +538,28 @@ class AtlasFoundationFirstEngine:
             )
         )
 
+        forest_canopy_tree_samples = (
+            cls._sample_forest_canopy_trees(
+                forest_canopy_surfaces=(
+                    composition[
+                        "forest_canopy_surfaces"
+                    ]
+                ),
+                existing_trees=[
+                    *composition["tree_input"],
+                    *tree_row_members,
+                ],
+                max_trees=(
+                    cls.FOREST_CANOPY_TREE_SAMPLE_LIMIT
+                ),
+            )
+        )
+
         tree_build_kwargs = {
             "trees": [
                 *composition["tree_input"],
                 *tree_row_members,
+                *forest_canopy_tree_samples,
             ],
             "coordinate_engine": coordinate_engine,
             "terrain_mesh": terrain_mesh,
@@ -580,9 +604,160 @@ class AtlasFoundationFirstEngine:
             **composition,
             "tree_row_members": tuple(tree_row_members),
             "tree_row_member_count": len(tree_row_members),
+            "forest_canopy_tree_samples": len(
+                forest_canopy_tree_samples
+            ),
+            "forest_canopy_tree_input": tuple(
+                forest_canopy_tree_samples
+            ),
             "tree_meshes": tree_meshes,
             "forest_canopy_meshes": forest_canopy_meshes,
         }
+
+    @staticmethod
+    def _sample_forest_canopy_trees(
+        *,
+        forest_canopy_surfaces,
+        existing_trees,
+        max_trees,
+    ):
+        if max_trees <= 0:
+            return []
+
+        adapted_surfaces = []
+
+        for surface in forest_canopy_surfaces or ():
+            geometry = surface.get("geometry") or ()
+
+            if len(geometry) < 3:
+                continue
+
+            adapted_surfaces.append(
+                {
+                    "id": surface.get("id"),
+                    "geometry": geometry,
+                    "park_type": "landuse:forest",
+                    "tags": {
+                        "source": "worldcover",
+                    },
+                }
+            )
+
+        sampled = AtlasGreenAreaTreeSampler.sample(
+            parks=adapted_surfaces,
+            existing_trees=existing_trees,
+            max_trees=max_trees,
+        )
+
+        surface_by_id = {
+            surface.get("id"): surface
+            for surface in forest_canopy_surfaces or ()
+        }
+
+        result = []
+
+        for tree in sampled:
+            tags = dict(tree.get("tags") or {})
+
+            forest_surface_id = tags.get("park_id")
+            surface = surface_by_id.get(
+                forest_surface_id
+            )
+
+            lat = float(tree["lat"])
+            lon = float(tree["lon"])
+
+            if surface is not None:
+                geometry = (
+                    AtlasGreenAreaTreeSampler
+                    ._normalized_geometry(
+                        surface.get("geometry", ())
+                    )
+                )
+
+                if len(geometry) >= 3:
+                    key = (
+                        f"{forest_surface_id}|"
+                        f"{tree.get('id')}|forest_jitter"
+                    ).encode("utf-8")
+
+                    digest = hashlib.sha256(
+                        key
+                    ).digest()
+
+                    lat_unit = (
+                        int.from_bytes(
+                            digest[0:4],
+                            byteorder="big",
+                        )
+                        / 0xFFFFFFFF
+                        - 0.5
+                    )
+
+                    lon_unit = (
+                        int.from_bytes(
+                            digest[4:8],
+                            byteorder="big",
+                        )
+                        / 0xFFFFFFFF
+                        - 0.5
+                    )
+
+                    lat_span = (
+                        max(point[0] for point in geometry)
+                        - min(point[0] for point in geometry)
+                    )
+                    lon_span = (
+                        max(point[1] for point in geometry)
+                        - min(point[1] for point in geometry)
+                    )
+
+                    candidate_lat = (
+                        lat
+                        + lat_unit
+                        * lat_span
+                        * 0.18
+                    )
+                    candidate_lon = (
+                        lon
+                        + lon_unit
+                        * lon_span
+                        * 0.18
+                    )
+
+                    if (
+                        AtlasGreenAreaTreeSampler
+                        ._point_inside_polygon(
+                            lat=candidate_lat,
+                            lon=candidate_lon,
+                            geometry=geometry,
+                        )
+                    ):
+                        lat = candidate_lat
+                        lon = candidate_lon
+
+            tags.update(
+                {
+                    "source": (
+                        "worldcover_forest_canopy_fill"
+                    ),
+                    "forest_surface_id": (
+                        forest_surface_id
+                    ),
+                }
+            )
+
+            result.append(
+                {
+                    **tree,
+                    "lat": lat,
+                    "lon": lon,
+                    "tree_kind": "canonical",
+                    "tags": tags,
+                }
+            )
+
+        return result
 
     @staticmethod
     def _resolve_vegetation_composition(
