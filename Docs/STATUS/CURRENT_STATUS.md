@@ -6137,3 +6137,81 @@ forest-canopy temsilidir.
 Yeni çalışma bu checkpoint'ten başlatılmalıdır:
 
 `768fa05c25017d2fa3bf644182f0018d736dc60d`
+
+---
+
+## 11 Ağustos 2026 — Rounded Label / Embedded Frame Milestone
+
+### Güncel güvenli checkpoint
+
+- Commit: `c882ab6` — `Embed rounded labels in wall frames`
+- `HEAD == origin/main == c882ab6`
+- Working tree temiz
+- Full regression: `3656 passed in 16.20s`
+
+### Wall Collection label fiziksel standardı
+
+Label sistemi artık ortak Wall Collection çekirdeğinde fiziksel ürün
+standardına taşınmıştır.
+
+Global `AtlasLabelPlateSpec` varsayılanı:
+
+- width: `118.0 mm`
+- height: `9.0 mm`
+- depth: `1.2 mm`
+- corner radius: `2.0 mm`
+
+`corner_radius_mm=0.0` açıkça verilerek eski dikdörtgen geometri halen
+desteklenmektedir.
+
+### Embedded label / frame recess
+
+`AtlasWallCollectionProductBuilder` ve
+`AtlasWallFrameHangerMesher` seviyesinde ortak front recess desteği
+eklenmiştir.
+
+Standart recess:
+
+- recess depth: `1.0 mm`
+- label plate başlangıç Z: `frame_depth - 1.0 mm`
+- `6.0 mm` frame için label plate: `Z 5.0 -> 6.2 mm`
+- text/icon yüzeyi: `Z 6.2 -> 6.8 mm`
+
+Rounded label outline ile frame recess outline bire bir aynı geometriyi
+kullanır.
+
+Bu davranış lokasyon-özel değildir. Varsayılan `AtlasLabelPlateSpec()`
+kullanan Bonn, Köln ve diğer Wall Collection ürünlerine ortak çekirdekten
+sirayet eder.
+
+### Doğrulama
+
+Focused label/recess regression:
+
+- `26 passed`
+
+Wall Collection related regression:
+
+- `58 passed`
+
+Full ATLAS regression:
+
+- `3656 passed in 16.20s`
+
+### Recovery güvenliği
+
+14 saatlik 9.0 topology/debug çalışma dalı çalışma ağacına geri
+getirilmemiştir.
+
+Safety stash korunmaktadır:
+
+`stash@{0}: On main: SAFETY before rollback to c7771ca 2026-08-11`
+
+Bu stash otomatik olarak apply/drop edilmemelidir.
+
+### Sıradaki iş
+
+Güncel `c882ab6` checkpoint'i üzerinden Bonn Münsterplatz hediye ürünü
+yeniden üretilecek ve yeni ortak rounded/embedded label standardı fiziksel
+ürün çıktısında doğrulanacaktır.
+
