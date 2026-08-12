@@ -13,7 +13,7 @@ class AtlasWallHangerSpec:
     recess_depth_mm: float
     front_wall_thickness_mm: float
 
-    SUPPORTED_PRODUCT_SIZES_MM = (150.0, 170.0, 200.0, 260.0)
+    SUPPORTED_PRODUCT_SIZES_MM = (150.0, 170.0, 200.0, 220.0, 260.0)
 
     HEAD_DIAMETER_MM = 5.0
     NECK_WIDTH_MM = 3.0

@@ -168,50 +168,59 @@ class AtlasWaterFoundationBuilder:
 
             source_width = tags.get("width")
 
-            try:
-                candidate = source_width
-
-                if isinstance(candidate, str):
-                    candidate = (
-                        candidate
-                        .replace("m", "")
-                        .strip()
-                    )
-
-                source_width_m = float(candidate)
-
-                if source_width_m <= 0.0:
-                    raise ValueError
-            except (
-                TypeError,
-                ValueError,
-            ):
-                skipped += 1
-                continue
-
-            exaggeration = (
-                AtlasWaterShorelineCompositionResolver
-                .resolve_cartographic_exaggeration(
-                    semantic_class="narrow_waterway",
-                    source_width_m=source_width_m,
-                    scale_ratio=(
-                        coordinate_engine.xy_scale
-                    ),
-                    product_size_mm=(
-                        cartographic_product_size_mm
-                    ),
-                    nozzle_diameter_mm=(
-                        cartographic_nozzle_diameter_mm
-                    ),
-                    minimum_printable_width_mm=(
-                        minimum_printable_width_mm
-                    ),
-                    semantic_priority=0.80,
-                    lod_level=(
-                        cartographic_lod_level
-                    ),
+            if source_width is None:
+                physical_width_mm = float(
+                    minimum_printable_width_mm
                 )
-            )
+            else:
+                try:
+                    candidate = source_width
+
+                    if isinstance(candidate, str):
+                        candidate = (
+                            candidate
+                            .replace("m", "")
+                            .strip()
+                        )
+
+                    source_width_m = float(candidate)
+
+                    if source_width_m <= 0.0:
+                        raise ValueError
+                except (
+                    TypeError,
+                    ValueError,
+                ):
+                    skipped += 1
+                    continue
+
+                exaggeration = (
+                    AtlasWaterShorelineCompositionResolver
+                    .resolve_cartographic_exaggeration(
+                        semantic_class="narrow_waterway",
+                        source_width_m=source_width_m,
+                        scale_ratio=(
+                            coordinate_engine.xy_scale
+                        ),
+                        product_size_mm=(
+                            cartographic_product_size_mm
+                        ),
+                        nozzle_diameter_mm=(
+                            cartographic_nozzle_diameter_mm
+                        ),
+                        minimum_printable_width_mm=(
+                            minimum_printable_width_mm
+                        ),
+                        semantic_priority=0.80,
+                        lod_level=(
+                            cartographic_lod_level
+                        ),
+                    )
+                )
+
+                physical_width_mm = (
+                    exaggeration.physical_width_mm
+                )
 
             mesh = (
                 AtlasWaterFoundationBuilder
@@ -219,9 +228,7 @@ class AtlasWaterFoundationBuilder:
                     geometry=geometry,
                     coordinate_engine=coordinate_engine,
                     terrain_mesh=terrain_mesh,
-                    width_mm=(
-                        exaggeration.physical_width_mm
-                    ),
+                    width_mm=physical_width_mm,
                     waterway_type=waterway_type,
                     source_id=water.get("id"),
                 )

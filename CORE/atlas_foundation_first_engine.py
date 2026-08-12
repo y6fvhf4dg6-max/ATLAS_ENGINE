@@ -111,6 +111,12 @@ from CORE.atlas_inland_water_polygon_builder import (
 from CORE.atlas_water_foundation_builder import (
     AtlasWaterFoundationBuilder,
 )
+from CORE.atlas_linear_infrastructure_resolver import (
+    AtlasLinearInfrastructureResolver,
+)
+from CORE.atlas_linear_infrastructure_solid_builder import (
+    AtlasLinearInfrastructureSolidBuilder,
+)
 from CORE.atlas_water_shoreline_composition_resolver import (
     AtlasWaterShorelineCompositionResolver,
 )
@@ -1759,6 +1765,97 @@ class AtlasFoundationFirstEngine:
         )
 
     @staticmethod
+    def _build_linear_infrastructure_meshes(
+        *,
+        linear_infrastructure,
+        coordinate_engine,
+        terrain_mesh,
+        scale_ratio,
+        minimum_printable_width_mm,
+        line_width_mm,
+        minimum_gap_mm,
+        cartographic_product_size_mm=None,
+        cartographic_nozzle_diameter_mm=None,
+        cartographic_lod_level=None,
+    ):
+        meshes = []
+
+        cartographic_enabled = all(
+            value is not None
+            for value in (
+                cartographic_product_size_mm,
+                cartographic_nozzle_diameter_mm,
+                cartographic_lod_level,
+            )
+        )
+
+        for item in linear_infrastructure or ():
+            if item.get("surface_visible") is False:
+                continue
+
+            tags = item.get("tags", {})
+
+            profile = (
+                AtlasLinearInfrastructureResolver
+                .resolve_profile(
+                    tags=tags,
+                    scale_ratio=scale_ratio,
+                    minimum_printable_width_mm=(
+                        minimum_printable_width_mm
+                    ),
+                    line_width_mm=line_width_mm,
+                    minimum_gap_mm=minimum_gap_mm,
+                    cartographic_product_size_mm=(
+                        cartographic_product_size_mm
+                        if cartographic_enabled
+                        else None
+                    ),
+                    cartographic_nozzle_diameter_mm=(
+                        cartographic_nozzle_diameter_mm
+                        if cartographic_enabled
+                        else None
+                    ),
+                    cartographic_lod_level=(
+                        cartographic_lod_level
+                        if cartographic_enabled
+                        else None
+                    ),
+                )
+            )
+
+            if profile is None:
+                continue
+
+            if profile.semantic_class not in {
+                "railway",
+                "light_rail",
+                "tram",
+            }:
+                continue
+
+            mesh = (
+                AtlasLinearInfrastructureSolidBuilder
+                .build_product_solid(
+                    item=item,
+                    coordinate_engine=coordinate_engine,
+                    profile=profile,
+                    terrain_mesh=terrain_mesh,
+                    height_mm=0.40,
+                )
+            )
+
+            if mesh is None:
+                continue
+
+            mesh["semantic_class"] = (
+                profile.semantic_class
+            )
+            mesh["source_id"] = item.get("id")
+            meshes.append(mesh)
+
+        return meshes
+
+    @staticmethod
     def generate_city_stl(
         pbf_path,
         bbox,
@@ -2297,6 +2394,38 @@ class AtlasFoundationFirstEngine:
             debug=debug,
         )
 
+        linear_infrastructure_meshes = []
+
+        if (
+            not castle_only
+            and road_minimum_printable_width_mm is not None
+        ):
+            linear_infrastructure_meshes = (
+                AtlasFoundationFirstEngine
+                ._build_linear_infrastructure_meshes(
+                    linear_infrastructure=linear_infrastructure,
+                    coordinate_engine=coordinate_engine,
+                    terrain_mesh=terrain_slab,
+                    scale_ratio=xy_scale,
+                    minimum_printable_width_mm=(
+                        road_minimum_printable_width_mm
+                    ),
+                    line_width_mm=(
+                        cartographic_nozzle_diameter_mm
+                    ),
+                    minimum_gap_mm=0.20,
+                    cartographic_product_size_mm=(
+                        target_size_mm
+                    ),
+                    cartographic_nozzle_diameter_mm=(
+                        cartographic_nozzle_diameter_mm
+                    ),
+                    cartographic_lod_level=(
+                        resolved_cartographic_lod_level
+                    ),
+                )
+            )
+
         park_meshes = AtlasParkFoundationBuilder.build_parks(
             parks=park_input,
             coordinate_engine=coordinate_engine,
@@ -2491,6 +2620,9 @@ class AtlasFoundationFirstEngine:
             "terrain": [terrain_slab],
             "buildings": building_meshes,
             "roads": road_meshes,
+            "linear_infrastructure": (
+                linear_infrastructure_meshes
+            ),
             "parks": park_meshes,
             "elevated_areas": elevated_area_meshes,
             "artworks": artwork_meshes,
@@ -2737,6 +2869,9 @@ class AtlasFoundationFirstEngine:
 
         building_meshes = mesh_groups["buildings"]
         road_meshes = mesh_groups["roads"]
+        linear_infrastructure_meshes = mesh_groups[
+            "linear_infrastructure"
+        ]
         park_meshes = mesh_groups["parks"]
         elevated_area_meshes = mesh_groups[
             "elevated_areas"
@@ -2764,6 +2899,7 @@ class AtlasFoundationFirstEngine:
                 "terrain",
                 "buildings",
                 "roads",
+                "linear_infrastructure",
                 "parks",
                 "elevated_areas",
                 "artworks",
@@ -2788,6 +2924,10 @@ class AtlasFoundationFirstEngine:
             print("Terrain meshes     : 1")
             print(f"Building meshes    : " f"{len(building_meshes)}")
             print(f"Road meshes        : " f"{len(road_meshes)}")
+            print(
+                f"Linear infra meshes: "
+                f"{len(linear_infrastructure_meshes)}"
+            )
             print(f"Park meshes        : " f"{len(park_meshes)}")
             print(
                 f"Elevated areas     : "

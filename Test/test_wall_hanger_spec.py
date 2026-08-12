@@ -30,6 +30,17 @@ def test_200mm_wall_collection_uses_single_center_hanger():
     assert spec.hanger_count == 1
     assert spec.center_x_positions_mm == pytest.approx((0.0,))
 
+def test_220mm_wall_collection_uses_single_center_hanger():
+    spec = AtlasWallHangerSpec.for_product_size(
+        outer_width_mm=220.0,
+        outer_height_mm=220.0,
+        frame_width_mm=10.0,
+        frame_depth_mm=6.0,
+    )
+
+    assert spec.hanger_count == 1
+    assert spec.center_x_positions_mm == pytest.approx((0.0,))
+
 
 def test_260mm_wall_collection_uses_center_and_two_symmetric_hangers():
     spec = AtlasWallHangerSpec.for_product_size(

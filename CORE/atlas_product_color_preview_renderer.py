@@ -33,6 +33,7 @@ class AtlasProductColorPreviewRenderer:
         "buildings": "buildings",
         "landmarks": "landmarks",
         "roads": "roads",
+        "linear_infrastructure": "roads",
         "parks": "parks",
         "trees": "trees",
         "forest_canopies": "trees",
