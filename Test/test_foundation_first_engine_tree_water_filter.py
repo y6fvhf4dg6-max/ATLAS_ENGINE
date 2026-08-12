@@ -204,7 +204,10 @@ def test_engine_resolves_nature_data_into_tree_and_canopy_inputs():
 
     assert tuple(
         item["id"] for item in result["tree_input"]
-    ) == (100,)
+    ) == (
+        100,
+        "worldcover_0",
+    )
 
     assert len(result["forest_canopy_surfaces"]) == 1
     assert (
@@ -373,20 +376,16 @@ def test_engine_prepares_scene_vegetation_and_respects_castle_only():
         debug=False,
     )
 
-    assert normal["forest_canopy_tree_samples"] > 0
-    assert len(normal["tree_meshes"]) == (
-        1
-        + normal["forest_canopy_tree_samples"]
-    )
-    assert len(normal["forest_canopy_meshes"]) == 1
+    assert normal["forest_canopy_tree_samples"] == 0
+    assert len(normal["tree_meshes"]) == 2
+    assert normal["forest_canopy_meshes"] == []
 
     assert any(
         mesh.get("source") == "osm"
         for mesh in normal["tree_meshes"]
     )
     assert any(
-        mesh.get("source")
-        == "worldcover_forest_canopy_fill"
+        mesh.get("source") == "worldcover"
         for mesh in normal["tree_meshes"]
     )
 
@@ -1480,3 +1479,398 @@ def test_forest_canopy_tree_sampling_breaks_regular_grid_deterministically(
         round(tree["lon"], 8)
         for tree in first
     }) > 2
+
+def test_build_vegetation_meshes_uses_worldcover_sampled_trees_without_duplicate_canopy(
+    monkeypatch,
+):
+    captured = {}
+
+    def fake_build_trees(**kwargs):
+        captured["trees"] = list(kwargs["trees"])
+        return [
+            {
+                "type": "tree_foundation",
+                "tags": dict(tree.get("tags") or {}),
+            }
+            for tree in kwargs["trees"]
+        ]
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasTreeFoundationBuilder.build_trees",
+        fake_build_trees,
+    )
+
+    nature_data = {
+        "trees": [
+            {
+                "id": "worldcover_0",
+                "lat": 18.0310,
+                "lon": -76.6580,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "worldcover",
+                    "class_id": 10,
+                    "resolution_m": 10,
+                },
+            },
+        ],
+        "tree_rows": [],
+        "forests": [
+            {
+                "id": "forest_cell_1",
+                "lat": 18.0310,
+                "lon": -76.6580,
+                "class_id": 10,
+                "source": "worldcover",
+                "resolution_m": 10,
+            },
+        ],
+    }
+
+    result = AtlasFoundationFirstEngine._build_vegetation_meshes(
+        existing_trees=[],
+        existing_tree_rows=[],
+        nature_data=nature_data,
+        roads=[],
+        pedestrian_paths=[],
+        coordinate_engine=_VegetationCoordinateEngine(),
+        terrain_mesh={
+            "metadata": {
+                "size_x_mm": 10.0,
+                "size_y_mm": 10.0,
+            },
+            "triangles": [
+                (
+                    (0.0, 0.0, 0.0),
+                    (10.0, 0.0, 0.0),
+                    (10.0, 10.0, 0.0),
+                ),
+                (
+                    (0.0, 0.0, 0.0),
+                    (10.0, 10.0, 0.0),
+                    (0.0, 10.0, 0.0),
+                ),
+            ],
+        },
+        scale_ratio=5000.0,
+        debug=False,
+    )
+
+    assert [
+        tree["id"]
+        for tree in captured["trees"]
+    ] == [
+        "worldcover_0",
+    ]
+
+    assert result["forest_canopy_tree_samples"] == 0
+    assert result["forest_canopy_meshes"] == []
+
+
+def test_scale_aware_worldcover_tree_sampling_is_deterministic_and_respects_physical_spacing():
+    import math
+
+    base_lat = 18.0310
+    base_lon = -76.6580
+
+    meters_per_degree_lat = 111_320.0
+    meters_per_degree_lon = (
+        111_320.0
+        * math.cos(math.radians(base_lat))
+    )
+
+    lat_step = 10.0 / meters_per_degree_lat
+    lon_step = 10.0 / meters_per_degree_lon
+
+    tree_cover = []
+
+    for row in range(8):
+        for column in range(8):
+            tree_cover.append(
+                {
+                    "id": f"cell_{row}_{column}",
+                    "lat": base_lat + row * lat_step,
+                    "lon": base_lon + column * lon_step,
+                    "class_id": 10,
+                    "source": "worldcover",
+                    "resolution_m": 10,
+                }
+            )
+
+    nature_data = {
+        "trees": [
+            {
+                "id": "osm_tree",
+                "lat": base_lat,
+                "lon": base_lon,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "osm",
+                },
+            },
+            {
+                "id": "legacy_worldcover_sample",
+                "lat": base_lat,
+                "lon": base_lon,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "worldcover",
+                },
+            },
+        ],
+        "tree_cover": tree_cover,
+        "forests": list(tree_cover),
+        "tree_rows": [],
+        "metadata": {},
+    }
+
+    first = (
+        AtlasFoundationFirstEngine
+        ._resample_worldcover_trees_for_product(
+            nature_data=nature_data,
+            scale_ratio=5000.0,
+            physical_min_spacing_mm=4.0,
+        )
+    )
+
+    second = (
+        AtlasFoundationFirstEngine
+        ._resample_worldcover_trees_for_product(
+            nature_data=nature_data,
+            scale_ratio=5000.0,
+            physical_min_spacing_mm=4.0,
+        )
+    )
+
+    assert first == second
+
+    assert any(
+        tree["id"] == "osm_tree"
+        for tree in first["trees"]
+    )
+
+    worldcover_trees = [
+        tree
+        for tree in first["trees"]
+        if (
+            (tree.get("tags") or {}).get("source")
+            == "worldcover"
+        )
+    ]
+
+    assert worldcover_trees
+    assert all(
+        tree["id"] != "legacy_worldcover_sample"
+        for tree in worldcover_trees
+    )
+
+    def distance_m(first_tree, second_tree):
+        mean_lat = math.radians(
+            (
+                float(first_tree["lat"])
+                + float(second_tree["lat"])
+            )
+            / 2.0
+        )
+
+        dx = (
+            float(second_tree["lon"])
+            - float(first_tree["lon"])
+        ) * 111_320.0 * math.cos(mean_lat)
+
+        dy = (
+            float(second_tree["lat"])
+            - float(first_tree["lat"])
+        ) * 111_320.0
+
+        return math.hypot(dx, dy)
+
+    for index, first_tree in enumerate(worldcover_trees):
+        for second_tree in worldcover_trees[index + 1:]:
+            assert (
+                distance_m(first_tree, second_tree)
+                >= 19.999
+            )
+
+    finer_scale = (
+        AtlasFoundationFirstEngine
+        ._resample_worldcover_trees_for_product(
+            nature_data=nature_data,
+            scale_ratio=2500.0,
+            physical_min_spacing_mm=4.0,
+        )
+    )
+
+    finer_worldcover_trees = [
+        tree
+        for tree in finer_scale["trees"]
+        if (
+            (tree.get("tags") or {}).get("source")
+            == "worldcover"
+        )
+    ]
+
+    assert (
+        len(finer_worldcover_trees)
+        >= len(worldcover_trees)
+    )
+
+def test_scale_aware_worldcover_resampler_preserves_existing_samples_without_raw_tree_cover():
+    nature_data = {
+        "trees": [
+            {
+                "id": "osm_tree",
+                "lat": 18.0310,
+                "lon": -76.6580,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "osm",
+                },
+            },
+            {
+                "id": "worldcover_existing",
+                "lat": 18.0311,
+                "lon": -76.6581,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "worldcover",
+                },
+            },
+        ],
+        "tree_cover": [],
+        "forests": [],
+        "tree_rows": [],
+        "metadata": {},
+    }
+
+    result = (
+        AtlasFoundationFirstEngine
+        ._resample_worldcover_trees_for_product(
+            nature_data=nature_data,
+            scale_ratio=5000.0,
+            physical_min_spacing_mm=4.0,
+        )
+    )
+
+    assert tuple(
+        tree["id"]
+        for tree in result["trees"]
+    ) == (
+        "osm_tree",
+        "worldcover_existing",
+    )
+
+def test_build_vegetation_meshes_resamples_raw_worldcover_for_product(
+    monkeypatch,
+):
+    import math
+
+    captured = {}
+
+    def fake_build_trees(**kwargs):
+        captured["trees"] = list(kwargs["trees"])
+        return []
+
+    monkeypatch.setattr(
+        "CORE.atlas_foundation_first_engine."
+        "AtlasTreeFoundationBuilder.build_trees",
+        fake_build_trees,
+    )
+
+    base_lat = 5.0
+    base_lon = 5.0
+
+    meters_per_degree_lat = 111_320.0
+    meters_per_degree_lon = (
+        111_320.0
+        * math.cos(math.radians(base_lat))
+    )
+
+    lat_step = 10.0 / meters_per_degree_lat
+    lon_step = 10.0 / meters_per_degree_lon
+
+    tree_cover = []
+
+    for row in range(4):
+        for column in range(4):
+            tree_cover.append(
+                {
+                    "id": f"cell_{row}_{column}",
+                    "lat": base_lat + row * lat_step,
+                    "lon": base_lon + column * lon_step,
+                    "class_id": 10,
+                    "source": "worldcover",
+                    "resolution_m": 10,
+                }
+            )
+
+    nature_data = {
+        "trees": [
+            {
+                "id": "legacy_worldcover_sample",
+                "lat": base_lat,
+                "lon": base_lon,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "worldcover",
+                },
+            },
+        ],
+        "tree_cover": tree_cover,
+        "forests": list(tree_cover),
+        "tree_rows": [],
+        "metadata": {},
+    }
+
+    result = AtlasFoundationFirstEngine._build_vegetation_meshes(
+        existing_trees=[],
+        existing_tree_rows=[],
+        nature_data=nature_data,
+        roads=[],
+        pedestrian_paths=[],
+        coordinate_engine=_VegetationCoordinateEngine(),
+        terrain_mesh={
+            "metadata": {
+                "size_x_mm": 10.0,
+                "size_y_mm": 10.0,
+            },
+            "triangles": [
+                (
+                    (0.0, 0.0, 0.0),
+                    (10.0, 0.0, 0.0),
+                    (10.0, 10.0, 0.0),
+                ),
+                (
+                    (0.0, 0.0, 0.0),
+                    (10.0, 10.0, 0.0),
+                    (0.0, 10.0, 0.0),
+                ),
+            ],
+        },
+        scale_ratio=5000.0,
+        debug=False,
+    )
+
+    tree_ids = tuple(
+        tree["id"]
+        for tree in captured["trees"]
+    )
+
+    assert "legacy_worldcover_sample" not in tree_ids
+
+    assert any(
+        tree_id.startswith("worldcover_product_")
+        for tree_id in tree_ids
+    )
+
+    assert all(
+        (
+            (tree.get("tags") or {}).get("source")
+            == "worldcover"
+        )
+        for tree in captured["trees"]
+    )
+
+    assert result["forest_canopy_tree_samples"] == 0
+    assert result["forest_canopy_meshes"] == []

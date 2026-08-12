@@ -571,7 +571,7 @@ def test_raw_worldcover_resolution_controls_canopy_connectivity():
     )
 
 
-def test_compose_nature_data_avoids_worldcover_double_representation():
+def test_compose_nature_data_preserves_worldcover_trees_with_forest_mask():
     nature_data = {
         "trees": [
             {
@@ -615,7 +615,10 @@ def test_compose_nature_data_avoids_worldcover_double_representation():
 
     assert tuple(
         item["id"] for item in result["isolated_trees"]
-    ) == (100,)
+    ) == (
+        100,
+        "worldcover_0",
+    )
 
     assert tuple(
         item["id"] for item in result["tree_rows"]
@@ -883,3 +886,46 @@ def test_forest_canopy_foundation_is_closed_and_manifold():
 
     assert report["open_edge_count"] == 0
     assert report["non_manifold_edge_count"] == 0
+
+def test_compose_nature_data_preserves_worldcover_sampled_trees():
+    nature_data = {
+        "trees": [
+            {
+                "id": "worldcover_0",
+                "lat": 18.0310,
+                "lon": -76.6580,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "worldcover",
+                    "class_id": 10,
+                    "resolution_m": 10,
+                },
+            },
+            {
+                "id": "worldcover_1",
+                "lat": 18.0311,
+                "lon": -76.6581,
+                "tree_type": "tree",
+                "tags": {
+                    "source": "worldcover",
+                    "class_id": 10,
+                    "resolution_m": 10,
+                },
+            },
+        ],
+        "tree_rows": [],
+        "forests": [],
+    }
+
+    result = (
+        AtlasVegetationCompositionResolver
+        .compose_nature_data(nature_data)
+    )
+
+    assert tuple(
+        tree["id"]
+        for tree in result["isolated_trees"]
+    ) == (
+        "worldcover_0",
+        "worldcover_1",
+    )

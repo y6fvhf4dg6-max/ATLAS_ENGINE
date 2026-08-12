@@ -368,6 +368,8 @@ class AtlasVegetationCompositionResolver:
 
         sources = []
 
+        worldcover_sampled_trees = []
+
         for tree in nature_data.get("trees", ()):
             tags = tree.get("tags") or {}
 
@@ -375,6 +377,7 @@ class AtlasVegetationCompositionResolver:
                 isinstance(tags, Mapping)
                 and tags.get("source") == "worldcover"
             ):
+                worldcover_sampled_trees.append(tree)
                 continue
 
             sources.append(tree)
@@ -399,5 +402,14 @@ class AtlasVegetationCompositionResolver:
 
         return {
             **result,
+            "isolated_trees": tuple(
+                [
+                    *result["isolated_trees"],
+                    *sorted(
+                        worldcover_sampled_trees,
+                        key=cls._source_sort_key,
+                    ),
+                ]
+            ),
             "forest_canopy_surfaces": forest_canopy_surfaces,
         }

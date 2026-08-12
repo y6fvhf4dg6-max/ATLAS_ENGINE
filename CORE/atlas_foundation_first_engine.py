@@ -150,6 +150,7 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 class AtlasFoundationFirstEngine:
     FOREST_CANOPY_TREE_SAMPLE_LIMIT = 80
+    WORLDCOVER_TREE_MIN_PHYSICAL_SPACING_MM = 4.0
     @staticmethod
     def _select_scene_morphology(
         *,
@@ -522,6 +523,14 @@ class AtlasFoundationFirstEngine:
         cartographic_lod_level=None,
         debug=True,
     ):
+        nature_data = cls._resample_worldcover_trees_for_product(
+            nature_data=nature_data,
+            scale_ratio=scale_ratio,
+            physical_min_spacing_mm=(
+                cls.WORLDCOVER_TREE_MIN_PHYSICAL_SPACING_MM
+            ),
+        )
+
         composition = cls._resolve_vegetation_composition(
             existing_trees=existing_trees,
             existing_tree_rows=existing_tree_rows,
@@ -538,8 +547,18 @@ class AtlasFoundationFirstEngine:
             )
         )
 
+        has_worldcover_sampled_trees = any(
+            (
+                (tree.get("tags") or {}).get("source")
+                == "worldcover"
+            )
+            for tree in composition["tree_input"]
+        )
+
         forest_canopy_tree_samples = (
-            cls._sample_forest_canopy_trees(
+            []
+            if has_worldcover_sampled_trees
+            else cls._sample_forest_canopy_trees(
                 forest_canopy_surfaces=(
                     composition[
                         "forest_canopy_surfaces"
@@ -592,7 +611,9 @@ class AtlasFoundationFirstEngine:
         )
 
         forest_canopy_meshes = (
-            AtlasForestCanopyFoundationBuilder.build(
+            []
+            if has_worldcover_sampled_trees
+            else AtlasForestCanopyFoundationBuilder.build(
                 surfaces=composition["forest_canopy_surfaces"],
                 coordinate_engine=coordinate_engine,
                 terrain_mesh=terrain_mesh,
@@ -756,6 +777,253 @@ class AtlasFoundationFirstEngine:
                     "tags": tags,
                 }
             )
+
+        return result
+
+    @staticmethod
+    def _resample_worldcover_trees_for_product(
+        *,
+        nature_data,
+        scale_ratio,
+        physical_min_spacing_mm,
+    ):
+        import math
+
+        if not isinstance(nature_data, dict):
+            return nature_data
+
+        result = dict(nature_data)
+
+        existing_trees = list(
+            nature_data.get("trees", ()) or ()
+        )
+
+        non_worldcover_trees = [
+            tree
+            for tree in existing_trees
+            if (
+                (tree.get("tags") or {}).get("source")
+                != "worldcover"
+            )
+        ]
+
+        tree_cover = list(
+            nature_data.get("tree_cover", ()) or ()
+        )
+
+        if not tree_cover:
+            result["trees"] = existing_trees
+            return result
+
+        if (
+            scale_ratio <= 0.0
+            or physical_min_spacing_mm <= 0.0
+        ):
+            result["trees"] = existing_trees
+            return result
+
+        minimum_spacing_m = (
+            float(physical_min_spacing_mm)
+            * float(scale_ratio)
+            / 1000.0
+        )
+
+        mean_lat = sum(
+            float(item["lat"])
+            for item in tree_cover
+        ) / len(tree_cover)
+
+        meters_per_degree_lat = 111_320.0
+        meters_per_degree_lon = (
+            111_320.0
+            * math.cos(math.radians(mean_lat))
+        )
+
+        origin_lat = min(
+            float(item["lat"])
+            for item in tree_cover
+        )
+        origin_lon = min(
+            float(item["lon"])
+            for item in tree_cover
+        )
+
+        candidates = []
+
+        for item in tree_cover:
+            lat = float(item["lat"])
+            lon = float(item["lon"])
+
+            resolution_m = float(
+                item.get("resolution_m", 10)
+            )
+
+            key = (
+                f"{lat:.12f}|"
+                f"{lon:.12f}|"
+                "worldcover_product_tree"
+            ).encode("utf-8")
+
+            digest = hashlib.sha256(key).digest()
+
+            lat_unit = (
+                int.from_bytes(
+                    digest[0:4],
+                    byteorder="big",
+                )
+                / 0xFFFFFFFF
+                - 0.5
+            )
+
+            lon_unit = (
+                int.from_bytes(
+                    digest[4:8],
+                    byteorder="big",
+                )
+                / 0xFFFFFFFF
+                - 0.5
+            )
+
+            jitter_limit_m = resolution_m * 0.40
+
+            jittered_lat = (
+                lat
+                + lat_unit
+                * 2.0
+                * jitter_limit_m
+                / meters_per_degree_lat
+            )
+
+            jittered_lon = (
+                lon
+                + lon_unit
+                * 2.0
+                * jitter_limit_m
+                / meters_per_degree_lon
+            )
+
+            x_m = (
+                (jittered_lon - origin_lon)
+                * meters_per_degree_lon
+            )
+
+            y_m = (
+                (jittered_lat - origin_lat)
+                * meters_per_degree_lat
+            )
+
+            candidates.append(
+                (
+                    digest.hex(),
+                    item,
+                    jittered_lat,
+                    jittered_lon,
+                    x_m,
+                    y_m,
+                )
+            )
+
+        candidates.sort(
+            key=lambda candidate: candidate[0]
+        )
+
+        bucket_size_m = minimum_spacing_m
+        buckets = {}
+        sampled_trees = []
+
+        for (
+            _rank,
+            item,
+            lat,
+            lon,
+            x_m,
+            y_m,
+        ) in candidates:
+            bucket_x = math.floor(
+                x_m / bucket_size_m
+            )
+            bucket_y = math.floor(
+                y_m / bucket_size_m
+            )
+
+            accepted = True
+
+            for neighbour_y in range(
+                bucket_y - 1,
+                bucket_y + 2,
+            ):
+                for neighbour_x in range(
+                    bucket_x - 1,
+                    bucket_x + 2,
+                ):
+                    for other_x, other_y in buckets.get(
+                        (neighbour_x, neighbour_y),
+                        (),
+                    ):
+                        if (
+                            math.hypot(
+                                x_m - other_x,
+                                y_m - other_y,
+                            )
+                            < minimum_spacing_m
+                        ):
+                            accepted = False
+                            break
+
+                    if not accepted:
+                        break
+
+                if not accepted:
+                    break
+
+            if not accepted:
+                continue
+
+            buckets.setdefault(
+                (bucket_x, bucket_y),
+                [],
+            ).append((x_m, y_m))
+
+            sampled_trees.append(
+                {
+                    "id": (
+                        f"worldcover_product_"
+                        f"{len(sampled_trees)}"
+                    ),
+                    "lat": lat,
+                    "lon": lon,
+                    "tree_type": "tree",
+                    "tree_kind": "canonical",
+                    "tags": {
+                        "source": "worldcover",
+                        "class_id": item.get("class_id"),
+                        "resolution_m": item.get(
+                            "resolution_m",
+                            10,
+                        ),
+                    },
+                }
+            )
+
+        result["trees"] = [
+            *non_worldcover_trees,
+            *sampled_trees,
+        ]
+
+        result["metadata"] = {
+            **dict(
+                nature_data.get("metadata", {}) or {}
+            ),
+            "worldcover_product_tree_samples": (
+                len(sampled_trees)
+            ),
+            "worldcover_product_tree_spacing_mm": (
+                float(physical_min_spacing_mm)
+            ),
+            "worldcover_product_tree_spacing_m": (
+                minimum_spacing_m
+            ),
+        }
 
         return result
 

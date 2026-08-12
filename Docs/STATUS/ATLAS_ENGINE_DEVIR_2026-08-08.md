@@ -7517,3 +7517,112 @@ Yatay scope expansion yapılmayacak.
 Her sahne bağımsız olarak tamamlanıp doğrulanmadan sonraki sahneye
 geçilmeyecek.
 
+---
+
+## 12 Ağustos 2026 — Scale-Aware WorldCover Vegetation / Jamaica Validation
+
+### Durum
+
+Jamaica / Mavis Bank / Blue Mountains sahnesi üzerinde WorldCover forest
+temsili production seviyesinde yeniden kalibre edilmiştir.
+
+Bu milestone Jamaica ürününün tamamlandığı anlamına gelmez.
+Kilitlenen konu, WorldCover tree-cover verisinin fiziksel Wall Collection
+ürününe genel ve scale-aware biçimde dönüştürülmesidir.
+
+Jamaica çalışması başlangıcındaki Git checkpoint:
+
+- HEAD: `98b5cbf`
+- origin/main: `98b5cbf`
+- Jamaica vegetation değişiklikleri henüz commit/push edilmemiştir.
+
+### Jamaica doğrulama sahnesi
+
+- center: `18.0314032, -76.6583705`
+- location: Mavis Bank / Blue Mountains, Jamaica
+- city/map size: `150 × 150 mm`
+- audit scale: `1:5000`
+- ground coverage: yaklaşık `750 × 750 m`
+- terrain source elevation delta: `264.70549808231567 m`
+
+OSM production input:
+
+- buildings: `249`
+- roads: `6`
+
+### Reddedilen forest canopy yaklaşımı
+
+İlk WorldCover forest temsili continuous canopy/slab hattından üretildi.
+
+Bu yaklaşım reddedildi çünkü büyük forest polygonları terrain üzerinde
+uzun planar triangle/ramp yüzeyleri oluşturdu ve gerçek orman görünümünü
+bozdu.
+
+Hole-aware canopy ve `inner_rings` denemeleri production çözümü olarak
+kabul edilmedi ve çalışma ağacından temizlendi.
+
+### Kilitlenen WorldCover tree representation
+
+Raw `tree_cover` verisi korunur ve ürün scale bilgisi çözüldükten sonra
+Foundation/product context içinde yeniden örneklenir.
+
+Genel fiziksel kontrat:
+
+- minimum physical tree-center spacing: `4.0 mm`
+- spacing scale-aware çözülür
+- `1:5000` için source minimum spacing: `20.0 m`
+- sampling deterministic minimum-distance / blue-noise-like davranır
+- WorldCover raster satır/sütun görünümünü kırmak için source cell içinde
+  deterministic jitter uygulanır
+- jitter limiti source cell resolution değerinin `%40`ıdır
+- OSM/non-WorldCover ağaçları korunur
+- raw `tree_cover` yoksa mevcut WorldCover sampled trees korunur
+- raw `tree_cover` varsa legacy WorldCover sample seti yeniden oluşturulur
+
+Production hattında sampled WorldCover trees mevcutsa duplicate:
+
+- `worldcover_forest_canopy_fill`
+- continuous forest canopy slab
+
+üretilmez.
+
+### Gerçek production doğrulaması
+
+Monkeypatch kullanılmadan gerçek `AtlasFoundationFirstEngine` hattından
+üretilen Jamaica sonucu:
+
+- physical spacing contract: `4.0 mm`
+- source spacing at `1:5000`: `20.0 m`
+- final WorldCover tree meshes: `623`
+- forest canopy meshes: `0`
+- tree sources: `worldcover`
+- buildings: `249`
+- roads: `6`
+- terrain delta: `264.70549808231567 m`
+- triangles: `158722`
+
+Validation STL:
+
+`OUTPUT/STL/jamaica_mavis_bank_blue_mountains_150mm_5000_PRODUCTION_WORLDCOVER_TREE_FIX.stl`
+
+### Test doğrulaması
+
+İlgili vegetation regression:
+
+- `106 passed in 0.40s`
+
+Full ATLAS regression:
+
+- `3661 passed in 16.22s`
+
+`git diff --check` temizdir.
+
+### Aktif sonraki adım
+
+Önce bu WorldCover vegetation milestone güvenli biçimde commit/push
+edilecek.
+
+Ardından Jamaica sahnesinin kalan fiziksel ürün doğrulamasına devam
+edilecek. Seychelles veya başka lokasyona Jamaica tamamlanmadan
+geçilmeyecek.
+
