@@ -6483,12 +6483,106 @@ Full ATLAS regression:
 
 `git diff --check` temizdir.
 
+### Jamaica Wall Collection fiziksel üretim benchmarkı — 12 Ağustos 2026
+
+WorldCover vegetation milestone sonrasında Jamaica / Mavis Bank /
+Blue Mountains sahnesi gerçek Wall Collection ürününe dönüştürülmüştür.
+
+Ürün kontratı:
+
+- outer size: `170 × 170 mm`
+- city/map area: `150 × 150 mm`
+- scale: `1:5000`
+- frame: Black
+- label plate: Desert Tan
+- label text/icon: Black
+- roofs: Brick Red
+- vegetation: Dark Green
+- label:
+  - `JAMAICA`
+  - `MAVIS BANK / BLUE MOUNTAINS`
+- kişisel ikon: interlocking wedding rings
+
+Bambu Studio / AMS fiziksel renk eşlemesi:
+
+- A1: Black — PLA Basic
+- A2: Desert Tan — PLA Matte
+- A3: Brick Red — PLA Matte
+- A4: Dark Green — PLA Matte
+
+Dört multicolor STL parçası hizalı multi-part object olarak yüklenmiş ve
+doğru filamentlere atanmıştır.
+
+Gerçek Bambu Studio slice benchmarkı:
+
+- model / gerçek ürün: `210.53 g`
+- purge: `142.04 g`
+- prime tower: `44.18 g`
+- toplam filament: `396.75 g`
+- ürün dışı filament: `186.22 g`
+- ürün dışı oran: yaklaşık `%47`
+- filament changes: `616`
+- estimated print time: `19 h 53 min`
+- purge multiplier: `0.60`
+
+Bu sonuç fiziksel baskı için kabul edilmemiştir.
+
+### Kritik üretim dersi
+
+Semantik olarak doğru ve manifold çok renkli STL üretmek tek başına
+production-ready olmak için yeterli değildir.
+
+Aynı Z katmanlarında terrain, roads, buildings, roofs, vegetation ve label
+gibi farklı renkli geometrilerin tekrar tekrar bulunması AMS tarafında çok
+yüksek filament-change sayısı üretmektedir.
+
+Jamaica benchmarkında ana problem purge multiplier değildir:
+
+- `616` filament değişimi vardır
+- purge ve prime tower toplamı ürün kütlesine yaklaşmaktadır
+- purge multiplier azaltmak yalnız ikincil optimizasyondur
+- kalıcı çözüm ürünün color/layer architecture ve multicolor export
+  stratejisinde aranmalıdır
+
+Bundan sonraki fiziksel ürün değerlendirmelerinde şu metrikler birinci sınıf
+production acceptance kriterleri olarak izlenecektir:
+
+- filament-change count
+- purge mass
+- prime-tower mass
+- product mass
+- total filament mass
+- estimated print time
+
+### Jamaica ürün durumu
+
+Mevcut Jamaica / Mavis Bank / Blue Mountains ürünü silinmeyecektir.
+
+Bu çalışma:
+
+- gerçek AMS maliyetini ortaya çıkaran ilk production benchmarkıdır
+- multicolor optimizasyonu için regression/reference ürün olarak korunacaktır
+- edinilen deneyim başarısızlık değil, fiziksel production mimarisi girdisidir
+
+Fiziksel baskı şu anda `HOLD` durumundadır.
+
 ### Aktif sonraki adım
 
-WorldCover vegetation milestone commit/push edilmiştir ve STL topology
-doğrulaması tamamlanmıştır.
+Mevcut Jamaica slice basılmayacaktır.
 
-Aktif iş Jamaica sahnesinin kalan fiziksel ürün doğrulamasıdır.
+Devam sırası:
 
-Jamaica tamamlanmadan Seychelles veya başka lokasyona geçilmeyecektir.
+1. Bambu Studio layer preview üzerinden renk değişimlerinin yoğun olduğu
+   Z aralıklarını ölç.
+2. `616` filament değişiminin hangi semantic mesh kombinasyonlarından
+   kaynaklandığını belirle.
+3. Görsel kaliteyi koruyarak aynı katmandaki renk değişimlerini azaltacak
+   production/color-layer stratejisi tasarla.
+4. Yeni STL setini üret ve tekrar slice et.
+5. Yeni sonucu mevcut `210.53 / 142.04 / 44.18 / 396.75 g`,
+   `616 changes`, `19 h 53 min` benchmarkına karşılaştır.
+6. Atık kabul edilebilir seviyeye inmeden ilk fiziksel baskıyı başlatma.
+
+Jamaica işi kayıt altına alınmadan ve üretim dersi korunmadan Seychelles
+veya başka lokasyona geçilmeyecektir.
 

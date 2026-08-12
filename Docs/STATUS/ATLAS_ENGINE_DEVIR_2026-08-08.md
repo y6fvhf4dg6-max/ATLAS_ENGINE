@@ -7642,3 +7642,173 @@ Aktif iş Jamaica sahnesinin kalan fiziksel ürün doğrulamasıdır.
 
 Jamaica tamamlanmadan Seychelles veya başka lokasyona geçilmeyecektir.
 
+---
+
+## 12 Ağustos 2026 — Jamaica Physical Production Benchmark / HOLD
+
+### Güncel güvenli checkpoint
+
+Son doğrulanmış ve push edilmiş güvenli checkpoint:
+
+- commit: `9efa03c`
+- message: `Update Jamaica production checkpoint docs`
+- branch: `main`
+- `HEAD == origin/main == 9efa03c`
+
+Bu checkpoint sonrasında Jamaica Wall Collection / wedding-rings çalışması
+çalışma ağacında devam etmiştir.
+
+Henüz commit/full-regression ile kilitlenmemiş aktif dosyalar korunmalıdır;
+broad reset/restore uygulanmamalıdır.
+
+### Jamaica Wall Collection ürün kontratı
+
+Ürün:
+
+- location: Jamaica / Mavis Bank / Blue Mountains
+- center: `18.0314032, -76.6583705`
+- outer size: `170 × 170 mm`
+- city/map area: `150 × 150 mm`
+- scale: `1:5000`
+
+Label:
+
+- primary: `JAMAICA`
+- secondary: `MAVIS BANK / BLUE MOUNTAINS`
+- kişisel ikon: interlocking wedding rings
+
+Fiziksel palette:
+
+- Black: frame + roads/hardscape + label text/icon
+- Desert Tan: terrain + building walls + label plate
+- Brick Red: roofs
+- Dark Green: parks + trees + vegetation
+- Blue: water; bu Jamaica sahnesinde kullanılmıyor
+
+### Bambu Studio / AMS doğrulaması
+
+Dört hizalı multicolor STL tek multi-part object olarak Bambu Studio'ya
+yüklenmiştir.
+
+AMS eşlemesi:
+
+- A1: Black — PLA Basic
+- A2: Desert Tan — PLA Matte
+- A3: Brick Red — PLA Matte
+- A4: Dark Green — PLA Matte
+
+Prime Tower plaka içine alınmış ve plate-boundary hatası giderilmiştir.
+
+Purging volumes Bambu Studio tarafından yeniden hesaplanmış,
+karşılaştırma slice'ında multiplier `0.60` kullanılmıştır.
+
+### Gerçek fiziksel production benchmarkı
+
+Son temiz slice sonucu:
+
+- product/model mass: `210.53 g`
+- purge mass: `142.04 g`
+- prime tower mass: `44.18 g`
+- total filament mass: `396.75 g`
+- product dışı filament: `186.22 g`
+- product dışı oran: yaklaşık `%47`
+- filament changes: `616`
+- estimated print time: `19 h 53 min`
+- purge multiplier: `0.60`
+
+Bu slice fiziksel baskı için kabul edilmemiştir.
+
+Jamaica ilk fiziksel baskısı şu anda:
+
+`HOLD`
+
+durumundadır.
+
+### Ana production dersi
+
+Closed/manifold geometri ve semantik olarak doğru multicolor STL ayrımı
+tek başına `PRODUCTION_READY` anlamına gelmez.
+
+Jamaica gerçek AMS slice'ı şunu ortaya koymuştur:
+
+- aynı Z katmanlarında birçok semantic color bulunması çok yüksek
+  filament-change sayısı üretir;
+- `616` change, purge ve prime-tower maliyetini fiziksel ürün açısından
+  kabul edilemez seviyeye çıkarmıştır;
+- purge multiplier azaltılması yalnız ikincil optimizasyondur;
+- ana çözüm color/layer architecture ve multicolor export stratejisidir.
+
+Bundan sonra fiziksel ürün acceptance değerlendirmesinde zorunlu metrikler:
+
+- filament-change count
+- purge mass
+- prime-tower mass
+- product mass
+- total filament mass
+- estimated print time
+
+Bu metrikler STL topology ve semantic correctness kadar önemli production
+gate girdileri olarak ele alınacaktır.
+
+### Jamaica / Mavis Bank ürününün statüsü
+
+Mevcut Jamaica / Mavis Bank / Blue Mountains ürünü:
+
+- silinmeyecektir;
+- başarısız çalışma olarak sınıflandırılmayacaktır;
+- ilk gerçek AMS production-cost benchmarkı olarak korunacaktır;
+- multicolor optimization regression/reference sahnesi olacaktır.
+
+Bu ürün sayesinde gerçek fiziksel üretimde daha önce dijital doğrulamalarda
+görünmeyen filament-change maliyeti keşfedilmiştir.
+
+### Park edilen Jamaica Island Relief fikri
+
+Ayrı bir ürün yönü olarak park edilmiştir:
+
+`Jamaica Island Relief`
+
+Hedef:
+
+- `170 × 170 mm` bütün Jamaica adası
+- gerçek ada silueti
+- ada ölçekli topoğrafya
+- Blue Mountains relief
+- büyük vegetation/natural regions
+- Mavis Bank / honeymoon kişisel işareti
+- frame + `JAMAICA` label
+
+Amaç mevcut Mavis Bank şehir detayını bütün adaya ölçeklemek değildir.
+
+Ada ölçekli ürünün avantajı daha geniş ve daha az parçalanmış renk bölgeleri
+ile çok daha düşük filament-change ihtimali sağlamasıdır.
+
+Bu fikir Jamaica Mavis Bank benchmarkını silmez veya yerine geçmez;
+ayrı ürün yaklaşımı olarak park edilmiştir.
+
+### Moladan sonraki kesin devam
+
+Mevcut `616` değişimli slice basılmayacaktır.
+
+Devam sırası:
+
+1. Bambu Studio layer preview üzerinden color-change yoğun Z aralıklarını ölç.
+2. `616` değişimi oluşturan semantic mesh kombinasyonlarını belirle.
+3. Terrain / roads / buildings / roofs / vegetation / label renk mimarisini
+   fiziksel görünümü bozmadan optimize et.
+4. Gerekirse multicolor STL export stratejisini layer-aware hale getir.
+5. Yeni STL setini üret.
+6. Bambu Studio'da yeniden slice et.
+7. Yeni sonucu aşağıdaki benchmarka karşılaştır:
+   - `210.53 g` product
+   - `142.04 g` purge
+   - `44.18 g` prime tower
+   - `396.75 g` total
+   - `616` changes
+   - `19 h 53 min`
+8. Atık ve filament-change sayısı kabul edilebilir seviyeye inmeden
+   Jamaica fiziksel baskısını başlatma.
+
+Seychelles veya diğer sahnelere geçerken bu production dersi
+tekrarlanmayacaktır.
+

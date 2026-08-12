@@ -4640,30 +4640,44 @@ Yeni çalışma bu checkpoint'ten başlatılmalıdır:
 
 ---
 
-## 12 Ağustos 2026 — Güncel Production Checkpoint / Jamaica WorldCover
+## 12 Ağustos 2026 — Güncel Production Checkpoint / Jamaica
 
 Bu bölüm, yukarıdaki 11 Ağustos `768fa05` checkpoint kaydını supersede eder.
 
 ### Son güvenli ve push edilmiş commit
 
-- Commit: `65ce99d98867d1056b982a16d337800e212d5857`
-- Kısa hash: `65ce99d`
-- Commit mesajı: `Add scale-aware WorldCover tree sampling`
+- Commit: `9efa03c`
+- Commit mesajı: `Update Jamaica production checkpoint docs`
 - Branch: `main`
-- `HEAD == origin/main == 65ce99d`
+- `HEAD == origin/main == 9efa03c` son doğrulanmış güvenli checkpoint'tir.
 
-### Aktif ürün
+Bu checkpoint sonrasında Jamaica Wall Collection / wedding-rings çalışması
+çalışma ağacında devam etmiştir ve henüz ayrı commit/full-regression ile
+kilitlenmemiştir.
 
-Aktif Wall Collection ürünü:
+### Aktif referans ürün
 
-- Jamaica / Mavis Bank / Blue Mountains
+Jamaica / Mavis Bank / Blue Mountains:
+
 - center: `18.0314032, -76.6583705`
-- city/map size: `150 × 150 mm`
-- audit scale: `1:5000`
+- outer product: `170 × 170 mm`
+- city/map area: `150 × 150 mm`
+- scale: `1:5000`
 - ground coverage: yaklaşık `750 × 750 m`
 
-Jamaica henüz tamamlanmış ürün değildir.
-Seychelles'e Jamaica fiziksel ürün doğrulaması tamamlanmadan geçilmeyecektir.
+Ürün label kontratı:
+
+- primary: `JAMAICA`
+- secondary: `MAVIS BANK / BLUE MOUNTAINS`
+- kişisel ikon: interlocking wedding rings
+
+Paylaşılan fiziksel palette:
+
+- Black: frame + roads/hardscape + label text/icon
+- Desert Tan: terrain + building walls + label plate
+- Brick Red: roofs
+- Dark Green: parks + trees + vegetation
+- Blue: water; Jamaica sahnesinde kullanılmıyor
 
 ### Scale-Aware WorldCover Vegetation — LOCK
 
@@ -4685,9 +4699,7 @@ Kilitlenen fiziksel kontrat:
 Reddedilen continuous canopy/slab ve hole-aware `inner_rings` deneyleri
 production çözümünden çıkarılmıştır.
 
-### Jamaica gerçek production doğrulaması
-
-Monkeypatch kullanılmadan:
+Gerçek WorldCover production doğrulaması:
 
 - buildings: `249`
 - roads: `6`
@@ -4695,24 +4707,104 @@ Monkeypatch kullanılmadan:
 - forest canopy meshes: `0`
 - terrain elevation delta: `264.70549808231567 m`
 - triangles: `158722`
+- open edges: `0`
+- non-manifold edges: `0`
 
-Production STL:
+Validation STL:
 
 `OUTPUT/STL/jamaica_mavis_bank_blue_mountains_150mm_5000_PRODUCTION_WORLDCOVER_TREE_FIX.stl`
 
-Topology audit:
-
-- unique edges: `238083`
-- open edges: `0`
-- non-manifold edges: `0`
-- sonuç: closed + manifold
-
-### Regression
+WorldCover milestone regression:
 
 - vegetation related: `106 passed in 0.40s`
 - full ATLAS: `3661 passed in 16.22s`
-- `git diff --check`: temiz
+
+### Gerçek Bambu Studio / AMS production benchmarkı
+
+Jamaica ürünü dört hizalı multicolor STL parçası olarak gerçek Bambu Studio
+ve AMS 2 Pro hattında slice edilmiştir.
+
+AMS eşlemesi:
+
+- A1: Black — PLA Basic
+- A2: Desert Tan — PLA Matte
+- A3: Brick Red — PLA Matte
+- A4: Dark Green — PLA Matte
+
+Son karşılaştırma benchmarkı:
+
+- gerçek model/product mass: `210.53 g`
+- purge: `142.04 g`
+- prime tower: `44.18 g`
+- total filament: `396.75 g`
+- product dışı filament: `186.22 g`
+- product dışı oran: yaklaşık `%47`
+- filament changes: `616`
+- estimated print time: `19 h 53 min`
+- purge multiplier: `0.60`
+
+Bu slice fiziksel baskı için kabul edilmemiştir ve `HOLD` durumundadır.
+
+### Yeni production acceptance dersi
+
+Closed/manifold geometri ve doğru semantic color split artık tek başına
+production-ready kriteri değildir.
+
+Çok renkli fiziksel ürünlerde aşağıdaki metrikler zorunlu acceptance
+metrikleridir:
+
+- filament-change count
+- purge mass
+- prime-tower mass
+- product mass
+- total filament mass
+- estimated print time
+
+Jamaica benchmarkı, aynı Z katmanlarında birçok semantic rengin tekrar
+etmesinin AMS tarafında çok yüksek color-change maliyeti oluşturduğunu
+kanıtlamıştır.
+
+`616` değişimin ana çözümü purge multiplier'ı düşürmek değildir.
+Kalıcı çözüm color/layer architecture ve multicolor export stratejisinde
+aranacaktır.
+
+### Jamaica / Mavis Bank ürününün rolü
+
+Mevcut ürün silinmeyecek veya başarısız deney olarak sınıflandırılmayacaktır.
+
+Bu sahne:
+
+- ilk gerçek AMS production-cost benchmarkıdır
+- multicolor optimization için regression/reference ürünüdür
+- fiziksel product architecture kararlarının kaynağı olarak korunacaktır
+
+### Park edilmiş alternatif ürün yönü
+
+`Jamaica Island Relief` fikri park edilmiştir:
+
+- `170 × 170 mm` bütün Jamaica adası
+- gerçek ada silueti
+- topography / Blue Mountains relief
+- geniş doğal/vegetation bölgeleri
+- Mavis Bank / honeymoon kişisel işareti
+- frame + Jamaica label
+
+Amaç aynı şehir detayını bütün adaya taşımak değildir.
+Ada ölçekli ürün daha geniş renk bölgeleri ve çok daha az filament değişimi
+sağlayabilecek ayrı bir fiziksel ürün yaklaşımı olarak değerlendirilecektir.
 
 ### Sıradaki iş
 
-Jamaica sahnesinin kalan fiziksel ürün doğrulamasına devam edilecek.
+Mevcut `616` değişimli Jamaica slice basılmayacaktır.
+
+Devam:
+
+1. Bambu Studio layer preview ile color-change yoğun Z bölgelerini ölç.
+2. Değişimleri üreten semantic mesh kombinasyonlarını belirle.
+3. Görsel kaliteyi koruyarak color/layer architecture çözümü tasarla.
+4. Yeni STL setini slice et.
+5. Sonucu mevcut Jamaica benchmarkına karşılaştır.
+6. Atık ve değişim sayısı kabul edilebilir olmadan fiziksel baskıyı başlatma.
+
+Jamaica deneyimi production standardına işlendiği için daha sonraki
+lokasyonlarda aynı AMS maliyet hatası tekrarlanmamalıdır.
