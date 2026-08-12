@@ -22,10 +22,10 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
     monkeypatch,
     tmp_path,
 ):
-    white = (245, 245, 240)
-    red = (170, 35, 30)
-    green = (80, 125, 65)
     black = (20, 20, 20)
+    desert_tan = (205, 190, 160)
+    brick_red = (156, 48, 42)
+    dark_green = (73, 105, 58)
     blue = (70, 140, 180)
 
     scene = {
@@ -37,23 +37,27 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
                 "meshes": [_mesh(0.0)],
             },
             "terrain": {
-                "rgb": white,
+                "rgb": desert_tan,
                 "meshes": [_mesh(10.0)],
             },
             "building_walls": {
-                "rgb": white,
+                "rgb": desert_tan,
                 "meshes": [_mesh(20.0)],
             },
+            "landmarks": {
+                "rgb": desert_tan,
+                "meshes": [_mesh(25.0)],
+            },
             "building_roofs": {
-                "rgb": red,
+                "rgb": brick_red,
                 "meshes": [_mesh(30.0)],
             },
             "parks": {
-                "rgb": green,
+                "rgb": dark_green,
                 "meshes": [_mesh(40.0)],
             },
             "trees": {
-                "rgb": green,
+                "rgb": dark_green,
                 "meshes": [_mesh(50.0)],
             },
             "water": {
@@ -61,7 +65,7 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
                 "meshes": [_mesh(60.0)],
             },
             "label_plate": {
-                "rgb": white,
+                "rgb": desert_tan,
                 "meshes": [_mesh(70.0)],
             },
             "label_text": {
@@ -69,8 +73,8 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
                 "meshes": [_mesh(80.0)],
             },
             "roads": {
-                "rgb": white,
-                "meshes": [],
+                "rgb": black,
+                "meshes": [_mesh(90.0)],
             },
         },
     }
@@ -105,34 +109,41 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
     assert result["part_count"] == 5
 
     assert set(result["parts"]) == {
-        "white",
-        "red",
-        "green",
         "black",
+        "desert_tan",
+        "brick_red",
+        "dark_green",
         "blue",
     }
 
     assert len(writes) == 5
 
-    assert result["parts"]["white"]["rgb"] == white
-    assert result["parts"]["red"]["rgb"] == red
-    assert result["parts"]["green"]["rgb"] == green
     assert result["parts"]["black"]["rgb"] == black
+    assert result["parts"]["desert_tan"]["rgb"] == desert_tan
+    assert result["parts"]["brick_red"]["rgb"] == brick_red
+    assert result["parts"]["dark_green"]["rgb"] == dark_green
     assert result["parts"]["blue"]["rgb"] == blue
 
-    assert len(result["parts"]["white"]["source_batches"]) == 3
-    assert set(result["parts"]["white"]["source_batches"]) == {
+    assert set(
+        result["parts"]["desert_tan"]["source_batches"]
+    ) == {
         "terrain",
         "building_walls",
+        "landmarks",
         "label_plate",
     }
 
     assert set(result["parts"]["black"]["source_batches"]) == {
         "frame",
         "label_text",
+        "roads",
     }
 
-    assert set(result["parts"]["green"]["source_batches"]) == {
+    assert result["parts"]["brick_red"]["source_batches"] == (
+        "building_roofs",
+    )
+
+    assert set(result["parts"]["dark_green"]["source_batches"]) == {
         "parks",
         "trees",
     }
@@ -141,17 +152,17 @@ def test_multicolor_exporter_merges_material_batches_into_five_color_stls(
         "water",
     )
 
-    assert result["parts"]["white"]["output_path"] == (
-        tmp_path / "koeln_premium__white.stl"
-    )
-    assert result["parts"]["red"]["output_path"] == (
-        tmp_path / "koeln_premium__red.stl"
-    )
-    assert result["parts"]["green"]["output_path"] == (
-        tmp_path / "koeln_premium__green.stl"
-    )
     assert result["parts"]["black"]["output_path"] == (
         tmp_path / "koeln_premium__black.stl"
+    )
+    assert result["parts"]["desert_tan"]["output_path"] == (
+        tmp_path / "koeln_premium__desert_tan.stl"
+    )
+    assert result["parts"]["brick_red"]["output_path"] == (
+        tmp_path / "koeln_premium__brick_red.stl"
+    )
+    assert result["parts"]["dark_green"]["output_path"] == (
+        tmp_path / "koeln_premium__dark_green.stl"
     )
     assert result["parts"]["blue"]["output_path"] == (
         tmp_path / "koeln_premium__blue.stl"
@@ -202,11 +213,11 @@ def test_multicolor_exporter_deduplicates_identical_triangles_across_same_color_
     assert len(writes[0][0]["triangles"]) == 1
 
 
-def test_multicolor_exporter_includes_forest_canopy_in_green_part(
+def test_multicolor_exporter_includes_forest_canopy_in_dark_green_part(
     monkeypatch,
     tmp_path,
 ):
-    green = (80, 125, 65)
+    dark_green = (73, 105, 58)
 
     canopy_mesh = {
         "type": "forest_canopy_foundation",
@@ -224,7 +235,7 @@ def test_multicolor_exporter_includes_forest_canopy_in_green_part(
         "profile_name": "TEST_PROFILE",
         "material_batches": {
             "trees": {
-                "rgb": green,
+                "rgb": dark_green,
                 "meshes": [canopy_mesh],
             },
         },
@@ -255,9 +266,9 @@ def test_multicolor_exporter_includes_forest_canopy_in_green_part(
     )
 
     assert result["color_count"] == 1
-    assert set(result["parts"]) == {"green"}
-    assert result["parts"]["green"]["rgb"] == green
-    assert result["parts"]["green"]["source_batches"] == (
+    assert set(result["parts"]) == {"dark_green"}
+    assert result["parts"]["dark_green"]["rgb"] == dark_green
+    assert result["parts"]["dark_green"]["source_batches"] == (
         "trees",
     )
 
@@ -274,10 +285,10 @@ def test_multicolor_exporter_reports_semantic_roles_per_physical_part(
     monkeypatch,
     tmp_path,
 ):
-    white = (245, 245, 240)
-    red = (170, 35, 30)
-    green = (80, 125, 65)
     black = (20, 20, 20)
+    desert_tan = (205, 190, 160)
+    brick_red = (156, 48, 42)
+    dark_green = (73, 105, 58)
     blue = (70, 140, 180)
 
     scene = {
@@ -289,23 +300,23 @@ def test_multicolor_exporter_reports_semantic_roles_per_physical_part(
                 "meshes": [_mesh(0.0)],
             },
             "terrain": {
-                "rgb": white,
+                "rgb": desert_tan,
                 "meshes": [_mesh(10.0)],
             },
             "building_walls": {
-                "rgb": white,
+                "rgb": desert_tan,
                 "meshes": [_mesh(20.0)],
             },
             "building_roofs": {
-                "rgb": red,
+                "rgb": brick_red,
                 "meshes": [_mesh(30.0)],
             },
             "parks": {
-                "rgb": green,
+                "rgb": dark_green,
                 "meshes": [_mesh(40.0)],
             },
             "trees": {
-                "rgb": green,
+                "rgb": dark_green,
                 "meshes": [_mesh(50.0)],
             },
             "water": {
@@ -313,12 +324,16 @@ def test_multicolor_exporter_reports_semantic_roles_per_physical_part(
                 "meshes": [_mesh(60.0)],
             },
             "label_plate": {
-                "rgb": white,
+                "rgb": desert_tan,
                 "meshes": [_mesh(70.0)],
             },
             "label_text": {
                 "rgb": black,
                 "meshes": [_mesh(80.0)],
+            },
+            "roads": {
+                "rgb": black,
+                "meshes": [_mesh(90.0)],
             },
         },
     }
@@ -336,7 +351,7 @@ def test_multicolor_exporter_reports_semantic_roles_per_physical_part(
     )
 
     assert set(
-        result["parts"]["white"]["semantic_roles"]
+        result["parts"]["desert_tan"]["semantic_roles"]
     ) == {
         "terrain",
         "generic_building",
@@ -344,13 +359,13 @@ def test_multicolor_exporter_reports_semantic_roles_per_physical_part(
     }
 
     assert set(
-        result["parts"]["red"]["semantic_roles"]
+        result["parts"]["brick_red"]["semantic_roles"]
     ) == {
         "generic_building_roof",
     }
 
     assert set(
-        result["parts"]["green"]["semantic_roles"]
+        result["parts"]["dark_green"]["semantic_roles"]
     ) == {
         "vegetation",
     }
@@ -360,6 +375,7 @@ def test_multicolor_exporter_reports_semantic_roles_per_physical_part(
     ) == {
         "frame",
         "label_text",
+        "roads_hardscape",
     }
 
     assert set(

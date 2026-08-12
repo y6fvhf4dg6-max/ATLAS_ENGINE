@@ -1551,7 +1551,17 @@ def test_preview_scene_exposes_semantic_material_hierarchy_metadata():
         == batches["building_walls"][
             "physical_material"
         ]
-        == batches["roads"]["physical_material"]
+    )
+
+    assert (
+        batches["roads"]["physical_material"]
+        == batches["frame"]["physical_material"]
+        == batches["label_text"]["physical_material"]
+    )
+
+    assert (
+        batches["roads"]["physical_material"]
+        != batches["terrain"]["physical_material"]
     )
 
     assert (

@@ -64,13 +64,21 @@ def test_semantic_roles_can_share_one_physical_material():
     assert (
         roles["generic_building"]["rgb"]
         == roles["terrain"]["rgb"]
-        == roles["roads_hardscape"]["rgb"]
     )
 
     assert (
         roles["generic_building"]["physical_material"]
         == roles["terrain"]["physical_material"]
-        == roles["roads_hardscape"]["physical_material"]
+    )
+
+    assert (
+        roles["roads_hardscape"]["rgb"]
+        != roles["terrain"]["rgb"]
+    )
+
+    assert (
+        roles["roads_hardscape"]["physical_material"]
+        != roles["terrain"]["physical_material"]
     )
 
     assert (
@@ -227,7 +235,6 @@ def test_semantic_material_hierarchy_preserves_readability_when_color_is_shared(
     shared = (
         "generic_building",
         "terrain",
-        "roads_hardscape",
     )
 
     assert len(
@@ -247,6 +254,11 @@ def test_semantic_material_hierarchy_preserves_readability_when_color_is_shared(
     assert all(
         roles[name]["relief_priority"] >= 0.0
         for name in shared
+    )
+
+    assert (
+        roles["roads_hardscape"]["rgb"]
+        != roles["terrain"]["rgb"]
     )
 
 

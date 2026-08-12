@@ -9,10 +9,16 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 class AtlasWallCollectionMulticolorSTLExporter:
     BATCH_TO_COLOR_NAME = {
         "frame": "black",
-        "building_roofs": "red",
-        "parks": "green",
-        "trees": "green",
+        "roads": "black",
         "label_text": "black",
+        "terrain": "desert_tan",
+        "buildings": "desert_tan",
+        "building_walls": "desert_tan",
+        "landmarks": "desert_tan",
+        "label_plate": "desert_tan",
+        "building_roofs": "brick_red",
+        "parks": "dark_green",
+        "trees": "dark_green",
         "water": "blue",
     }
 
@@ -30,10 +36,10 @@ class AtlasWallCollectionMulticolorSTLExporter:
     }
 
     COLOR_ORDER = (
-        "white",
-        "red",
-        "green",
         "black",
+        "desert_tan",
+        "brick_red",
+        "dark_green",
         "blue",
     )
 

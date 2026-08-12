@@ -70,27 +70,28 @@ def test_competitor_profile_exposes_semantic_building_surface_colors():
 def test_koeln_premium_v1_uses_locked_five_color_palette():
     profile = AtlasProductPreviewMaterialProfile.koeln_premium_v1()
 
-    white = (245, 245, 240)
-    red = (170, 35, 30)
-    green = (80, 125, 65)
     black = (20, 20, 20)
+    desert_tan = (205, 190, 160)
+    brick_red = (156, 48, 42)
+    dark_green = (73, 105, 58)
     blue = (70, 140, 180)
 
     assert profile.name == "KOELN_PREMIUM_V1"
 
     assert profile.frame_rgb == black
-    assert profile.terrain_rgb == white
-    assert profile.building_rgb == white
-    assert profile.building_wall_rgb == white
-    assert profile.road_rgb == white
-    assert profile.label_plate_rgb == white
-
-    assert profile.building_roof_rgb == red
-
-    assert profile.green_rgb == green
-    assert profile.tree_rgb == green
-
+    assert profile.road_rgb == black
     assert profile.label_text_rgb == black
+
+    assert profile.terrain_rgb == desert_tan
+    assert profile.building_rgb == desert_tan
+    assert profile.building_wall_rgb == desert_tan
+    assert profile.landmark_rgb == desert_tan
+    assert profile.label_plate_rgb == desert_tan
+
+    assert profile.building_roof_rgb == brick_red
+
+    assert profile.green_rgb == dark_green
+    assert profile.tree_rgb == dark_green
 
     assert profile.water_rgb == blue
 
@@ -100,6 +101,7 @@ def test_koeln_premium_v1_uses_locked_five_color_palette():
         profile.building_rgb,
         profile.building_wall_rgb,
         profile.building_roof_rgb,
+        profile.landmark_rgb,
         profile.road_rgb,
         profile.green_rgb,
         profile.tree_rgb,
@@ -107,10 +109,10 @@ def test_koeln_premium_v1_uses_locked_five_color_palette():
         profile.label_plate_rgb,
         profile.label_text_rgb,
     } == {
-        white,
-        red,
-        green,
         black,
+        desert_tan,
+        brick_red,
+        dark_green,
         blue,
     }
 
