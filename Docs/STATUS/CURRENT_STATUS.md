@@ -6215,3 +6215,155 @@ Güncel `c882ab6` checkpoint'i üzerinden Bonn Münsterplatz hediye ürünü
 yeniden üretilecek ve yeni ortak rounded/embedded label standardı fiziksel
 ürün çıktısında doğrulanacaktır.
 
+---
+
+## 12 Ağustos 2026 — Wall Collection Physical Palette / Mola Checkpoint
+
+### Güncel güvenli checkpoint
+
+- Commit: `7f92013` — `Lock shared Wall Collection physical palette`
+- `HEAD == origin/main == 7f92013`
+- Working tree temiz
+- Full regression: `3656 passed in 15.92s`
+
+Önceki ortak rounded/embedded label milestone:
+
+- `c882ab6` — `Embed rounded labels in wall frames`
+
+### Ortak 5 renk fiziksel Wall Collection standardı
+
+Kullanıcının mevcut Bambu Lab PLA Matte filament stoğuna göre ortak fiziksel
+palet kilitlenmiştir.
+
+#### BLACK
+
+- outer frame
+- roads / hardscape
+- label text
+- label icon
+
+#### DESERT TAN
+
+- terrain
+- generic building walls
+- landmark walls
+- label plate
+
+#### BRICK RED
+
+- generic building roofs
+- landmark roof semantic role
+
+#### DARK GREEN
+
+- parks
+- trees
+- vegetation
+- forest vegetation
+
+#### BLUE
+
+- water
+
+Palette fiziksel olarak en fazla 5 renk kullanır.
+
+Preview RGB contract:
+
+- Black: `(20, 20, 20)`
+- Desert Tan: `(205, 190, 160)`
+- Brick Red: `(156, 48, 42)`
+- Dark Green: `(73, 105, 58)`
+- Blue: `(70, 140, 180)`
+
+### Multicolor STL isim standardı
+
+Wall Collection multicolor export artık fiziksel filament isimlerini kullanır:
+
+- `__black.stl`
+- `__desert_tan.stl`
+- `__brick_red.stl`
+- `__dark_green.stl`
+- `__blue.stl`
+
+Eski `white / red / green` isimleri ortak fiziksel palette kullanılmaz.
+
+### Bonn doğrulaması
+
+Bonn Münsterplatz güncel ortak palette yeniden üretilmiştir.
+
+Ürün:
+
+- outer size: `170 × 170 mm`
+- city opening: `150 × 150 mm`
+- scale: `1:3000`
+- label: `BONN / GEBURTSORT`
+- birthday cake icon aktif
+
+Güncel multicolor output triangle sayıları:
+
+- black: `3412`
+- desert_tan: `20102`
+- brick_red: `10211`
+- dark_green: `49804`
+- blue: `156`
+
+Yolların white batch'ten black batch'e taşındığı gerçek Bonn çıktısında
+doğrulanmıştır.
+
+Not: Bonner Münster içindeki landmark/component roof semantik dağılımının
+son görsel kontrolü ayrı bir ürün doğrulama konusu olarak kalabilir; ortak
+palette/geometri sözleşmesi bundan bağımsız olarak kilitlenmiştir.
+
+### Label fiziksel standardı
+
+Ortak label standardı korunmaktadır:
+
+- plate width: `118.0 mm`
+- plate height: `9.0 mm`
+- plate depth: `1.2 mm`
+- corner radius: `2.0 mm`
+- frame recess depth: `1.0 mm`
+- frame: Black
+- label plate: Desert Tan
+- label text/icon: Black
+
+### Test doğrulaması
+
+Palette focused regression:
+
+- `24 passed`
+
+Renderer/material related regression:
+
+- `54 passed`
+
+Semantic material hierarchy:
+
+- `8 passed`
+
+Full ATLAS regression:
+
+- `3656 passed in 15.92s`
+
+### Recovery güvenliği
+
+Safety stash korunmaktadır:
+
+`stash@{0}: On main: SAFETY before rollback to c7771ca 2026-08-11`
+
+Bu stash otomatik olarak apply/drop edilmemelidir.
+
+### Moladan sonraki kesin çalışma sırası
+
+Yatay scope expansion yapılmayacak.
+
+1. Jamaica Wall Collection sahnesi temizden oluşturulacak.
+2. Seychelles Wall Collection sahnesi temizden oluşturulacak.
+3. Kalan 8 sahne/plaka temizden, teker teker yeniden oluşturulacak.
+4. Toplam 10 sahne/plaka tamamlandıktan sonra collector box geliştirilecek.
+5. Ardından köşebentler / corner supports geliştirilecek.
+6. Plakaların arka yüzlerine mıknatıs yuvaları / magnet recesses eklenecek.
+
+Her sahne bağımsız olarak tamamlanıp doğrulanmadan sonraki sahneye
+geçilmeyecek.
+
