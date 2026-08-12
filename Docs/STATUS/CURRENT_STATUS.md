@@ -6380,11 +6380,15 @@ Bu milestone Jamaica ürününün tamamlandığı anlamına gelmez.
 Kilitlenen konu, WorldCover tree-cover verisinin fiziksel Wall Collection
 ürününe genel ve scale-aware biçimde dönüştürülmesidir.
 
-Jamaica çalışması başlangıcındaki Git checkpoint:
+Jamaica çalışması başlangıcındaki checkpoint `98b5cbf` tarihsel referanstır.
 
-- HEAD: `98b5cbf`
-- origin/main: `98b5cbf`
-- Jamaica vegetation değişiklikleri henüz commit/push edilmemiştir.
+Güncel güvenli ve push edilmiş WorldCover vegetation checkpoint:
+
+- Commit: `65ce99d98867d1056b982a16d337800e212d5857`
+- Kısa hash: `65ce99d`
+- Commit mesajı: `Add scale-aware WorldCover tree sampling`
+- `HEAD == origin/main == 65ce99d`
+- Commit sonrası code/test çalışma ağacı temiz olarak doğrulanmıştır.
 
 ### Jamaica doğrulama sahnesi
 
@@ -6455,6 +6459,18 @@ Validation STL:
 
 `OUTPUT/STL/jamaica_mavis_bank_blue_mountains_150mm_5000_PRODUCTION_WORLDCOVER_TREE_FIX.stl`
 
+### Production STL topology doğrulaması
+
+Mevcut `AtlasMeshValidator` edge-topology kurallarıyla gerçek ASCII STL
+üzerinde doğrulama yapılmıştır:
+
+- triangles: `158722`
+- unique edges: `238083`
+- open edges: `0`
+- non-manifold edges: `0`
+
+Bu production STL kapalı ve manifold olarak doğrulanmıştır.
+
 ### Test doğrulaması
 
 İlgili vegetation regression:
@@ -6469,10 +6485,10 @@ Full ATLAS regression:
 
 ### Aktif sonraki adım
 
-Önce bu WorldCover vegetation milestone güvenli biçimde commit/push
-edilecek.
+WorldCover vegetation milestone commit/push edilmiştir ve STL topology
+doğrulaması tamamlanmıştır.
 
-Ardından Jamaica sahnesinin kalan fiziksel ürün doğrulamasına devam
-edilecek. Seychelles veya başka lokasyona Jamaica tamamlanmadan
-geçilmeyecek.
+Aktif iş Jamaica sahnesinin kalan fiziksel ürün doğrulamasıdır.
+
+Jamaica tamamlanmadan Seychelles veya başka lokasyona geçilmeyecektir.
 

@@ -4637,3 +4637,82 @@ forest-canopy temsilidir.
 Yeni çalışma bu checkpoint'ten başlatılmalıdır:
 
 `768fa05c25017d2fa3bf644182f0018d736dc60d`
+
+---
+
+## 12 Ağustos 2026 — Güncel Production Checkpoint / Jamaica WorldCover
+
+Bu bölüm, yukarıdaki 11 Ağustos `768fa05` checkpoint kaydını supersede eder.
+
+### Son güvenli ve push edilmiş commit
+
+- Commit: `65ce99d98867d1056b982a16d337800e212d5857`
+- Kısa hash: `65ce99d`
+- Commit mesajı: `Add scale-aware WorldCover tree sampling`
+- Branch: `main`
+- `HEAD == origin/main == 65ce99d`
+
+### Aktif ürün
+
+Aktif Wall Collection ürünü:
+
+- Jamaica / Mavis Bank / Blue Mountains
+- center: `18.0314032, -76.6583705`
+- city/map size: `150 × 150 mm`
+- audit scale: `1:5000`
+- ground coverage: yaklaşık `750 × 750 m`
+
+Jamaica henüz tamamlanmış ürün değildir.
+Seychelles'e Jamaica fiziksel ürün doğrulaması tamamlanmadan geçilmeyecektir.
+
+### Scale-Aware WorldCover Vegetation — LOCK
+
+WorldCover `tree_cover` verisi fiziksel ürün scale bilgisi çözüldükten sonra
+Foundation/product context içinde deterministic minimum-distance /
+blue-noise-like yöntemle yeniden örneklenir.
+
+Kilitlenen fiziksel kontrat:
+
+- minimum tree-center spacing: `4.0 mm`
+- `1:5000` için source spacing: `20.0 m`
+- deterministic source-cell jitter
+- jitter limit: source resolution değerinin `%40`ı
+- OSM/non-WorldCover trees korunur
+- raw `tree_cover` yoksa mevcut sampled WorldCover trees korunur
+- raw `tree_cover` varsa legacy WorldCover sample set yeniden oluşturulur
+- sampled WorldCover trees varsa duplicate forest-canopy fill/slab üretilmez
+
+Reddedilen continuous canopy/slab ve hole-aware `inner_rings` deneyleri
+production çözümünden çıkarılmıştır.
+
+### Jamaica gerçek production doğrulaması
+
+Monkeypatch kullanılmadan:
+
+- buildings: `249`
+- roads: `6`
+- WorldCover tree meshes: `623`
+- forest canopy meshes: `0`
+- terrain elevation delta: `264.70549808231567 m`
+- triangles: `158722`
+
+Production STL:
+
+`OUTPUT/STL/jamaica_mavis_bank_blue_mountains_150mm_5000_PRODUCTION_WORLDCOVER_TREE_FIX.stl`
+
+Topology audit:
+
+- unique edges: `238083`
+- open edges: `0`
+- non-manifold edges: `0`
+- sonuç: closed + manifold
+
+### Regression
+
+- vegetation related: `106 passed in 0.40s`
+- full ATLAS: `3661 passed in 16.22s`
+- `git diff --check`: temiz
+
+### Sıradaki iş
+
+Jamaica sahnesinin kalan fiziksel ürün doğrulamasına devam edilecek.
