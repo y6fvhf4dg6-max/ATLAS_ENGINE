@@ -7812,3 +7812,99 @@ Devam sırası:
 Seychelles veya diğer sahnelere geçerken bu production dersi
 tekrarlanmayacaktır.
 
+---
+
+## Eschersheim Production Geometry Checkpoint — 13 Ağustos 2026
+
+Bu checkpoint, önceki 8.20 sonrası production checkpoint kayıtlarını
+güncel güvenli repo durumu açısından supersede eder.
+
+### Son güvenli ve push edilmiş commit
+
+- Commit: `311ddbfb15798ac7f6f525c1bd213b7be8626763`
+- Kısa hash: `311ddbf`
+- Commit mesajı: `Clip rail and water infrastructure to product bounds`
+- Branch: `main`
+- `HEAD == origin/main`
+- Full regression: `3674 passed in 16.69s`
+
+### Eschersheim / Niedwiesenstraße production geometry
+
+Aktif sipariş sahnesi:
+
+- lokasyon: Eschersheim / Frankfurt am Main
+- tarihî adres referansı: `Niedwiesenstraße 99`
+- scene basis: current / modern OSM geometry
+- highlighted current OSM way: `29054040`
+- current OSM address: `Niedwiesenstraße 103`
+- old 99 / current 103 eşleşmesi kesin tarihsel kanıt olarak kabul edilmez
+- outer product: `220 × 220 mm`
+- map opening: `200 × 200 mm`
+- frame width: `10 mm`
+- frame depth: `6 mm`
+- scale: `1:3000`
+
+### Rail ve water product-bound clipping
+
+Gerçek Eschersheim doğrulamasında railway ve narrow-waterway geometrilerinin
+ürün dışına taşabildiği tespit edildi.
+
+Genel çözüm:
+
+- surface railway footprint extrusion öncesinde product bounds'a clip edilir
+- narrow-waterway footprint solid oluşturulmadan önce product bounds'a clip edilir
+- clipping mevcut `AtlasRoadPolygonBuilder._clip_polygon_to_bounds`
+  mekanizmasını yeniden kullanır
+- lokasyona veya belirli OSM ID'sine özel geometri hack'i eklenmez
+- clipping sonrası solid yeniden üretildiği için boundary sidewall'ları korunur
+
+Gerçek Nidda doğrulaması:
+
+- source way: `251248199`
+- type: `narrow_waterway_foundation`
+- clipped bounds:
+  - X: `0.000000 .. 127.009576 mm`
+  - Y: `80.899604 .. 200.000000 mm`
+- triangles: `68`
+- open edges: `0`
+- non-manifold edges: `0`
+
+Gerçek railway doğrulaması:
+
+- dört surface railway mesh'i ürün sınırları içinde kalır
+- her railway solid için:
+  - open edges: `0`
+  - non-manifold edges: `0`
+
+Bambu Studio fiziksel ürün yerleşim doğrulamasında önce görülen
+yaklaşık `853 × 773 mm` taşma ve `laid over boundary` problemi ortadan kalktı.
+Final 5-color STL seti 220 × 220 mm ürün footprint'i içinde açılıyor.
+
+### Geometri lock / label pending
+
+Eschersheim şehir ve ürün geometrisi bu checkpoint'te kilitlenmiştir.
+
+Label metni ayrı bir ürün-content kararıdır ve henüz kilitli değildir.
+Sipariş sahibinden teyit beklenmektedir. Label daha sonra değiştirilirse
+şehir geometrisi, road/rail/water sistemi, ölçek veya product footprint
+yeniden tasarlanmayacaktır; yalnız label çıktıları ve ilgili final export'lar
+yeniden üretilecektir.
+
+### Korunması gereken aktif çalışma ağacı
+
+`311ddbf` commit'i dışında bırakılan Jamaica / wedding-rings / label
+çalışmaları bilinçli olarak korunmaktadır:
+
+- `CORE/atlas_label_text_spec.py`
+- `CORE/atlas_product_color_preview_renderer.py`
+- `CORE/atlas_wall_collection_product_builder.py`
+- `Test/test_label_text_spec.py`
+- `Test/test_product_color_preview_renderer.py`
+- `Test/test_wall_collection_product_builder.py`
+- `CORE/atlas_label_wedding_rings_mesher.py`
+- `Data/OSM/`
+- `Test/preview_jamaica_mavis_bank_blue_mountains_wall_collection.py`
+- `Test/test_label_wedding_rings_mesher.py`
+
+Bu dosyalar toplu stage/reset/restore/clean işlemine dahil edilmemelidir.
+
