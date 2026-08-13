@@ -6682,3 +6682,89 @@ yeniden üretilecektir.
 
 Bu dosyalar toplu stage/reset/restore/clean işlemine dahil edilmemelidir.
 
+
+
+---
+
+## 14 Ağustos 2026 — Physical Production Checkpoint
+
+### Jamaica Premium Island Relief V1 — PRODUCTION PACKAGE READY
+
+Jamaica whole-island relief yaklaşımı gerçek multicolor production package
+seviyesine ulaşmıştır.
+
+Geometry:
+
+- product: `170 × 170 mm`
+- opening: `150 × 150 mm`
+- frame: `10 mm`
+- island: `140.000 × 55.189 mm`
+- relief Z: `1.600 .. 9.788 mm`
+- island triangles: `68,444`
+
+Aligned color STLs:
+
+1. black frame
+2. blue sea
+3. green island relief
+4. white label plate
+5. black label text + wedding rings
+
+Label:
+
+`JAMAICA`
+`BLUE MOUNTAINS · MAVIS BANK`
+
+Bambu Studio production validation:
+
+- approximately `2 h 54 min`
+- approximately `88.62 g` total filament
+- `40` filament changes
+
+Bu sonuç, önceki Mavis Bank city-based benchmarkındaki `616` change /
+`396.75 g` / `19 h 53 min` sonucuna karşı yeni fiziksel color/layer
+architecture'ın başarılı production-cost doğrulamasıdır.
+
+Bambu Studio `.3mf` project kaydedildi.
+
+### Niedwiesenstraße 99 — physical completion work
+
+Tamamlanan fiziksel işler:
+
+- ana sahne basıldı
+- ayrı wide river insert basıldı
+- river insert sahneye fiziksel olarak eklendi
+- premium gift-box lid basıldı
+- premium gift-box base baskıya gönderildi
+
+Gift-box lid üst yüzeyinde premium kaliteyi bozan çizgisel / ipliksi yüzey
+gözlendi.
+
+Base için kullanılan son calibration:
+
+- `0.24 mm` layer height
+- `10%` sparse infill
+- `6` top shell layers
+- `No ironing`
+- slice yaklaşık `2 h 52 min`
+- yaklaşık `172.21 g`
+
+Base baskısı tamamlandığında fiziksel top-surface sonucu kontrol edilecek.
+
+### Next exact task
+
+Niedwiesenstraße fiziksel sahnesi için ayrı basılabilir tree / vegetation
+insert package hazırlanacak.
+
+Bu çalışma:
+
+- mevcut ATLAS canonical tree geometry'sini mümkün olduğunca yeniden kullanmalı
+- sahneye sonradan yerleştirilebilir olmalı
+- yeşil filamentle ayrı basılabilmeli
+- küçük boy varyasyonları / doğal kümelenme desteklemeli
+- mevcut Jamaica çalışmalarına zarar vermemeli
+
+### Working-tree protection
+
+Jamaica / wedding-rings aktif uncommitted çalışmalarına toplu
+reset/restore/clean uygulanmayacaktır.

@@ -7908,3 +7908,189 @@ yeniden üretilecektir.
 
 Bu dosyalar toplu stage/reset/restore/clean işlemine dahil edilmemelidir.
 
+
+
+---
+
+## Physical Production Devir Checkpoint — 14 Ağustos 2026
+
+Bu kayıt, yukarıdaki Jamaica Island Relief'in `parked` olarak tanımlandığı
+eski durumu ve Eschersheim label'ın `pending` olduğu checkpoint'i güncel
+fiziksel production durumu açısından supersede eder. Eski kayıtlar tarihsel
+bağlam olarak korunur.
+
+### 1. Jamaica Premium Island Relief V1
+
+Whole-island Jamaica relief yaklaşımı başarıyla gerçek production package
+seviyesine çıkarıldı.
+
+Final/current physical geometry:
+
+- outer: `170 × 170 mm`
+- opening: `150 × 150 mm`
+- frame width: `10 mm`
+- island width: `140.000 mm`
+- island height: `55.189 mm`
+- island relief Z: `1.600 .. 9.788 mm`
+- top terrain triangles: `33,360`
+- total island triangles: `68,444`
+
+Terrain generation reference:
+
+- terrain sample points: `17,196`
+- Delaunay top triangles: `33,429`
+- rejected outside triangles: `937`
+- terrain components: `9`
+- removed disconnected artifacts: `69`
+
+Aligned multicolor files:
+
+- `OUTPUT/JAMAICA/jamaica_premium_island_v1_multicolor/JAMAICA_FRAME_BLACK.stl`
+- `OUTPUT/JAMAICA/jamaica_premium_island_v1_multicolor/JAMAICA_SEA_BLUE.stl`
+- `OUTPUT/JAMAICA/jamaica_premium_island_v1_multicolor/JAMAICA_ISLAND_GREEN.stl`
+- `OUTPUT/JAMAICA/jamaica_premium_island_v1_multicolor/JAMAICA_LABEL_PLATE_WHITE.stl`
+- `OUTPUT/JAMAICA/jamaica_premium_island_v1_multicolor/JAMAICA_LABEL_TEXT_RINGS_BLACK.stl`
+
+Combined product:
+
+- `OUTPUT/JAMAICA/jamaica_premium_island_v1_WALL_COLLECTION_170mm.stl`
+
+Label content:
+
+- primary: `JAMAICA`
+- secondary: `BLUE MOUNTAINS · MAVIS BANK`
+- symbol: interlocking wedding rings
+
+Wedding-rings support was added through the generic label architecture rather
+than a Jamaica-only geometry hack.
+
+Relevant active code includes:
+
+- `CORE/atlas_label_text_spec.py`
+- `CORE/atlas_label_wedding_rings_mesher.py`
+- `CORE/atlas_wall_collection_product_builder.py`
+- corresponding tests
+
+Bambu Studio production slice:
+
+- total time: approximately `2 h 54 min`
+- total filament: approximately `88.62 g`
+- filament changes: `40`
+
+Bu yeni island architecture önceki city-based Jamaica benchmarkındaki:
+
+- `616` filament changes
+- `210.53 g` product
+- `142.04 g` purge
+- `44.18 g` prime tower
+- `396.75 g` total
+- `19 h 53 min`
+
+sonucuna karşı production-cost breakthrough olarak kabul edilir.
+
+Eski `616`-change Jamaica ürünü silinmeyecek; multicolor optimization
+benchmark/reference olarak korunacaktır.
+
+Jamaica final/current Bambu Studio project'i `.3mf` olarak kaydedilmiştir.
+
+### 2. Niedwiesenstraße 99 physical scene
+
+Ana fiziksel scene baskısı tamamlandı.
+
+Final scene üzerinde ayrıca:
+
+- wide river insert ayrı üretildi
+- `NIEDWIESENSTRASSE_99_RIVER_INSERT_WIDE.stl`
+- buffer: yaklaşık `0.80 mm` each side
+- thickness: yaklaşık `1.040 mm`
+- X span: yaklaşık `128.608 mm`
+- Y span: yaklaşık `120.699 mm`
+- triangles: `224`
+- river insert basıldı ve sahneye fiziksel olarak eklendi
+
+Bu insert mevcut basılmış ürünü yeniden basmadan water layer'ı fiziksel olarak
+tamamlama yönteminin ilk pratik örneğidir.
+
+### 3. Premium gift box physical validation
+
+Niedwiesenstraße gift-box lid basıldı.
+
+Label:
+
+- `NIEDWIESENSTRASSE 99`
+- `ESCHERSHEIM · FRANKFURT AM MAIN`
+
+Lid üzerindeki geniş beyaz flat top surface fiziksel olarak incelendi.
+Yazı geometrisi başarılı olmasına rağmen geniş top-surface üzerinde belirgin
+çizgisel / ipliksi yüzey dokusu görüldü. Bu yüzey premium standardı olarak
+kabul edilmedi.
+
+Gift-box base:
+
+- file:
+  `OUTPUT/STL/eschersheim_niedwiesenstrasse_99_premium_gift_box_v1/eschersheim_niedwiesenstrasse_99_220mm_PREMIUM_GIFT_BOX_V1_BASE.stl`
+- physical size yaklaşık `226.8 × 226.8 mm`
+- baskıya gönderildi
+
+Calibration denemelerinin temel sonucu:
+
+- `15% -> 10%` infill değişimi süreyi anlamlı azaltmadı
+- ironing geniş yüzeyde yaklaşık üç saat ek maliyet oluşturdu
+- ironing production için kapatıldı
+
+Baskıya gönderilen son yön:
+
+- layer height: `0.24 mm`
+- sparse infill: `10%`
+- top shell layers: `6`
+- ironing: `No ironing`
+- last slice: approximately `2 h 52 min`
+- material: approximately `172.21 g`
+
+Base fiziksel yüzey kalitesi baskı tamamlandıktan sonra değerlendirilecek.
+
+### 4. Niedwiesenstraße next exact physical task
+
+Sahnedeki ana görsel eksik artık vegetation / trees'dir.
+
+Moladan sonraki kesin iş:
+
+`separately printable Niedwiesenstraße tree / vegetation insert package`
+
+Amaç:
+
+- mevcut fiziksel sahneyi yeniden basmamak
+- mevcut ATLAS canonical tree geometrisini mümkün olduğunca kullanmak
+- yeşil filamentle ayrı tree insertler üretmek
+- yapıştırılabilir / fiziksel yerleşime uygun taban sağlamak
+- aynı boyda mekanik tekrar yerine birkaç küçük boy varyasyonu kullanmak
+- doğal kümelenme / tree-row mantığını korumak
+
+Motorun başlangıçta neden tree üretmediğinin araştırılması bu fiziksel
+tamamlama işinin ön koşulu değildir.
+
+### 5. Korunacak aktif working tree
+
+Jamaica / wedding-rings ve ilgili preview/test çalışmaları commit edilmeden
+önce korunacaktır.
+
+Özellikle mevcut aktif/untracked çalışmalar toplu `reset`, `restore`,
+`clean` veya `git add .` işlemine dahil edilmemelidir.
+
+Bilinen aktif alanlar:
+
+- `CORE/atlas_label_text_spec.py`
+- `CORE/atlas_product_color_preview_renderer.py`
+- `CORE/atlas_wall_collection_product_builder.py`
+- `CORE/atlas_label_wedding_rings_mesher.py`
+- `Test/test_label_text_spec.py`
+- `Test/test_product_color_preview_renderer.py`
+- `Test/test_wall_collection_product_builder.py`
+- `Test/test_label_wedding_rings_mesher.py`
+- `Test/preview_jamaica_mavis_bank_blue_mountains_wall_collection.py`
+- `Test/preview_jamaica_premium_island_relief_v1.py`
+- `Test/preview_jamaica_premium_island_v1.py`
+- `Data/OSM/`
+
+Moladan sonra önce `git status --short --branch` ile gerçek working tree
+yeniden doğrulanmalıdır.

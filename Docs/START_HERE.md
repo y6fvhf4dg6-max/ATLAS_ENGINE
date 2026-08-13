@@ -4905,3 +4905,89 @@ yeniden üretilecektir.
 
 Bu dosyalar toplu stage/reset/restore/clean işlemine dahil edilmemelidir.
 
+
+
+---
+
+## Physical Production Checkpoint — 14 Ağustos 2026
+
+### Jamaica Premium Island Relief V1
+
+Önce park edilmiş olan `Jamaica Island Relief` yönü artık aktif prototip
+değildir; gerçek Bambu Studio production package seviyesine ulaşmıştır.
+
+Kilit fiziksel ürün geometrisi:
+
+- outer product: `170 × 170 mm`
+- map opening: `150 × 150 mm`
+- frame width: `10 mm`
+- island footprint: yaklaşık `140.000 × 55.189 mm`
+- island relief Z: `1.600 .. 9.788 mm`
+- island mesh: `68,444` triangles
+- closed physical relief geometry
+
+Hizalı multicolor production STL seti:
+
+- `JAMAICA_FRAME_BLACK.stl`
+- `JAMAICA_SEA_BLUE.stl`
+- `JAMAICA_ISLAND_GREEN.stl`
+- `JAMAICA_LABEL_PLATE_WHITE.stl`
+- `JAMAICA_LABEL_TEXT_RINGS_BLACK.stl`
+
+Label:
+
+- primary: `JAMAICA`
+- secondary: `BLUE MOUNTAINS · MAVIS BANK`
+- icon: interlocking wedding rings
+
+Yeni Jamaica island architecture gerçek Bambu Studio slice'ında önceki
+Mavis Bank şehir benchmarkına göre production cost'u dramatik biçimde
+düşürmüştür:
+
+- estimated total time: yaklaşık `2 h 54 min`
+- total filament: yaklaşık `88.62 g`
+- filament changes: `40`
+
+Önceki şehir-temelli Jamaica benchmarkı:
+
+- `616` filament changes
+- `396.75 g` total filament
+- `19 h 53 min`
+
+silinmeyecektir; multicolor optimization regression/reference benchmarkı
+olarak korunacaktır.
+
+Jamaica Bambu Studio production project'i `.3mf` olarak kaydedilmiştir.
+
+### Niedwiesenstraße 99 physical scene
+
+Niedwiesenstraße 99 fiziksel sahnesi basılmıştır.
+
+Son fiziksel tamamlamalar:
+
+- ayrı Nidda/river insert üretildi
+- `NIEDWIESENSTRASSE_99_RIVER_INSERT_WIDE.stl` basıldı
+- river insert fiziksel sahneye yerleştirildi/yapıştırıldı
+- gift-box lid basıldı
+- gift-box base baskıya gönderildi
+
+Gift-box lid geniş beyaz top-surface baskısı premium yüzey standardını
+karşılamamıştır; yüzey çizgileri fiziksel olarak gözlenmiştir.
+
+Gift-box base için fiziksel calibration yönü:
+
+- layer height: `0.24 mm`
+- sparse infill: `10%`
+- top shell layers: `6`
+- ironing: `No ironing`
+- son slice: yaklaşık `2 h 52 min`
+- yaklaşık `172.21 g`
+
+Base baskısının fiziksel yüzey sonucu henüz değerlendirilmemiştir.
+
+Niedwiesenstraße sahnesindeki sıradaki kesin fiziksel iş:
+
+`detachable / separately printable tree and vegetation inserts`
+
+Motorun neden ağaç üretmediğini araştırmak şu anki fiziksel tamamlamanın
+ön koşulu değildir; önce mevcut sahneye uygun ayrı ağaç insertleri üretilecektir.
