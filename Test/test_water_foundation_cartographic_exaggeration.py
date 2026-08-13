@@ -33,6 +33,7 @@ def test_narrow_waterway_foundation_can_use_cartographic_exaggeration(
         width_mm,
         waterway_type,
         source_id,
+        clip_bounds=None,
     ):
         captured["width_mm"] = width_mm
         captured["waterway_type"] = waterway_type

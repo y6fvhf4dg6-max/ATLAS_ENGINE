@@ -1777,6 +1777,7 @@ class AtlasFoundationFirstEngine:
         cartographic_product_size_mm=None,
         cartographic_nozzle_diameter_mm=None,
         cartographic_lod_level=None,
+        clip_bounds=None,
     ):
         meshes = []
 
@@ -1841,6 +1842,16 @@ class AtlasFoundationFirstEngine:
                     profile=profile,
                     terrain_mesh=terrain_mesh,
                     height_mm=0.40,
+                    clip_bounds=(
+                        None
+                        if clip_bounds is None
+                        else {
+                            "min_x": float(clip_bounds[0]),
+                            "max_x": float(clip_bounds[1]),
+                            "min_y": float(clip_bounds[2]),
+                            "max_y": float(clip_bounds[3]),
+                        }
+                    ),
                 )
             )
 
@@ -2422,6 +2433,20 @@ class AtlasFoundationFirstEngine:
                     ),
                     cartographic_lod_level=(
                         resolved_cartographic_lod_level
+                    ),
+                    clip_bounds=(
+                        0.0,
+                        (
+                            float(size_x_mm)
+                            if size_x_mm is not None
+                            else float(target_size_mm)
+                        ),
+                        0.0,
+                        (
+                            float(size_y_mm)
+                            if size_y_mm is not None
+                            else float(target_size_mm)
+                        ),
                     ),
                 )
             )

@@ -29,6 +29,9 @@ from CORE.atlas_terrain_contour_band_builder import (
 from CORE.atlas_linear_infrastructure_solid_builder import (
     AtlasLinearInfrastructureSolidBuilder,
 )
+from CORE.atlas_road_polygon_builder import (
+    AtlasRoadPolygonBuilder,
+)
 from CORE.atlas_water_shoreline_composition_resolver import (
     AtlasWaterShorelineCompositionResolver,
 )
@@ -141,7 +144,19 @@ class AtlasWaterFoundationBuilder:
         cartographic_nozzle_diameter_mm,
         cartographic_lod_level,
         debug=True,
+        clip_bounds=None,
     ):
+        if clip_bounds is None:
+            product_size_mm = float(
+                cartographic_product_size_mm
+            )
+            clip_bounds = (
+                0.0,
+                product_size_mm,
+                0.0,
+                product_size_mm,
+            )
+
         meshes = []
         skipped = 0
 
@@ -231,6 +246,7 @@ class AtlasWaterFoundationBuilder:
                     width_mm=physical_width_mm,
                     waterway_type=waterway_type,
                     source_id=water.get("id"),
+                    clip_bounds=clip_bounds,
                 )
             )
 
@@ -274,6 +290,7 @@ class AtlasWaterFoundationBuilder:
         width_mm,
         waterway_type,
         source_id,
+        clip_bounds=None,
     ):
         width_mm = float(width_mm)
 
@@ -304,6 +321,30 @@ class AtlasWaterFoundationBuilder:
 
         if len(footprint) < 3:
             return None
+
+        if clip_bounds is not None:
+            min_x, max_x, min_y, max_y = clip_bounds
+
+            clipped_polygon = (
+                AtlasRoadPolygonBuilder
+                ._clip_polygon_to_bounds(
+                    {"points": footprint},
+                    {
+                        "min_x": float(min_x),
+                        "max_x": float(max_x),
+                        "min_y": float(min_y),
+                        "max_y": float(max_y),
+                    },
+                )
+            )
+
+            if clipped_polygon is None:
+                return None
+
+            footprint = clipped_polygon["points"]
+
+            if len(footprint) < 3:
+                return None
 
         mesh = (
             AtlasLinearInfrastructureSolidBuilder

@@ -5,6 +5,9 @@ from CORE.atlas_polygon_triangulator import AtlasPolygonTriangulator
 from CORE.atlas_linear_infrastructure_geometry_builder import (
     AtlasLinearInfrastructureGeometryBuilder,
 )
+from CORE.atlas_road_polygon_builder import (
+    AtlasRoadPolygonBuilder,
+)
 
 
 class AtlasLinearInfrastructureSolidBuilder:
@@ -17,6 +20,7 @@ class AtlasLinearInfrastructureSolidBuilder:
         profile,
         terrain_mesh,
         height_mm,
+        clip_bounds=None,
     ):
         footprint = (
             AtlasLinearInfrastructureGeometryBuilder
@@ -29,6 +33,22 @@ class AtlasLinearInfrastructureSolidBuilder:
 
         if len(footprint) < 3:
             return None
+
+        if clip_bounds is not None:
+            clipped_polygon = (
+                AtlasRoadPolygonBuilder
+                ._clip_polygon_to_bounds(
+                    {
+                        "points": footprint,
+                    },
+                    clip_bounds,
+                )
+            )
+
+            if clipped_polygon is None:
+                return None
+
+            footprint = clipped_polygon["points"]
 
         return cls.build_polygon_solid(
             points=footprint,
