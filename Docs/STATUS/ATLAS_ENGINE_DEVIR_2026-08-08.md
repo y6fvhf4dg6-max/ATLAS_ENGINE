@@ -8264,3 +8264,28 @@ Tests:
 
 Jamaica / wedding-rings active work remains intentionally separate and must not
 be included in the Physical Tree V1 commit.
+
+
+---
+
+## Bonn Birthplace Physical Production Handoff — 14 August 2026
+
+Status: `PRINTING`.
+
+- product/opening/scale: `170 × 170 mm` / `150 × 150 mm` / `1:3000`
+- label/icon: `BONN / GEBURTSORT` / baby stroller
+- water intentionally absent
+- package: `OUTPUT/STL/BONN_BIRTHPLACE_PRODUCTION_V1/`
+- files: `__black`, `__white`, `__desert_tan`, `__brick_red`, `__dark_green`; all `0` open / `0` non-manifold
+
+Added behavior: closed-building fallback, same-material wall/roof preservation, separate `landmark_roofs`, projected landmark overlap filtering, park topology cleanup, physical RGB filename resolution, Bonn profile and baby-stroller symbol.
+
+Automatic roof metadata did not cover every desired visible Münster roof. Desired church/tower roofs were painted Brick Red in Bambu Studio after incorrect red parts were reassigned to Desert Tan. This is stored in `bonn_muensterplatz_170mm_BIRTHPLACE_PRODUCTION_V1.3mf` and is product-local; automatic roof classification is not fully solved. Do not reuse older Bonn COLORGROUP/FINAL projects.
+
+Physical gate: model `121.46 g`; purge `45.64 g`; tower `15.15 g`; total `182.25 g`; `193` changes; `9 h 31 min`. Mapping: A1 Black, A2 White, A3 Desert Tan, A4 Dark Green, External Brick Red. External red requires manual switching.
+
+Permanent rule: preview/colorgroup appearance is not proof of physical color volume. Require closed/manifold solids or slicer-verified volumetric assignment, object/material inspection, plausible gram distribution and purge/prime/change/time review.
+
+Validation: `104 passed`; full `3704 passed in 16.29s`.
+
+Working-tree protection: Jamaica/Seychelles previews and `Data/OSM/` remain outside this Bonn milestone. No broad stage/reset/restore/clean.

@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from shapely.geometry import Polygon
+from shapely.ops import unary_union
 
 from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
 from CORE.atlas_label_text_spec import AtlasLabelTextSpec
@@ -62,6 +63,44 @@ class AtlasProductColorPreviewRenderer:
             ]
 
         return translated
+
+    @staticmethod
+    def _triangle_mesh_is_closed(
+        triangles,
+        *,
+        precision: int = 6,
+    ) -> bool:
+        edge_counts = {}
+
+        def point_key(point):
+            return tuple(
+                round(float(value), precision)
+                for value in point
+            )
+
+        for triangle in triangles:
+            if len(triangle) != 3:
+                return False
+
+            points = tuple(
+                point_key(point)
+                for point in triangle
+            )
+
+            for first, second in (
+                (points[0], points[1]),
+                (points[1], points[2]),
+                (points[2], points[0]),
+            ):
+                edge = tuple(sorted((first, second)))
+                edge_counts[edge] = (
+                    edge_counts.get(edge, 0) + 1
+                )
+
+        return bool(edge_counts) and all(
+            count == 2
+            for count in edge_counts.values()
+        )
 
     @staticmethod
     def _replace_z(
@@ -811,6 +850,131 @@ class AtlasProductColorPreviewRenderer:
         return retained
 
     @classmethod
+    def _safe_projected_mesh_polygon(
+        cls,
+        mesh: dict,
+    ):
+        polygon = cls._safe_footprint_polygon(mesh)
+
+        if polygon is not None:
+            return polygon
+
+        projected_triangles = []
+
+        for triangle in mesh.get("triangles", []):
+            if len(triangle) != 3:
+                continue
+
+            triangle_polygon = Polygon(
+                [
+                    (
+                        float(point[0]),
+                        float(point[1]),
+                    )
+                    for point in triangle
+                ]
+            )
+
+            if (
+                triangle_polygon.is_valid
+                and triangle_polygon.area > 1e-9
+            ):
+                projected_triangles.append(
+                    triangle_polygon
+                )
+
+        if not projected_triangles:
+            return None
+
+        polygon = unary_union(projected_triangles)
+
+        if polygon.is_empty:
+            return None
+
+        if not polygon.is_valid:
+            polygon = polygon.buffer(0)
+
+        return polygon if not polygon.is_empty else None
+
+    @classmethod
+    def _filter_buildings_covered_by_landmarks(
+        cls,
+        building_meshes: list,
+        landmark_meshes: list,
+        *,
+        coverage_tolerance: float = 1e-6,
+        minimum_coverage_ratio: float = 0.999,
+        minimum_residual_coverage_ratio: float = 0.95,
+        maximum_uncovered_area_mm2: float = 0.10,
+    ) -> list:
+        landmark_polygons = [
+            polygon
+            for polygon in (
+                cls._safe_projected_mesh_polygon(mesh)
+                for mesh in landmark_meshes
+            )
+            if polygon is not None
+        ]
+
+        retained = []
+
+        for mesh in building_meshes:
+            building_polygon = (
+                cls._safe_footprint_polygon(mesh)
+            )
+
+            if building_polygon is None:
+                retained.append(mesh)
+                continue
+
+            building_area = float(
+                building_polygon.area
+            )
+            covered = False
+
+            for landmark_polygon in landmark_polygons:
+                if landmark_polygon.buffer(
+                    coverage_tolerance
+                ).covers(building_polygon):
+                    covered = True
+                    break
+
+                if building_area <= coverage_tolerance:
+                    continue
+
+                covered_area = float(
+                    landmark_polygon.intersection(
+                        building_polygon
+                    ).area
+                )
+
+                coverage_ratio = (
+                    covered_area / building_area
+                )
+                uncovered_area = max(
+                    0.0,
+                    building_area - covered_area,
+                )
+
+                if (
+                    coverage_ratio
+                    >= minimum_coverage_ratio
+                    or (
+                        coverage_ratio
+                        >= minimum_residual_coverage_ratio
+                        and uncovered_area
+                        <= maximum_uncovered_area_mm2
+                    )
+                ):
+                    covered = True
+                    break
+
+            if not covered:
+                retained.append(mesh)
+
+        return retained
+
+    @classmethod
     def _separate_touching_building_solids(
         cls,
         meshes: list,
@@ -940,6 +1104,17 @@ class AtlasProductColorPreviewRenderer:
                 if parent_polygon.buffer(
                     coverage_tolerance
                 ).covers(candidate_polygon):
+                    covered = True
+                    break
+
+                candidate_area = float(candidate_polygon.area)
+                if candidate_area <= coverage_tolerance:
+                    continue
+                covered_area = float(
+                    parent_polygon.intersection(candidate_polygon).area
+                )
+                coverage_ratio = covered_area / candidate_area
+                if coverage_ratio >= 0.999:
                     covered = True
                     break
 
@@ -1175,10 +1350,7 @@ class AtlasProductColorPreviewRenderer:
                 if intersection.is_empty:
                     continue
 
-                if intersection.geom_type not in {
-                    "Point",
-                    "MultiPoint",
-                }:
+                if float(intersection.area) > 1e-12:
                     continue
 
                 first_centroid = first_polygon.centroid
@@ -1298,6 +1470,15 @@ class AtlasProductColorPreviewRenderer:
                 "rgb": material_profile.landmark_rgb,
                 "meshes": [],
             },
+            "landmark_roofs": {
+                "rgb": (
+                    material_profile.landmark_roof_rgb
+                    if material_profile.landmark_roof_rgb
+                    is not None
+                    else material_profile.building_roof_rgb
+                ),
+                "meshes": [],
+            },
             "building_walls": {
                 "rgb": material_profile.building_wall_rgb,
                 "meshes": [],
@@ -1337,6 +1518,7 @@ class AtlasProductColorPreviewRenderer:
             "terrain": "terrain",
             "buildings": "generic_building",
             "landmarks": "landmark_wall",
+            "landmark_roofs": "landmark_roof",
             "building_walls": "generic_building",
             "building_roofs": "generic_building_roof",
             "roads": "roads_hardscape",
@@ -1383,6 +1565,15 @@ class AtlasProductColorPreviewRenderer:
                 list(mesh_groups.get("buildings", []))
             )
         )
+        landmark_meshes = list(
+            mesh_groups.get("landmarks", [])
+        )
+        building_meshes = (
+            cls._filter_buildings_covered_by_landmarks(
+                building_meshes,
+                landmark_meshes,
+            )
+        )
         building_meshes = (
             cls._separate_touching_building_solids(
                 building_meshes
@@ -1416,11 +1607,37 @@ class AtlasProductColorPreviewRenderer:
                     and "building_wall_triangles" in mesh
                     and "building_roof_triangles" in mesh
                 ):
-                    color_solids = (
-                        cls._build_flat_roof_color_solids(
-                            mesh=mesh,
+                    original_triangles = list(
+                        mesh.get("triangles", [])
+                    )
+                    building_material_is_shared = (
+                        tuple(material_profile.building_wall_rgb)
+                        == tuple(
+                            material_profile.building_roof_rgb
                         )
                     )
+
+                    if (
+                        building_material_is_shared
+                        and cls._triangle_mesh_is_closed(
+                            original_triangles
+                        )
+                    ):
+                        color_solids = (
+                            {
+                                "type": (
+                                    "building_same_material_solid"
+                                ),
+                                "triangles": original_triangles,
+                            },
+                            None,
+                        )
+                    else:
+                        color_solids = (
+                            cls._build_flat_roof_color_solids(
+                                mesh=mesh,
+                            )
+                        )
 
                     if color_solids is None:
                         color_solids = (
@@ -1437,45 +1654,66 @@ class AtlasProductColorPreviewRenderer:
                         )
 
                     if color_solids is None:
-                        wall_mesh = {
-                            "type": mesh.get(
-                                "type",
-                                "building",
-                            ),
-                            "triangles": (
-                                mesh[
-                                    "building_wall_triangles"
-                                ]
-                            ),
-                        }
-                        roof_mesh = {
-                            "type": mesh.get(
-                                "type",
-                                "building",
-                            ),
-                            "triangles": (
-                                mesh[
-                                    "building_roof_triangles"
-                                ]
-                            ),
-                        }
+                        original_triangles = list(
+                            mesh.get("triangles", [])
+                        )
+
+                        if cls._triangle_mesh_is_closed(
+                            original_triangles
+                        ):
+                            wall_mesh = {
+                                "type": (
+                                    "building_color_fallback_solid"
+                                ),
+                                "triangles": original_triangles,
+                            }
+                            roof_mesh = None
+                        else:
+                            wall_mesh = {
+                                "type": mesh.get(
+                                    "type",
+                                    "building",
+                                ),
+                                "triangles": list(
+                                    mesh[
+                                        "building_wall_triangles"
+                                    ]
+                                ),
+                            }
+                            roof_mesh = {
+                                "type": mesh.get(
+                                    "type",
+                                    "building",
+                                ),
+                                "triangles": list(
+                                    mesh[
+                                        "building_roof_triangles"
+                                    ]
+                                ),
+                            }
                     else:
                         wall_mesh, roof_mesh = color_solids
 
                     source_id = mesh.get("source_id")
 
                     wall_mesh["source_id"] = source_id
-                    roof_mesh["source_id"] = source_id
+
+                    if roof_mesh is not None:
+                        roof_mesh["source_id"] = source_id
 
                     translated_wall_mesh = cls._translate_mesh(
                         wall_mesh,
                         city_offset_x_mm,
                         city_offset_y_mm,
                     )
-                    translated_roof_mesh = cls._translate_mesh(
-                        roof_mesh,
-                        city_offset_x_mm,
-                        city_offset_y_mm,
+                    translated_roof_mesh = (
+                        cls._translate_mesh(
+                            roof_mesh,
+                            city_offset_x_mm,
+                            city_offset_y_mm,
+                        )
+                        if roof_mesh is not None
+                        else None
                     )
 
                     if (
@@ -1509,11 +1747,12 @@ class AtlasProductColorPreviewRenderer:
                     ]["meshes"].append(
                         translated_wall_mesh
                     )
-                    material_batches[
-                        "building_roofs"
-                    ]["meshes"].append(
-                        translated_roof_mesh
-                    )
+                    if translated_roof_mesh is not None:
+                        material_batches[
+                            "building_roofs"
+                        ]["meshes"].append(
+                            translated_roof_mesh
+                        )
                     continue
 
                 source_id = mesh.get("source_id")
@@ -1573,6 +1812,21 @@ class AtlasProductColorPreviewRenderer:
                     )
                 )
 
+                if group_name == "landmarks":
+                    for landmark_roof_mesh in mesh.get(
+                        "roof_meshes",
+                        [],
+                    ):
+                        material_batches[
+                            "landmark_roofs"
+                        ]["meshes"].append(
+                            cls._translate_mesh(
+                                landmark_roof_mesh,
+                                city_offset_x_mm,
+                                city_offset_y_mm,
+                            )
+                        )
+
         if label_plate_spec is not None or label_text_spec is not None:
             product = AtlasWallCollectionProductBuilder.build(
                 city_result=city_result,
@@ -1592,6 +1846,9 @@ class AtlasProductColorPreviewRenderer:
             )
             material_batches["label_text"]["meshes"].extend(
                 product["label_wedding_rings_meshes"]
+            )
+            material_batches["label_text"]["meshes"].extend(
+                product["label_baby_stroller_meshes"]
             )
 
         return {

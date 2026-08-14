@@ -524,3 +524,46 @@ def test_wall_collection_adds_wedding_rings_at_right_side_of_label():
     assert max(z for _, _, z in vertices) == pytest.approx(6.8)
 
     assert rings_mesh in product["meshes"]
+
+def test_wall_collection_adds_baby_stroller_at_right_side_of_label():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=9.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="BONN",
+            secondary_text="MEINE GEBURTSSTADT",
+            primary_height_mm=4.2,
+            secondary_height_mm=2.8,
+            depth_mm=0.6,
+            max_width_mm=96.0,
+            baby_stroller=True,
+        ),
+    )
+
+    assert len(product["label_baby_stroller_meshes"]) == 1
+
+    stroller_mesh = product["label_baby_stroller_meshes"][0]
+    vertices = _all_vertices(stroller_mesh)
+
+    assert stroller_mesh["type"] == "label_baby_stroller"
+
+    assert min(x for x, _, _ in vertices) >= 46.0
+    assert max(x for x, _, _ in vertices) <= 56.1
+
+    assert min(z for _, _, z in vertices) == pytest.approx(6.2)
+    assert max(z for _, _, z in vertices) == pytest.approx(6.8)
+
+    assert stroller_mesh in product["meshes"]

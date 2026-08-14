@@ -286,3 +286,29 @@ def test_semantic_material_hierarchy_assigns_landmark_higher_readability_priorit
         >
         roles["generic_building_roof"]["readability_priority"]
     )
+
+
+
+def test_bonn_profile_separates_landmark_roofs_from_generic_roofs():
+    hierarchy = AtlasSemanticMaterialHierarchy.resolve(
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.bonn_birthplace_v1()
+        ),
+        maximum_physical_color_count=5,
+    )
+
+    roles = hierarchy["roles"]
+
+    assert roles["generic_building_roof"]["rgb"] == (
+        205,
+        190,
+        160,
+    )
+    assert roles["landmark_roof"]["rgb"] == (
+        156,
+        48,
+        42,
+    )
+    assert roles["terrain"]["rgb"] == (245, 245, 240)
+    assert roles["label_plate"]["rgb"] == (245, 245, 240)
+    assert hierarchy["physical_color_count"] == 5

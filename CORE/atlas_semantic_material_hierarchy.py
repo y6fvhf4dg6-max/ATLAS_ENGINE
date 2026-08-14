@@ -71,7 +71,7 @@ class AtlasSemanticMaterialHierarchy:
             ("generic_building", "building_rgb"),
             ("generic_building_roof", "building_roof_rgb"),
             ("landmark_wall", "landmark_rgb"),
-            ("landmark_roof", "building_roof_rgb"),
+            ("landmark_roof", "landmark_roof_rgb"),
             ("vegetation", "green_rgb"),
             ("water", "water_rgb"),
             ("roads_hardscape", "road_rgb"),
@@ -133,12 +133,20 @@ class AtlasSemanticMaterialHierarchy:
         for semantic_role, field_name in (
             cls.ROLE_RGB_FIELDS.items()
         ):
-            rgb = tuple(
-                getattr(
-                    material_profile,
-                    field_name,
-                )
+            rgb_value = getattr(
+                material_profile,
+                field_name,
             )
+
+            if (
+                semantic_role == "landmark_roof"
+                and rgb_value is None
+            ):
+                rgb_value = (
+                    material_profile.building_roof_rgb
+                )
+
+            rgb = tuple(rgb_value)
 
             if rgb not in physical_material_by_rgb:
                 physical_material_by_rgb[

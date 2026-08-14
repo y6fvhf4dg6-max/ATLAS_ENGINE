@@ -202,3 +202,26 @@ def test_dalyan_kaunos_premium_v1_uses_locked_five_color_palette():
         mediterranean_blue,
     }
 
+
+
+
+def test_bonn_birthplace_v1_uses_locked_physical_palette():
+    profile = AtlasProductPreviewMaterialProfile.bonn_birthplace_v1()
+
+    assert profile.name == "BONN_BIRTHPLACE_V1"
+    assert profile.frame_rgb == (20, 20, 20)
+    assert profile.road_rgb == (20, 20, 20)
+    assert profile.label_text_rgb == (20, 20, 20)
+
+    assert profile.terrain_rgb == (245, 245, 240)
+    assert profile.label_plate_rgb == (245, 245, 240)
+    assert profile.water_rgb == (245, 245, 240)
+
+    assert profile.building_rgb == (205, 190, 160)
+    assert profile.building_wall_rgb == (205, 190, 160)
+    assert profile.building_roof_rgb == (205, 190, 160)
+    assert profile.landmark_rgb == (205, 190, 160)
+
+    assert profile.landmark_roof_rgb == (156, 48, 42)
+    assert profile.green_rgb == (73, 105, 58)
+    assert profile.tree_rgb == (73, 105, 58)

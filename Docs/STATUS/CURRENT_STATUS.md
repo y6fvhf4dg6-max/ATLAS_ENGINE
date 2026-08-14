@@ -6849,3 +6849,53 @@ Important:
 
 Niedwiesenstraße-specific geometry hack was not added. The fix is generic and
 applies through the shared ATLAS tree foundation / WorldCover composition path.
+
+
+---
+
+## 14 August 2026 — Bonn Birthplace Production V1 / PRINTING
+
+### Product and palette
+
+- location: Bonn Münsterplatz
+- product/opening/scale: `170 × 170 mm` / `150 × 150 mm` / `1:3000`
+- label: `BONN / GEBURTSORT`; symbol: baby stroller
+- Black: frame, roads, label text, stroller
+- White: terrain, label plate
+- Desert Tan: buildings, generic roofs, landmark walls
+- Brick Red: historic church/tower roof surfaces
+- Dark Green: parks, trees
+- water/Blue: not used
+
+`BONN_BIRTHPLACE_V1` separates generic and landmark roof materials.
+
+### Geometry/export corrections
+
+- unsupported semantic splits preserve the closed original building;
+- same-material generic walls/roofs remain one closed solid;
+- landmark roofs use a separate `landmark_roofs` batch;
+- projected landmark/building overlaps and park near-coverage/touching topology are filtered;
+- known physical RGB values resolve to filament filenames instead of internal names such as `material_1`.
+
+Package: `OUTPUT/STL/BONN_BIRTHPLACE_PRODUCTION_V1/`
+
+Topology:
+
+- black `4512`, white `2592`, desert_tan `19382`, brick_red `78`, dark_green `27428` triangles
+- every file: `0` open / `0` non-manifold
+
+### Physical completion and production lesson
+
+Automatic landmark roof metadata did not cover every intended Münster roof surface. Incorrect red parts were reassigned to Desert Tan and the desired roofs were painted Brick Red in Bambu Studio. This is product-local physical completion; automatic roof classification is not fully solved.
+
+Preview correctness alone is not a physical production gate. Require closed/manifold material solids or slicer-verified volumetric color, Bambu object/material inspection, plausible per-filament model mass, purge/prime-tower/change/time review, and AMS/external capacity review.
+
+Slice:
+
+- model `121.46 g`; purge `45.64 g`; tower `15.15 g`; total `182.25 g`
+- changes `193`; time `9 h 31 min`; estimated finish approximately `08:07` on 15 August
+- A1 Black; A2 White; A3 Desert Tan; A4 Dark Green; External Brick Red
+
+Current project: `bonn_muensterplatz_170mm_BIRTHPLACE_PRODUCTION_V1.3mf`. Older erroneous Bonn projects must not be reused. External red requires manual intervention.
+
+Regression: `104 passed`; full `3704 passed in 16.29s`.

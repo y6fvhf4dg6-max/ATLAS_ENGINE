@@ -110,3 +110,16 @@ def test_label_text_spec_can_enable_wedding_rings():
     assert spec.graduation_cap is False
     assert spec.birthday_cake is False
     assert spec.home is False
+
+def test_label_text_spec_can_enable_baby_stroller():
+    spec = AtlasLabelTextSpec(
+        primary_text="BONN",
+        secondary_text="MEINE GEBURTSSTADT",
+        baby_stroller=True,
+    )
+
+    assert spec.baby_stroller is True
+    assert spec.graduation_cap is False
+    assert spec.birthday_cake is False
+    assert spec.home is False
+    assert spec.wedding_rings is False

@@ -20,6 +20,7 @@ class AtlasProductPreviewMaterialProfile:
     water_rgb: RGB
     label_plate_rgb: RGB = (28, 28, 28)
     label_text_rgb: RGB = (232, 228, 216)
+    landmark_roof_rgb: RGB | None = None
 
     def __post_init__(self):
         for field in fields(self):
@@ -27,6 +28,12 @@ class AtlasProductPreviewMaterialProfile:
                 continue
 
             value = getattr(self, field.name)
+
+            if (
+                field.name == "landmark_roof_rgb"
+                and value is None
+            ):
+                continue
 
             if (
                 not isinstance(value, tuple)
@@ -84,6 +91,31 @@ class AtlasProductPreviewMaterialProfile:
             water_rgb=blue,
             label_plate_rgb=desert_tan,
             label_text_rgb=black,
+        )
+
+    @classmethod
+    def bonn_birthplace_v1(cls):
+        black = (20, 20, 20)
+        white = (245, 245, 240)
+        desert_tan = (205, 190, 160)
+        brick_red = (156, 48, 42)
+        dark_green = (73, 105, 58)
+
+        return cls(
+            name="BONN_BIRTHPLACE_V1",
+            frame_rgb=black,
+            building_rgb=desert_tan,
+            building_wall_rgb=desert_tan,
+            building_roof_rgb=desert_tan,
+            landmark_rgb=desert_tan,
+            terrain_rgb=white,
+            road_rgb=black,
+            green_rgb=dark_green,
+            tree_rgb=dark_green,
+            water_rgb=white,
+            label_plate_rgb=white,
+            label_text_rgb=black,
+            landmark_roof_rgb=brick_red,
         )
 
     @classmethod

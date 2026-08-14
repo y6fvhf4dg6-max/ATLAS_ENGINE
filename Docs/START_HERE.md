@@ -5085,3 +5085,21 @@ Validation:
 
 - focused tree regression: `61 passed`
 - full regression: `3689 passed in 16.37s`
+
+
+---
+
+## Bonn Birthplace Production V1 — 14 August 2026
+
+Bonn Münsterplatz birthday gift reached physical production.
+
+- product: `170 × 170 mm`; opening: `150 × 150 mm`; scale: `1:3000`
+- label: `BONN / GEBURTSORT`; symbol: baby stroller
+- palette: Black frame/roads/text/stroller; White terrain/plate; Desert Tan buildings/generic roofs/landmark walls; Brick Red Bambu-painted historic roofs; Dark Green parks/trees
+- water/Blue: intentionally absent
+- package: `OUTPUT/STL/BONN_BIRTHPLACE_PRODUCTION_V1/`
+- five aligned STL files: every file `0` open / `0` non-manifold
+- slice: `121.46 g` model, `45.64 g` purge, `15.15 g` prime tower, `182.25 g` total, `193` changes, `9 h 31 min`
+- mapping: A1 Black, A2 White, A3 Desert Tan, A4 Dark Green, External Brick Red
+- status: `PRINTING`; external red requires manual intervention
+- validation: `104 passed`; full `3704 passed in 16.29s`

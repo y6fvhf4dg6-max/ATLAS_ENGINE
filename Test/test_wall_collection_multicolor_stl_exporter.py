@@ -565,3 +565,73 @@ def test_multicolor_exporter_accepts_package_within_production_color_limit(
     assert result[
         "maximum_physical_color_count"
     ] == 2
+
+
+def test_multicolor_exporter_uses_physical_palette_names_for_bonn(
+    monkeypatch,
+    tmp_path,
+):
+    writes = []
+
+    monkeypatch.setattr(
+        "CORE.atlas_wall_collection_multicolor_stl_exporter."
+        "AtlasSTLWriter.write",
+        lambda **kwargs: writes.append(kwargs),
+    )
+
+    scene = {
+        "type": "product_color_preview_scene",
+        "profile_name": "BONN_BIRTHPLACE_V1",
+        "material_batches": {
+            "frame": {
+                "rgb": (20, 20, 20),
+                "physical_material": "material_4",
+                "meshes": [_mesh(0.0)],
+            },
+            "terrain": {
+                "rgb": (245, 245, 240),
+                "physical_material": "material_5",
+                "meshes": [_mesh(10.0)],
+            },
+            "label_plate": {
+                "rgb": (245, 245, 240),
+                "physical_material": "material_5",
+                "meshes": [_mesh(20.0)],
+            },
+            "building_walls": {
+                "rgb": (205, 190, 160),
+                "physical_material": "material_1",
+                "meshes": [_mesh(30.0)],
+            },
+            "building_roofs": {
+                "rgb": (205, 190, 160),
+                "physical_material": "material_1",
+                "meshes": [_mesh(40.0)],
+            },
+            "landmark_roofs": {
+                "rgb": (156, 48, 42),
+                "physical_material": "material_2",
+                "meshes": [_mesh(50.0)],
+            },
+            "parks": {
+                "rgb": (73, 105, 58),
+                "physical_material": "material_3",
+                "meshes": [_mesh(60.0)],
+            },
+        },
+    }
+
+    result = AtlasWallCollectionMulticolorSTLExporter.export_scene(
+        scene=scene,
+        output_directory=tmp_path,
+        product_name="bonn_birthplace",
+        maximum_physical_color_count=5,
+    )
+
+    assert set(result["parts"]) == {
+        "black",
+        "white",
+        "desert_tan",
+        "brick_red",
+        "dark_green",
+    }

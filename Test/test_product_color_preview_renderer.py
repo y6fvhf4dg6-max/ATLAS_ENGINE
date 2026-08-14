@@ -1866,3 +1866,491 @@ def test_renderer_adds_wedding_rings_to_label_text_material_batch():
         "label_text",
         "label_wedding_rings",
     ]
+
+def test_renderer_adds_baby_stroller_to_label_text_material_batch():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    profile = AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=9.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="BONN",
+            secondary_text="MEINE GEBURTSSTADT",
+            baby_stroller=True,
+        ),
+    )
+
+    label_text_meshes = (
+        scene["material_batches"]["label_text"]["meshes"]
+    )
+
+    assert len(label_text_meshes) == 3
+
+    assert [
+        mesh["type"]
+        for mesh in label_text_meshes
+    ] == [
+        "label_text",
+        "label_text",
+        "label_baby_stroller",
+    ]
+
+
+
+def test_renderer_preserves_closed_building_when_color_split_is_unsupported():
+    first = (10.0, 20.0, 0.8)
+    second = (12.0, 20.0, 0.8)
+    third = (10.0, 22.0, 0.8)
+    apex = (10.0, 20.0, 3.8)
+
+    closed_triangles = [
+        (first, third, second),
+        (first, second, apex),
+        (second, third, apex),
+        (third, first, apex),
+    ]
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [
+        {
+            "type": "building",
+            "source_id": 999001,
+            "triangles": closed_triangles,
+            "building_wall_triangles": closed_triangles[1:],
+            "building_roof_triangles": closed_triangles[:1],
+            "roof_geometry": "unsupported_fixture_roof",
+        }
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    wall_meshes = scene["material_batches"][
+        "building_walls"
+    ]["meshes"]
+    roof_meshes = scene["material_batches"][
+        "building_roofs"
+    ]["meshes"]
+
+    assert len(wall_meshes) == 1
+    assert len(roof_meshes) == 0
+    assert len(wall_meshes[0]["triangles"]) == 4
+    assert _open_edge_count(wall_meshes[0]["triangles"]) == 0
+
+
+
+def test_renderer_keeps_differently_segmented_adjacent_parks_closed():
+    def build_prism(ring_xy):
+        bottom = [
+            (x, y, 0.3)
+            for x, y in ring_xy
+        ]
+        top = [
+            (x, y, 0.5)
+            for x, y in ring_xy
+        ]
+
+        triangles = []
+
+        for index in range(1, len(ring_xy) - 1):
+            triangles.append(
+                (top[0], top[index], top[index + 1])
+            )
+            triangles.append(
+                (
+                    bottom[0],
+                    bottom[index + 1],
+                    bottom[index],
+                )
+            )
+
+        for index in range(len(ring_xy)):
+            next_index = (index + 1) % len(ring_xy)
+            triangles.extend(
+                [
+                    (
+                        bottom[index],
+                        bottom[next_index],
+                        top[next_index],
+                    ),
+                    (
+                        bottom[index],
+                        top[next_index],
+                        top[index],
+                    ),
+                ]
+            )
+
+        return {
+            "type": "park_foundation",
+            "park_type": "leisure:park",
+            "bottom": bottom,
+            "top": top,
+            "triangles": triangles,
+        }
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["parks"] = [
+        build_prism(
+            [
+                (10.0, 10.0),
+                (20.0, 10.0),
+                (20.0, 15.0),
+                (20.0, 20.0),
+                (10.0, 20.0),
+            ]
+        ),
+        build_prism(
+            [
+                (20.0, 15.0),
+                (30.0, 15.0),
+                (30.0, 25.0),
+                (20.0, 25.0),
+                (20.0, 20.0),
+            ]
+        ),
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    combined_triangles = [
+        triangle
+        for mesh in scene["material_batches"]["parks"]["meshes"]
+        for triangle in mesh["triangles"]
+    ]
+
+    assert _open_edge_count(combined_triangles) == 0
+    assert _non_manifold_edge_count(combined_triangles) == 0
+
+
+
+def test_renderer_preserves_shared_external_park_boundary_walls():
+    city_result = _city_result()
+    city_result["mesh_groups"]["parks"] = [
+        _park_mesh(
+            x0=10.0,
+            y0=10.0,
+            x1=20.0,
+            y1=20.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="leisure:park",
+        ),
+        _park_mesh(
+            x0=10.0,
+            y0=15.0,
+            x1=25.0,
+            y1=25.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="leisure:park",
+        ),
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    combined_triangles = [
+        triangle
+        for mesh in scene["material_batches"]["parks"]["meshes"]
+        for triangle in mesh["triangles"]
+    ]
+
+    assert _open_edge_count(combined_triangles) == 0
+
+
+
+def test_renderer_filters_nearly_covered_grass_and_separates_line_touching_parks():
+    nearly_covered_city = _city_result()
+    nearly_covered_city["mesh_groups"]["parks"] = [
+        _park_mesh(
+            x0=10.0,
+            y0=10.0,
+            x1=20.0,
+            y1=20.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="leisure:park",
+        ),
+        _park_mesh(
+            x0=10.0,
+            y0=10.0,
+            x1=20.001,
+            y1=20.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="landuse:grass",
+        ),
+    ]
+
+    nearly_covered_scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=nearly_covered_city,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    assert len(
+        nearly_covered_scene[
+            "material_batches"
+        ]["parks"]["meshes"]
+    ) == 1
+
+    touching_city = _city_result()
+    touching_city["mesh_groups"]["parks"] = [
+        _park_mesh(
+            x0=10.0,
+            y0=10.0,
+            x1=20.0,
+            y1=20.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="leisure:park",
+        ),
+        _park_mesh(
+            x0=20.0,
+            y0=10.0,
+            x1=30.0,
+            y1=20.0,
+            bottom_z=0.3,
+            top_z=0.5,
+            park_type="landuse:grass",
+        ),
+    ]
+
+    touching_scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=touching_city,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    touching_meshes = touching_scene[
+        "material_batches"
+    ]["parks"]["meshes"]
+
+    first_polygon = (
+        AtlasProductColorPreviewRenderer._safe_footprint_polygon(
+            touching_meshes[0]
+        )
+    )
+    second_polygon = (
+        AtlasProductColorPreviewRenderer._safe_footprint_polygon(
+            touching_meshes[1]
+        )
+    )
+
+    assert first_polygon.distance(second_polygon) > 0.0
+
+
+
+def test_renderer_excludes_generic_building_covered_by_landmark():
+    building = _park_mesh(
+        x0=10.0,
+        y0=10.0,
+        x1=11.5,
+        y1=11.0,
+        bottom_z=0.3,
+        top_z=5.0,
+        park_type="fixture",
+    )
+    building.update(
+        {
+            "type": "building",
+            "source_id": 7001,
+            "building_wall_triangles": list(
+                building["triangles"]
+            ),
+            "building_roof_triangles": [],
+        }
+    )
+
+    landmark = _park_mesh(
+        x0=10.0,
+        y0=10.0,
+        x1=11.433,
+        y1=11.0,
+        bottom_z=0.3,
+        top_z=8.0,
+        park_type="fixture",
+    )
+    landmark.update(
+        {
+            "type": "church_landmark",
+            "landmark_id": 8001,
+        }
+    )
+    landmark.pop("bottom")
+    landmark.pop("top")
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [building]
+    city_result["mesh_groups"]["landmarks"] = [landmark]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        ),
+    )
+
+    assert len(
+        scene["material_batches"]["building_walls"]["meshes"]
+    ) == 0
+    assert len(
+        scene["material_batches"]["landmarks"]["meshes"]
+    ) == 1
+
+
+def test_renderer_separates_landmark_body_and_roofs_by_material():
+    landmark_body = _park_mesh(
+        x0=10.0,
+        y0=10.0,
+        x1=20.0,
+        y1=20.0,
+        bottom_z=0.3,
+        top_z=6.0,
+        park_type="fixture",
+    )
+    landmark_body.update(
+        {
+            "type": "church_landmark",
+            "landmark_id": 8001,
+        }
+    )
+
+    landmark_roof = _park_mesh(
+        x0=11.0,
+        y0=11.0,
+        x1=19.0,
+        y1=19.0,
+        bottom_z=6.0,
+        top_z=8.0,
+        park_type="fixture",
+    )
+    landmark_roof["type"] = "landmark_roof"
+    landmark_body["roof_meshes"] = [landmark_roof]
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = []
+    city_result["mesh_groups"]["landmarks"] = [
+        landmark_body
+    ]
+
+    profile = (
+        AtlasProductPreviewMaterialProfile.bonn_birthplace_v1()
+    )
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+    )
+
+    batches = scene["material_batches"]
+
+    assert len(batches["landmarks"]["meshes"]) == 1
+    assert batches["landmarks"]["rgb"] == profile.landmark_rgb
+    assert len(batches["landmark_roofs"]["meshes"]) == 1
+    assert (
+        batches["landmark_roofs"]["rgb"]
+        == profile.landmark_roof_rgb
+    )
+    assert _open_edge_count(
+        batches["landmark_roofs"]["meshes"][0]["triangles"]
+    ) == 0
+
+
+def test_renderer_keeps_same_material_building_as_one_closed_solid():
+    building = _park_mesh(
+        x0=10.0,
+        y0=10.0,
+        x1=20.0,
+        y1=20.0,
+        bottom_z=0.3,
+        top_z=5.0,
+        park_type="fixture",
+    )
+    original_triangles = list(building["triangles"])
+    building.update(
+        {
+            "type": "building",
+            "source_id": 7001,
+            "building_wall_triangles": original_triangles[4:],
+            "building_roof_triangles": original_triangles[:2],
+            "building_flat_roof_triangles": (
+                original_triangles[:2]
+            ),
+        }
+    )
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [building]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.bonn_birthplace_v1()
+        ),
+    )
+
+    wall_meshes = scene["material_batches"][
+        "building_walls"
+    ]["meshes"]
+    roof_meshes = scene["material_batches"][
+        "building_roofs"
+    ]["meshes"]
+
+    assert len(wall_meshes) == 1
+    assert len(roof_meshes) == 0
+    assert len(wall_meshes[0]["triangles"]) == len(
+        original_triangles
+    )
+    assert _open_edge_count(wall_meshes[0]["triangles"]) == 0
+    assert (
+        _non_manifold_edge_count(
+            wall_meshes[0]["triangles"]
+        )
+        == 0
+    )

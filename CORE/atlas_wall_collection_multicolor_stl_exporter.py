@@ -7,6 +7,15 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 
 class AtlasWallCollectionMulticolorSTLExporter:
+    PHYSICAL_PALETTE_NAME_BY_RGB = {
+        (20, 20, 20): "black",
+        (245, 245, 240): "white",
+        (205, 190, 160): "desert_tan",
+        (156, 48, 42): "brick_red",
+        (73, 105, 58): "dark_green",
+        (70, 140, 180): "blue",
+    }
+
     BATCH_TO_COLOR_NAME = {
         "frame": "black",
         "roads": "black",
@@ -15,6 +24,7 @@ class AtlasWallCollectionMulticolorSTLExporter:
         "buildings": "desert_tan",
         "building_walls": "desert_tan",
         "landmarks": "desert_tan",
+        "landmark_roofs": "brick_red",
         "label_plate": "desert_tan",
         "building_roofs": "brick_red",
         "parks": "dark_green",
@@ -27,6 +37,7 @@ class AtlasWallCollectionMulticolorSTLExporter:
         "terrain": "terrain",
         "building_walls": "generic_building",
         "building_roofs": "generic_building_roof",
+        "landmark_roofs": "landmark_roof",
         "parks": "vegetation",
         "trees": "vegetation",
         "water": "water",
@@ -211,7 +222,15 @@ class AtlasWallCollectionMulticolorSTLExporter:
                 group["legacy_color_names"]
             )
 
-            if len(legacy_color_names) == 1:
+            physical_palette_name = (
+                cls.PHYSICAL_PALETTE_NAME_BY_RGB.get(
+                    tuple(group["rgb"])
+                )
+            )
+
+            if physical_palette_name is not None:
+                part_name = physical_palette_name
+            elif len(legacy_color_names) == 1:
                 part_name = legacy_color_names[0]
             elif group["physical_material"]:
                 part_name = group[

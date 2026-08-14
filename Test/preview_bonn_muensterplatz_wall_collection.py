@@ -7,6 +7,9 @@ from CORE.atlas_product_area_engine import AtlasProductAreaEngine
 from CORE.atlas_product_color_preview_renderer import (
     AtlasProductColorPreviewRenderer,
 )
+from CORE.atlas_product_color_preview_obj_exporter import (
+    AtlasProductColorPreviewOBJExporter,
+)
 from CORE.atlas_product_preview_material_profile import (
     AtlasProductPreviewMaterialProfile,
 )
@@ -33,11 +36,16 @@ PRODUCT_OUTPUT_PATH = (
 
 MULTICOLOR_OUTPUT_DIRECTORY = (
     "OUTPUT/STL/"
-    "bonn_muensterplatz_multicolor"
+    "BONN_BIRTHPLACE_PRODUCTION_V1"
 )
 
 MULTICOLOR_PRODUCT_NAME = (
-    "bonn_muensterplatz_170mm"
+    "bonn_muensterplatz_170mm_BIRTHPLACE_PRODUCTION_V1"
+)
+
+BONN_OBJ_PREVIEW_OUTPUT = (
+    "OUTPUT/PREVIEW/"
+    "bonn_muensterplatz_170mm_CURRENT_COLOR_PREVIEW.obj"
 )
 
 CENTER_LAT = 50.73380000
@@ -93,13 +101,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--primary-text",
-        default="",
-        help="Optional primary label line.",
+        default="BONN",
+        help="Primary label line.",
     )
     parser.add_argument(
         "--secondary-text",
-        default="",
-        help="Optional secondary label line.",
+        default="GEBURTSORT",
+        help="Secondary label line.",
     )
 
     return parser
@@ -129,7 +137,7 @@ def main(argv=None):
         label_text_spec = AtlasLabelTextSpec(
             primary_text=primary_text,
             secondary_text=secondary_text,
-            birthday_cake=True,
+            baby_stroller=True,
         )
 
     bbox = AtlasProductAreaEngine.build_bbox_from_center(
@@ -169,6 +177,8 @@ def main(argv=None):
         f"{frame_spec.inner_height_mm:.6f} mm"
     )
 
+    city_result["mesh_groups"]["waters"] = []
+
     product_result = AtlasWallCollectionSTLExporter.export(
         city_result=city_result,
         output_path=PRODUCT_OUTPUT_PATH,
@@ -179,7 +189,7 @@ def main(argv=None):
     )
 
     material_profile = (
-        AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        AtlasProductPreviewMaterialProfile.bonn_birthplace_v1()
     )
 
     color_scene = AtlasProductColorPreviewRenderer.build_scene(
@@ -189,9 +199,6 @@ def main(argv=None):
         material_profile=material_profile,
         label_plate_spec=label_plate_spec,
         label_text_spec=label_text_spec,
-        highlighted_building_source_ids={
-            112526702,
-        },
     )
 
     multicolor_result = (
@@ -200,6 +207,11 @@ def main(argv=None):
             output_directory=MULTICOLOR_OUTPUT_DIRECTORY,
             product_name=MULTICOLOR_PRODUCT_NAME,
         )
+    )
+
+    obj_preview_result = AtlasProductColorPreviewOBJExporter.export(
+        scene=color_scene,
+        output_path=BONN_OBJ_PREVIEW_OUTPUT,
     )
 
     print("")
@@ -236,6 +248,7 @@ def main(argv=None):
     print(f"City triangles      : {city_result['triangles']}")
     print(f"Intermediate STL    : {CITY_OUTPUT_PATH}")
     print(f"Final product STL   : {PRODUCT_OUTPUT_PATH}")
+    print(f"Interactive OBJ     : {obj_preview_result["obj_path"]}")
     print(
         f"Multicolor profile  : "
         f"{multicolor_result['profile_name']}"
