@@ -8094,3 +8094,45 @@ Bilinen aktif alanlar:
 
 Moladan sonra önce `git status --short --branch` ile gerçek working tree
 yeniden doğrulanmalıdır.
+
+
+### 6. Gift Box BASE physical validation result — PASS
+
+Niedwiesenstraße Premium Gift Box V1 BASE baskısı fiziksel olarak tamamlandı.
+
+Baskı sonrası gözlem:
+
+- geniş iç taban yüzeyi belirgin biçimde pürüzsüz ve homojen çıktı
+- önceki lid baskısındaki çizgisel / ipliksi geniş yüzey problemi oluşmadı
+- köşelerde kalkma gözlenmedi
+- duvar ve taban geometrisi genel olarak stabil
+- sağ uzun kenarda hafif inward bow / içe kaçma mevcut
+- bu inward bow elle hissedilebiliyor ancak baskıyı reddedecek seviyede değil
+
+Bu sonuç ironing'in gerekli olmadığını fiziksel olarak doğrulamıştır.
+
+Validated production settings:
+
+- nozzle: `0.4 mm`
+- layer height: `0.24 mm`
+- sparse infill: `10%`
+- top shell layers: `6`
+- ironing: `No ironing`
+
+Physical decision:
+
+`Premium Gift Box V1 BASE = PASS`
+
+Bu kombinasyon bundan sonra büyük düz Gift Box yüzeyleri için referans
+production setting olarak kullanılacaktır.
+
+Önceki lid baskısının geniş beyaz top-surface kalitesi production standardı
+olarak kabul edilmez. Lid yeniden basılacaksa BASE ile doğrulanan aynı ayar
+kombinasyonu kullanılmalıdır.
+
+Takip edilmesi gereken tolerans konusu:
+
+`long-wall slight inward bow`
+
+Bu sapma sonraki box component baskılarında karşılaştırılacak; artış gösterirse
+geometry / cooling / wall-thickness kaynakları ayrıca incelenecektir.

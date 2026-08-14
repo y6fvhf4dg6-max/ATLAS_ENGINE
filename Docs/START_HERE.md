@@ -4991,3 +4991,35 @@ Niedwiesenstraße sahnesindeki sıradaki kesin fiziksel iş:
 
 Motorun neden ağaç üretmediğini araştırmak şu anki fiziksel tamamlamanın
 ön koşulu değildir; önce mevcut sahneye uygun ayrı ağaç insertleri üretilecektir.
+
+
+### Gift Box Base Physical Validation — PASS
+
+Niedwiesenstraße Premium Gift Box V1 BASE baskısı fiziksel olarak tamamlandı.
+
+Son fiziksel sonuç:
+
+- geniş iç taban yüzeyi pürüzsüz ve homojen
+- önceki lid baskısındaki çizgisel / ipliksi top-surface problemi görülmedi
+- köşe kalkması / corner lifting gözlenmedi
+- genel geometri ve duvarlar kabul edilebilir
+- sağ uzun kenarda elle hissedilebilen hafif inward bow / içe kaçma gözlendi
+- bu sapma baskıyı reddedecek seviyede değildir, ancak physical tolerance
+  kaydı olarak korunacaktır
+
+Bu baskı ile aşağıdaki ayar kombinasyonu Gift Box düz yüzeyleri için yeni
+fiziksel referans olmuştur:
+
+- nozzle: `0.4 mm`
+- layer height: `0.24 mm`
+- sparse infill: `10%`
+- top shell layers: `6`
+- ironing: `No ironing`
+
+Bu ayarlar yeni lid baskısında da kullanılacaktır.
+
+Sonuç:
+
+`Gift Box BASE physical surface validation: PASS`
+
+Önceki lid baskısının yüzey standardı supersede edilmiştir.

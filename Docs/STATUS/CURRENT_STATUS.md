@@ -6768,3 +6768,33 @@ Bu çalışma:
 
 Jamaica / wedding-rings aktif uncommitted çalışmalarına toplu
 reset/restore/clean uygulanmayacaktır.
+
+
+### Gift Box BASE physical validation — PASS
+
+Niedwiesenstraße Premium Gift Box V1 BASE baskısı tamamlandı ve fiziksel olarak
+incelendi.
+
+Observed result:
+
+- large flat internal surface: smooth / homogeneous
+- previous lid'deki çapraz / ipliksi surface artifact: yok
+- corner lifting: yok
+- visible severe warping: yok
+- right long edge: hafif, elle hissedilebilen inward bow
+- inward bow acceptance: PASS, tolerance note olarak korunacak
+
+Physical reference settings:
+
+- `0.4 mm` nozzle
+- `0.24 mm` layer height
+- `10%` sparse infill
+- `6` top shell layers
+- `No ironing`
+
+Decision:
+
+- Gift Box BASE physical validation: `PASS`
+- bu ayar kombinasyonu yeni flat-surface production reference'tır
+- yeni lid baskısı aynı ayarlarla yapılmalıdır
+- eski lid top-surface sonucu artık production standardı değildir
