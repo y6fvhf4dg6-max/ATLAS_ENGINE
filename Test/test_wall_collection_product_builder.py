@@ -480,3 +480,47 @@ def test_wall_collection_matches_rounded_label_and_frame_recess_outline():
         assert actual_point[1] == pytest.approx(
             expected_point[1]
         )
+
+
+def test_wall_collection_adds_wedding_rings_at_right_side_of_label():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    product = AtlasWallCollectionProductBuilder.build(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=9.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="JAMAICA",
+            secondary_text="MAVIS BANK / BLUE MOUNTAINS",
+            primary_height_mm=4.2,
+            secondary_height_mm=2.8,
+            depth_mm=0.6,
+            max_width_mm=96.0,
+            wedding_rings=True,
+        ),
+    )
+
+    assert len(product["label_wedding_rings_meshes"]) == 1
+
+    rings_mesh = product["label_wedding_rings_meshes"][0]
+    vertices = _all_vertices(rings_mesh)
+
+    assert rings_mesh["type"] == "label_wedding_rings"
+
+    assert min(x for x, _, _ in vertices) >= 47.9
+    assert max(x for x, _, _ in vertices) <= 56.1
+
+    assert min(z for _, _, z in vertices) == pytest.approx(6.2)
+    assert max(z for _, _, z in vertices) == pytest.approx(6.8)
+
+    assert rings_mesh in product["meshes"]

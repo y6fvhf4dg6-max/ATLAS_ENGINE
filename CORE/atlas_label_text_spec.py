@@ -15,6 +15,7 @@ class AtlasLabelTextSpec:
     graduation_cap: bool = False
     birthday_cake: bool = False
     home: bool = False
+    wedding_rings: bool = False
 
     def __post_init__(self) -> None:
         primary_text = str(self.primary_text).strip()
@@ -27,6 +28,7 @@ class AtlasLabelTextSpec:
         graduation_cap = bool(self.graduation_cap)
         birthday_cake = bool(self.birthday_cake)
         home = bool(self.home)
+        wedding_rings = bool(self.wedding_rings)
 
         if not primary_text:
             raise ValueError("primary_text must not be empty")
@@ -71,4 +73,9 @@ class AtlasLabelTextSpec:
             self,
             "home",
             home,
+        )
+        object.__setattr__(
+            self,
+            "wedding_rings",
+            wedding_rings,
         )

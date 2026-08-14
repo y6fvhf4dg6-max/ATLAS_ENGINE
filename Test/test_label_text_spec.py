@@ -97,3 +97,16 @@ def test_label_text_spec_can_enable_home_symbol():
     assert spec.home is True
     assert spec.graduation_cap is False
     assert spec.birthday_cake is False
+
+
+def test_label_text_spec_can_enable_wedding_rings():
+    spec = AtlasLabelTextSpec(
+        primary_text="JAMAICA",
+        secondary_text="MAVIS BANK / BLUE MOUNTAINS",
+        wedding_rings=True,
+    )
+
+    assert spec.wedding_rings is True
+    assert spec.graduation_cap is False
+    assert spec.birthday_cake is False
+    assert spec.home is False

@@ -1823,3 +1823,46 @@ def test_preview_highlighting_reports_only_geometry_present_in_production_scene(
         for mesh in batch["meshes"]
         if isinstance(mesh, dict)
     )
+
+
+def test_renderer_adds_wedding_rings_to_label_text_material_batch():
+    from CORE.atlas_label_plate_spec import AtlasLabelPlateSpec
+    from CORE.atlas_label_text_spec import AtlasLabelTextSpec
+
+    profile = AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=_city_result(),
+        frame_spec=AtlasWallFrameSpec(
+            outer_width_mm=170.0,
+            outer_height_mm=170.0,
+            frame_width_mm=10.0,
+        ),
+        frame_depth_mm=6.0,
+        material_profile=profile,
+        label_plate_spec=AtlasLabelPlateSpec(
+            width_mm=118.0,
+            height_mm=9.0,
+            depth_mm=1.2,
+        ),
+        label_text_spec=AtlasLabelTextSpec(
+            primary_text="JAMAICA",
+            secondary_text="MAVIS BANK / BLUE MOUNTAINS",
+            wedding_rings=True,
+        ),
+    )
+
+    label_text_meshes = (
+        scene["material_batches"]["label_text"]["meshes"]
+    )
+
+    assert len(label_text_meshes) == 3
+
+    assert [
+        mesh["type"]
+        for mesh in label_text_meshes
+    ] == [
+        "label_text",
+        "label_text",
+        "label_wedding_rings",
+    ]

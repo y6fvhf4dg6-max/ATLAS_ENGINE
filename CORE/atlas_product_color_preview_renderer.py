@@ -1590,6 +1590,9 @@ class AtlasProductColorPreviewRenderer:
             material_batches["label_text"]["meshes"].extend(
                 product["label_graduation_cap_meshes"]
             )
+            material_batches["label_text"]["meshes"].extend(
+                product["label_wedding_rings_meshes"]
+            )
 
         return {
             "type": "product_color_preview_scene",
