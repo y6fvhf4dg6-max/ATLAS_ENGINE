@@ -3,6 +3,9 @@ import pytest
 from CORE.atlas_tree_row_resolver import (
     AtlasTreeRowResolver,
 )
+from CORE.atlas_tree_foundation_builder import (
+    AtlasTreeFoundationBuilder,
+)
 
 
 def test_resolver_builds_profile_from_source_tree_row_geometry():
@@ -219,8 +222,13 @@ def test_resolver_uses_explicit_tree_spacing_evidence_for_product_spacing():
     assert spacing["evidence_source"] == "explicit_tree_spacing"
     assert spacing["source_spacing_m"] == pytest.approx(5.0)
     assert spacing["action"] == "enlarge"
+    canonical = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+    )
+
     assert spacing["resolved_spacing_mm"] == pytest.approx(
-        1.55 + 0.40
+        canonical["crown_diameter_mm"] + 0.40
     )
 
 
@@ -245,7 +253,14 @@ def test_resolver_does_not_infer_tree_spacing_from_geometry_vertices():
 
     assert spacing["evidence_source"] == "product_readability"
     assert spacing["action"] == "fallback"
-    assert spacing["resolved_spacing_mm"] == pytest.approx(1.95)
+    canonical = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+    )
+
+    assert spacing["resolved_spacing_mm"] == pytest.approx(
+        canonical["crown_diameter_mm"] + 0.40
+    )
     assert "source_spacing_m" not in spacing
 
 
@@ -333,7 +348,14 @@ def test_resolver_uses_product_readability_fallback_when_spacing_is_missing():
 
     assert spacing["action"] == "fallback"
     assert spacing["evidence_source"] == "product_readability"
-    assert spacing["resolved_spacing_mm"] == pytest.approx(1.95)
+    canonical = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+    )
+
+    assert spacing["resolved_spacing_mm"] == pytest.approx(
+        canonical["crown_diameter_mm"] + 0.40
+    )
 
 
 def test_explicit_two_point_osm_tree_row_is_strong_evidence():

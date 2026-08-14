@@ -168,6 +168,11 @@ class AtlasTreeFoundationBuilder:
             rng,
         )
 
+        physical_scale = (
+            AtlasTreeFoundationBuilder
+            ._resolve_physical_tree_scale(tree)
+        )
+
         canonical_tree = (
             AtlasTreeFoundationBuilder
             ._build_canonical_tree(
@@ -175,6 +180,7 @@ class AtlasTreeFoundationBuilder:
                 y=y,
                 base_z=base_z,
                 tree=tree,
+                physical_scale=physical_scale,
                 scale_ratio=getattr(
                     coordinate_engine,
                     "xy_scale",
@@ -252,6 +258,26 @@ class AtlasTreeFoundationBuilder:
         return "canonical"
 
     @staticmethod
+    def _resolve_physical_tree_scale(tree):
+        if not isinstance(tree, dict):
+            return 1.0
+
+        tags = tree.get("tags") or {}
+
+        if tags.get("source") != "worldcover":
+            return 1.0
+
+        variants = (0.95, 1.0, 1.05)
+
+        rng = random.Random(
+            str(tree.get("id", "worldcover_tree"))
+        )
+
+        return variants[
+            rng.randrange(len(variants))
+        ]
+
+    @staticmethod
     def _canonical_tree_dimensions(
         *,
         tree=None,
@@ -260,7 +286,7 @@ class AtlasTreeFoundationBuilder:
         nozzle_diameter_mm=None,
         lod_level=None,
     ):
-        crown_diameter_mm = 1.55
+        crown_diameter_mm = 3.875
 
         tags = (
             tree.get("tags", {})
@@ -334,10 +360,10 @@ class AtlasTreeFoundationBuilder:
                 )
 
         return {
-            "total_height_mm": 2.15,
-            "trunk_height_mm": 0.80,
-            "trunk_diameter_mm": 0.45,
-            "crown_height_mm": 1.35,
+            "total_height_mm": 5.375,
+            "trunk_height_mm": 2.00,
+            "trunk_diameter_mm": 1.125,
+            "crown_height_mm": 3.375,
             "crown_diameter_mm": crown_diameter_mm,
         }
 
@@ -348,6 +374,7 @@ class AtlasTreeFoundationBuilder:
         y,
         base_z,
         tree=None,
+        physical_scale=1.0,
         scale_ratio=None,
         product_size_mm=None,
         nozzle_diameter_mm=None,
@@ -363,6 +390,23 @@ class AtlasTreeFoundationBuilder:
                 lod_level=lod_level,
             )
         )
+
+        physical_scale = float(physical_scale)
+
+        dimensions = {
+            key: (
+                float(value) * physical_scale
+                if key in {
+                    "total_height_mm",
+                    "trunk_height_mm",
+                    "trunk_diameter_mm",
+                    "crown_height_mm",
+                    "crown_diameter_mm",
+                }
+                else value
+            )
+            for key, value in dimensions.items()
+        }
 
         segment_count = (
             AtlasTreeFoundationBuilder

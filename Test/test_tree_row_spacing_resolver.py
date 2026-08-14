@@ -21,8 +21,13 @@ def test_spacing_resolver_preserves_printable_source_spacing():
         5.0 * 1000.0 / 5500.0
     )
     assert result["minimum_printable_mm"] == pytest.approx(0.4)
+    canonical = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+    )
+
     assert result["resolved_spacing_mm"] == pytest.approx(
-        1.55 + 0.40
+        canonical["crown_diameter_mm"] + 0.40
     )
 
 
@@ -35,8 +40,13 @@ def test_spacing_resolver_enlarges_sub_printable_spacing():
 
     assert result["action"] == "enlarge"
     assert result["scaled_spacing_mm"] < 0.4
+    canonical = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+    )
+
     assert result["resolved_spacing_mm"] == pytest.approx(
-        1.55 + 0.40
+        canonical["crown_diameter_mm"] + 0.40
     )
 
 
@@ -58,10 +68,17 @@ def test_spacing_resolver_derives_product_fallback_from_tree_symbol_size():
 
     assert result["action"] == "fallback"
     assert result["evidence_source"] == "product_readability"
-    assert result["resolved_spacing_mm"] == pytest.approx(
-        1.55 + 0.40
+    canonical = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
     )
-    assert result["tree_symbol_max_diameter_mm"] == pytest.approx(1.55)
+
+    assert result["resolved_spacing_mm"] == pytest.approx(
+        canonical["crown_diameter_mm"] + 0.40
+    )
+    assert result["tree_symbol_max_diameter_mm"] == pytest.approx(
+        canonical["crown_diameter_mm"]
+    )
     assert result["clearance_mm"] == pytest.approx(0.40)
 
 

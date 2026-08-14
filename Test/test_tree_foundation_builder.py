@@ -191,6 +191,66 @@ def test_canonical_tree_exposes_single_printable_dimension_contract():
     )
 
 
+def test_canonical_tree_meets_physical_v1_print_minimums():
+    dimensions = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+    )
+
+    assert dimensions["trunk_diameter_mm"] >= 1.0
+    assert dimensions["crown_diameter_mm"] >= 3.5
+    assert dimensions["total_height_mm"] >= 5.0
+
+
+def test_worldcover_tree_physical_scale_variant_is_deterministic():
+    tree = {
+        "id": "worldcover_product_123",
+        "tags": {
+            "source": "worldcover",
+        },
+    }
+
+    first = (
+        AtlasTreeFoundationBuilder
+        ._resolve_physical_tree_scale(tree)
+    )
+    second = (
+        AtlasTreeFoundationBuilder
+        ._resolve_physical_tree_scale(tree)
+    )
+
+    assert first == second
+    assert first in {0.95, 1.0, 1.05}
+
+
+def test_non_worldcover_tree_keeps_canonical_physical_scale():
+    tree = {
+        "id": "osm_tree_123",
+        "tags": {
+            "source": "osm",
+            "natural": "tree",
+        },
+    }
+
+    assert (
+        AtlasTreeFoundationBuilder
+        ._resolve_physical_tree_scale(tree)
+        == 1.0
+    )
+
+
+def test_worldcover_physical_scale_variants_preserve_print_minimums():
+    base = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+    )
+
+    for scale in (0.95, 1.0, 1.05):
+        assert base["trunk_diameter_mm"] * scale >= 1.0
+        assert base["crown_diameter_mm"] * scale >= 3.5
+        assert base["total_height_mm"] * scale >= 5.0
+
+
 def test_canonical_tree_has_visible_trunk_and_crown_above_ground():
     base_z = 3.0
 
@@ -240,6 +300,78 @@ def test_canonical_tree_geometry_is_deterministic():
     )
 
     assert first == second
+
+
+def test_build_tree_mesh_applies_worldcover_physical_scale_variant(monkeypatch):
+    class CoordinateEngineStub:
+        xy_scale = 3000.0
+
+        @staticmethod
+        def latlon_to_stl_mm(lat, lon):
+            return 75.0, 75.0
+
+    terrain_mesh = {
+        "triangles": [
+            (
+                (0.0, 0.0, 1.0),
+                (150.0, 0.0, 1.0),
+                (150.0, 150.0, 1.0),
+            ),
+            (
+                (0.0, 0.0, 1.0),
+                (150.0, 150.0, 1.0),
+                (0.0, 150.0, 1.0),
+            ),
+        ],
+    }
+
+    captured = {}
+
+    monkeypatch.setattr(
+        AtlasTreeFoundationBuilder,
+        "_resolve_physical_tree_scale",
+        staticmethod(lambda tree: 1.05),
+    )
+
+    monkeypatch.setattr(
+        "CORE.atlas_tree_foundation_builder."
+        "AtlasFoundationSampler.terrain_z_at_xy",
+        lambda **kwargs: 1.0,
+    )
+
+    original = (
+        AtlasTreeFoundationBuilder
+        ._build_canonical_tree
+    )
+
+    def capture_build_canonical_tree(**kwargs):
+        captured["physical_scale"] = kwargs.get(
+            "physical_scale"
+        )
+        return original(**kwargs)
+
+    monkeypatch.setattr(
+        AtlasTreeFoundationBuilder,
+        "_build_canonical_tree",
+        staticmethod(capture_build_canonical_tree),
+    )
+
+    mesh = AtlasTreeFoundationBuilder._build_tree_mesh(
+        tree={
+            "id": "worldcover_product_42",
+            "lat": 50.0,
+            "lon": 7.0,
+            "tags": {
+                "source": "worldcover",
+            },
+        },
+        index=0,
+        coordinate_engine=CoordinateEngineStub(),
+        terrain_mesh=terrain_mesh,
+    )
+
+    assert mesh is not None
+    assert captured["physical_scale"] == pytest.approx(1.05)
 
 
 def test_tree_outside_actual_terrain_bounds_is_rejected(monkeypatch):

@@ -8136,3 +8136,131 @@ Takip edilmesi gereken tolerans konusu:
 
 Bu sapma sonraki box component baskılarında karşılaştırılacak; artış gösterirse
 geometry / cooling / wall-thickness kaynakları ayrıca incelenecektir.
+
+
+---
+
+## Physical Tree V1 Devir Checkpoint — 14 Ağustos 2026
+
+### Problem
+
+ATLAS preview'de ağaçları gösterebiliyor fakat fiziksel baskıda ağaçlar
+kırıntı / çok ince çıkıntı gibi görünüyordu.
+
+Gerçek Niedwiesenstraße probe sonucu:
+
+- tree meshes: `721`
+- source: `worldcover`
+- each tree: `240` triangles
+- old physical height: `2.150 mm`
+- old crown footprint: yaklaşık `1.55 × 1.55 mm`
+
+Bu doğrulama tree üretiminin çalıştığını, fakat physical dimension contract'ın
+yetersiz olduğunu kanıtladı.
+
+### Physical Tree V1 canonical geometry
+
+Old:
+
+- trunk height: `0.80 mm`
+- trunk diameter: `0.45 mm`
+- crown height: `1.35 mm`
+- crown diameter: `1.55 mm`
+- total height: `2.15 mm`
+
+New:
+
+- trunk height: `2.000 mm`
+- trunk diameter: `1.125 mm`
+- crown height: `3.375 mm`
+- crown diameter: `3.875 mm`
+- total height: `5.375 mm`
+
+Canonical mesh topology remained closed/manifold.
+
+### WorldCover spacing calibration
+
+Old:
+
+`WORLDCOVER_TREE_MIN_PHYSICAL_SPACING_MM = 4.0`
+
+New:
+
+`WORLDCOVER_TREE_MIN_PHYSICAL_SPACING_MM = 6.0`
+
+At `1:3000`, this corresponds to approximately `18 m` minimum source spacing.
+
+Real Niedwiesenstraße result:
+
+- before 6 mm spacing: `703` Physical V1 trees
+- after 6 mm spacing: `349` trees
+
+This reduced excessive visual density without shrinking tree geometry.
+
+### Deterministic natural size variation
+
+WorldCover trees now receive deterministic physical scale variants:
+
+- `0.95×`
+- `1.00×`
+- `1.05×`
+
+Non-WorldCover trees remain `1.00×`.
+
+All variants preserve Physical V1 minimum print dimensions.
+
+Real scene distribution:
+
+- `0.95×`: `118`
+- `1.00×`: `112`
+- `1.05×`: `119`
+
+### Final visual candidate
+
+File:
+
+`OUTPUT/CALIBRATION/niedwiesenstrasse_99_TREE_PHYSICAL_V1_SPACING_6MM_VARIANTS.stl`
+
+Metrics:
+
+- trees: `349`
+- triangles: `83,760`
+- open edges: `0`
+- non-manifold edges: `0`
+
+Bambu Studio visual inspection:
+
+`PASS`
+
+The result no longer resembles fragmented / micro tree artifacts. Tree trunks
+and crowns are physically readable, overall density is acceptable, and mild
+size variation reduces mechanical repetition.
+
+### Regression
+
+Focused combined tree regression:
+
+`61 passed`
+
+Full ATLAS regression:
+
+`3689 passed in 16.37s`
+
+### Files in this milestone
+
+CORE:
+
+- `CORE/atlas_tree_foundation_builder.py`
+- `CORE/atlas_foundation_first_engine.py`
+
+Tests:
+
+- `Test/test_tree_foundation_builder.py`
+- `Test/test_foundation_first_engine_tree_water_filter.py`
+- `Test/test_tree_row_spacing_resolver.py`
+- `Test/test_tree_row_resolver.py`
+
+### Working-tree protection
+
+Jamaica / wedding-rings active work remains intentionally separate and must not
+be included in the Physical Tree V1 commit.

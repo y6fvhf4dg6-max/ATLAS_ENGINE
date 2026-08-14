@@ -6798,3 +6798,54 @@ Decision:
 - bu ayar kombinasyonu yeni flat-surface production reference'tır
 - yeni lid baskısı aynı ayarlarla yapılmalıdır
 - eski lid top-surface sonucu artık production standardı değildir
+
+
+---
+
+## 14 Ağustos 2026 — Physical Tree V1
+
+Status: `PASS / ready for checkpoint commit`
+
+Problem confirmed:
+
+ATLAS had a functioning tree pipeline but the previous canonical tree contract
+was not physically printable at product scale.
+
+Old canonical dimensions:
+
+- trunk diameter: `0.45 mm`
+- crown diameter: `1.55 mm`
+- total height: `2.15 mm`
+
+Physical Tree V1:
+
+- trunk diameter: `1.125 mm`
+- crown diameter: `3.875 mm`
+- total height: `5.375 mm`
+- WorldCover spacing: `6.0 mm`
+- deterministic WorldCover scale variants:
+  `0.95× / 1.00× / 1.05×`
+
+Niedwiesenstraße real validation:
+
+- tree count after Physical V1 spacing: `349`
+- variant distribution:
+  - `0.95×`: `118`
+  - `1.00×`: `112`
+  - `1.05×`: `119`
+- final tree-only candidate:
+  - `83,760` triangles
+  - `0` open edges
+  - `0` non-manifold edges
+
+Bambu Studio visual density / geometry validation: `PASS`
+
+Regression:
+
+- tree-focused combined package: `61 passed`
+- full regression: `3689 passed in 16.37s`
+
+Important:
+
+Niedwiesenstraße-specific geometry hack was not added. The fix is generic and
+applies through the shared ATLAS tree foundation / WorldCover composition path.

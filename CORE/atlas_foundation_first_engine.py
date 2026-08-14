@@ -156,7 +156,7 @@ from EXPORT.atlas_stl_writer import AtlasSTLWriter
 
 class AtlasFoundationFirstEngine:
     FOREST_CANOPY_TREE_SAMPLE_LIMIT = 80
-    WORLDCOVER_TREE_MIN_PHYSICAL_SPACING_MM = 4.0
+    WORLDCOVER_TREE_MIN_PHYSICAL_SPACING_MM = 6.0
     @staticmethod
     def _select_scene_morphology(
         *,

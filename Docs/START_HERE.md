@@ -5023,3 +5023,65 @@ Sonuç:
 `Gift Box BASE physical surface validation: PASS`
 
 Önceki lid baskısının yüzey standardı supersede edilmiştir.
+
+
+---
+
+## Physical Tree V1 — 14 Ağustos 2026
+
+ATLAS tree pipeline fiziksel üretim açısından yeniden kalibre edildi.
+
+Kök neden:
+
+- preview ağacı gösterebiliyordu;
+- fakat eski canonical tree fiziksel ölçüleri çok küçüktü:
+  - trunk diameter: `0.45 mm`
+  - crown diameter: `1.55 mm`
+  - total height: `2.15 mm`
+- gerçek Niedwiesenstraße probe'unda yüzlerce tree mesh üretilmesine rağmen
+  bu ölçüler fiziksel baskıda kırıntı / çok ince çıkıntı görünümü oluşturuyordu.
+
+Physical Tree V1 canonical dimensions:
+
+- trunk diameter: `1.125 mm`
+- trunk height: `2.000 mm`
+- crown diameter: `3.875 mm`
+- crown height: `3.375 mm`
+- total height: `5.375 mm`
+
+WorldCover physical composition:
+
+- minimum physical spacing: `6.0 mm`
+- eski spacing: `4.0 mm`
+- deterministic size variants:
+  - `0.95×`
+  - `1.00×`
+  - `1.05×`
+
+Niedwiesenstraße real-scene validation:
+
+- previous large-tree geometry probe: `703` trees
+- Physical Tree V1 spacing result: `349` trees
+- variant distribution:
+  - `0.95×`: `118`
+  - `1.00×`: `112`
+  - `1.05×`: `119`
+
+Final visual candidate:
+
+- trees: `349`
+- triangles: `83,760`
+- open edges: `0`
+- non-manifold edges: `0`
+
+Bambu Studio visual validation:
+
+`PASS`
+
+Tree geometry, spacing and mild deterministic size variation are accepted as
+the current Physical Tree V1 direction.
+
+Validation:
+
+- focused tree regression: `61 passed`
+- full regression: `3689 passed in 16.37s`

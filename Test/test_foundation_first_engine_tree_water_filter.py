@@ -1103,10 +1103,10 @@ def test_tree_crown_clear_of_building_footprint_is_retained():
     building_mesh = {
         "type": "building",
         "bottom": (
-            (11.00, 9.0, 1.0),
-            (12.00, 9.0, 1.0),
-            (12.00, 11.0, 1.0),
-            (11.00, 11.0, 1.0),
+            (12.25, 9.0, 1.0),
+            (13.25, 9.0, 1.0),
+            (13.25, 11.0, 1.0),
+            (12.25, 11.0, 1.0),
         ),
         "triangles": (),
     }
@@ -1177,10 +1177,10 @@ def test_tree_crown_clear_of_road_surface_is_retained():
     road_mesh = {
         "type": "road_foundation",
         "top": (
-            (11.00, 9.0, 1.0),
-            (12.00, 9.0, 1.0),
-            (12.00, 11.0, 1.0),
-            (11.00, 11.0, 1.0),
+            (12.25, 9.0, 1.0),
+            (13.25, 9.0, 1.0),
+            (13.25, 11.0, 1.0),
+            (12.25, 11.0, 1.0),
         ),
         "triangles": (),
     }
@@ -1566,6 +1566,24 @@ def test_build_vegetation_meshes_uses_worldcover_sampled_trees_without_duplicate
 
     assert result["forest_canopy_tree_samples"] == 0
     assert result["forest_canopy_meshes"] == []
+
+
+def test_worldcover_tree_spacing_meets_physical_v1_crown_clearance():
+    from CORE.atlas_tree_foundation_builder import (
+        AtlasTreeFoundationBuilder,
+    )
+
+    crown_diameter = (
+        AtlasTreeFoundationBuilder
+        ._canonical_tree_dimensions()
+        ["crown_diameter_mm"]
+    )
+
+    assert (
+        AtlasFoundationFirstEngine
+        .WORLDCOVER_TREE_MIN_PHYSICAL_SPACING_MM
+        >= crown_diameter * 1.5
+    )
 
 
 def test_scale_aware_worldcover_tree_sampling_is_deterministic_and_respects_physical_spacing():
