@@ -8289,3 +8289,37 @@ Permanent rule: preview/colorgroup appearance is not proof of physical color vol
 Validation: `104 passed`; full `3704 passed in 16.29s`.
 
 Working-tree protection: Jamaica/Seychelles previews and `Data/OSM/` remain outside this Bonn milestone. No broad stage/reset/restore/clean.
+
+---
+
+## Seychellen Premium Archipelago Physical Handoff — 15 August 2026
+
+Status: `PRINT QUEUE`.
+
+- product/opening: `170 × 170 mm` / `150 × 150 mm`
+- island span: `140.000 × 99.808 mm`
+- relief: `1.600 .. 10.683 mm`
+- German label: `SEYCHELLEN / SILBERHOCHZEIT · 25 JAHRE`
+- symbol intentionally absent
+- palette: Black frame/text, White plate, Dark Green islands, Blue sea
+- five aligned STL parts / four physical colors
+- all parts: `0` open / `0` non-manifold
+
+Topology correction: preserve all disconnected islands, but separate two
+components touching at only one XY vertex by `0.0001 mm`. This removes
+four-owner vertical edges while remaining visually and dimensionally
+imperceptible.
+
+Bambu physical gate: model `73.03 g`; purge `9.98 g`; tower `3.31 g`;
+total `86.32 g`; `40` changes; `2 h 32 min`. Model mass: Black `22.21 g`,
+White `1.49 g`, Dark Green `1.72 g`, Blue `47.61 g`.
+
+Saved project:
+`seychelles_premium_archipelago_170mm_PRODUCTION_V1.3mf`.
+
+The project is ready but the printer is occupied. Do not regenerate or change
+the accepted label, topology or palette unless physical printing exposes a
+real defect.
+
+Working-tree protection: Jamaica previews and `Data/OSM/` remain separate.
+Do not broad-stage, reset, restore or clean them.

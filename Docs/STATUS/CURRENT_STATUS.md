@@ -6899,3 +6899,52 @@ Slice:
 Current project: `bonn_muensterplatz_170mm_BIRTHPLACE_PRODUCTION_V1.3mf`. Older erroneous Bonn projects must not be reused. External red requires manual intervention.
 
 Regression: `104 passed`; full `3704 passed in 16.29s`.
+
+---
+
+## 15 August 2026 — Seychellen Premium Archipelago V1 / PRINT QUEUE
+
+### Product contract
+
+- outer/opening: `170 × 170 mm` / `150 × 150 mm`
+- archipelago span: `140.000 × 99.808 mm`
+- relief Z: `1.600 .. 10.683 mm`
+- German label: `SEYCHELLEN / SILBERHOCHZEIT · 25 JAHRE`
+- no label symbol
+- Black: frame and label text
+- White: label plate
+- Dark Green: island relief
+- Blue: sea slab
+
+The physical package contains five aligned STL files but uses four physical
+filaments because frame and label text are separate Black parts.
+
+### Geometry and topology
+
+The real disconnected archipelago components are preserved. Two independent
+island components that touched at only one XY vertex were separated by
+`0.0001 mm`. This removed two four-owner vertical edges without changing the
+visible product dimensions or triangle count.
+
+- sea: `12` triangles
+- island relief: `7248` triangles
+- frame: `248` triangles
+- label plate: `96` triangles
+- label text: `2344` triangles
+- every physical STL: `0` open / `0` non-manifold
+
+### Bambu physical gate
+
+- model: `73.03 g`
+- purge: `9.98 g`
+- prime tower: `3.31 g`
+- total: `86.32 g`
+- filament changes: `40`
+- total time: `2 h 32 min`
+
+Per-material model mass is plausible: Black `22.21 g`, White `1.49 g`,
+Dark Green `1.72 g`, Blue `47.61 g`.
+
+Project: `seychelles_premium_archipelago_170mm_PRODUCTION_V1.3mf`.
+
+Status: `PRINT QUEUE`; the current printer job must finish first.

@@ -5103,3 +5103,23 @@ Bonn Münsterplatz birthday gift reached physical production.
 - mapping: A1 Black, A2 White, A3 Desert Tan, A4 Dark Green, External Brick Red
 - status: `PRINTING`; external red requires manual intervention
 - validation: `104 passed`; full `3704 passed in 16.29s`
+
+---
+
+## Seychellen Premium Archipelago V1 — 15 August 2026
+
+Seychellen anniversary gift reached the physical print queue.
+
+- product: `170 × 170 mm`; opening: `150 × 150 mm`
+- composition: true disconnected Seychelles archipelago on a sea slab
+- island span: `140.000 × 99.808 mm`
+- relief Z: `1.600 .. 10.683 mm`
+- German label: `SEYCHELLEN / SILBERHOCHZEIT · 25 JAHRE`
+- symbol: intentionally absent
+- four physical colors: Black frame/text; White label plate; Dark Green islands; Blue sea
+- five aligned STL files because frame and label text remain separate Black parts
+- every physical STL: `0` open / `0` non-manifold
+- slice: `73.03 g` model, `9.98 g` purge, `3.31 g` prime tower, `86.32 g` total
+- production: `40` filament changes; `2 h 32 min`
+- project: `seychelles_premium_archipelago_170mm_PRODUCTION_V1.3mf`
+- status: `PRINT QUEUE`; printer currently occupied
