@@ -5209,3 +5209,40 @@ Meckenheim home-memory gift reached Bambu project readiness.
 
 Before slicing or starting another print, finish the current Köln job and
 update both P2S firmware and Bambu Studio.
+
+---
+
+## Semantic Relief, Figurative & Kit System V1
+
+Status: `RED_CONTRACT`
+
+ATLAS 2.5D rölyef sistemi için yeni uzun vadeli program; tarihi ve sanatsal mimari rölyefleri, kimliği korunan kişiselleştirilmiş figüratif sahneleri ve yeniden kullanılabilir demonte mimari kit parçalarını aynı semantic component graph omurgasında birleştirecektir.
+
+Ana amaç yalnız fotoğrafı height-map olarak kabartmak değildir. Sistem kaynak nesneleri, component ilişkilerini, semantic depth ve occlusion düzenini, hedef yüzeyi, fiziksel baskı sınırlarını ve seçilen ürün biçimini anlayan bir üst orkestrasyon katmanı kuracaktır.
+
+Program kapsamı:
+
+- kilise, katedral, cami, heykel ve tarihi cephelerdeki oyma, kakma, figür, yazıt ve süslemeler;
+- identity-preserving portrait relief;
+- body, pose, gesture ve prop grammar;
+- profesör, olta ve balık kovası gibi personalized story scenes;
+- kemer, pencere, kapı, kubbe, tuğla ve kiremit için shared component catalog;
+- assembled landmark, facade relief ve modular construction kit çıktıları;
+- topology, slicer, volumetric material ve physical validation kapıları.
+
+Kesin okuma sırası:
+
+1. `Docs/START_HERE.md` içindeki bu bölüm;
+2. `Docs/STATUS/CURRENT_STATUS.md` içindeki güncel program durumu;
+3. `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md` içindeki `Semantic Relief, Figurative & Kit System V1 — Master Execution Compass` ana roadmap kaydı;
+4. gerekli olduğunda mevcut relief architecture ve karar belgeleri.
+
+Güncel kesin durma noktası:
+
+- CORE geliştirmesi başlatılmadı;
+- Phase 0 baseline sonucu: `1020 passed in 2.28s`, exit `0`;
+- Phase 0 status: `LOCKED`; full regression: `3772 passed in 16.84s`, exit `0`;
+- RED contract testi yazılmadı;
+- sıradaki iş `CURRENT_STATUS` bağlantı kaydı, belge kontrolleri ve Phase 0 baseline auditidir;
+- Phase 1 implementation, Phase 0 kaydedilmeden başlatılamaz;
+- portrait implementation, Phase 8 decision gate `GO` olmadan başlatılamaz.

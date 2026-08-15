@@ -7131,3 +7131,52 @@ Validation: related package `71 passed`; full regression
 
 Production sequencing requirement: complete the current Köln print, then
 update P2S firmware and Bambu Studio before slicing or starting Meckenheim.
+
+---
+
+## Semantic Relief, Figurative & Kit System V1 — ROADMAP WRITING
+
+ATLAS 2.5D rölyef motorunun mevcut kodu incelendi. Sonuç: temel zayıflık height-map matematiği değil; kaynakları semantic component graph haline getirip depth, occlusion, fiziksel feature, surface projection ve product output kararlarıyla yönetecek üst omurganın eksikliğidir.
+
+### Doğrulanan mevcut temel
+
+Mevcut sistem image input, preprocessing, multiscale decomposition, depth composition ve compression, mask ve morphology, layer separation, semantic material, portrait landmark regions, physical profiles, closed relief mesh, topology ve print-risk raporları, STL export, facade component meshers ve production-package altyapısına sahiptir. Bu katmanlar korunacak ve yeni semantic program tarafından yeniden kullanılacaktır.
+
+### Doğrulanan ana boşluklar
+
+- `AtlasSemanticArchitectureComponent` henüz yalnız identity metadata taşır.
+- Canonical component graph, transform, target surface, depth order, occlusion, physical policy, repetition, output eligibility ve assembly interface eksiktir.
+- Architectural Relief V1 tek normalize height-map sonucunu düz plakaya çevirir; gerçek semantic architecture orchestration ve surface projection yapmaz.
+- Production package Dalyan ve 80x50 mm sabitlerine bağlıdır.
+- Figurative body, pose, gesture, prop, contact ve personalized story grammar mevcut değildir.
+- Production seviyesinde canonical face/head fitting hattı tamamlanmamıştır.
+- Portrait belgelerinde FLAME kararı ile multi-view reconstruction yönü arasında açık decision gate gerektiren çelişki vardır.
+
+### Kilitlenen program kapsamı
+
+Ana roadmap 15 fazdan oluşur:
+
+- Phase 0: audit ve karar temizliği;
+- Phase 1–5: semantic scene contract, geometry adapters, depth/occlusion, physical resolver ve surface projection;
+- Phase 6–7: ornament library ve ilk architectural semantic relief product;
+- Phase 8–11: face/head decision gate, portrait, figurative grammar ve personalized story composer;
+- Phase 12–13: shared component catalog ve modular architectural kit;
+- Phase 14–15: unified orchestration ve commercial production gate.
+
+Detaylı kabul kapıları ve stop kriterleri aktif devir belgesindeki `Semantic Relief, Figurative & Kit System V1 — Master Execution Compass` bölümündedir.
+
+### Güncel durum
+
+Status: `RED_CONTRACT`
+
+- Yeni CORE veya Test implementation başlatılmadı.
+- Yeni RED contract yazılmadı.
+- Phase 0 baseline tamamlandı: relief, architectural relief, semantic architecture ve portrait contract paketlerinde `1020 passed in 2.28s`, exit `0`.
+- Phase 0 status: `LOCKED`; full regression: `3772 passed in 16.84s`, exit `0`.
+- Yeni CORE veya Test implementation başlatılmadı; ilk RED contract henüz yazılmadı.
+- `Data/OSM/` ve üç Jamaica preview scripti korunmuş unrelated untracked kapsamıdır.
+- Broad stage, reset, restore veya clean uygulanmayacaktır.
+
+### Sıradaki kesin tek iş
+
+Üç roadmap belgesinin birlikte UTF-8, heading, duplicate, control-byte, diff ve status kontrolünü yapmak. Kontroller yeşilse mevcut relief ve semantic architecture baseline test paketlerini çalıştırmak ve sonucu Phase 0 audit kaydına eklemek. Phase 1 RED contract bundan önce başlatılmayacaktır.

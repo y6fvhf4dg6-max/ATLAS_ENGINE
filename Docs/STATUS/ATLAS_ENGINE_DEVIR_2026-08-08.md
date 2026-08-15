@@ -8461,3 +8461,704 @@ Mandatory next production sequence:
 
 Working-tree protection remains mandatory: do not include `Data/OSM/` or the
 three Jamaica preview scripts. No broad stage/reset/restore/clean.
+---
+
+## Semantic Relief, Figurative & Kit System V1 — Master Execution Compass
+
+Status: RED CONTRACT
+
+Bu bölüm, ATLAS 2.5D rölyef sisteminin uzun vadeli geliştirme pusulasıdır. Gelecek motor bu belgeyi `Docs/START_HERE.md` ve `Docs/STATUS/CURRENT_STATUS.md` ile birlikte okumadan geliştirmeye başlamamalıdır.
+
+### 1. Program amacı
+
+Program üç ticari yeteneği aynı semantik geometri omurgasında birleştirecektir:
+
+1. Tarihi ve önemli yapılar için mimari 2.5D rölyef: oyma, kakma, heykelcik, figür, yazıt, kemer, pencere, kapı, kubbe, friz, korniş ve cephe süslemeleri.
+2. Kişiye özel anlatı rölyefi: kimliği korunan portre veya karikatür, beden pozu, meslek ya da hobi ve sahne aksesuarları. İlk örnek profesör, olta ve balık kovası sahnesidir.
+3. Ortak parça kataloğu ve demonte maket sistemi: aynı kemer, pencere, kapı, kubbe, tuğla, kiremit ve süsleme parçaları assembled landmark, facade relief ve construction kit çıktılarında yeniden kullanılabilmelidir.
+
+Hedef yalnız bir fotoğrafı height-map olarak kabartmak değildir. Hedef; nesneleri, parçaları, derinlik ilişkilerini, hedef yüzeyi, fiziksel baskı sınırlarını ve ürün biçimini anlayan semantik bir üretim sistemidir.
+
+### 2. Değişmez mühendislik kuralları
+
+- Test-first: RED contract, minimal implementation, focused test, related regression, full regression.
+- Provider algılar ve tanımlar; ATLAS CORE geometriyi, fiziksel kararı ve kalite kapısını üretir.
+- Görsel preview tek başına üretim kanıtı değildir.
+- Her fiziksel parça closed ve manifold olmalıdır.
+- Semantik kimlik, fiziksel malzeme kimliği ve ticari çıktı rolü ayrı tutulmalıdır.
+- Görünür anlamlı renkler otomatik olarak birleştirilemez veya değiştirilemez.
+- Landmark özel hard-code ancak doğrulanmış katalog verisi olarak bulunabilir; genel motor davranışı yerine kullanılamaz.
+- Her faz tek başına geri alınabilir olmalıdır.
+- Korunan unrelated dosyalar stage, reset, restore veya clean işlemlerine dahil edilemez.
+- `git add .` kullanılmaz; yalnız ilgili dosyalar stage edilir.
+
+### 3. Korunacak mevcut teknik temel
+
+Aşağıdaki mevcut katmanlar silinmeyecek, yeniden yazılmayacak ve yeni semantik omurganın altında yeniden kullanılacaktır:
+
+- image input ve preprocessing;
+- multiscale form, detail ve micro-detail ayrıştırması;
+- depth composition ve compression;
+- subject ve semantic mask sistemi;
+- morphology, feathering ve layer separation;
+- semantic height ve material düzenleme;
+- normal, confidence ve face-region yardımcıları;
+- physical relief profile ve sampling plan;
+- closed relief mesh builder;
+- topology, slope ve print-risk raporları;
+- STL ve production-package altyapısı;
+- semantic architecture identity modeli;
+- facade bay, opening, arch, panel, cornice ve detail üreticileri;
+- church facade ve landmark grammar temelleri;
+- MediaPipe portrait landmark provider sözleşmeleri.
+
+Bu temel değersiz veya başarısız değildir. Eksik olan height-map matematiğinden önce, bu katmanları doğru semantik sahne kararlarıyla yönetecek üst omurgadır.
+
+### 4. Mevcut mimari boşluk
+
+Mevcut AtlasSemanticArchitectureComponent yalnız identity metadata taşır. Aşağıdaki alanlar henüz canonical değildir:
+
+- kalıcı component ID ve parent component ID;
+- kaynak geometrisi ve geometry adapter kimliği;
+- local transform, orientation ve fiziksel boyutlar;
+- target surface ve projection mode;
+- semantic depth band, layer order ve occlusion ilişkisi;
+- relief polarity, minimum feature ve exaggeration politikası;
+- semantic material role ve fiziksel material role;
+- repetition pattern, quantity ve interchangeable-part kimliği;
+- assembled landmark, facade relief ve kit output eligibility;
+- connector, tolerance ve assembly-interface bilgisi;
+- provenance, confidence ve operatör override kaydı.
+
+Mevcut Architectural Relief V1 gerçek anlamda semantik mimari orkestrasyon yapmaz. Architectural kind metadata olarak taşınır; tek normalize height-map düz bir plakaya dönüştürülür. Surface projection, component graph, semantic occlusion ve ortak parça kataloğu eksiktir.
+
+Mevcut production package genel değildir; Dalyan ve 80x50 mm adlandırmalarına bağlı sabitler içerir. Bu katman, mevcut Dalyan paketini bozmadan daha sonra genel relief product manifest sözleşmesine taşınmalıdır.
+
+Figurative sistemde henüz canonical body, pose, gesture, prop, contact, balance ve story-scene graph bulunmaz. Portrait landmark altyapısı vardır; fakat ticari canonical face/head geometry ve identity-preserving fitting hattı tamamlanmamıştır.
+
+Temel eksik akış şudur:
+
+```text
+doğrulanmış kaynaklar
+→ semantic component graph
+→ spatial ve depth composition
+→ physical feature resolution
+→ geometry adapters
+→ surface projection
+→ output-mode orchestration
+→ topology ve quality gate
+→ production package
+```
+
+### 5. Portrait karar çelişkisi
+
+Belgelerde çözülmesi gereken iki farklı karar bulunmaktadır:
+
+- Temmuz 2026 devir kaydı, tek fotoğraftan AI-depth ve DSINE ana geometri yolunu appearance-to-geometry leakage nedeniyle dondurmuş; çoklu fotoğraf veya kısa videodan güvenilir 3D face/head reconstruction araştırmasını istemiştir.
+- `Docs/DECISIONS.md`, FLAME 2023 Open modelini canonical face geometry olarak seçmiş ve sıradaki paketi AtlasParametricFaceGeometry olarak kaydetmiştir.
+
+Bu çelişki kod yazarak sessizce çözülemez. Phase 8 içinde lisans, gizlilik, Mac uyumu, kimlik koruma, multi-view desteği, aksesuar davranışı ve mesh kalitesi kanıtlarıyla açık bir GO, HOLD veya REJECT kararı verilmelidir. Bu karar verilmeden production portrait geometry geliştirilmeyecektir.
+
+### 6. Ana faz planı — Part A
+
+#### Phase 0 — Audit, karar temizliği ve roadmap kilidi
+
+Yapılacaklar:
+
+- `RELIEF_CURRENT_ARCHITECTURE.md` belgesindeki eski tespitleri güncel kodla karşılaştırmak;
+- mevcut relief, architecture, portrait ve production-package public contract envanterini kesinleştirmek;
+- tekrar kullanılacak, genelleştirilecek, dondurulacak ve kaldırılmayacak katmanları işaretlemek;
+- portrait karar çelişkisini Phase 8 decision gate olarak kilitlemek;
+- mevcut full regression baseline sonucunu kaydetmek.
+
+Kabul kapısı:
+
+- üç ana durum belgesi aynı roadmap, aktif faz ve durma noktasını göstermeli;
+- unrelated dosyalarda değişiklik olmamalı;
+- baseline test sonucu kaydedilmiş olmalı.
+
+#### Phase 1 — Semantic Relief Scene Contract V1
+
+Canonical ve immutable sözleşmeler test-first oluşturulacak:
+
+- `AtlasSemanticReliefComponent`;
+- `AtlasSemanticReliefScene`;
+- component ID, parent ID ve source reference;
+- semantic class ve geometry source kind;
+- transform, dimensions ve orientation;
+- target surface ve projection mode;
+- depth band, layer order ve occlusion policy;
+- material role ve physical feature policy;
+- repetition, output eligibility ve provenance.
+
+Bu faz mesh üretmeyecek. Yalnız doğrulanmış ve provider-independent sahne sözleşmesi kuracaktır.
+
+Kabul kapısı:
+
+- immutable ve deterministic contract;
+- duplicate ID, missing parent, cycle, geçersiz depth order ve geçersiz output mode reddi;
+- architecture, portrait, figurative ve kit kullanımlarını temsil eden synthetic fixture;
+- mevcut AtlasSemanticArchitectureModel ile geçiş ilişkisi belgelenmiş olmalı.
+
+#### Phase 2 — Geometry Source Adapter Contracts
+
+Semantik component ile geometri kaynağı birbirinden ayrılacaktır. İlk adapter sözleşmeleri:
+
+- height-map relief source;
+- existing triangle mesh source;
+- parametric primitive source;
+- facade grammar source;
+- catalog component source;
+- future canonical face/head source;
+- future body, pose ve prop source.
+
+Provider sonucu doğrudan STL olmayacak. Adapter normalize geometry, local bounds, anchors, confidence, provenance ve supported projection modes döndürecektir.
+
+Kabul kapısı:
+
+- provider ve CORE sorumlulukları ayrı olmalı;
+- aynı semantic scene farklı adapter implementation ile çalışabilmeli;
+- adapter sonucu deterministic ve inputtan izole olmalı;
+- desteklenmeyen projection mode erken ve açık hata vermeli.
+
+### 7. Ana faz planı — Part B
+
+#### Phase 3 — Semantic Depth & Occlusion Composer
+
+Component graph, tek height-map yerine anlamlı derinlik sahnesine dönüştürülecektir.
+
+Yapılacaklar:
+
+- semantic depth band ve local relief range çözümü;
+- foreground, middle ground ve background ilişkileri;
+- parent-child depth inheritance;
+- explicit overlap ve occlusion kuralları;
+- contact, embed, recess ve raised-feature politikaları;
+- material boundary ile geometry boundary ayrımı;
+- deterministik conflict report ve operator override kaydı.
+
+Kabul kapısı:
+
+- melek, kemer, yazıt ve arka duvar gibi üç veya daha fazla katman doğru sıralanmalı;
+- çakışan depth band, cycle ve fiziksel olarak imkansız embed reddedilmeli;
+- aynı girdi aynı composition planını vermeli;
+- composer henüz triangle mesh üretmemeli.
+
+#### Phase 4 — Physical Feature Resolver
+
+Semantik ayrıntılar nozzle, layer height, ürün ölçüsü ve malzemeye göre fiziksel karara dönüştürülecektir.
+
+Her feature için karar:
+
+- preserve;
+- enlarge;
+- merge;
+- simplify;
+- convert to engraving;
+- omit with report;
+- require operator review.
+
+Ölçülecek unsurlar:
+
+- minimum raised width ve height;
+- minimum groove width ve depth;
+- unsupported projection ve slope;
+- fragile neck, limb, wing ve ornament bağlantısı;
+- adjacent-feature spacing;
+- repeated-detail density;
+- semantic importance ve readability priority.
+
+Kabul kapısı:
+
+- kararlar deterministic ve profile-driven olmalı;
+- sessiz feature kaybı olmamalı;
+- her enlargement veya omission raporlanmalı;
+- aynı feature farklı ürün boyutlarında farklı fakat açıklanabilir karar alabilmeli.
+
+#### Phase 5 — Surface Target & Projection V1
+
+Relief ve ornament geometry yalnız düz plakaya değil, doğrulanmış hedef yüzeylere uygulanacaktır.
+
+Uygulama sırası:
+
+1. flat plane;
+2. oriented planar quad;
+3. bilinear quadrilateral surface;
+4. cylindrical surface;
+5. dome ve vault surface;
+6. arbitrary indexed mesh surface.
+
+Her target surface şunları taşımalıdır:
+
+- stable local UV frame;
+- outward normal convention;
+- clipping boundary;
+- relief direction ve polarity;
+- allowable depth envelope;
+- attachment ve intersection policy;
+- source component ve target component identity.
+
+Kabul kapısı:
+
+- projection sonrası orientation ve winding doğru olmalı;
+- target dışı geometri deterministic olarak clip edilmeli veya reddedilmeli;
+- relief parent duvar, silindir veya kubbeyle fiziksel olarak bağlı olmalı;
+- self-intersection ve depth-envelope ihlali raporlanmalı;
+- flat projection mevcut relief davranışını bozmamalı.
+
+### 8. Ana faz planı — Part C
+
+#### Phase 6 — Architectural Ornament Library V1
+
+Genel ve yeniden kullanılabilir ilk semantik mimari parça aileleri oluşturulacaktır:
+
+- arch ve archivolt;
+- recessed window ve tracery;
+- portal, door surround ve tympanum;
+- column, pilaster, capital ve base;
+- cornice, frieze ve molding;
+- medallion, rosette ve inscription panel;
+- geometric ve floral ornament;
+- figurative plaque ve statue niche;
+- brick, stone block, roof tile ve repeatable surface unit.
+
+Her katalog kaydı şunları taşımalıdır:
+
+- canonical component ID ve version;
+- semantic class ve style tags;
+- parametric dimensions ve anchors;
+- supported projection modes;
+- minimum printable profile;
+- material role;
+- repetition ve symmetry bilgisi;
+- assembled, relief ve kit output eligibility;
+- license ve provenance kaydı.
+
+Kabul kapısı:
+
+- aynı parça farklı boyutlarda deterministic üretilmeli;
+- her katalog parçası tek başına topology gate geçmeli;
+- fiziksel olarak okunamayan varyant reddedilmeli veya resolver tarafından dönüştürülmeli;
+- tekrar eden parçalar aynı canonical kimliği korumalı.
+
+#### Phase 7 — Architectural Semantic Relief Product V1
+
+İlk gerçek ürün tek bir doğrulanmış tarihi cephe veya anıt yüzeyi üzerinden geliştirilecektir. Hedef, generic height-map ile semantic component graph sonucunu aynı fiziksel üründe karşılaştırmaktır.
+
+Zorunlu içerik:
+
+- en az bir recessed opening;
+- en az bir raised ornament;
+- en az bir figurative veya emblematic feature;
+- en az bir inscription ya da panel;
+- en az üç semantic depth band;
+- gerçek target-surface projection;
+- shaded preview ve physical print coupon.
+
+Kabul kapısı:
+
+- kimlik ve ana mimari ritim kaynakla görsel olarak uyuşmalı;
+- semantic sürüm generic height-map baseline sonucundan daha okunabilir olmalı;
+- closed/manifold topology zorunlu olmalı;
+- slicer layer preview ve minimum feature kontrolü geçmeli;
+- fiziksel coupon kabul edilmeden product-ready statüsü verilmemeli.
+
+#### Phase 8 — Canonical Face/Head Decision Gate
+
+Bu faz production portrait kodu yazmadan önce tamamlanacak teknik ve ticari karar paketidir.
+
+Karşılaştırılacak yollar:
+
+- FLAME 2023 Open canonical geometry ve ATLAS fitting;
+- ticari kullanıma uygun alternatif parametric face/head modelleri;
+- multi-view image reconstruction;
+- kısa video tabanlı reconstruction;
+- güvenli local veya kontrollü API tabanlı çözümler.
+
+Zorunlu kanıtlar:
+
+- ticari lisans ve attribution yükümlülükleri;
+- model ve veri saklama sınırları;
+- Apple Silicon uyumu;
+- local, API ve gizlilik davranışı;
+- tek fotoğraf, üç fotoğraf ve video desteği;
+- identity, expression ve pose korunumu;
+- gözlük, saç, kulak ve yüz örtücü aksesuar davranışı;
+- mesh kalitesi, topology ve işlem süresi;
+- relief projection için uygunluk.
+
+Karar yalnız `GO`, `HOLD` veya `REJECT` olabilir. Kanıt olmadan FLAME veya başka bir motor production dependency yapılamaz. Tek fotoğraftan AI-depth ana yüz geometrisi olarak yeniden etkinleştirilemez.
+
+### 9. Ana faz planı — Part D
+
+#### Phase 9 — Identity-Preserving Portrait Relief V1
+
+Yalnız Phase 8 `GO` kararından sonra geliştirilecektir.
+
+Hedef akış:
+
+```text
+onaylı müşteri girdisi
+→ face/head reconstruction
+→ canonical semantic regions
+→ identity ve expression kontrolü
+→ frontal contact-plane projection
+→ feature-sensitive depth compression
+→ düşük genlikli residual detail
+→ accessory separation
+→ shaded preview
+→ operator quality gate
+→ manifold relief mesh
+```
+
+Ana yüz hacmi güvenilir face/head geometry kaynağından gelmelidir. AI-depth yalnız saç, kulak, siluet veya geniş derinlik yardımcısı olabilir. Gölge, yansıma, gözlük camı ve kıyafet deseni ana geometriye dönüşmemelidir.
+
+Kabul kapısı:
+
+- kimlik ve temel ifade operatör tarafından kabul edilmeli;
+- alın, yanak, burun, dudak ve çene hacimleri tutarlı olmalı;
+- gözlük camı alttaki yüzü bozmamalı, çerçeve ayrı aksesuar olmalı;
+- shaded preview kabul edilmeden STL üretilmemeli;
+- müşteri verisi ve model provenance kaydı bulunmalı.
+
+#### Phase 10 — Figurative Body, Pose & Prop Grammar V1
+
+Portre başı, semantik beden ve sahne bileşenleriyle birleştirilecektir.
+
+İlk canonical roller:
+
+- head ve neck anchor;
+- torso ve pelvis;
+- upper arm, forearm ve hand;
+- thigh, lower leg ve foot;
+- standing support ve ground contact;
+- gaze, gesture ve hand-grip targets;
+- clothing silhouette;
+- prop ve prop-contact anchors.
+
+İlk aksesuar ailesi:
+
+- fishing rod;
+- fishing line;
+- fish bucket;
+- optional fish emblem;
+- ground veya shoreline context panel.
+
+Kabul kapısı:
+
+- poz anatomik ve statik olarak okunabilir olmalı;
+- el ile olta arasında gerçek contact bulunmalı;
+- kova zemine veya ele fiziksel olarak bağlanmalı;
+- ince olta ve uzuvlar physical resolver kontrolünden geçmeli;
+- silhouette, head identity ve ana hikâye 170 mm ürün boyutunda okunabilmeli;
+- karikatür exaggeration kimliği yok etmemeli.
+
+#### Phase 11 — Personalized Story Composer V1
+
+Kullanıcının kişisi, mesleği, hobisi ve hediye bağlamı semantic scene brief haline getirilecektir.
+
+İlk senaryo:
+
+- kişi profesör;
+- amatör balıkçılık hobisi var;
+- ayakta duruyor;
+- bir elinde olta bulunuyor;
+- yanında balık kovası bulunuyor;
+- yüz kimliği korunmuş, kontrollü karikatür anlatımı kullanılıyor.
+
+Composer şunları üretmelidir:
+
+- normalized story brief;
+- selected character, pose, prop ve environment components;
+- component graph ve contact graph;
+- depth ve occlusion planı;
+- material-role planı;
+- ambiguity ve operator-review report;
+- preview recipe ve product-output request.
+
+Kabul kapısı:
+
+- eksik veya çelişkili brief sessizce tamamlanmamalı;
+- kişinin kimliği, mesleği ve hobisi ayrı semantic alanlar olarak korunmalı;
+- aksesuarlar bedene rastgele yerleştirilmemeli;
+- aynı onaylı brief deterministic scene plan vermeli;
+- operatör onayı olmadan ticari STL üretilmemeli.
+
+### 10. Ana faz planı — Part E
+
+#### Phase 12 — Shared Component Catalog & Kit Contract V1
+
+Architectural relief ve demonte maket aynı canonical parça kimliklerini kullanacaktır. Katalog yalnız mesh deposu olmayacak; parametrik, fiziksel ve ticari sözleşme taşıyacaktır.
+
+Canonical kayıt alanları:
+
+- catalog component ID ve version;
+- semantic class, style ve period tags;
+- geometry generator veya validated asset reference;
+- nominal dimensions ve allowed parameter ranges;
+- local origin, orientation ve assembly anchors;
+- connector family ve tolerance profile;
+- minimum wall, minimum feature ve material profile;
+- repeatability ve interchangeable-part group;
+- allowed output modes;
+- license, provenance ve validation status;
+- superseded-by ve backward-compatibility bilgisi.
+
+Kit contract alanları:
+
+- part number ve quantity;
+- parent assembly ve assembly step;
+- connector interface;
+- orientation ve placement transform;
+- glue-required, friction-fit veya mechanical-lock policy;
+- support ve print orientation recommendation;
+- color ve material role;
+- replacement ve spare-part eligibility.
+
+Kabul kapısı:
+
+- katalog kaydı immutable ve versioned olmalı;
+- duplicate ID ve uyumsuz connector reddedilmeli;
+- aynı canonical parça relief ve kit çıktısında izlenebilmeli;
+- değişen geometri eski BOM kimliğini sessizce bozamamalı;
+- her fiziksel parça ayrı topology report taşımalı.
+
+#### Phase 13 — Modular Architectural Kit Prototype V1
+
+İlk prototip, doğrulanmış ve sınırlı bir tarihi cephe ya da yapı bölümü olacaktır. Tam katedral veya cami ile başlanmayacaktır.
+
+Prototipte bulunacaklar:
+
+- en az 12 tekrar eden kemerli pencere;
+- ayrı kapı veya portal;
+- ayrı duvar panelleri;
+- en az bir çatı, kubbe veya tonoz parçası;
+- tekrar eden tuğla, taş veya kiremit ailesi;
+- connector ve tolerance coupon;
+- BOM, parça numaraları ve montaj sırası;
+- baskı plakası grupları;
+- yedek parça tanımı;
+- gerçek fiziksel fit testi.
+
+Kabul kapısı:
+
+- tüm parçalar ayrı closed/manifold solid olmalı;
+- parça numarası BOM ile birebir eşleşmeli;
+- bağlantılar hedef toleransla fiziksel olarak oturmalı;
+- tekrar eden parçalar birbirinin yerine kullanılabilmeli;
+- montaj sırası kapalı veya erişilemez bağlantı üretmemeli;
+- kırılan tek parça bütün kit yeniden basılmadan değiştirilebilmeli.
+
+#### Phase 14 — Unified Product Orchestration
+
+Aynı semantic component graph, seçilen product output mode değiştirilerek farklı fiziksel ürünlere dönüştürülecektir:
+
+- flat relief;
+- projected facade relief;
+- framed portrait relief;
+- personalized figurative story relief;
+- assembled landmark;
+- modular construction kit;
+- replacement veya spare-part package.
+
+Orchestrator sorumlulukları:
+
+- output mode eligibility kontrolü;
+- component selection ve transformation;
+- physical profile ve scale resolution;
+- material-role batching;
+- relief, solid ve kit geometry adapter seçimi;
+- topology ve quality gate çağrıları;
+- BOM, manifest, preview ve report üretimi;
+- deterministic dosya adları ve package layout;
+- operator-review ve acceptance status kaydı.
+
+Kabul kapısı:
+
+- aynı kaynak component kimlikleri farklı output modlarında korunmalı;
+- unsupported output mode erken reddedilmeli;
+- relief, assembled ve kit geometrileri birbirine karıştırılmamalı;
+- manifest her fiziksel dosyayı semantic component ve material role ile eşlemeli;
+- preview ile gerçek physical part listesi tutarlı olmalı.
+
+#### Phase 15 — Commercial Production Gate
+
+Hiçbir ürün yalnız STL yazıldığı için production-ready sayılmayacaktır.
+
+Zorunlu kapılar:
+
+1. source, license ve provenance kontrolü;
+2. semantic completeness ve operator review;
+3. physical feature resolution report;
+4. closed/manifold topology;
+5. self-intersection ve disconnected-part analizi;
+6. dimensions, tolerance ve minimum feature kontrolü;
+7. shaded veya color preview kabulü;
+8. slicer object ve volumetric material structure kontrolü;
+9. filament gram distribution sanity check;
+10. support, orientation, purge ve prime-tower incelemesi;
+11. gerekiyorsa physical coupon veya fit test;
+12. final 3MF, STL, manifest, BOM ve report paketi.
+
+Preview doğru görünürken slicer iç hacmi yanlış filamente verebilir. Bu nedenle per-face color veya colorgroup görünümü volumetric material kanıtı değildir. Ayrı physical solids veya slicer tarafında doğrulanmış volumetric assignment zorunludur.
+
+Production status değerleri:
+
+- `DRAFT`;
+- `CONTRACT_READY`;
+- `GEOMETRY_READY`;
+- `PREVIEW_ACCEPTED`;
+- `SLICER_VALIDATED`;
+- `PHYSICAL_VALIDATED`;
+- `PRODUCTION_READY`;
+- `HOLD`;
+- `REJECTED`.
+
+Statü atlaması yapılamaz. Her geçiş kanıt dosyası veya doğrulanabilir rapor taşımalıdır.
+
+### 11. Test ve fixture stratejisi
+
+Her faz şu sırayla geliştirilecektir:
+
+1. mevcut baseline testlerini çalıştırmak;
+2. tek davranış için RED contract test yazmak;
+3. minimal production implementation yapmak;
+4. focused testi çalıştırmak;
+5. related package regression çalıştırmak;
+6. `git diff --check` uygulamak;
+7. gerekiyorsa deterministic fixture ve preview üretmek;
+8. full regression çalıştırmak;
+9. üç ana durum belgesini güncellemek;
+10. yalnız ilgili dosyaları stage etmek;
+11. commit ve push yapmak;
+12. HEAD, origin/main ve status doğrulamak.
+
+Zorunlu fixture aileleri:
+
+- synthetic semantic component graph;
+- layered architectural facade;
+- curved target surface;
+- minimum-feature ve occlusion edge cases;
+- canonical ornament catalog entries;
+- portrait identity ve accessory cases;
+- standing body, hand-grip ve prop-contact cases;
+- repeated architectural kit parts;
+- connector ve tolerance coupons;
+- production manifest ve material-batch fixtures.
+
+Her fixture:
+
+- deterministic olmalı;
+- lisans ve provenance taşımalı;
+- beklenen semantic graph, bounds ve topology değerlerini kaydetmeli;
+- input mutation ve output isolation testlerine uygun olmalı;
+- büyük binary dosyayı gerekçesiz olarak Git deposuna eklememeli.
+
+### 12. Stop ve rollback kriterleri
+
+Aşağıdaki durumlardan birinde geliştirme durdurulacak ve milestone `HOLD` olarak kaydedilecektir:
+
+- lisans veya ticari kullanım belirsizliği;
+- müşteri görseli için gizlilik ve saklama politikası eksikliği;
+- kimlik kaybı veya appearance-to-geometry leakage;
+- semantic component graph ile fiziksel geometri arasında izlenebilirlik kaybı;
+- açık, non-manifold veya self-intersecting production mesh;
+- minimum feature ve tolerance kapısının geçilememesi;
+- preview ile slicer volumetric material yapısının uyuşmaması;
+- deterministic olmayan sonuç;
+- baseline regression bozulması;
+- fiziksel coupon veya fit testinin başarısız olması;
+- roadmap dışı yatay kapsam genişlemesi.
+
+Rollback kuralı:
+
+- son yeşil ve push edilmiş commit korunur;
+- unrelated kullanıcı dosyalarına dokunulmaz;
+- destructive reset, broad restore veya clean uygulanmaz;
+- deneysel sonuç ayrı tutulur ve production dependency yapılmaz;
+- başarısızlık nedeni, kanıtı ve yeniden başlama koşulu belgeye yazılır.
+
+### 13. Milestone kayıt sözleşmesi
+
+Her faz sonunda aşağıdaki bilgiler `START_HERE`, `CURRENT_STATUS` ve aktif devir belgesine tutarlı biçimde kaydedilecektir:
+
+- faz adı ve status;
+- amaç ve kapsam;
+- oluşturulan veya değiştirilen contractlar;
+- ilgili CORE ve Test dosyaları;
+- focused, related ve full regression sonuçları;
+- fixture, preview ve fiziksel validation kanıtları;
+- bilinen sınırlar ve kapsam dışı maddeler;
+- son güvenli commit ve origin/main durumu;
+- korunan unrelated dosyalar;
+- bir sonraki kesin tek adım.
+
+Ara durum değerleri:
+
+- `ROADMAP_WRITING`;
+- `AUDIT_ACTIVE`;
+- `RED_CONTRACT`;
+- `IMPLEMENTATION_ACTIVE`;
+- `TEST_GREEN`;
+- `PHYSICAL_VALIDATION_PENDING`;
+- `LOCKED`;
+- `HOLD`;
+- `REJECTED`.
+
+Bir faz `LOCKED` olmadan sonraki bağımlı faz production implementation olarak başlatılamaz.
+
+### 14. Öncelik ve bağımlılık kuralı
+
+Zorunlu ana sıra:
+
+```text
+Phase 0
+→ Phase 1
+→ Phase 2
+→ Phase 3
+→ Phase 4
+→ Phase 5
+→ Phase 6
+→ Phase 7
+→ Phase 8 decision gate
+→ Phase 9
+→ Phase 10
+→ Phase 11
+→ Phase 12
+→ Phase 13
+→ Phase 14
+→ Phase 15
+```
+
+Phase 8 araştırması, Phase 1–7 mimari hattını durdurmaz. Ancak Phase 9–11, Phase 8 `GO` kararı olmadan production geliştirmeye geçemez. Phase 12 catalog contract, Phase 13 kit prototipinden önce kilitlenmelidir. Phase 14 ve Phase 15, önceki ürün hatlarından en az birer gerçek validation kanıtı olmadan kilitlenemez.
+
+### 15. Kesin güncel durma noktası
+
+Status: `RED_CONTRACT`
+
+Phase 0 baseline kanıtı:
+
+- kapsam: relief, architectural relief, semantic architecture ve portrait contract testleri;
+- sonuç: `1020 passed in 2.28s`;
+- command exit: `0`;
+- diff check: temiz;
+- unrelated untracked dosyalar değişmedi.
+- full regression: `3772 passed in 16.84s`, exit `0`;
+- Phase 0 status: `LOCKED`.
+
+Bu kayıt anında:
+
+- semantic relief programı için CORE implementation başlatılmadı;
+- yeni RED contract testi yazılmadı;
+- Phase 0 ilgili baseline regression tamamlandı ve yeşil;
+- mevcut relief ve facade altyapısına dokunulmadı;
+- portrait için FLAME veya başka motor production dependency yapılmadı;
+- korunan Jamaica preview dosyaları ve `Data/OSM/` kapsam dışıdır.
+
+Sıradaki kesin iş:
+
+1. Bu ana roadmap kaydını `START_HERE` ve `CURRENT_STATUS` belgelerine kısa ve tutarlı yönlendirmelerle bağlamak.
+2. Üç belgenin UTF-8, heading, diff ve status kontrollerini yapmak.
+3. Mevcut relief ve semantic architecture baseline testlerini çalıştırmak.
+4. Phase 0 audit sonucunu kaydetmek.
+5. Yalnız bundan sonra Phase 1 için ilk RED contract testini yazmak.
