@@ -8286,7 +8286,7 @@ Physical gate: model `121.46 g`; purge `45.64 g`; tower `15.15 g`; total `182.25
 
 Permanent rule: preview/colorgroup appearance is not proof of physical color volume. Require closed/manifold solids or slicer-verified volumetric assignment, object/material inspection, plausible gram distribution and purge/prime/change/time review.
 
-Validation: `104 passed`; full `3704 passed in 16.29s`.
+Validation: `109 passed`; full `3704 passed in 16.54s`.
 
 Working-tree protection: Jamaica/Seychelles previews and `Data/OSM/` remain outside this Bonn milestone. No broad stage/reset/restore/clean.
 

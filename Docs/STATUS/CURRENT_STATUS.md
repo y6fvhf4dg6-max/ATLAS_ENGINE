@@ -6898,7 +6898,7 @@ Slice:
 
 Current project: `bonn_muensterplatz_170mm_BIRTHPLACE_PRODUCTION_V1.3mf`. Older erroneous Bonn projects must not be reused. External red requires manual intervention.
 
-Regression: `104 passed`; full `3704 passed in 16.29s`.
+Regression: `109 passed`; full `3704 passed in 16.54s`.
 
 ---
 
