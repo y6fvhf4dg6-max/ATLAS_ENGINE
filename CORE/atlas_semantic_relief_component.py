@@ -3,6 +3,10 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from CORE.atlas_semantic_relief_transform import (
+    AtlasSemanticReliefTransform,
+)
+
 
 def _normalize_identifier(value, *, field_name: str) -> str:
     normalized = "_".join(
@@ -23,6 +27,7 @@ class AtlasSemanticReliefComponent:
     semantic_class: str
     geometry_source_kind: str
     parent_component_id: str | None = None
+    transform: AtlasSemanticReliefTransform | None = None
     source_reference: str | None = None
     target_surface_id: str | None = None
     projection_mode: str = "none"
@@ -35,6 +40,15 @@ class AtlasSemanticReliefComponent:
     confidence: float = 1.0
 
     def __post_init__(self) -> None:
+        if self.transform is not None and not isinstance(
+            self.transform,
+            AtlasSemanticReliefTransform,
+        ):
+            raise TypeError(
+                "transform must be an "
+                "AtlasSemanticReliefTransform or None"
+            )
+
         if isinstance(self.confidence, bool):
             raise ValueError(
                 "confidence must be numeric"

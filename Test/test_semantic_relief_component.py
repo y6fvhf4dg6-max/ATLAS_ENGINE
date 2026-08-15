@@ -5,6 +5,9 @@ import pytest
 from CORE.atlas_semantic_relief_component import (
     AtlasSemanticReliefComponent,
 )
+from CORE.atlas_semantic_relief_transform import (
+    AtlasSemanticReliefTransform,
+)
 
 
 def test_semantic_relief_component_normalizes_canonical_identity():
@@ -218,4 +221,31 @@ def test_semantic_relief_component_rejects_invalid_confidence(
             semantic_class="Figurative Ornament",
             geometry_source_kind="Catalog Component",
             confidence=confidence,
+        )
+
+def test_semantic_relief_component_preserves_validated_transform():
+    transform = AtlasSemanticReliefTransform(
+        translation_mm=(4.0, 12.0, 1.2),
+        rotation_degrees_xyz=(0.0, 0.0, 15.0),
+        dimensions_mm=(12.0, 24.5, 3.0),
+    )
+    component = AtlasSemanticReliefComponent(
+        component_id="Portal Angel",
+        semantic_class="Figurative Ornament",
+        geometry_source_kind="Catalog Component",
+        transform=transform,
+    )
+
+    assert component.transform is transform
+
+def test_semantic_relief_component_rejects_unvalidated_transform():
+    with pytest.raises(TypeError, match="transform"):
+        AtlasSemanticReliefComponent(
+            component_id="Portal Angel",
+            semantic_class="Figurative Ornament",
+            geometry_source_kind="Catalog Component",
+            transform={
+                "translation_mm": (0.0, 0.0, 0.0),
+                "dimensions_mm": (12.0, 24.5, 3.0),
+            },
         )

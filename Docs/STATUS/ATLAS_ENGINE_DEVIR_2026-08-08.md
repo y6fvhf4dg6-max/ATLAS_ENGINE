@@ -9195,3 +9195,31 @@ Kalıcı yüzde kayıt kuralı:
 - her anlamlı milestone kaydında `ATLAS genel tamamlanma` ve `Aktif program tamamlanma` birlikte yazılacaktır;
 - yüzdeler test sayısına göre değil, kabul kapısı tamamlanan gerçek yeteneklere göre değiştirilecektir;
 - Phase veya fiziksel ürün kabul kapısı tamamlanmadan yapay yüzde artışı yapılmayacaktır.
+
+### Phase 1 ara milestone — Transform ve fiziksel yerleşim
+
+Status: `IMPLEMENTATION_ACTIVE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%8`
+- CORE: `CORE/atlas_semantic_relief_transform.py`
+- Entegrasyon: `CORE/atlas_semantic_relief_component.py`
+- Test: `Test/test_semantic_relief_transform.py`
+- Focused validation: `31 passed in 0.05s`
+- Related semantic validation: `55 passed in 0.16s`
+- Full regression: `3803 passed in 16.81s`
+- Diff check: temiz
+
+Tamamlanan davranışlar:
+
+- immutable translation, XYZ rotation ve physical dimensions;
+- numeric değerlerin deterministic float tuple normalizasyonu;
+- finite-value validation;
+- positive physical dimensions zorunluluğu;
+- explicit `component_local` veya normalize edilmiş coordinate-space kimliği;
+- malformed triplet reddi;
+- component üzerinde yalnız validated transform nesnesi kabulü.
+
+Bu contract aynı kemer, heykel, pencere veya kit parçasının farklı konum, yön ve fiziksel ölçülerde güvenilir biçimde yeniden kullanılmasını sağlar.
+
+Phase 1 henüz `LOCKED` değildir. Sıradaki kesin paket repetition ve interchangeable-instance contractıdır. Ardından `AtlasSemanticReliefScene` graph doğrulamaları başlayacaktır.
