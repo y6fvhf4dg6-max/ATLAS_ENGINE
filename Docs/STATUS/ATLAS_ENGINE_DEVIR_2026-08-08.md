@@ -8413,3 +8413,51 @@ safe reductions without silently changing visible semantic colors.
 
 Working-tree protection remains mandatory: do not include `Data/OSM/` or the
 three Jamaica preview scripts. No broad stage/reset/restore/clean.
+
+---
+
+## Meckenheim Jungholzweg 2/3 Production V2 Handoff — 15 August 2026
+
+Status: `BAMBU PROJECT READY`; slicing pending.
+
+- outer/opening/scale: `170 / 150 mm / 1:3000`
+- label/icon: `JUNGHOLZWEG 2/3 / MECKENHEIM` / home
+- verified targets:
+  - OSM `220593156`: Jungholzweg 2/2a/2b
+  - OSM `389176145`: Jungholzweg 3
+- Apple Maps comparison confirmed the first target within `7.64 m`
+- Black frame/text/icon
+- White terrain/roads/plate
+- Desert Tan generic buildings/roofs
+- Brick Red only the two verified target roofs
+- Dark Green parks/Physical Tree V2
+- no real scene water; no Blue output
+
+The renderer now supports opt-in roof-only highlighted-building separation.
+Default same-material closed-solid preservation remains unchanged. Meckenheim
+forces closed wall/roof color solids only for the two verified target IDs;
+there is no manual or location-specific geometry hack.
+
+Five aligned STLs:
+
+- Black `1848`, White `5832`, Brick Red `20`,
+  Desert Tan `10150`, Dark Green `19952` triangles
+- every file: `0` open / `0` non-manifold
+
+Project:
+
+`OUTPUT/STL/meckenheim_jungholzweg_2_3_multicolor_170mm_PRODUCTION_V2/meckenheim_jungholzweg_2_3_170mm_HOME_PRODUCTION_V2.3mf`
+
+Validation: related `71 passed`; full `3772 passed in 16.90s`.
+
+Mandatory next production sequence:
+
+1. finish the current Köln print;
+2. update P2S firmware;
+3. update Bambu Studio;
+4. reopen and slice the saved Meckenheim project;
+5. inspect object/material mapping, model/purge/tower grams, changes and time;
+6. print only after the physical gate passes.
+
+Working-tree protection remains mandatory: do not include `Data/OSM/` or the
+three Jamaica preview scripts. No broad stage/reset/restore/clean.

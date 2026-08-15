@@ -23,21 +23,21 @@ PBF_PATH = "Data/OSM/meckenheim-jungholzweg-2-3-test.osm.pbf"
 
 CITY_OUTPUT_PATH = (
     "OUTPUT/STL/"
-    "meckenheim_jungholzweg_2_3_city_150mm_PREMIUM_V1.stl"
+    "meckenheim_jungholzweg_2_3_city_150mm_PRODUCTION_V2.stl"
 )
 
 PRODUCT_OUTPUT_PATH = (
     "OUTPUT/STL/"
-    "meckenheim_jungholzweg_2_3_wall_collection_170mm_PREMIUM_V1.stl"
+    "meckenheim_jungholzweg_2_3_wall_collection_170mm_PRODUCTION_V2.stl"
 )
 
 MULTICOLOR_OUTPUT_DIRECTORY = (
     "OUTPUT/STL/"
-    "meckenheim_jungholzweg_2_3_multicolor_PREMIUM_V1"
+    "meckenheim_jungholzweg_2_3_multicolor_170mm_PRODUCTION_V2"
 )
 
 MULTICOLOR_PRODUCT_NAME = (
-    "meckenheim_jungholzweg_2_3_170mm_PREMIUM_V1"
+    "meckenheim_jungholzweg_2_3_170mm_PRODUCTION_V2"
 )
 
 CENTER_LAT = 50.61977675
@@ -49,6 +49,14 @@ FRAME_DEPTH_MM = 6.0
 CITY_SIZE_MM = 150.0
 
 SCALE_RATIO = 3000.0
+
+DEFAULT_PRIMARY_TEXT = "JUNGHOLZWEG 2/3"
+DEFAULT_SECONDARY_TEXT = "MECKENHEIM"
+
+HIGHLIGHTED_BUILDING_SOURCE_IDS = {
+    220593156,
+    389176145,
+}
 
 
 
@@ -93,12 +101,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--primary-text",
-        default="",
+        default=DEFAULT_PRIMARY_TEXT,
         help="Optional primary label line.",
     )
     parser.add_argument(
         "--secondary-text",
-        default="",
+        default=DEFAULT_SECONDARY_TEXT,
         help="Optional secondary label line.",
     )
 
@@ -188,7 +196,7 @@ def main(argv=None):
     )
 
     material_profile = (
-        AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        AtlasProductPreviewMaterialProfile.meckenheim_home_v2()
     )
 
     color_scene = AtlasProductColorPreviewRenderer.build_scene(
@@ -198,10 +206,11 @@ def main(argv=None):
         material_profile=material_profile,
         label_plate_spec=label_plate_spec,
         label_text_spec=label_text_spec,
-        highlighted_building_source_ids={
-            220593156,
-            389176145,
-        },
+        highlighted_building_source_ids=(
+            HIGHLIGHTED_BUILDING_SOURCE_IDS
+        ),
+        highlighted_building_roofs_only=True,
+        highlighted_building_roof_batch="landmark_roofs",
     )
 
     multicolor_result = (

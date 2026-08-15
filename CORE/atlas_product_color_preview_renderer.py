@@ -1406,6 +1406,8 @@ class AtlasProductColorPreviewRenderer:
         label_text_spec: AtlasLabelTextSpec | None = None,
         highlighted_building_source_ids=None,
         highlighted_landmark_ids=None,
+        highlighted_building_roofs_only=False,
+        highlighted_building_roof_batch="building_roofs",
     ) -> dict:
         highlighted_building_source_ids = {
             str(source_id)
@@ -1422,6 +1424,22 @@ class AtlasProductColorPreviewRenderer:
 
         applied_highlighted_building_source_ids = set()
         applied_highlighted_landmark_ids = set()
+
+        highlighted_building_roofs_only = bool(
+            highlighted_building_roofs_only
+        )
+        highlighted_building_roof_batch = str(
+            highlighted_building_roof_batch
+        )
+
+        if highlighted_building_roof_batch not in {
+            "building_roofs",
+            "landmark_roofs",
+        }:
+            raise ValueError(
+                "highlighted_building_roof_batch must be "
+                "building_roofs or landmark_roofs"
+            )
 
         terrain_size_x_mm = float(city_result["terrain_size_x_mm"])
         terrain_size_y_mm = float(city_result["terrain_size_y_mm"])
@@ -1616,9 +1634,16 @@ class AtlasProductColorPreviewRenderer:
                             material_profile.building_roof_rgb
                         )
                     )
+                    is_roof_only_highlight = (
+                        highlighted_building_roofs_only
+                        and mesh.get("source_id") is not None
+                        and str(mesh.get("source_id"))
+                        in highlighted_building_source_ids
+                    )
 
                     if (
                         building_material_is_shared
+                        and not is_roof_only_highlight
                         and cls._triangle_mesh_is_closed(
                             original_triangles
                         )
@@ -1721,6 +1746,28 @@ class AtlasProductColorPreviewRenderer:
                         and str(source_id)
                         in highlighted_building_source_ids
                     ):
+                        if highlighted_building_roofs_only:
+                            material_batches[
+                                "building_walls"
+                            ]["meshes"].append(
+                                translated_wall_mesh
+                            )
+
+                            if translated_roof_mesh is not None:
+                                translated_roof_mesh["type"] = (
+                                    "highlighted_building_roof"
+                                )
+                                material_batches[
+                                    highlighted_building_roof_batch
+                                ]["meshes"].append(
+                                    translated_roof_mesh
+                                )
+
+                            applied_highlighted_building_source_ids.add(
+                                str(source_id)
+                            )
+                            continue
+
                         highlighted_mesh = {
                             "type": "highlighted_building",
                             "source_id": source_id,

@@ -5182,3 +5182,30 @@ Production lesson: ATLAS needs a future layer-aware material/change optimizer
 that reports per-layer material demand, identifies invisible or redundant
 material parts, estimates purge/prime-tower cost and reduces safe transitions
 without changing visible semantic colors.
+
+---
+
+## Meckenheim Jungholzweg 2/3 Home Production V2 — 15 August 2026
+
+Meckenheim home-memory gift reached Bambu project readiness.
+
+- verified address targets:
+  - Jungholzweg 2/2a/2b: OSM `220593156`
+  - Jungholzweg 3: OSM `389176145`
+- Apple Maps comparison confirmed Jungholzweg 2 within `7.64 m`
+- product/opening/scale: `170 × 170 mm` / `150 × 150 mm` / `1:3000`
+- label: `JUNGHOLZWEG 2/3 / MECKENHEIM`; symbol: home
+- Black: frame/text/home symbol
+- White: terrain/roads/label plate
+- Desert Tan: generic buildings and roofs
+- Brick Red: only the two verified target roofs
+- Dark Green: parks and Physical Tree V2 vegetation
+- water/Blue: absent from the real scene
+- five physical STL files: every part `0` open / `0` non-manifold
+- saved project:
+  `meckenheim_jungholzweg_2_3_170mm_HOME_PRODUCTION_V2.3mf`
+- status: `BAMBU PROJECT READY`; slice pending
+- validation: related `71 passed`; full `3772 passed in 16.90s`
+
+Before slicing or starting another print, finish the current Köln job and
+update both P2S firmware and Bambu Studio.

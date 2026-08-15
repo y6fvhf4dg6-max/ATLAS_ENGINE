@@ -2354,3 +2354,62 @@ def test_renderer_keeps_same_material_building_as_one_closed_solid():
         )
         == 0
     )
+
+def test_renderer_can_route_only_selected_building_roof_to_landmark_roof_batch():
+    selected_source_id = 220593156
+    wall_triangle = (
+        (10.0, 20.0, 0.8),
+        (11.0, 20.0, 0.8),
+        (10.0, 20.0, 5.0),
+    )
+    roof_triangle = (
+        (10.0, 20.0, 5.0),
+        (11.0, 20.0, 5.0),
+        (10.0, 21.0, 5.0),
+    )
+
+    city_result = _city_result()
+    city_result["mesh_groups"]["buildings"] = [
+        {
+            "type": "building",
+            "source_id": selected_source_id,
+            "triangles": [
+                wall_triangle,
+                roof_triangle,
+            ],
+            "building_wall_triangles": [wall_triangle],
+            "building_roof_triangles": [roof_triangle],
+        },
+    ]
+
+    scene = AtlasProductColorPreviewRenderer.build_scene(
+        city_result=city_result,
+        frame_spec=AtlasWallFrameSpec(),
+        frame_depth_mm=6.0,
+        material_profile=(
+            AtlasProductPreviewMaterialProfile.meckenheim_home_v2()
+        ),
+        highlighted_building_source_ids={
+            selected_source_id,
+        },
+        highlighted_building_roofs_only=True,
+        highlighted_building_roof_batch="landmark_roofs",
+    )
+
+    batches = scene["material_batches"]
+
+    assert len(batches["building_walls"]["meshes"]) == 1
+    assert batches["building_roofs"]["meshes"] == []
+    assert len(batches["landmark_roofs"]["meshes"]) == 1
+
+    assert (
+        batches["building_walls"]["meshes"][0]["source_id"]
+        == selected_source_id
+    )
+    assert (
+        batches["landmark_roofs"]["meshes"][0]["source_id"]
+        == selected_source_id
+    )
+    assert len(
+        batches["landmark_roofs"]["meshes"][0]["triangles"]
+    ) == 1

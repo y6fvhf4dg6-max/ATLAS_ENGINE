@@ -144,6 +144,32 @@ class AtlasProductPreviewMaterialProfile:
         )
 
     @classmethod
+    def meckenheim_home_v2(cls):
+        black = (20, 20, 20)
+        white = (245, 245, 240)
+        desert_tan = (205, 190, 160)
+        brick_red = (156, 48, 42)
+        dark_green = (73, 105, 58)
+        blue = (70, 140, 180)
+
+        return cls(
+            name="MECKENHEIM_HOME_V2",
+            frame_rgb=black,
+            building_rgb=desert_tan,
+            building_wall_rgb=desert_tan,
+            building_roof_rgb=desert_tan,
+            landmark_rgb=desert_tan,
+            terrain_rgb=white,
+            road_rgb=white,
+            green_rgb=dark_green,
+            tree_rgb=dark_green,
+            water_rgb=blue,
+            label_plate_rgb=white,
+            label_text_rgb=black,
+            landmark_roof_rgb=brick_red,
+        )
+
+    @classmethod
     def dalyan_kaunos_premium_v1(cls):
         ivory = (242, 235, 218)
         sandstone = (190, 145, 92)

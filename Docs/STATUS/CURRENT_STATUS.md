@@ -7075,3 +7075,59 @@ Add a generic production optimizer/report before future batch printing:
 - never replace a visible semantic color automatically;
 - retain Bambu object/material, layer-preview and gram-distribution checks as
   the final physical gate.
+
+---
+
+## 15 August 2026 — Meckenheim Home Production V2 / BAMBU PROJECT READY
+
+### Verified product contract
+
+- address: Jungholzweg 2/3, 53340 Meckenheim
+- verified OSM buildings:
+  - `220593156`: `2, 2 a, 2 b`, `building=apartments`
+  - `389176145`: `3`, `building=house`
+- Apple Maps Jungholzweg 2 pin:
+  `50.619320, 7.032310`
+- OSM `220593156` center is `7.64 m` from the Apple pin
+- outer/opening/scale: `170 / 150 mm / 1:3000`
+- label/icon: `JUNGHOLZWEG 2/3 / MECKENHEIM` / home
+
+### Physical palette and selected-roof separation
+
+The Bonn-style premium hierarchy is used:
+
+- Black: frame, label text and home symbol
+- White: terrain, roads and label plate
+- Desert Tan: generic buildings and generic roofs
+- Brick Red: only the verified Jungholzweg 2/3 target roofs
+- Dark Green: parks and Physical Tree V2 vegetation
+- Blue: available in the profile but absent from this real scene
+
+A new opt-in renderer contract preserves same-material buildings as single
+closed solids by default, but can force safe closed wall/roof separation for
+verified highlighted buildings. Meckenheim uses roof-only highlighting and
+routes the two target roofs to the Brick Red landmark-roof batch. All other
+walls and roofs remain Desert Tan.
+
+Physical STL topology:
+
+- Black `1848` triangles
+- White `5832`
+- Brick Red `20`
+- Desert Tan `10150`
+- Dark Green `19952`
+- every part: `0` open / `0` non-manifold
+
+Saved Bambu project:
+
+`OUTPUT/STL/meckenheim_jungholzweg_2_3_multicolor_170mm_PRODUCTION_V2/meckenheim_jungholzweg_2_3_170mm_HOME_PRODUCTION_V2.3mf`
+
+Visual composition: `PASS`.
+Physical topology gate: `PASS`.
+Slice/mass/change/time gate: `PENDING`.
+
+Validation: related package `71 passed`; full regression
+`3772 passed in 16.90s`.
+
+Production sequencing requirement: complete the current Köln print, then
+update P2S firmware and Bambu Studio before slicing or starting Meckenheim.
