@@ -37,6 +37,26 @@ class AtlasPremiumGiftBoxSpec:
         spec._validate()
         return spec
 
+    @classmethod
+    def for_mini_wall_collection_v1(
+        cls,
+    ) -> "AtlasPremiumGiftBoxSpec":
+        return cls.for_wall_collection(
+            product_width_mm=120.0,
+            product_height_mm=120.0,
+            product_depth_mm=20.0,
+        )
+
+    @classmethod
+    def for_original_wall_collection_v1(
+        cls,
+    ) -> "AtlasPremiumGiftBoxSpec":
+        return cls.for_wall_collection(
+            product_width_mm=170.0,
+            product_height_mm=170.0,
+            product_depth_mm=30.0,
+        )
+
     def _validate(self) -> None:
         values = {
             "product_width_mm": self.product_width_mm,

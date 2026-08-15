@@ -122,3 +122,67 @@ def test_lid_preserves_flat_personalization_surface(spec):
     assert max(x for x, _, _ in top_vertices) == pytest.approx(115.8)
     assert min(y for _, y, _ in top_vertices) == pytest.approx(-115.8)
     assert max(y for _, y, _ in top_vertices) == pytest.approx(115.8)
+
+
+
+@pytest.mark.parametrize(
+    (
+        "factory_name",
+        "expected_base_width_mm",
+        "expected_base_depth_mm",
+        "expected_lid_width_mm",
+    ),
+    (
+        (
+            "for_mini_wall_collection_v1",
+            126.8,
+            25.4,
+            131.6,
+        ),
+        (
+            "for_original_wall_collection_v1",
+            176.8,
+            35.4,
+            181.6,
+        ),
+    ),
+)
+def test_standard_box_meshes_are_closed_manifold(
+    factory_name,
+    expected_base_width_mm,
+    expected_base_depth_mm,
+    expected_lid_width_mm,
+):
+    factory = getattr(
+        AtlasPremiumGiftBoxSpec,
+        factory_name,
+    )
+    standard_spec = factory()
+
+    base_mesh = AtlasPremiumGiftBoxMesher.build_base(
+        spec=standard_spec,
+    )
+    lid_mesh = AtlasPremiumGiftBoxMesher.build_lid(
+        spec=standard_spec,
+    )
+
+    assert base_mesh["outer_width_mm"] == pytest.approx(
+        expected_base_width_mm
+    )
+    assert base_mesh["outer_height_mm"] == pytest.approx(
+        expected_base_width_mm
+    )
+    assert base_mesh["total_depth_mm"] == pytest.approx(
+        expected_base_depth_mm
+    )
+
+    assert lid_mesh["outer_width_mm"] == pytest.approx(
+        expected_lid_width_mm
+    )
+    assert lid_mesh["outer_height_mm"] == pytest.approx(
+        expected_lid_width_mm
+    )
+    assert lid_mesh["total_depth_mm"] == pytest.approx(10.0)
+
+    _assert_closed_manifold(base_mesh)
+    _assert_closed_manifold(lid_mesh)
