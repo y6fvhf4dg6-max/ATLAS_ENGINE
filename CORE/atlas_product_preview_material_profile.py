@@ -94,6 +94,31 @@ class AtlasProductPreviewMaterialProfile:
         )
 
     @classmethod
+    def koeln_graduation_v2(cls):
+        black = (20, 20, 20)
+        white = (245, 245, 240)
+        brick_red = (156, 48, 42)
+        dark_green = (73, 105, 58)
+        blue = (70, 140, 180)
+
+        return cls(
+            name="KOELN_GRADUATION_V2",
+            frame_rgb=black,
+            building_rgb=white,
+            building_wall_rgb=white,
+            building_roof_rgb=white,
+            landmark_rgb=white,
+            terrain_rgb=white,
+            road_rgb=white,
+            green_rgb=dark_green,
+            tree_rgb=dark_green,
+            water_rgb=blue,
+            label_plate_rgb=white,
+            label_text_rgb=black,
+            landmark_roof_rgb=brick_red,
+        )
+
+    @classmethod
     def bonn_birthplace_v1(cls):
         black = (20, 20, 20)
         white = (245, 245, 240)

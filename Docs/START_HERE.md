@@ -5151,3 +5151,34 @@ Physical Tree V2 supersedes V1 for future generated scenes:
 
 Validation: related tree package `76 passed`; full regression
 `3764 passed in 16.70s`.
+
+
+---
+
+## Köln Graduation Production V2 — 15 August 2026
+
+Köln Humanwissenschaftliche Fakultät / former Pädagogische Fakultät gift
+was rebuilt with the current ATLAS physical product standard.
+
+- recipient context: graduate of the former Pädagogische Fakultät
+- verified target: Gebäude `216`, Gronewaldstraße 2; OSM source `125014714`
+- product/opening/scale: `170 × 170 mm` / `150 × 150 mm` / `1:3000`
+- label: `UNIVERSITÄT ZU KÖLN / PÄDAGOGISCHE FAKULTÄT`
+- symbol: graduation cap
+- palette: Black frame/text/cap; White terrain/roads/buildings/plate;
+  Brick Red painted Gebäude 216 roof; Dark Green parks/Physical Tree V2;
+  Blue water
+- generated five-color STL package: every part `0` open / `0` non-manifold
+- invisible legacy `46`-triangle Brick Red part removed in Bambu Studio;
+  Gebäude 216 roof received slicer-verified volumetric Brick Red painting
+- slice: `100.77 g` model, `22.90 g` purge, `6.67 g` prime tower,
+  `130.33 g` total; `88` changes; `6 h 19 min`
+- project:
+  `OUTPUT/STL/koeln_paedagogische_fakultaet_multicolor_170mm_PRODUCTION_V2/koeln_paedagogische_fakultaet_170mm_GRADUATION_PRODUCTION_V2.3mf`
+- status: `PRINT QUEUE`, behind Seychellen
+- validation: focused `25 passed`; related `82 passed`; full `3767 passed in 16.96s`
+
+Production lesson: ATLAS needs a future layer-aware material/change optimizer
+that reports per-layer material demand, identifies invisible or redundant
+material parts, estimates purge/prime-tower cost and reduces safe transitions
+without changing visible semantic colors.

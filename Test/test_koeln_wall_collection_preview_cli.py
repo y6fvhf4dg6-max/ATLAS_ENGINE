@@ -1,6 +1,11 @@
 import pytest
 
 from Test.preview_koeln_paedagogische_fakultaet_wall_collection import (
+    CITY_SIZE_MM,
+    FRAME_WIDTH_MM,
+    HIGHLIGHTED_BUILDING_SOURCE_IDS,
+    PRODUCT_OUTER_SIZE_MM,
+    SCALE_RATIO,
     build_parser,
 )
 
@@ -59,3 +64,14 @@ def test_preview_rejects_secondary_text_without_primary_text():
         match="secondary text requires primary text",
     ):
         arguments.validate_label_text()
+
+
+def test_koeln_production_uses_current_physical_contract():
+    assert PRODUCT_OUTER_SIZE_MM == 170.0
+    assert CITY_SIZE_MM == 150.0
+    assert FRAME_WIDTH_MM == 10.0
+    assert SCALE_RATIO == 3000.0
+
+
+def test_koeln_production_does_not_color_entire_faculty_building_red():
+    assert HIGHLIGHTED_BUILDING_SOURCE_IDS == frozenset()

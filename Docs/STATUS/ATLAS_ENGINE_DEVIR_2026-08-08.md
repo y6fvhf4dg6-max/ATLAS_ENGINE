@@ -8362,3 +8362,54 @@ Green.
 Working-tree protection remains mandatory: do not include `Data/OSM/` or the
 three Jamaica preview scripts in this milestone. No broad stage/reset/restore/
 clean.
+
+
+---
+
+## Köln Graduation Production V2 Handoff — 15 August 2026
+
+Status: `PRINT QUEUE`, behind Seychellen.
+
+- outer/opening/scale: `170 / 150 mm / 1:3000`
+- label/icon:
+  `UNIVERSITÄT ZU KÖLN / PÄDAGOGISCHE FAKULTÄT` / graduation cap
+- verified focus: Gebäude `216`, Gronewaldstraße 2,
+  OSM source `125014714`
+- Black: frame/text/cap
+- White: terrain/roads/buildings/plate
+- Brick Red: Bambu-painted Gebäude 216 roof only
+- Dark Green: parks/Physical Tree V2
+- Blue: water
+- generated five STL parts all `0` open / `0` non-manifold
+
+The automatically generated `46`-triangle Brick Red part was invisible in the
+assembled product and was deleted from the Bambu project. The verified Gebäude
+216 roof was painted in Bambu Studio; walls remained White. Removing the
+redundant part reduced the slice from `89` to `88` changes and from `6 h 20 min`
+to `6 h 19 min`.
+
+Final physical gate:
+
+- model `100.77 g`; purge `22.90 g`; tower `6.67 g`;
+  total `130.33 g`
+- `88` changes; `6 h 19 min`
+- Black `22.24 g`; White `71.75 g`; Brick Red `0.16 g`;
+  Dark Green approximately `6.37 g`; Blue approximately `0.25 g`
+
+Project:
+
+`OUTPUT/STL/koeln_paedagogische_fakultaet_multicolor_170mm_PRODUCTION_V2/koeln_paedagogische_fakultaet_170mm_GRADUATION_PRODUCTION_V2.3mf`
+
+Validation: focused `25 passed`; related `82 passed`; full `3767 passed in 16.96s`.
+
+Do not enable support for the Black floating-cantilever warning. Layer
+inspection proves that the Black label text/cap is supported by the continuous
+White label plate.
+
+Parked next engine capability: a generic layer-aware physical material/change
+optimizer. It must report per-layer material demand, transition-causing
+geometry, redundant/occluded parts and purge/prime-tower cost, then propose
+safe reductions without silently changing visible semantic colors.
+
+Working-tree protection remains mandatory: do not include `Data/OSM/` or the
+three Jamaica preview scripts. No broad stage/reset/restore/clean.

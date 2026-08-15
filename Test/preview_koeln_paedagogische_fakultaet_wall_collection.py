@@ -23,32 +23,34 @@ PBF_PATH = "Data/OSM/koeln-paedagogische-fakultaet-test.osm.pbf"
 
 CITY_OUTPUT_PATH = (
     "OUTPUT/STL/"
-    "koeln_paedagogische_fakultaet_city_134mm.stl"
+    "koeln_paedagogische_fakultaet_city_150mm_PRODUCTION_V2.stl"
 )
 
 PRODUCT_OUTPUT_PATH = (
     "OUTPUT/STL/"
-    "koeln_paedagogische_fakultaet_wall_collection_150mm.stl"
+    "koeln_paedagogische_fakultaet_wall_collection_170mm_PRODUCTION_V2.stl"
 )
 
 MULTICOLOR_OUTPUT_DIRECTORY = (
     "OUTPUT/STL/"
-    "koeln_paedagogische_fakultaet_multicolor"
+    "koeln_paedagogische_fakultaet_multicolor_170mm_PRODUCTION_V2"
 )
 
 MULTICOLOR_PRODUCT_NAME = (
-    "koeln_paedagogische_fakultaet_150mm"
+    "koeln_paedagogische_fakultaet_170mm_PRODUCTION_V2"
 )
 
 CENTER_LAT = 50.93428235
 CENTER_LON = 6.91972655
 
-PRODUCT_OUTER_SIZE_MM = 150.0
-FRAME_WIDTH_MM = 8.0
+PRODUCT_OUTER_SIZE_MM = 170.0
+FRAME_WIDTH_MM = 10.0
 FRAME_DEPTH_MM = 6.0
-CITY_SIZE_MM = 134.0
+CITY_SIZE_MM = 150.0
 
-SCALE_RATIO = 5500.0
+SCALE_RATIO = 3000.0
+
+HIGHLIGHTED_BUILDING_SOURCE_IDS = frozenset()
 
 
 
@@ -179,7 +181,7 @@ def main(argv=None):
     )
 
     material_profile = (
-        AtlasProductPreviewMaterialProfile.koeln_premium_v1()
+        AtlasProductPreviewMaterialProfile.koeln_graduation_v2()
     )
 
     color_scene = AtlasProductColorPreviewRenderer.build_scene(
@@ -189,9 +191,9 @@ def main(argv=None):
         material_profile=material_profile,
         label_plate_spec=label_plate_spec,
         label_text_spec=label_text_spec,
-        highlighted_building_source_ids={
-            125014714,
-        },
+        highlighted_building_source_ids=(
+            HIGHLIGHTED_BUILDING_SOURCE_IDS
+        ),
     )
 
     multicolor_result = (

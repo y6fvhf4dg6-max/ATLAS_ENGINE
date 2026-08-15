@@ -6997,3 +6997,81 @@ Validation:
 
 Seychellen production state: `PRINTING`; A1 Black, A2 White, A3 Blue,
 A4 Dark Green.
+
+
+---
+
+## 15 August 2026 — Köln Graduation Production V2 / PRINT QUEUE
+
+### Physical product
+
+- current standard: `170 × 170 mm` outer, `150 × 150 mm` opening
+- scale: `1:3000`
+- label: `UNIVERSITÄT ZU KÖLN / PÄDAGOGISCHE FAKULTÄT`
+- icon: graduation cap
+- target building: Universität zu Köln Gebäude `216`,
+  Gronewaldstraße 2; OSM source `125014714`
+- Gebäude 216 scene bounds:
+  X `70.084 .. 80.355 mm`, Y `51.402 .. 91.826 mm`
+- current institutional name: Humanwissenschaftliche Fakultät;
+  recipient context: former Pädagogische Fakultät
+
+### Physical palette and geometry
+
+- Black: frame, label text, graduation cap
+- White: terrain, roads, generic buildings/roofs, label plate
+- Brick Red: only the Bambu-painted roof of Gebäude 216
+- Dark Green: parks and Physical Tree V2 vegetation
+- Blue: real scene water (`148` triangles)
+
+Generated material STL topology:
+
+- black `2904`, white `9526`, generated Brick Red `46`,
+  Dark Green `40900`, Blue `148` triangles
+- every generated STL: `0` open / `0` non-manifold
+
+The generated `46`-triangle Brick Red part was not visibly useful and was
+removed from the Bambu project. Gebäude 216 was identified from source ID and
+scene bounds, then only its roof was painted Brick Red. Its walls and all
+neighbouring buildings remain White. Layer preview confirmed real volumetric
+red toolpaths.
+
+The Black STL floating-cantilever warning is a false positive caused by label
+text/cap being separate components in the shared Black part. Layer inspection
+confirmed continuous White label-plate material below the Black text; supports
+must not be enabled.
+
+### Bambu physical gate
+
+Final slice after removing the redundant generated red part:
+
+- model `100.77 g`
+- purge `22.90 g`
+- prime tower `6.67 g`
+- total `130.33 g`
+- filament changes `88`
+- total time `6 h 19 min`
+
+Removing the redundant part improved the earlier slice from `89` to `88`
+changes, `23.09` to `22.90 g` purge and `6 h 20 min` to `6 h 19 min`.
+
+Saved project:
+
+`OUTPUT/STL/koeln_paedagogische_fakultaet_multicolor_170mm_PRODUCTION_V2/koeln_paedagogische_fakultaet_170mm_GRADUATION_PRODUCTION_V2.3mf`
+
+Status: `PRINT QUEUE`, after the current Seychellen production.
+
+Validation: focused `25 passed`; related `82 passed`; full `3767 passed in 16.96s`.
+
+### Parked engine development: layer-aware color/change optimization
+
+Add a generic production optimizer/report before future batch printing:
+
+- report required physical materials for every Z layer;
+- identify empty, occluded or visually redundant material parts;
+- report which geometry causes every filament transition;
+- estimate model, purge and prime-tower mass before Bambu completion;
+- propose safe material-order/consolidation opportunities;
+- never replace a visible semantic color automatically;
+- retain Bambu object/material, layer-preview and gram-distribution checks as
+  the final physical gate.

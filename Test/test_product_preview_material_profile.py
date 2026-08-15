@@ -116,6 +116,56 @@ def test_koeln_premium_v1_uses_locked_five_color_palette():
         blue,
     }
 
+def test_koeln_graduation_v2_uses_white_roads_and_historic_red_roofs():
+    profile = (
+        AtlasProductPreviewMaterialProfile
+        .koeln_graduation_v2()
+    )
+
+    black = (20, 20, 20)
+    white = (245, 245, 240)
+    brick_red = (156, 48, 42)
+    dark_green = (73, 105, 58)
+    blue = (70, 140, 180)
+
+    assert profile.name == "KOELN_GRADUATION_V2"
+    assert profile.frame_rgb == black
+    assert profile.label_text_rgb == black
+    assert profile.terrain_rgb == white
+    assert profile.road_rgb == white
+    assert profile.label_plate_rgb == white
+    assert profile.building_rgb == white
+    assert profile.building_wall_rgb == white
+    assert profile.building_roof_rgb == white
+    assert profile.landmark_rgb == white
+    assert profile.landmark_roof_rgb == brick_red
+    assert profile.green_rgb == dark_green
+    assert profile.tree_rgb == dark_green
+    assert profile.water_rgb == blue
+
+    assert {
+        profile.frame_rgb,
+        profile.terrain_rgb,
+        profile.road_rgb,
+        profile.label_plate_rgb,
+        profile.building_rgb,
+        profile.building_wall_rgb,
+        profile.building_roof_rgb,
+        profile.landmark_rgb,
+        profile.landmark_roof_rgb,
+        profile.green_rgb,
+        profile.tree_rgb,
+        profile.water_rgb,
+        profile.label_text_rgb,
+    } == {
+        black,
+        white,
+        brick_red,
+        dark_green,
+        blue,
+    }
+
+
 def test_preview_material_profile_exposes_separate_landmark_color():
     profile = AtlasProductPreviewMaterialProfile(
         name="LANDMARK_TEST",
