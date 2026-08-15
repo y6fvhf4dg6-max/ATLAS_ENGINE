@@ -186,3 +186,152 @@ def test_standard_box_meshes_are_closed_manifold(
 
     _assert_closed_manifold(base_mesh)
     _assert_closed_manifold(lid_mesh)
+
+
+
+@pytest.mark.parametrize(
+    ("capacity_mm", "usable_height_mm"),
+    (
+        (25.0, 27.0),
+        (50.0, 52.0),
+    ),
+)
+def test_middle_module_has_female_bottom_and_male_top(
+    capacity_mm,
+    usable_height_mm,
+):
+    spec = AtlasPremiumGiftBoxSpec.for_original_wall_collection_v1()
+    mesh = AtlasPremiumGiftBoxMesher.build_middle_module(
+        spec=spec,
+        product_capacity_mm=capacity_mm,
+    )
+
+    assert mesh["type"] == "premium_gift_box_middle_module"
+    assert mesh["product_capacity_mm"] == pytest.approx(capacity_mm)
+    assert mesh["usable_height_mm"] == pytest.approx(
+        usable_height_mm
+    )
+    assert mesh["bottom_connector"] == "female"
+    assert mesh["top_connector"] == "male"
+    assert mesh["connector_engagement_mm"] == pytest.approx(1.6)
+    assert mesh["connector_recess_depth_mm"] == pytest.approx(1.8)
+    _assert_closed_manifold(mesh)
+
+
+def test_base_has_male_top_connector():
+    spec = AtlasPremiumGiftBoxSpec.for_original_wall_collection_v1()
+    mesh = AtlasPremiumGiftBoxMesher.build_base(spec=spec)
+
+    assert mesh["top_connector"] == "male"
+    assert mesh["connector_engagement_mm"] == pytest.approx(1.6)
+    _assert_closed_manifold(mesh)
+
+
+def test_lid_has_female_bottom_connector():
+    spec = AtlasPremiumGiftBoxSpec.for_original_wall_collection_v1()
+    mesh = AtlasPremiumGiftBoxMesher.build_lid(spec=spec)
+
+    assert mesh["bottom_connector"] == "female"
+    assert mesh["connector_recess_depth_mm"] == pytest.approx(1.8)
+    _assert_closed_manifold(mesh)
+
+
+@pytest.mark.parametrize("capacity_mm", (25.0, 50.0))
+def test_middle_module_connector_dimensions_match_base_and_lid(
+    capacity_mm,
+):
+    spec = AtlasPremiumGiftBoxSpec.for_original_wall_collection_v1()
+    base = AtlasPremiumGiftBoxMesher.build_base(spec=spec)
+    module = AtlasPremiumGiftBoxMesher.build_middle_module(
+        spec=spec,
+        product_capacity_mm=capacity_mm,
+    )
+    lid = AtlasPremiumGiftBoxMesher.build_lid(spec=spec)
+
+    assert (
+        base["male_connector_outer_width_mm"]
+        + 2.0 * spec.connector_clearance_per_side_mm
+        == pytest.approx(
+            module["female_connector_inner_width_mm"]
+        )
+    )
+    assert (
+        module["male_connector_outer_width_mm"]
+        + 2.0 * spec.connector_clearance_per_side_mm
+        == pytest.approx(
+            lid["female_connector_inner_width_mm"]
+        )
+    )
+
+def test_lid_contains_real_centered_personalization_recess():
+    spec = AtlasPremiumGiftBoxSpec.for_original_wall_collection_v1()
+    mesh = AtlasPremiumGiftBoxMesher.build_lid(spec=spec)
+
+    assert mesh["personalization_recess_depth_mm"] == pytest.approx(
+        0.8
+    )
+    assert mesh["personalization_recess_size_mm"] == pytest.approx(
+        (110.4, 28.4)
+    )
+
+    recess_floor_z = (
+        spec.lid_total_depth_mm
+        - spec.personalization_recess_depth_mm
+    )
+    vertices = _vertices(mesh)
+
+    assert any(
+        abs(z - recess_floor_z) < 1e-9
+        and abs(x) <= 55.2 + 1e-9
+        and abs(y) <= 14.2 + 1e-9
+        for x, y, z in vertices
+    )
+
+    _assert_closed_manifold(mesh)
+
+
+def test_personalization_plate_is_closed_manifold_and_centered():
+    spec = AtlasPremiumGiftBoxSpec.for_original_wall_collection_v1()
+
+    mesh = AtlasPremiumGiftBoxMesher.build_personalization_plate(
+        spec=spec,
+    )
+
+    assert mesh["type"] == "premium_gift_box_personalization_plate"
+    assert mesh["width_mm"] == pytest.approx(110.0)
+    assert mesh["height_mm"] == pytest.approx(28.0)
+    assert mesh["depth_mm"] == pytest.approx(1.2)
+    assert mesh["fit_system"] == "removable_recess_insert"
+
+    vertices = _vertices(mesh)
+
+    assert min(x for x, _, _ in vertices) == pytest.approx(-55.0)
+    assert max(x for x, _, _ in vertices) == pytest.approx(55.0)
+    assert min(y for _, y, _ in vertices) == pytest.approx(-14.0)
+    assert max(y for _, y, _ in vertices) == pytest.approx(14.0)
+    assert min(z for _, _, z in vertices) == pytest.approx(0.0)
+    assert max(z for _, _, z in vertices) == pytest.approx(1.2)
+
+    _assert_closed_manifold(mesh)
+
+
+def test_personalization_text_builds_one_or_two_centered_lines():
+    spec = AtlasPremiumGiftBoxSpec.for_original_wall_collection_v1()
+
+    one_line = AtlasPremiumGiftBoxMesher.build_personalization_text(
+        spec=spec,
+        lines=("FÜR ANNA",),
+    )
+    two_lines = AtlasPremiumGiftBoxMesher.build_personalization_text(
+        spec=spec,
+        lines=("FÜR ANNA", "BONN · 2026"),
+    )
+
+    assert len(one_line) == 1
+    assert len(two_lines) == 2
+    assert all(mesh["triangles"] for mesh in two_lines)
+    assert all(
+        mesh["depth_mm"]
+        == pytest.approx(spec.personalization_text_depth_mm)
+        for mesh in two_lines
+    )

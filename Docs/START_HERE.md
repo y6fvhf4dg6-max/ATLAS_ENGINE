@@ -5122,4 +5122,32 @@ Seychellen anniversary gift reached the physical print queue.
 - slice: `73.03 g` model, `9.98 g` purge, `3.31 g` prime tower, `86.32 g` total
 - production: `40` filament changes; `2 h 32 min`
 - project: `seychelles_premium_archipelago_170mm_PRODUCTION_V1.3mf`
-- status: `PRINT QUEUE`; printer currently occupied
+- status: `PRINTING`; AMS mapping A1 Black, A2 White, A3 Blue, A4 Dark Green
+
+---
+
+## Modular, Personalized Gift Box & Physical Tree V2 — 15 August 2026
+
+Premium Gift Box now supports Mini `120 mm`, Original `170 mm` and Grande
+`220 mm` products, stackable `25 mm` / `50 mm` middle modules and a removable
+personalization insert.
+
+- connector system: base male top; middle female bottom / male top; lid female bottom
+- engagement: `1.6 mm`; recess: `1.8 mm`; clearance: `0.25 mm/side`
+- personalization plates: Mini `80 × 24`, Original `110 × 28`, Grande `140 × 32 mm`
+- plate/recess/text: `1.2 / 0.8 / 0.6 mm`; fit clearance `0.20 mm/side`
+- maximum personalization lines: `2`
+- personalized lid, plate and text: `0` open / `0` non-manifold
+- universal tier corner supports: `25 mm` and `50 mm`; four required per level
+
+Physical Tree V2 supersedes V1 for future generated scenes:
+
+- canonical trunk diameter: `1.50 mm`
+- smallest `0.95×` trunk: `1.425 mm`
+- root collar: `2.20 mm` diameter × `0.80 mm` height
+- terrain embed: `0.60 mm`
+- visible height and accepted organic crown form preserved
+- strengthened tree: `0` open / `0` non-manifold
+
+Validation: related tree package `76 passed`; full regression
+`3764 passed in 16.70s`.

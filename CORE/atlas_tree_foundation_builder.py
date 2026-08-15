@@ -362,7 +362,10 @@ class AtlasTreeFoundationBuilder:
         return {
             "total_height_mm": 5.375,
             "trunk_height_mm": 2.00,
-            "trunk_diameter_mm": 1.125,
+            "trunk_diameter_mm": 1.50,
+            "root_collar_diameter_mm": 2.20,
+            "root_collar_height_mm": 0.80,
+            "terrain_embed_depth_mm": 0.60,
             "crown_height_mm": 3.375,
             "crown_diameter_mm": crown_diameter_mm,
         }
@@ -420,6 +423,16 @@ class AtlasTreeFoundationBuilder:
             dimensions["trunk_diameter_mm"]
             / 2.0
         )
+        root_collar_radius = (
+            dimensions["root_collar_diameter_mm"]
+            / 2.0
+        )
+        root_collar_height = dimensions[
+            "root_collar_height_mm"
+        ]
+        terrain_embed_depth = dimensions[
+            "terrain_embed_depth_mm"
+        ]
         crown_height = dimensions[
             "crown_height_mm"
         ]
@@ -428,14 +441,23 @@ class AtlasTreeFoundationBuilder:
             / 2.0
         )
 
-        trunk_bottom_z = float(base_z)
+        terrain_surface_z = float(base_z)
+        trunk_bottom_z = (
+            terrain_surface_z
+            - terrain_embed_depth
+        )
+        root_collar_bottom_z = trunk_bottom_z
+        root_collar_top_z = (
+            root_collar_bottom_z
+            + root_collar_height
+        )
         trunk_top_z = (
-            trunk_bottom_z
+            terrain_surface_z
             + trunk_height
         )
         crown_bottom_z = trunk_top_z
         top_z = (
-            trunk_bottom_z
+            terrain_surface_z
             + dimensions["total_height_mm"]
         )
 
@@ -472,9 +494,13 @@ class AtlasTreeFoundationBuilder:
                 )
             ]
 
-        trunk_bottom = ring(
+        root_collar_bottom = ring(
+            root_collar_radius,
+            root_collar_bottom_z,
+        )
+        root_collar_top = ring(
             trunk_radius,
-            trunk_bottom_z,
+            root_collar_top_z,
         )
         trunk_top = ring(
             trunk_radius,
@@ -542,7 +568,13 @@ class AtlasTreeFoundationBuilder:
 
         AtlasTreeFoundationBuilder._ring_to_ring(
             triangles,
-            trunk_bottom,
+            root_collar_bottom,
+            root_collar_top,
+        )
+
+        AtlasTreeFoundationBuilder._ring_to_ring(
+            triangles,
+            root_collar_top,
             trunk_top,
         )
 
@@ -570,11 +602,11 @@ class AtlasTreeFoundationBuilder:
 
         AtlasTreeFoundationBuilder._cap_bottom(
             triangles,
-            trunk_bottom,
+            root_collar_bottom,
             (
                 float(x),
                 float(y),
-                trunk_bottom_z,
+                root_collar_bottom_z,
             ),
         )
 
@@ -588,6 +620,8 @@ class AtlasTreeFoundationBuilder:
             "triangles": triangles,
             "dimensions": dimensions,
             "trunk_bottom_z": trunk_bottom_z,
+            "root_collar_bottom_z": root_collar_bottom_z,
+            "root_collar_top_z": root_collar_top_z,
             "trunk_top_z": trunk_top_z,
             "crown_bottom_z": crown_bottom_z,
             "top_z": top_z,

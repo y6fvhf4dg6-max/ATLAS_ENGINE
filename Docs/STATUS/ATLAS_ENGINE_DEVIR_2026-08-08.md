@@ -8323,3 +8323,42 @@ real defect.
 
 Working-tree protection: Jamaica previews and `Data/OSM/` remain separate.
 Do not broad-stage, reset, restore or clean them.
+
+---
+
+## Modular Gift Box, Personalization & Physical Tree V2 Handoff — 15 August 2026
+
+### Gift box
+
+- standards: Mini `120`, Original `170`, Grande `220 mm`
+- middle capacities: `25 / 50 mm`
+- connector system: base male; middle female/male; lid female
+- personalized removable plates:
+  `80 × 24`, `110 × 28`, `140 × 32 mm`
+- real centered lid recess: `0.8 mm`
+- plate: `1.2 mm`; fit: `0.20 mm/side`; text: `0.6 mm`; max two lines
+- universal corner-support masters: `25 / 50 mm`, four per level
+- all physical parts passed closed/manifold gates
+
+### Physical Tree V2
+
+Physical handling feedback supersedes the V1 attachment contract. Preserve the
+accepted crown form and organic distribution, but use:
+
+- canonical trunk `1.50 mm`
+- root collar `2.20 mm` diameter, `0.80 mm` height
+- terrain embed `0.60 mm`
+- smallest scale variant trunk `1.425 mm`
+- visible total height remains `5.375 mm`
+
+The root collar, trunk and crown form one connected closed mesh.
+Topology: `0` open / `0` non-manifold.
+
+Validation: tree package `76 passed`; full `3764 passed in 16.70s`.
+
+Seychellen is now `PRINTING` with A1 Black, A2 White, A3 Blue and A4 Dark
+Green.
+
+Working-tree protection remains mandatory: do not include `Data/OSM/` or the
+three Jamaica preview scripts in this milestone. No broad stage/reset/restore/
+clean.

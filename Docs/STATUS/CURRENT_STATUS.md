@@ -6947,4 +6947,53 @@ Dark Green `1.72 g`, Blue `47.61 g`.
 
 Project: `seychelles_premium_archipelago_170mm_PRODUCTION_V1.3mf`.
 
-Status: `PRINT QUEUE`; the current printer job must finish first.
+Status: `PRINTING`.
+
+---
+
+## 15 August 2026 — Modular/Personalized Gift Box and Physical Tree V2
+
+### Gift-box production system
+
+The shared Premium Gift Box now supports:
+
+- Mini `120 mm`, Original `170 mm`, Grande `220 mm`;
+- `25 mm` and `50 mm` stackable middle capacities with `2 mm` usable clearance;
+- base male, middle female/male and lid female connector architecture;
+- removable centered personalization insert with a real lid recess;
+- one or two centered DejaVu Sans Bold personalization lines;
+- universal `25 mm` / `50 mm` tier corner supports, quantity four per level.
+
+Personalization standards:
+
+- Mini plate/recess: `80 × 24` / `80.4 × 24.4 mm`
+- Original: `110 × 28` / `110.4 × 28.4 mm`
+- Grande: `140 × 32` / `140.4 × 32.4 mm`
+- plate thickness `1.2 mm`; recess depth `0.8 mm`;
+  fit clearance `0.20 mm/side`; raised text `0.6 mm`
+
+All generated modular box parts, personalization lids/inserts/text and
+universal supports passed closed/manifold topology gates.
+
+### Physical Tree V2
+
+Physical printing showed that the accepted V1 tree appearance was good but its
+`1.125 mm` trunk started directly at the terrain surface and could break under
+light handling.
+
+The generic canonical tree was strengthened without changing placement,
+density, crown appearance or visible product height:
+
+- trunk diameter `1.50 mm`
+- smallest deterministic variant `1.425 mm`
+- root collar `2.20 × 0.80 mm`
+- terrain embed `0.60 mm`
+- connected single closed surface; `0` open / `0` non-manifold
+
+Validation:
+
+- tree-related package: `76 passed`
+- full regression: `3764 passed in 16.70s`
+
+Seychellen production state: `PRINTING`; A1 Black, A2 White, A3 Blue,
+A4 Dark Green.

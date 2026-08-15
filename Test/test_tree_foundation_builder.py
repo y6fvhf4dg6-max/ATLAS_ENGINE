@@ -197,7 +197,10 @@ def test_canonical_tree_meets_physical_v1_print_minimums():
         ._canonical_tree_dimensions()
     )
 
-    assert dimensions["trunk_diameter_mm"] >= 1.0
+    assert dimensions["trunk_diameter_mm"] >= 1.50
+    assert dimensions["root_collar_diameter_mm"] == pytest.approx(2.20)
+    assert dimensions["root_collar_height_mm"] == pytest.approx(0.80)
+    assert dimensions["terrain_embed_depth_mm"] == pytest.approx(0.60)
     assert dimensions["crown_diameter_mm"] >= 3.5
     assert dimensions["total_height_mm"] >= 5.0
 
@@ -246,7 +249,7 @@ def test_worldcover_physical_scale_variants_preserve_print_minimums():
     )
 
     for scale in (0.95, 1.0, 1.05):
-        assert base["trunk_diameter_mm"] * scale >= 1.0
+        assert base["trunk_diameter_mm"] * scale >= 1.40
         assert base["crown_diameter_mm"] * scale >= 3.5
         assert base["total_height_mm"] * scale >= 5.0
 
@@ -267,7 +270,16 @@ def test_canonical_tree_has_visible_trunk_and_crown_above_ground():
 
     dimensions = result["dimensions"]
 
-    assert result["trunk_bottom_z"] == base_z
+    assert result["trunk_bottom_z"] == pytest.approx(
+        base_z - dimensions["terrain_embed_depth_mm"]
+    )
+    assert result["root_collar_bottom_z"] == pytest.approx(
+        result["trunk_bottom_z"]
+    )
+    assert result["root_collar_top_z"] == pytest.approx(
+        result["trunk_bottom_z"]
+        + dimensions["root_collar_height_mm"]
+    )
     assert (
         result["trunk_top_z"]
         == base_z + dimensions["trunk_height_mm"]
@@ -464,3 +476,60 @@ def test_tree_crown_must_fit_inside_actual_terrain_bounds(monkeypatch):
     )
 
     assert result is None
+
+def test_canonical_tree_root_collar_strengthens_terrain_connection():
+    base_z = 3.0
+    result = AtlasTreeFoundationBuilder._build_canonical_tree(
+        x=10.0,
+        y=20.0,
+        base_z=base_z,
+    )
+    dimensions = result["dimensions"]
+
+    assert dimensions["root_collar_diameter_mm"] > (
+        dimensions["trunk_diameter_mm"]
+    )
+    assert result["trunk_bottom_z"] < base_z
+    assert result["root_collar_bottom_z"] < base_z
+    assert result["root_collar_top_z"] > base_z
+
+    vertices = [
+        point
+        for triangle in result["triangles"]
+        for point in triangle
+    ]
+    collar_radius = dimensions["root_collar_diameter_mm"] / 2.0
+
+    assert any(
+        abs(z - result["root_collar_bottom_z"]) < 1e-9
+        and abs(((x - 10.0) ** 2 + (y - 20.0) ** 2) ** 0.5 - collar_radius)
+        < 1e-6
+        for x, y, z in vertices
+    )
+
+
+def test_strengthened_tree_preserves_visible_product_height():
+    base_z = 3.0
+    result = AtlasTreeFoundationBuilder._build_canonical_tree(
+        x=10.0,
+        y=20.0,
+        base_z=base_z,
+    )
+
+    assert result["top_z"] == pytest.approx(
+        base_z + result["dimensions"]["total_height_mm"]
+    )
+
+def test_strengthened_canonical_tree_is_closed_and_manifold():
+    from CORE.atlas_mesh_validator import AtlasMeshValidator
+
+    mesh = AtlasTreeFoundationBuilder._build_canonical_tree(
+        x=10.0,
+        y=20.0,
+        base_z=3.0,
+    )
+    report = AtlasMeshValidator._topology_report(mesh)
+
+    assert report["edge_count"] > 0
+    assert report["open_edge_count"] == 0
+    assert report["non_manifold_edge_count"] == 0
