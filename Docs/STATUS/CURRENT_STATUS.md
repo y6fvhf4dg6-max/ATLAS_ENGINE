@@ -7180,3 +7180,20 @@ Status: `RED_CONTRACT`
 ### Sıradaki kesin tek iş
 
 Üç roadmap belgesinin birlikte UTF-8, heading, duplicate, control-byte, diff ve status kontrolünü yapmak. Kontroller yeşilse mevcut relief ve semantic architecture baseline test paketlerini çalıştırmak ve sonucu Phase 0 audit kaydına eklemek. Phase 1 RED contract bundan önce başlatılmayacaktır.
+
+### Phase 1 ilerleme — Canonical component foundation
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%7`
+- Phase 1 status: `IMPLEMENTATION_ACTIVE`
+- Yeni contract: `AtlasSemanticReliefComponent`
+- Focused validation: `22 passed`
+- Related semantic validation: `46 passed in 0.14s`
+- Full regression: `3794 passed in 16.84s`
+- Diff check: temiz
+
+Canonical component artık identity, parent identity, source reference, target surface, projection mode, depth band, layer order, material role, physical feature policy, output eligibility, provenance ve confidence alanlarını immutable ve normalize edilmiş biçimde taşır. Eksik target/projection ilişkisi, geçersiz layer order, geçersiz output modes ve geçersiz confidence reddedilir.
+
+Phase 1 henüz tamamlanmadı. Sıradaki paket transform, orientation ve physical dimensions contractıdır; ardından repetition ve `AtlasSemanticReliefScene` graph doğrulamaları gelecektir.
+
+Yüzde kayıt kuralı: bundan sonraki her anlamlı milestone kaydında `ATLAS genel tamamlanma` ve `Aktif program tamamlanma` birlikte yazılacaktır. Yüzdeler test sayısına göre değil, kabul kapısı tamamlanan gerçek yeteneklere göre değiştirilecektir.

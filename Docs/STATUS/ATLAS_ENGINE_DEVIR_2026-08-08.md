@@ -9162,3 +9162,36 @@ Sıradaki kesin iş:
 3. Mevcut relief ve semantic architecture baseline testlerini çalıştırmak.
 4. Phase 0 audit sonucunu kaydetmek.
 5. Yalnız bundan sonra Phase 1 için ilk RED contract testini yazmak.
+
+### Phase 1 ara milestone — Canonical component foundation
+
+Status: `IMPLEMENTATION_ACTIVE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%7`
+- CORE: `CORE/atlas_semantic_relief_component.py`
+- Test: `Test/test_semantic_relief_component.py`
+- Focused validation: `22 passed in 0.03s`
+- Related semantic validation: `46 passed in 0.14s`
+- Full regression: `3794 passed in 16.84s`
+- Diff check: temiz
+
+Tamamlanan canonical davranışlar:
+
+- immutable component contract;
+- component ve parent identity normalizasyonu;
+- source reference korunumu;
+- target surface ve projection mode birlikteliği;
+- semantic depth band ve non-negative layer order;
+- semantic material role ve physical feature policy;
+- non-empty, unique output eligibility;
+- provenance ve finite `0.0..1.0` confidence;
+- geçersiz projection, layer order, output mode ve confidence girdilerinin reddi.
+
+Phase 1 henüz `LOCKED` değildir. Sıradaki kesin paket immutable transform, orientation ve physical dimensions contractıdır. Ardından repetition contract ve `AtlasSemanticReliefScene` graph doğrulamaları geliştirilecektir.
+
+Kalıcı yüzde kayıt kuralı:
+
+- her anlamlı milestone kaydında `ATLAS genel tamamlanma` ve `Aktif program tamamlanma` birlikte yazılacaktır;
+- yüzdeler test sayısına göre değil, kabul kapısı tamamlanan gerçek yeteneklere göre değiştirilecektir;
+- Phase veya fiziksel ürün kabul kapısı tamamlanmadan yapay yüzde artışı yapılmayacaktır.
