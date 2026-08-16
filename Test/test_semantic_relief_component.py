@@ -282,3 +282,28 @@ def test_semantic_relief_component_rejects_unvalidated_repetition():
                 "interchangeable": True,
             },
         )
+
+def test_semantic_relief_component_normalizes_occlusion_policy():
+    component = AtlasSemanticReliefComponent(
+        component_id="Portal Angel",
+        semantic_class="Figurative Ornament",
+        geometry_source_kind="Catalog Component",
+        occlusion_policy=" Occludes Lower Layers ",
+    )
+    default_component = AtlasSemanticReliefComponent(
+        component_id="Main Wall",
+        semantic_class="Architectural Surface",
+        geometry_source_kind="Parametric Primitive",
+    )
+
+    assert component.occlusion_policy == "occludes_lower_layers"
+    assert default_component.occlusion_policy == "opaque"
+
+def test_semantic_relief_component_rejects_blank_occlusion_policy():
+    with pytest.raises(ValueError, match="occlusion_policy"):
+        AtlasSemanticReliefComponent(
+            component_id="Main Wall",
+            semantic_class="Architectural Surface",
+            geometry_source_kind="Parametric Primitive",
+            occlusion_policy=" ",
+        )

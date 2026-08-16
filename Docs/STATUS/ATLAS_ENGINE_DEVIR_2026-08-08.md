@@ -9263,3 +9263,43 @@ Status: `GREEN_MILESTONE`; Phase 1 henüz `LOCKED` değildir.
 Phase 1 kalan kabul kapıları: component `occlusion_policy`; architecture, portrait, figurative ve kit kullanımını aynı contract ile gösteren synthetic fixture; mevcut `AtlasSemanticArchitectureModel` alanlarının yeni scene/component sözleşmesine geçiş eşlemesinin belgelenmesi. Gerçek adapter Phase 2 kapsamındadır.
 
 Sıradaki kesin iş: `occlusion_policy` için ilk RED contract.
+
+### Phase 1 geçiş ilişkisi — Semantic Architecture → Semantic Relief
+
+Mevcut `AtlasSemanticArchitectureModel` ve component sözleşmesi korunacaktır. Yeni semantic relief contract eski modeli değiştirmez; Phase 2 adapterı doğrulanmış mimari modeli yeni scene graph’a tek yönlü ve deterministic biçimde aktaracaktır.
+
+Alan eşlemesi:
+
+- `role + instance_index` → unique `component_id`; önerilen deterministic biçim `{role}_{instance_index}`;
+- `parent_role` → kesin `parent_component_id`; tekrar eden parent rolleri belirsizse adapter açık hata vermelidir;
+- `geometry_kind` → doğrudan yeni geometry kaynağı sayılmaz; `geometry_source_kind=semantic_architecture_adapter` kullanılır ve eski geometry kind adapter girdisi/source reference olarak korunur;
+- `landmark_family` → scene provenance ve semantic-class çözümleme bağlamı;
+- `grammar_name` → adapter configuration/source provenance;
+- `profile_name` ve eski flags → körlemesine kopyalanmaz; yalnız açık mapping ile output eligibility, physical policy veya provenance alanlarına aktarılır;
+- mevcut component sırası → yeni scene component sırası; deterministic kalmalıdır.
+
+Geçiş kuralları:
+
+- duplicate yeni ID üretilemez;
+- missing veya ambiguous parent sessiz fallback yapamaz;
+- eski model mutation görmez;
+- adapter sonucu `AtlasSemanticReliefScene` doğrulamalarından geçmek zorundadır;
+- reverse conversion varsayılmaz;
+- gerçek adapter implementation ve mapping testleri Phase 2 kapsamındadır.
+
+### Phase 1 kabul kapısı — LOCKED
+
+Status: `LOCKED`.
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%12`
+- `AtlasSemanticReliefComponent`, transform, repetition ve immutable scene graph tamamlandı.
+- `occlusion_policy` dahil Phase 1 alan ve validation sözleşmeleri kapatıldı.
+- Architecture, portrait, figurative ve modular-kit aileleri synthetic fixture ile aynı scene contractında doğrulandı.
+- `AtlasSemanticArchitectureModel` geçiş ilişkisi yukarıda belgelendi; eski model korunur ve gerçek adapter Phase 2 kapsamındadır.
+- Focused use-case: `41 passed in 0.06s`.
+- Related semantic regression: `87 passed in 0.20s`.
+- Full regression: `3835 passed in 16.74s`.
+- `git diff --check`: temiz.
+
+Phase 1 yeniden açılmayacaktır; yalnız gerçek regresyon veya açık contract eksikliği kanıtlanırsa düzeltme yapılacaktır. Sıradaki kesin iş Phase 2 provider-independent Geometry Source Adapter result contractı için ilk RED testidir.

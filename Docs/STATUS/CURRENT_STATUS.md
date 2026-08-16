@@ -7248,3 +7248,21 @@ Status: `GREEN_MILESTONE`; Phase 1 henüz `LOCKED` değildir.
 - `git diff --check`: temiz.
 
 Phase 1 kalan kabul kapıları: `occlusion_policy`; architecture, portrait, figurative ve kit synthetic fixture; mevcut `AtlasSemanticArchitectureModel` geçiş ilişkisinin belgelenmesi. Sıradaki kesin iş: `occlusion_policy` için ilk RED contract.
+
+### Phase 1 LOCKED — Semantic Relief Scene Contract V1
+
+Status: `LOCKED`.
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%12`
+- Immutable component, transform, repetition ve scene graph contractları tamamlandı.
+- Duplicate ID, missing parent/target surface, self-parent ve parent-cycle doğrulamaları tamamlandı.
+- Depth/layer, output mode, occlusion policy, material/physical policy, provenance ve confidence sözleşmeleri tamamlandı.
+- Architecture, portrait, figurative ve modular-kit kullanımları synthetic fixture ile doğrulandı.
+- Mevcut `AtlasSemanticArchitectureModel` ile tek yönlü geçiş ilişkisi belgelendi; gerçek adapter Phase 2 kapsamındadır.
+- Focused use-case paketi: `41 passed in 0.06s`.
+- Related semantic regression: `87 passed in 0.20s`.
+- Full regression: `3835 passed in 16.74s`.
+- `git diff --check`: temiz.
+
+Phase 1 kabul kapısı eksiksiz kapanmıştır. Sıradaki kesin iş: Phase 2 Geometry Source Adapter Contracts için provider-independent normalize geometry result sözleşmesinin ilk RED testi.

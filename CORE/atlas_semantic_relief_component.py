@@ -37,6 +37,7 @@ class AtlasSemanticReliefComponent:
     projection_mode: str = "none"
     depth_band: str = "primary"
     layer_order: int = 0
+    occlusion_policy: str = "opaque"
     material_role: str = "unassigned"
     physical_feature_policy: str = "preserve"
     output_modes: tuple[str, ...] = ("relief",)
@@ -184,6 +185,7 @@ class AtlasSemanticReliefComponent:
             "geometry_source_kind",
             "projection_mode",
             "depth_band",
+            "occlusion_policy",
             "material_role",
             "physical_feature_policy",
         ):
