@@ -5302,3 +5302,14 @@ Status: `GREEN_MILESTONE`; Phase 1 henüz `LOCKED` değildir.
 - Mevcut `AtlasSemanticArchitectureModel` geçiş ilişkisi belgelendi; implementation Phase 2 adapter işidir.
 - Phase 1 closeout: focused use-case `41 passed in 0.06s`; related `87 passed in 0.20s`; full `3835 passed in 16.74s`.
 - Sıradaki paket: Phase 2 provider-independent Geometry Source Adapter result contractı.
+
+### 25 mm corner support physical acceptance
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%12`
+- Status: `GREEN_PROTOTYPE`.
+- Connector blokları kaldırılmış sade köşe ve iç raf geometrisi doğrulandı.
+- Corner-support paketi: `26 passed`; full regression: `3836 passed in 16.80s`.
+- Dört parçalık gerçek baskı kalite, tutuş ve sallanma testlerini geçti.
+- Yalnız yeniden üretilmiş `25MM` STL geçerlidir; mevcut `50MM` STL eski ve geçersizdir.
+- Sıradaki fiziksel iş: beş sahnelik kutu için geçme toleransı kalibrasyon kuponu.

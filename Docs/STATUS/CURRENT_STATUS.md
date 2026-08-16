@@ -7266,3 +7266,17 @@ Status: `LOCKED`.
 - `git diff --check`: temiz.
 
 Phase 1 kabul kapısı eksiksiz kapanmıştır. Sıradaki kesin iş: Phase 2 Geometry Source Adapter Contracts için provider-independent normalize geometry result sözleşmesinin ilk RED testi.
+
+### Wall Collection 25 mm corner support — GREEN_PROTOTYPE
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%12`
+- Universal köşebent geometrisindeki harici alt female socket ile üst male pin/pad kaldırıldı.
+- Üretim geometrisi yalnız 90 derece ana köşe gövdesi ve iç taşıyıcı raftan oluşur.
+- Focused corner-support paketi: `26 passed in 0.08s`.
+- Full regression: `3836 passed in 16.80s`.
+- Yeniden üretilen `ATLAS_TIER_CORNER_SUPPORT_25MM.stl`: `64` triangle, yaklaşık `13 KB`, toplam yükseklik `33.4 mm`.
+- Dört parçalık PLA fiziksel prototip basıldı; görsel kalite, tutuş ve dört-köşe sallanma kontrolleri geçti.
+- Fiziksel kabul: `GREEN_PROTOTYPE`.
+- Mevcut `50MM` STL yeniden üretilmedi; eski connector geometrisi taşıdığı için üretimde kullanılmayacaktır.
+- Sıradaki fiziksel paket: beş sahnelik modüler kutu için küçük geçme toleransı kalibrasyon kuponu.

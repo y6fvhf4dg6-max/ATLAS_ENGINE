@@ -123,8 +123,11 @@ def test_mesher_builds_one_universal_stackable_corner_support(
     assert mesh["product_capacity_mm"] == pytest.approx(
         capacity_mm
     )
-    assert mesh["bottom_connector"] == "female"
-    assert mesh["top_connector"] == "male"
+    assert "bottom_connector" not in mesh
+    assert "top_connector" not in mesh
+    assert "connector_engagement_mm" not in mesh
+    assert "connector_recess_depth_mm" not in mesh
+    assert "connector_clearance_per_side_mm" not in mesh
     assert mesh["triangles"]
     _assert_closed_manifold(mesh)
 
@@ -142,3 +145,31 @@ def test_universal_support_geometry_is_independent_of_product_xy_size():
     assert "product_width_mm" not in mesh
     assert "product_height_mm" not in mesh
     assert mesh["frame_contact_width_mm"] == pytest.approx(8.0)
+
+def test_universal_support_excludes_external_connector_blocks():
+    spec = AtlasWallCollectionTieredCornerSupportSpec.for_module(
+        product_capacity_mm=25.0,
+    )
+    mesh = (
+        AtlasWallCollectionTieredCornerSupportMesher
+        .build_universal_support(spec=spec)
+    )
+    vertices = [
+        point
+        for triangle in mesh["triangles"]
+        for point in triangle
+    ]
+    body_min = -spec.xy_fit_clearance_mm - spec.wall_thickness_mm
+
+    assert min(point[0] for point in vertices) == pytest.approx(body_min)
+    assert min(point[1] for point in vertices) == pytest.approx(body_min)
+    assert max(point[0] for point in vertices) == pytest.approx(
+        spec.corner_engagement_mm
+    )
+    assert max(point[1] for point in vertices) == pytest.approx(
+        spec.corner_engagement_mm
+    )
+    assert min(point[2] for point in vertices) == pytest.approx(0.0)
+    assert max(point[2] for point in vertices) == pytest.approx(
+        spec.total_height_mm
+    )

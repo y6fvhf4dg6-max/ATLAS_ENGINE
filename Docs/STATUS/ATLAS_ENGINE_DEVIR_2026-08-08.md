@@ -9303,3 +9303,14 @@ Status: `LOCKED`.
 - `git diff --check`: temiz.
 
 Phase 1 yeniden açılmayacaktır; yalnız gerçek regresyon veya açık contract eksikliği kanıtlanırsa düzeltme yapılacaktır. Sıradaki kesin iş Phase 2 provider-independent Geometry Source Adapter result contractı için ilk RED testidir.
+
+### Fiziksel milestone — 25 mm corner support GREEN_PROTOTYPE
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%12`
+- Harici female socket ve male pin/pad geometrileri kaldırıldı; yalnız ana 90 derece köşe ile iç taşıyıcı raf korundu.
+- Focused paket: `26 passed in 0.08s`; full regression: `3836 passed in 16.80s`.
+- Yeni `25MM` STL `64` triangle ve yaklaşık `13 KB` olarak üretildi.
+- Dört gerçek PLA parça kalite, tutuş ve sallanma kontrollerini geçti: `GREEN_PROTOTYPE`.
+- Mevcut `50MM` STL eski connector geometrisi nedeniyle geçersizdir ve basılmayacaktır.
+- Sonraki fiziksel iş tam kutudan önce havuz-yükseltici-kapak geçmeleri için küçük tolerans kuponudur.
