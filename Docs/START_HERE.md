@@ -5278,3 +5278,15 @@ Status: `GREEN_MILESTONE`
 - Semantic component yalnız doğrulanmış immutable repetition contractını kabul eder.
 - Son güvenli push edilmiş commit halen `7f46042`; repetition milestone henüz commit/push edilmedi.
 - Sıradaki kesin iş: immutable semantic relief scene/model graph için ilk RED contract.
+
+### Semantic Relief scene graph milestone
+
+Status: `GREEN_MILESTONE`; Phase 1 henüz `LOCKED` değildir.
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%10`
+- Scene graph: focused `12 passed`; related `84 passed in 0.19s`; full `3832 passed in 16.78s`.
+- Unique identity, parent/target integrity, cycle rejection ve deterministic graph traversal tamamlandı.
+- Son güvenli push edilmiş commit halen `5c02518`; scene graph milestone henüz commit/push edilmedi.
+- Phase 1 kalanları: `occlusion_policy`, dört kullanım ailesini kapsayan synthetic fixture ve mevcut semantic architecture modelinin geçiş ilişkisi.
+- Sıradaki kesin iş: component `occlusion_policy` için ilk RED contract.

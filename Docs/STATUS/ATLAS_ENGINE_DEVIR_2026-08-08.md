@@ -9243,3 +9243,23 @@ Status: `GREEN_MILESTONE`
 Bu contract tekrarlanan pencere, kemer, sütun, panel, karo ve kit parçalarını ortak canonical grup ve fiziksel tekrar düzeniyle temsil eder. Gerçek interchangeability fit/tolerance kanıtı sonraki physical resolver ve production gate aşamalarında ayrıca zorunludur.
 
 Sıradaki kesin iş: component, transform ve repetition contractlarını birleştiren immutable `AtlasSemanticReliefScene` graph için ilk RED sözleşme.
+
+### Phase 1 ara milestone — Immutable semantic relief scene graph
+
+Status: `GREEN_MILESTONE`; Phase 1 henüz `LOCKED` değildir.
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%10`
+- Yeni contract: `CORE/atlas_semantic_relief_scene.py`
+- Yeni test: `Test/test_semantic_relief_scene.py`
+- Immutable scene identity ve non-empty typed component koleksiyonu kuruldu.
+- Duplicate component ID, missing parent, missing target surface, self-parent ve parent cycle reddedilir.
+- `component_for_id`, `children_for_id`, `components_for_target_surface` ve `root_components` deterministic traversal sağlar.
+- Focused: `12 passed in 0.02s`.
+- Related: `84 passed in 0.19s`.
+- Full regression: `3832 passed in 16.78s`.
+- `git diff --check`: temiz.
+
+Phase 1 kalan kabul kapıları: component `occlusion_policy`; architecture, portrait, figurative ve kit kullanımını aynı contract ile gösteren synthetic fixture; mevcut `AtlasSemanticArchitectureModel` alanlarının yeni scene/component sözleşmesine geçiş eşlemesinin belgelenmesi. Gerçek adapter Phase 2 kapsamındadır.
+
+Sıradaki kesin iş: `occlusion_policy` için ilk RED contract.

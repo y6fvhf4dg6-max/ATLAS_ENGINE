@@ -7231,3 +7231,20 @@ Status: `GREEN_MILESTONE`
 - Korunan Jamaica/OSM untracked girdilerine dokunulmadı.
 
 Sıradaki kesin iş: Phase 1 içinde canonical component, transform ve repetition contractlarını tek immutable semantic relief scene/model graph altında birleştiren ilk RED sözleşme.
+
+### Phase 1 ilerleme — Immutable semantic relief scene graph
+
+Status: `GREEN_MILESTONE`; Phase 1 henüz `LOCKED` değildir.
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%10`
+- Yeni contract: `CORE/atlas_semantic_relief_scene.py`
+- Yeni test: `Test/test_semantic_relief_scene.py`
+- Scene identity, typed/non-empty components, unique IDs, parent/target referansları, self-parent ve cycle kapıları kilitlendi.
+- Canonical component, direct-child, target-surface ve root-component sorguları eklendi.
+- Focused: `12 passed in 0.02s`
+- Related: `84 passed in 0.19s`
+- Full regression: `3832 passed in 16.78s`
+- `git diff --check`: temiz.
+
+Phase 1 kalan kabul kapıları: `occlusion_policy`; architecture, portrait, figurative ve kit synthetic fixture; mevcut `AtlasSemanticArchitectureModel` geçiş ilişkisinin belgelenmesi. Sıradaki kesin iş: `occlusion_policy` için ilk RED contract.
