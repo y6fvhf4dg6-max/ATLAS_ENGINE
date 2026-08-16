@@ -9223,3 +9223,23 @@ Tamamlanan davranışlar:
 Bu contract aynı kemer, heykel, pencere veya kit parçasının farklı konum, yön ve fiziksel ölçülerde güvenilir biçimde yeniden kullanılmasını sağlar.
 
 Phase 1 henüz `LOCKED` değildir. Sıradaki kesin paket repetition ve interchangeable-instance contractıdır. Ardından `AtlasSemanticReliefScene` graph doğrulamaları başlayacaktır.
+
+### Phase 1 ara milestone — Repetition ve interchangeable instances
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%9`
+- Yeni contract: `CORE/atlas_semantic_relief_repetition.py`
+- Yeni test: `Test/test_semantic_relief_repetition.py`
+- Canonical alanlar: `repeat_group_id`, pozitif `quantity`, finite `spacing_mm`, strict boolean `interchangeable`.
+- Çoklu instance için sıfır spacing reddedilir; tek instance için kabul edilir.
+- Component yalnız doğrulanmış repetition nesnesi veya `None` kabul eder.
+- Focused: `41 passed in 0.04s`.
+- Related: `72 passed in 0.17s`.
+- Full regression: `3820 passed in 16.81s`.
+- `git diff --check`: temiz.
+
+Bu contract tekrarlanan pencere, kemer, sütun, panel, karo ve kit parçalarını ortak canonical grup ve fiziksel tekrar düzeniyle temsil eder. Gerçek interchangeability fit/tolerance kanıtı sonraki physical resolver ve production gate aşamalarında ayrıca zorunludur.
+
+Sıradaki kesin iş: component, transform ve repetition contractlarını birleştiren immutable `AtlasSemanticReliefScene` graph için ilk RED sözleşme.

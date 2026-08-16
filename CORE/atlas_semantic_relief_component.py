@@ -3,6 +3,9 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from CORE.atlas_semantic_relief_repetition import (
+    AtlasSemanticReliefRepetition,
+)
 from CORE.atlas_semantic_relief_transform import (
     AtlasSemanticReliefTransform,
 )
@@ -28,6 +31,7 @@ class AtlasSemanticReliefComponent:
     geometry_source_kind: str
     parent_component_id: str | None = None
     transform: AtlasSemanticReliefTransform | None = None
+    repetition: AtlasSemanticReliefRepetition | None = None
     source_reference: str | None = None
     target_surface_id: str | None = None
     projection_mode: str = "none"
@@ -40,6 +44,15 @@ class AtlasSemanticReliefComponent:
     confidence: float = 1.0
 
     def __post_init__(self) -> None:
+        if self.repetition is not None and not isinstance(
+            self.repetition,
+            AtlasSemanticReliefRepetition,
+        ):
+            raise TypeError(
+                "repetition must be an "
+                "AtlasSemanticReliefRepetition or None"
+            )
+
         if self.transform is not None and not isinstance(
             self.transform,
             AtlasSemanticReliefTransform,

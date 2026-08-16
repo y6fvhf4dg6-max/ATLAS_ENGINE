@@ -7212,3 +7212,22 @@ Yüzde kayıt kuralı: bundan sonraki her anlamlı milestone kaydında `ATLAS ge
 Transform contract translation, XYZ rotation, positive physical dimensions ve coordinate-space kimliğini immutable ve finite değerlerle taşır. Malformed triplets, non-finite değerler ve non-positive dimensions reddedilir. `AtlasSemanticReliefComponent` yalnız doğrulanmış transform nesnesi kabul eder.
 
 Sıradaki Phase 1 paketi repetition ve interchangeable-instance contractıdır; ardından `AtlasSemanticReliefScene` graph doğrulamaları geliştirilecektir.
+
+### Phase 1 ilerleme — Repetition ve interchangeable instances
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%9`
+- Yeni immutable contract: `CORE/atlas_semantic_relief_repetition.py`
+- Yeni test paketi: `Test/test_semantic_relief_repetition.py`
+- `AtlasSemanticReliefRepetition`; canonical `repeat_group_id`, pozitif `quantity`, finite `spacing_mm` ve strict boolean `interchangeable` taşır.
+- Çoklu instance için sıfır spacing reddedilir; tek instance için sıfır spacing kabul edilir.
+- `AtlasSemanticReliefComponent`, yalnız doğrulanmış `AtlasSemanticReliefRepetition` veya `None` kabul eder.
+- Focused validation: `41 passed in 0.04s`
+- Related semantic validation: `72 passed in 0.17s`
+- Full regression: `3820 passed in 16.81s`
+- `git diff --check`: temiz.
+- Korunan Jamaica/OSM untracked girdilerine dokunulmadı.
+
+Sıradaki kesin iş: Phase 1 içinde canonical component, transform ve repetition contractlarını tek immutable semantic relief scene/model graph altında birleştiren ilk RED sözleşme.

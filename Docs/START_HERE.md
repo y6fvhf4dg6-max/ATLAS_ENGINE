@@ -5265,3 +5265,16 @@ Her anlamlı milestone kaydında ATLAS genel yüzdesi ve aktif program yüzdesi 
 - Transform foundation: focused `31 passed`; related `55 passed`; full `3803 passed in 16.81s`
 - Tamamlanan: translation, XYZ orientation, positive physical dimensions, coordinate space ve validated component connection
 - Sıradaki paket: repetition ve interchangeable-instance contract
+
+### Semantic Relief repetition milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%9`
+- Repetition foundation: focused `41 passed`; related `72 passed in 0.17s`; full `3820 passed in 16.81s`.
+- Canonical repetition alanları: normalized group identity, positive quantity, finite physical spacing ve strict interchangeability.
+- Çoklu instance sıfır spacing ile üst üste bindirilemez.
+- Semantic component yalnız doğrulanmış immutable repetition contractını kabul eder.
+- Son güvenli push edilmiş commit halen `7f46042`; repetition milestone henüz commit/push edilmedi.
+- Sıradaki kesin iş: immutable semantic relief scene/model graph için ilk RED contract.

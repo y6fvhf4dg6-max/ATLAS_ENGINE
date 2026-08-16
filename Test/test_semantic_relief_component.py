@@ -5,6 +5,9 @@ import pytest
 from CORE.atlas_semantic_relief_component import (
     AtlasSemanticReliefComponent,
 )
+from CORE.atlas_semantic_relief_repetition import (
+    AtlasSemanticReliefRepetition,
+)
 from CORE.atlas_semantic_relief_transform import (
     AtlasSemanticReliefTransform,
 )
@@ -247,5 +250,35 @@ def test_semantic_relief_component_rejects_unvalidated_transform():
             transform={
                 "translation_mm": (0.0, 0.0, 0.0),
                 "dimensions_mm": (12.0, 24.5, 3.0),
+            },
+        )
+
+def test_semantic_relief_component_preserves_validated_repetition():
+    repetition = AtlasSemanticReliefRepetition(
+        repeat_group_id="Nave Windows",
+        quantity=12,
+        spacing_mm=(8.0, 0.0, 0.0),
+        interchangeable=True,
+    )
+    component = AtlasSemanticReliefComponent(
+        component_id="Nave Window",
+        semantic_class="Architectural Opening",
+        geometry_source_kind="Parametric Primitive",
+        repetition=repetition,
+    )
+
+    assert component.repetition is repetition
+
+def test_semantic_relief_component_rejects_unvalidated_repetition():
+    with pytest.raises(TypeError, match="repetition"):
+        AtlasSemanticReliefComponent(
+            component_id="Nave Window",
+            semantic_class="Architectural Opening",
+            geometry_source_kind="Parametric Primitive",
+            repetition={
+                "repeat_group_id": "nave_windows",
+                "quantity": 12,
+                "spacing_mm": (8.0, 0.0, 0.0),
+                "interchangeable": True,
             },
         )
