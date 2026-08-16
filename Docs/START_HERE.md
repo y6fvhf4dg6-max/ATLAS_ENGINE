@@ -5313,3 +5313,248 @@ Status: `GREEN_MILESTONE`; Phase 1 henüz `LOCKED` değildir.
 - Dört parçalık gerçek baskı kalite, tutuş ve sallanma testlerini geçti.
 - Yalnız yeniden üretilmiş `25MM` STL geçerlidir; mevcut `50MM` STL eski ve geçersizdir.
 - Sıradaki fiziksel iş: beş sahnelik kutu için geçme toleransı kalibrasyon kuponu.
+
+### Semantic Relief Phase 2 — Geometry Source Result milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%14`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- Yeni provider-independent contract: `AtlasGeometrySourceResult`
+- Contract normalized geometry, local bounds, normalized anchors, confidence, provenance ve supported projection modes taşır.
+- Caller mutable inputundan izole snapshot oluşturur; reversed bounds reddedilir.
+- Unsupported projection mode `require_projection_mode()` ile erken ve açık hata verir.
+- Focused validation: `21 passed in 0.02s`.
+- Related semantic regression: `113 passed in 0.27s`.
+- Full regression: `3873 passed in 16.79s`, `1` unrelated pre-existing Premium Gift Box calibration failure.
+- `git diff --check`: temiz.
+- Full regression kırığı Phase 2 ile ilişkili değildir; untracked calibration spec `(0.20, 0.25, 0.30)` kullanırken untracked eski test `(0.05, 0.10, 0.15)` beklemektedir.
+- Sıradaki kesin iş: Phase 2 adapter interface/provider responsibility contract için ilk RED test.
+
+### Semantic Relief Phase 2 — Geometry Source Adapter boundary milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%15`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- Yeni abstract contract: `AtlasGeometrySourceAdapter`
+- Concrete geometry-source adapter yalnız `adapt(source)` üzerinden canonical `AtlasGeometrySourceResult` üretir.
+- Provider-specific payload CORE geometry contractı olarak kabul edilmez.
+- `validate_result()` non-canonical adapter outputunu erken reddeder.
+- Projection capability yalnız canonical result üzerinden `validate_projection_mode()` ile doğrulanır.
+- Focused Phase 2 validation: `27 passed in 0.04s`.
+- Related semantic regression: `113 passed in 0.25s`.
+- Full regression: `3879 passed in 16.74s`, `1` unrelated pre-existing Premium Gift Box calibration failure.
+- `git diff --check`: temiz.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Phase 2 kapsamında ilk concrete geometry-source adapter ailesi için plana göre height-map relief source contractının ilk RED testi.
+
+### Semantic Relief Phase 2 — Height-map Geometry Source Adapter milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%17`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- İlk concrete geometry-source adapter: `AtlasHeightMapGeometrySourceAdapter`
+- Normalized `0.0..1.0` 2D height-map kaynağını physical width/depth/relief-height bilgisiyle canonical `AtlasGeometrySourceResult` sınırına taşır.
+- Adapter mesh veya STL üretmez; canonical snapshot yalnız height field, shape ve fiziksel ölçüleri taşır.
+- İlk capability yalnız `flat_plane` projection mode olarak ilan edilir; cylindrical/dome/arbitrary surface desteği Phase 5 kapsamındadır.
+- Mutable caller height-map/source inputları resulttan izole edilir.
+- Malformed, non-finite, non-normalized height-map; geçersiz fiziksel ölçüler ve eksik source alanları reddedilir.
+- Focused Phase 2 validation: `44 passed in 0.08s`.
+- Related semantic/architectural relief regression: `126 passed in 0.28s`.
+- Full regression: `3896 passed in 16.73s`, `1` unrelated pre-existing Premium Gift Box calibration failure.
+- `git diff --check`: temiz.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Master Execution Compass Phase 2 sırasındaki ikinci concrete adapter ailesi olan `existing triangle mesh source` için ilk RED contract.
+
+### Semantic Relief Phase 2 — Existing Triangle Mesh Source Adapter milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%19`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- İkinci concrete geometry-source adapter: `AtlasTriangleMeshGeometrySourceAdapter`
+- Mevcut ATLAS triangle-soup mesh formatını provider-independent canonical `AtlasGeometrySourceResult` sınırına taşır.
+- Canonical geometry snapshot `geometry_kind=triangle_mesh`, isolated triangle tuples ve `triangle_count` içerir.
+- Local bounds bütün triangle noktalarından deterministic hesaplanır.
+- Mutable caller triangle inputları resulttan izole edilir.
+- Empty/malformed triangle collections, yanlış point boyutu, non-numeric/bool/non-finite coordinates ve eksik source alanları erken reddedilir.
+- Adapter topology/manifold üretim kapısı değildir; existing source geometry yalnız normalize edilir.
+- Focused Phase 2 validation: `55 passed in 0.09s`.
+- Related semantic/relief regression: `143 passed in 0.27s`.
+- Gift Box stale calibration test güncel production contractına hizalandı; production spec değiştirilmedi.
+- Full regression: `3908 passed in 16.80s`.
+- `git diff --check`: temiz.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Master Execution Compass Phase 2 sırasındaki üçüncü concrete adapter ailesi olan `parametric primitive source` için ilk RED contract.
+
+### Semantic Relief Phase 2 — Parametric Primitive Source Adapter milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%21`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- Üçüncü concrete geometry-source adapter: `AtlasParametricPrimitiveGeometrySourceAdapter`
+- İlk desteklenen primitive: `closed_cylinder`
+- Adapter existing ATLAS parametric primitive tanımını canonical `AtlasGeometrySourceResult` sınırına taşır.
+- Canonical snapshot `geometry_kind=parametric_primitive`, normalized primitive type ve normalized parameter set taşır.
+- `closed_cylinder` parametreleri: center X/Y, base Z, radius, height, segments.
+- Local bounds ve `base_center` / `top_center` anchors deterministic hesaplanır.
+- Adapter mesh veya triangle üretmez; parametric descriptor yalnız geometry-source contract olarak taşınır.
+- Unsupported primitive türü, eksik source/parameter, non-finite/non-numeric değerler, invalid radius/height ve invalid segment count erken reddedilir.
+- Focused Phase 2 validation: `74 passed in 0.11s`.
+- Related semantic/geometry regression: `152 passed in 0.29s`.
+- Full regression: `3927 passed in 16.52s`.
+- `git diff --check`: temiz.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Master Execution Compass Phase 2 sırasındaki dördüncü concrete adapter ailesi olan `facade grammar source` için ilk RED contract.
+
+### Semantic Relief Phase 2 — Facade Grammar Source Adapter milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%23`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- Dördüncü concrete geometry-source adapter: `AtlasFacadeGrammarGeometrySourceAdapter`
+- İlk desteklenen facade grammar: `uniform_openings`
+- Adapter facade grammar descriptorını provider-independent canonical `AtlasGeometrySourceResult` sınırına taşır.
+- Canonical snapshot; facade width/height, level count, bay count, opening kind, horizontal/vertical margin ratios ve deterministic opening count taşır.
+- Local bounds facade yüzey düzleminde `(0,0,0)` → `(width,0,height)` olarak deterministic hesaplanır.
+- `bottom_left`, `bottom_center`, `top_center` anchors üretilir.
+- Adapter `AtlasFacadeOpeningMesher` veya diğer facade mesh producerlarını çağırmaz; triangle/mesh/STL üretmez.
+- Unsupported grammar, malformed source, invalid dimensions/counts/margins ve blank identifiers erken reddedilir.
+- Focused Phase 2 validation: `102 passed in 0.13s`.
+- Related semantic/facade regression: `188 passed in 0.37s`.
+- Full regression: `3955 passed in 16.66s`.
+- `git diff --check`: temiz.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Master Execution Compass Phase 2 sırasındaki beşinci concrete adapter ailesi olan `catalog component source` için ilk RED contract.
+
+### Semantic Relief Phase 2 — Catalog Component Source Adapter milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%25`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- Beşinci concrete geometry-source adapter: `AtlasCatalogComponentGeometrySourceAdapter`
+- Adapter mevcut `AtlasMasterLandmarkCatalog` kaydı ile semantic component referansını canonical `AtlasGeometrySourceResult` sınırında birleştirir.
+- Catalog resolution Wikidata veya OSM identity üzerinden yapılabilir.
+- Canonical snapshot catalog key, landmark family, grammar/profile metadata, component flags, geometry overrides, component role, component geometry kind ve instance index taşır.
+- Catalog metadata ile geometry metadata ayrıdır; `local_bounds` ve anchors source geometry descriptorından açıkça gelir ve catalog kaydına gömülmez.
+- Catalog entry component flags bildiriyorsa undeclared component role erken reddedilir.
+- Adapter mesh/triangle/STL üretmez.
+- Unresolved catalog entry, malformed source, invalid instance index ve blank semantic identifiers erken fail eder.
+- Focused Phase 2 validation: `116 passed in 0.16s`.
+- Related catalog/semantic regression: `137 passed in 0.25s`.
+- Full regression: `3969 passed in 16.77s`.
+- `git diff --check`: temiz.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Master Execution Compass Phase 2 sırasındaki altıncı adapter ailesi olan `future canonical face/head source` için mevcut face/head geometry contractlarının audit edilmesi ve ilk RED contract.
+
+### Semantic Relief Phase 2 — Face/Head Geometry Source Adapter milestone
+
+Status: `GREEN_MILESTONE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%27`
+- Aktif faz: Phase 2 `IMPLEMENTATION_ACTIVE`
+- Altıncı concrete geometry-source adapter: `AtlasFaceHeadGeometrySourceAdapter`
+- Adapter mevcut `AtlasPortraitLandmarkResult` contractını canonical `AtlasGeometrySourceResult` sınırına taşır.
+- Canonical geometry kind: `face_head_landmarks`.
+- Coordinate space: `normalized_image_2d`.
+- Landmark kimlikleri canonical snake_case biçimine normalize edilir.
+- Local bounds landmark extents üzerinden deterministic hesaplanır.
+- Landmarklar aynı semantic kimliklerle 3D anchor formuna `(x, y, 0.0)` taşınır.
+- Provider confidence korunur; provenance `portrait_landmark_provider:<provider_id>` olarak kaydedilir.
+- Desteklenen projection mode şu aşamada yalnız `flat_plane`.
+- Adapter 3D canonical head mesh, vertices, faces, triangles veya STL üretmez.
+- Bu milestone Phase 8 Face/Head Decision Gate'i erkenden ihlal etmez; yalnız provider result ile canonical geometry-source sınırını tanımlar.
+- Focused Phase 2 validation: `124 passed in 0.18s`.
+- Related portrait/face regression: `176 passed in 0.22s`.
+- Full regression: `3977 passed in 16.92s`.
+- `git diff --check`: temiz.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Master Execution Compass Phase 2 sırasındaki yedinci adapter ailesi olan `future body/pose/prop source` için mevcut figurative/body/pose/prop contractlarının audit edilmesi ve ilk RED contract.
+
+### Semantic Relief Phase 2 — Geometry Source Adapter Contracts LOCKED
+
+Status: `LOCKED`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%30`
+- Phase 2 `Geometry Source Adapter Contracts` tamamlandı ve acceptance gate geçti.
+- Canonical boundary: `AtlasGeometrySourceResult`
+- Base adapter boundary: `AtlasGeometrySourceAdapter`
+- Kilitlenen adapter aileleri:
+  - height-map relief source
+  - existing triangle mesh source
+  - parametric primitive source
+  - facade grammar source
+  - catalog component source
+  - future canonical face/head source boundary
+  - future body/pose/prop source boundary
+- Provider-specific payloadlar doğrudan CORE geometry-source sınırını geçemez.
+- Aynı semantic scene farklı adapter implementasyonlarıyla çalışabilir.
+- Adapter resultları deterministic ve mutable inputtan izole canonical snapshotlardır.
+- Unsupported projection mode adapter/result sınırında erken ve açık hata verir.
+- Face/head adapterı yalnız normalized portrait landmark descriptorı taşır; canonical 3D head geometry kararı Phase 8'e bırakılmıştır.
+- Body/pose/prop adapterı `semantic_reference_only` contractıdır; skeleton/joint/pose/prop geometry icat edilmemiştir.
+- Phase 2 final focused validation: `137 passed in 0.21s`.
+- Full regression: `3990 passed in 16.55s`.
+- `git diff --check`: temiz.
+- Phase 2 acceptance gate: PASS.
+- Phase 2 kaynaklı regression kırığı yoktur.
+- Sıradaki kesin iş: Master Execution Compass Phase 3 `Semantic Depth & Occlusion` audit ve ilk RED contract.
+
+### Semantic Relief Phase 3 — Semantic Depth & Occlusion Composer LOCKED
+
+Status: `LOCKED`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%36`
+- Phase 3 `Semantic Depth & Occlusion Composer` tamamlandı ve acceptance gate geçti.
+- Yeni canonical composer: `AtlasSemanticDepthOcclusionComposer`.
+- Semantic component graph deterministic back-to-front composition planına dönüştürülüyor.
+- `depth_band` → configured normalized local relief range çözümü kilitlendi.
+- Foreground / middle / background dahil arbitrary semantic depth-band isimleri profile/config üzerinden destekleniyor; numeric ranges hard-code edilmedi.
+- Overlapping depth-band ranges reddediliyor; yalnız sınırdan temas eden ranges kabul ediliyor.
+- Aynı depth band içinde `layer_order` ve component identity deterministic sıra sağlıyor.
+- Parent-child depth inheritance kilitlendi:
+  - child `depth_band=primary` ise ilk explicit ancestor bandını transitively miras alabilir;
+  - explicit child bandı korunur;
+  - root `primary` explicit range olmadan sessizce çözülmez.
+- Explicit occlusion policy kontrolü eklendi; anlamsız `occludes_lower_layers` yönü deterministic conflict olarak raporlanıyor.
+- Semantic depth relation contractı eklendi:
+  - `contact`
+  - `embed`
+  - `recess`
+  - `raised`
+- Semantic depth relation, mesher-level `embed_mm` ve Phase 4 `physical_feature_policy` kararlarından ayrı tutuldu.
+- `contact` depth amount almaz; `embed/recess/raised` pozitif amount ve parent attachment gerektirir.
+- Resolved local relief envelope'ını tüketen veya aşan embed `impossible embed` olarak reddedilir.
+- Material identity ile geometry boundary identity ayrıldı; material eşitliği geometry merge anlamına gelmez.
+- `geometry_boundary_id` component identity üzerinden deterministic korunur.
+- Deterministic operator override kaydı eklendi; Phase 3'te ilk desteklenen override alanı `depth_band`.
+- Override original/override değerleri auditable record olarak tutulur; source scene/component mutate edilmez.
+- Parent cycle validation mevcut `AtlasSemanticReliefScene` contractında kalır; composer duplicate cycle implementation taşımaz.
+- Composer triangle mesh / STL üretmez.
+- Phase 3 acceptance:
+  - 3+ semantic layer doğru sıralanıyor: PASS
+  - overlapping depth bands reddediliyor: PASS
+  - parent cycle reddediliyor: PASS
+  - physically impossible embed reddediliyor: PASS
+  - identical input → identical composition plan: PASS
+  - mesh/triangle üretmeme: PASS
+- Phase 3 focused: `30 passed in 0.04s`.
+- Related regression: `124 passed in 0.18s`.
+- Full regression: `4020 passed in 16.68s`.
+- `git diff --check`: temiz.
+- Sıradaki kesin iş: Master Execution Compass Phase 4 `Physical Feature Resolver` audit; mevcut printability/minimum-feature/exaggeration altyapısını çıkarmak, ardından ilk RED contract.
