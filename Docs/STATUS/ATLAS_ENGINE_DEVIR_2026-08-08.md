@@ -9545,3 +9545,564 @@ Status: `LOCKED`
 - `git diff --check`: temiz.
 - Korunan unrelated working-tree çalışmalarına reset/restore/clean uygulanmadı.
 - Sıradaki kesin tek iş: Master Execution Compass Phase 4 `Physical Feature Resolver` audit ve ilk RED contract.
+
+### Semantic Relief Phase 4 — Physical Feature Resolver LOCKED
+
+Status: `LOCKED`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%42`
+- Phase 4 acceptance gate tamamlandı.
+- Canonical resolver: `AtlasPhysicalFeatureResolver`.
+- Canonical physical profile: `AtlasPhysicalFeatureProfile`.
+- Phase 4 mesh/STL üretmez; semantic feature ölçülerini physical decision planına dönüştürür.
+- Mevcut legacy/specialized physical systems yeniden yazılmadı:
+  - `AtlasPhysicalDetailResolver`
+  - `AtlasPhysicalCartographicExaggerationResolver`
+  - `AtlasMinimumThicknessAnalyzer`
+  - `AtlasFragileConnectionAnalyzer`
+  - `AtlasFacadeOrnamentDensityResolver`
+- Phase 4 bunların görevlerini kopyalamadan daha üst canonical semantic karar katmanı oluşturur.
+- Kilitlenen fiziksel action vocabulary:
+  - `preserve`
+  - `enlarge`
+  - `merge`
+  - `simplify`
+  - `convert_to_engraving`
+  - `omit`
+  - `require_operator_review`
+- Ölçüm/karar kapsamı:
+  - minimum raised width / height
+  - minimum groove width / depth
+  - adjacent-feature spacing
+  - repeated-detail density
+  - unsupported projection
+  - unsupported slope
+  - fragile connection ratio
+  - semantic importance
+  - readability priority
+  - product size
+  - nozzle diameter
+  - layer height
+  - material identity
+- Important unprintable feature otomatik omit edilmez.
+- Omission ve enlargement explicit reason/adjustment records taşır.
+- Product-size aware raised-feature scaling aynı semantic feature'ın farklı ürün ölçülerinde açıklanabilir farklı karar almasını sağlar.
+- Acceptance:
+  - deterministic decisions: PASS
+  - no silent feature loss: PASS
+  - enlargement / omission reporting: PASS
+  - high-priority unprintable feature operator review: PASS
+  - different product size → different but explainable decision: PASS
+- Phase 4 focused: `17 passed in 0.04s`.
+- Related regression: `104 passed in 0.14s`.
+- Full regression: `4037 passed in 17.01s`.
+- `git diff --check`: temiz.
+- Korunan unrelated working-tree çalışmalarına reset/restore/clean uygulanmadı.
+- Sıradaki kesin tek iş: Master Execution Compass Phase 5 `Surface Target & Projection V1` audit ve ilk RED contract.
+
+### Semantic Relief Phase 5 — Surface Target & Projection V1 LOCKED
+
+Status: `LOCKED`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%48`
+- Phase 5 acceptance gate tamamlandı.
+- Canonical target contract: `AtlasSurfaceTarget`.
+- Canonical projection engine: `AtlasSurfaceProjectionEngine`.
+- Kilitlenen target surface aileleri:
+  - `flat_plane`
+  - `oriented_planar`
+  - `bilinear_surface`
+  - `cylindrical_surface`
+  - `dome_surface`
+  - `vault_surface`
+  - `indexed_mesh_surface`
+- Her target surface canonical olarak şu fiziksel/geometrik contractları taşır:
+  - stable local UV/frame identity
+  - outward normal convention
+  - clipping boundary
+  - relief polarity
+  - allowable depth envelope
+  - attachment policy
+  - intersection policy
+  - source component identity
+  - target component identity
+- `indexed_mesh_surface` için explicit per-vertex `vertex_uvs` contractı zorunludur.
+- Indexed mesh projection UV-space face selection ve barycentric interpolation ile deterministic world-space geometry üretir.
+- Projection davranışları:
+  - target dışı geometri deterministic reject edilir
+  - depth-envelope ihlali reject edilir
+  - `must_attach` relief target yüzeye temas etmek zorundadır
+  - duplicate overlapping triangles reject edilir
+  - `outward` / `inward` relief polarity bütün projection modlarında fiziksel depth yönüne uygulanır
+- Orientation/winding audit artık placeholder değildir.
+- Gerçek winding audit şu target ailelerinde aktif:
+  - flat plane
+  - oriented planar
+  - bilinear surface
+  - cylindrical surface
+  - vault surface
+  - dome surface
+  - indexed mesh surface
+- Existing architectural relief hattı korunmuştur; projection sistemi mevcut relief producer davranışını yeniden yazmaz.
+- Existing architectural relief regression: `70 passed in 0.16s`.
+- Acceptance:
+  - projection sonrası orientation / winding audit: PASS
+  - deterministic target boundary reject: PASS
+  - physical attachment enforcement: PASS
+  - depth-envelope enforcement: PASS
+  - duplicate overlap detection: PASS
+  - inward / outward polarity: PASS
+  - arbitrary indexed mesh UV projection: PASS
+  - flat projection existing relief compatibility: PASS
+- Phase 5 focused validation: `31 passed in 0.06s`.
+- Related regression: `157 passed in 0.26s`.
+- Full regression: `4068 passed in 16.89s`.
+- `git diff --check`: temiz.
+- Korunan unrelated working-tree çalışmalarına reset/restore/clean uygulanmadı.
+- Sıradaki kesin tek iş: Master Execution Compass Phase 6 `Architectural Ornament Library V1` audit ve ilk RED contract.
+
+### Semantic Relief Phase 6 — Architectural Ornament Library V1 LOCKED
+
+Status: `LOCKED`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%54`
+- Phase 6 `Architectural Ornament Library V1` tamamlandı ve kilitlendi.
+- Canonical catalog modelleri:
+  - `AtlasArchitecturalOrnamentCatalogEntry`
+  - `AtlasArchitecturalOrnamentInstance`
+  - `AtlasArchitecturalOrnamentCatalog`
+- Her canonical catalog entry şu contract alanlarını taşır:
+  - component ID ve version
+  - semantic class ve style tags
+  - parametric dimensions
+  - anchors
+  - supported projection modes
+  - minimum printable profile
+  - material role
+  - repetition mode ve symmetry
+  - assembled / relief / kit output eligibility
+  - license ve provenance
+  - geometry producer identity
+- Bound catalog instances deterministic ve immutable parametre contractı taşır.
+- Fiziksel minimum profile ihlalleri binding aşamasında deterministic reject edilir.
+- Repeated instances canonical component identity'yi korurken ayrı occurrence identity taşıyabilir.
+- Phase 5 projection mode contractları catalog seviyesinde korunur.
+- Mevcut geometry producer'ları mümkün olan yerlerde yeniden kullanıldı; duplicate topology/primitive altyapısı oluşturulmadı.
+- Phase 6 sonunda canonical reusable aileler:
+  - `arch.round_v1`
+  - `archivolt.round_v1`
+  - `opening.recessed_rect_v1`
+  - `tracery.mullion_transom_v1`
+  - `portal.surround_rect_v1`
+  - `tympanum.triangular_v1`
+  - `pilaster.rect_v1`
+  - `column.classical_round_v1`
+  - `column_base.classical_round_v1`
+  - `column_capital.classical_round_v1`
+  - `cornice.band_v1`
+  - `frieze.band_v1`
+  - `molding.rectangular_band_v1`
+  - `medallion.circular_v1`
+  - `rosette.circular_v1`
+  - `panel.inscription_rect_v1`
+  - `ornament.geometric_polygon_v1`
+  - `ornament.floral_radial_v1`
+  - `plaque.figurative_rect_v1`
+  - `niche.recessed_arch_v1`
+  - `surface_unit.brick_v1`
+  - `surface_unit.stone_block_v1`
+  - `surface_unit.roof_tile_v1`
+- Phase 6 kapsamında eklenen reusable geometry producer'ları:
+  - `AtlasFacadePortalSurroundMesher`
+  - `AtlasFacadePilasterMesher`
+  - `AtlasClassicalColumnDetailMesher`
+  - `AtlasGeometricOrnamentMesher`
+  - `AtlasFloralOrnamentMesher`
+  - `AtlasRecessedArchNicheMesher`
+  - `AtlasFacadeTraceryMesher`
+  - `AtlasTympanumMesher`
+  - `AtlasFacadeMoldingMesher`
+  - `AtlasFigurativePlaqueMesher`
+  - `AtlasRepeatableSurfaceUnitMesher`
+- `AtlasFacadeArchMesher`, `AtlasFacadeOpeningMesher`, `AtlasFacadePanelBuilder`, `AtlasFacadeCircularPanelBuilder`, `AtlasClassicalColonnadeBuilder` ve `AtlasClosedCylinderBuilder` uygun family contractlarında yeniden kullanıldı.
+- Archivolt mevcut arch producer üzerinden ayrı semantic catalog identity olarak doğrulandı.
+- Tracery canonical mullion + transom kapalı component sistemiyle doğrulandı.
+- Tympanum triangular pediment panel olarak reusable closed prism üretir.
+- Figurative plaque Phase 6 sınırında yalnız figurative-content carrier contractıdır; insan/portre geometrisi sonraki figurative fazlara bırakılmıştır.
+- Brick / stone block / roof tile aynı reusable physical surface-unit primitive'ini paylaşır; semantic identity catalog seviyesinde ayrıdır.
+- Aynı canonical part farklı geçerli boyutlarda deterministic binding üretir.
+- Minimum printable profile altındaki fiziksel olarak okunamaz varyantlar deterministic reject edilir.
+- Catalog producer entegrasyonlarında mevcut `AtlasMeshValidator` topology gate yeniden kullanıldı.
+- Phase 6 focused acceptance: `61 passed in 0.21s`.
+- Phase 6 related regression: `135 passed in 0.34s`.
+- Full regression: `4129 passed in 17.09s`.
+- `git diff --check`: temiz.
+- Korunan unrelated working-tree çalışmalarına reset/restore/clean uygulanmadı.
+- Phase 6 `LOCKED`.
+- Sıradaki kesin tek iş: Master Execution Compass Phase 7 `Architectural Semantic Relief Product` contractını audit etmek ve ilk RED contractı açmak.
+
+### Semantic Relief Phase 7 — Architectural Semantic Relief Product V1 IMPLEMENTATION_ACTIVE
+
+Status: `IMPLEMENTATION_ACTIVE`
+
+- ATLAS genel tamamlanma: `%68`
+- Aktif program tamamlanma: `%58`
+- Phase 7 `Architectural Semantic Relief Product V1` gerçek ürün doğrulama hattında aktif.
+- İlk gerçek Phase 7 referansı kilitlendi:
+  - `Cathédrale Notre-Dame de Strasbourg`
+  - west facade / central portal
+  - reference ID: `strasbourg_cathedral_central_portal_phase7_v1`
+- Gerçek reference asset:
+  - `Data/RELIEF/strasbourg_cathedral_phase7/strasbourg_cathedral_central_portal_reference.jpg`
+  - JPEG RGB
+  - `1333 × 2000`
+  - `1219504 bytes`
+  - SHA-256: `e9315eca500ef296c33016ad4c576a5e65dde1828d04885bd5a01ab24abcaeef`
+  - license: `CC-BY-2.0`
+  - provenance: `Wikimedia Commons / jeffowenphotos`
+- Canonical Strasbourg reference contract:
+  - `CORE/atlas_strasbourg_cathedral_phase7_reference.py`
+  - `Test/test_strasbourg_cathedral_phase7_reference.py`
+- Strasbourg reference mevcut `AtlasArchitecturalReliefInput` hattına bağlandı.
+- Yeni image-to-relief profile identity:
+  - `ARCHITECTURAL_STONE_FACADE`
+  - mevcut güvenli architectural relief sayısal davranışı korunuyor
+  - `ROCK_CARVED_LANDMARK` kimliği Strasbourg'a zorla uygulanmıyor.
+- Phase 7 product contractı:
+  - `AtlasArchitecturalSemanticReliefProduct`
+  - zorunlu semantic içerik denetimleri
+  - real `AtlasSurfaceTarget` binding
+  - canonical `AtlasSurfaceProjectionEngine` delegation
+  - operator visual acceptance
+  - physical coupon acceptance
+- Phase 7 baseline/semantic comparison:
+  - `AtlasArchitecturalSemanticReliefComparisonReport`
+  - generic score comparison
+  - `AtlasPhysicalFeatureDecision` tabanlı feature-retention comparison
+  - semantic readability görsel operatör kabulünden ayrı tutuluyor.
+- Phase 7 mandatory semantic içerik contractı:
+  - recessed opening
+  - raised ornament
+  - figurative or emblematic feature
+  - inscription or panel
+  - minimum three semantic depth bands
+  - real target-surface projection
+- Strasbourg real component geometry milestone tamamlandı:
+  - `build_strasbourg_cathedral_phase7_component_meshes()`
+  - dört canonical catalog instance mevcut Phase 6 geometry producer'larına doğrudan bağlandı
+  - recessed opening -> `AtlasFacadeOpeningMesher`
+  - archivolt -> `AtlasFacadeArchMesher`
+  - figurative tympanum carrier -> `AtlasFigurativePlaqueMesher`
+  - panel carrier -> `AtlasFacadePanelBuilder`
+  - occurrence identity ve canonical semantic class mesh metadata üzerinde korunuyor
+  - dört component mesh ayrı ayrı closed/manifold topology gate geçiyor
+  - mevcut V1 panel yalnız semantic panel carrier'dır; gerçek inscription varlığı iddia edilmez.
+- Strasbourg projection milestone tamamlandı:
+  - dört gerçek component mesh canonical `oriented_planar` `AtlasSurfaceTarget` üzerine `AtlasSurfaceProjectionEngine` ile project ediliyor
+  - facade-space `(X, Y, Z)` producer geometrisi projection-local `(U, V, depth)` contractına deterministic dönüştürülüyor
+  - attachment ve `0.0 .. 1.8 mm` depth-envelope gate geçiliyor
+  - closed-solid tangent side faces winding audit tarafından artık yanlış violation sayılmıyor
+  - `opening.recessed_rect_v1` inward polarity ile project ediliyor
+  - archivolt, figurative tympanum carrier ve panel carrier outward polarity ile project ediliyor
+  - projection sonucu occurrence identity ve canonical semantic class metadata'sını koruyor
+  - recessed opening'in inward davranışı target outward normal boyunca signed-depth contractıyla doğrulandı.
+- Strasbourg semantic depth / occlusion composition milestone tamamlandı:
+  - mevcut Phase 3 `AtlasSemanticDepthOcclusionComposer` Phase 7 Strasbourg referansına bağlandı
+  - canonical facade surface scene graph içinde gerçek target component olarak temsil ediliyor
+  - semantic sıra deterministic: `recessed -> primary -> raised_primary -> raised_secondary`
+  - composer depth-band aralıkları canonical normalize `0.0 .. 1.0` contractını koruyor
+  - projected gerçek geometry üzerinde recessed opening ile üç ayrı raised fiziksel seviye ayrışıyor
+  - figurative tympanum ve archivolt için gereksiz yükseklik zorlaması yapılmadı; mevcut gerçek producer geometrisi korundu
+  - composition plan `conflicts == ()`
+- Phase 7 focused validation: `34 passed in 0.05s`.
+- Phase 7 related regression: `124 passed in 0.16s`.
+- Full regression: `4149 passed in 16.44s`.
+- `git diff --check`: temiz (`EXIT=0`).
+- Korunan unrelated working-tree çalışmalarına reset/restore/clean uygulanmadı.
+- Phase 7 henüz `LOCKED` değildir.
+- Sıradaki kesin tek iş: Strasbourg semantic ve generic height-map baseline çıktısını aynı fiziksel ürün contractında karşılaştıran gerçek comparison path'i test-first bağlamak.
+
+
+## 18 Aug 2026 — Phase 7 Portrait Semantic Diagnostic Checkpoint
+
+Status:
+- Semantic Relief, Figurative & Kit System V1 remains active.
+- Phase 7 — Architectural Semantic Relief Product V1 remains `IMPLEMENTATION_ACTIVE`.
+- This portrait work is a controlled Phase 7 diagnostic experiment; Phase 8 / Phase 9 have NOT started.
+- ATLAS overall progress remains 68%.
+- Active program progress remains 58%.
+
+Portrait diagnostic findings:
+- Real two-person portrait source was processed through the existing image-relief pipeline.
+- Illumination normalization and aspect-correct crop were validated.
+- MediaPipe 0.10.35 runtime was isolated in a dedicated Python 3.12 environment.
+- The front face produced a valid 478-point XYZ landmark set.
+- MediaPipe Z is anatomically coherent enough to act as relative coarse-form evidence, but it is provider-estimated relative depth, not scanned 3D geometry.
+- Full-face landmark-Z replacement / hybrid was visually rejected because it softened identity-bearing facial detail too aggressively.
+- The existing linear `AtlasReliefFaceDepthCalibrator` passes synthetic tests but did not materially restore the real shadow-compressed face volume; it is NOT locked as a production capability and remains experimental.
+- A root cause was found for the persistent flat plateaus around the nose and lips:
+  `ROCK_CARVED_LANDMARK.depth_upper_percentile=97.0` clips valid portrait facial peaks in `AtlasReliefDepthCompressor`.
+- Measured 97.0 percentile behavior:
+  - nose AT_ONE = 16.671%
+  - mouth AT_ONE = 10.597%
+  - nose gradient-near-zero = 22.454%
+- Diagnostic `depth_upper_percentile=99.5` result:
+  - nose AT_ONE = 0.249%
+  - mouth AT_ONE = 0.438%
+  - nose gradient-near-zero = 6.210%
+- 100.0 removes clipping completely but compresses the useful visual range more than desired.
+- Therefore 99.5 is the accepted current PORTRAIT DIAGNOSTIC baseline; it has NOT yet been added as a canonical production profile.
+- Canonical diagnostic STL:
+  `OUTPUT/RELIEF/portrait_semantic_experiment_v1/two_person_portrait_PORTRAIT_BASELINE_99_5_PREVIEW.stl`
+  - 4,037,596 triangles
+  - approx. 80.0 x 84.0816 x 2.6 mm
+- Bambu Studio visual inspection confirms the severe 97-percentile nose plateau is substantially reduced and face volume is more continuous.
+- Remaining limitation: facial relief is still too luminance/texture-driven around eyes, nose-understructure, mouth and skin texture.
+
+Validation at this checkpoint:
+- focused portrait/profile: 26 passed in 0.08s
+- Strasbourg Phase 7 reference: 9 passed in 0.04s
+- full regression: 4152 passed in 16.96s
+- git diff --check: EXIT=0
+
+Phase 7 architectural status remains unchanged:
+- Strasbourg real-photo generic relief baseline is valid.
+- Semantic-only primitive replacement was visually rejected.
+- Image relief remains the main form carrier.
+- Semantic systems should operate as local structural/depth corrections, not wholesale replacement of source identity.
+
+Exact next single task:
+- Build a non-destructive diagnostic using MediaPipe XYZ only as LOW-FREQUENCY LOCAL structural support for the front-face nose and upper/lower-lip regions on top of the accepted 99.5 portrait baseline.
+- Do not modify the rest of the face.
+- Do not return to full-face landmark hybrid.
+- Do not start Phase 8 or Phase 9.
+- Do not create a canonical portrait product profile until this local correction is visually validated.
+
+
+## 18 Aug 2026 — Phase 7 Local Semantic Depth Diagnostic Accepted
+
+Status:
+- Phase 7 remains `IMPLEMENTATION_ACTIVE`.
+- Portrait work remains a controlled Phase 7 diagnostic; Phase 8 / Phase 9 have NOT started.
+- No canonical portrait product profile has been created.
+
+Accepted diagnostic result:
+- The accepted portrait image baseline remains the real-photo relief pipeline with diagnostic
+  `depth_upper_percentile=99.5`.
+- Full-face MediaPipe XYZ replacement/hybrid remains REJECTED because it softens identity-bearing detail.
+- Strict-local MediaPipe XYZ correction for the foreground face nose + mouth region is DIAGNOSTIC ACCEPTED.
+- MediaPipe XYZ is used only as low-frequency relative structural support; it is not treated as scanned 3D geometry.
+- The original photo-derived height map remains the primary form/identity carrier.
+- Correction is spatially restricted to the selected local anatomical masks.
+- Verified outside-mask preservation:
+  `OUTSIDE_MAX_DELTA=0.000000000000`.
+- Local correction metrics:
+  - touched pixels: 54,077
+  - local mean absolute normalized depth delta: 0.037910
+  - local max absolute normalized depth delta: 0.120165
+- Corrected physical diagnostic STL:
+  `OUTPUT/RELIEF/portrait_semantic_experiment_v1/two_person_portrait_PORTRAIT_99_5_LOCAL_NOSE_MOUTH_Z_PREVIEW.stl`
+  - triangles: 4,037,596
+  - approx. 80.0 x 84.0816 x 2.6 mm
+- Bambu Studio oblique-angle inspection showed a small but real improvement in nose / nose-understructure continuity without visible whole-face identity loss or mask-boundary artifact.
+- Lip improvement is more limited and does not justify further parameter sweeping at this stage.
+
+Architectural implication for Phase 7:
+- Image-derived relief should remain the main form carrier.
+- Semantic/provider-derived geometry should be applied as bounded local structural correction at identity-critical regions.
+- Semantic geometry should NOT wholesale replace real image form.
+- This diagnostic question is considered answered; further portrait tuning is parked.
+
+Validation immediately before this diagnostic sequence:
+- focused portrait/profile: 26 passed in 0.08s
+- Strasbourg Phase 7 reference: 9 passed in 0.04s
+- full regression: 4152 passed in 16.96s
+- git diff --check: EXIT=0
+
+Exact next task:
+- Return to the official Phase 7 Strasbourg path.
+- Build the real semantic-vs-generic comparison from actual generated outputs / measurable retained semantic evidence.
+- Do NOT recreate hard-coded comparison decisions.
+- Do NOT continue portrait parameter tuning.
+
+## Phase 7 Strasbourg Semantic Structural Depth Checkpoint — 18 August 2026
+
+**Program:** Semantic Relief, Figurative & Kit System V1
+**Phase:** Phase 7 — Architectural Semantic Relief Product V1
+**Status:** `IMPLEMENTATION_ACTIVE`
+**ATLAS overall completion:** 68%
+**Active program completion:** 58%
+
+Phase 7 remains focused on the real Strasbourg Cathedral central-portal reference. The real photo-derived relief remains the primary identity/form carrier; semantic geometry is a bounded structural enhancement layer and must not replace the photographic architecture.
+
+### Checkpoint capability completed
+
+The Strasbourg comparison path now has the missing measurable structural-depth bridge:
+
+- `AtlasArchitecturalSemanticReliefFeatureMeasurement`
+  - reports active pixels, retained pixels, and retained-active-pixel ratio from the existing physical detail filter;
+  - connected-component retention ratio is no longer treated as the primary readability metric because component fragmentation can distort that score.
+- `AtlasProjectedSemanticMeshDepthRasterizer`
+  - rasterizes projected triangle meshes into deterministic depth maps;
+  - supports world-space projected meshes through `AtlasSurfaceTarget`;
+  - converts world coordinates back to target-local `U/V + signed normal depth`;
+  - respects relief polarity during overlap resolution:
+    - outward -> greatest signed depth;
+    - inward -> most recessed signed depth.
+- `AtlasFacadeArchBandMesher`
+  - adds the minimum closed/manifold arch-band geometry required for the Strasbourg archivolt;
+  - replaces the previous solid arch behavior only in the Strasbourg Phase 7 reference path.
+- Strasbourg projected semantic depths are now physically coherent:
+  - recessed opening: `-0.800 mm`;
+  - archivolt: `+0.900 mm`;
+  - figurative tympanum: `+0.700 mm`;
+  - panel: `+0.500 mm`.
+- The previous archivolt solid-overlap defect was corrected with the arch-band geometry.
+- Strasbourg opening, archivolt, figurative tympanum, and panel placement has been re-registered against the previously accepted real image-space registration instead of the earlier generic canonical placements.
+- The rejected strict-local detail-gain experiment remains rejected as a Phase 7 superiority proof. It was perfectly local but produced only a very small pixel-retention gain and did not provide sufficient visual/semantic superiority evidence.
+- No hard-coded preserve/omit comparison decisions were reintroduced.
+- Portrait diagnostic work remains parked; Phase 8/9 has not started.
+
+### Validation at this checkpoint
+
+- Focused Phase 7 geometry/raster/Strasbourg tests: `17 passed in 0.19s`
+- Related regression: `68 passed in 0.27s`
+- Full regression: `4163 passed in 16.82s`
+- `git diff --check`: `EXIT=0`
+
+### Exact next task after the pause
+
+Run one post-registration Strasbourg overlap + signed-depth audit using the newly registered component geometry. Verify that the opening, archivolt, figurative tympanum, and panel occupy physically coherent regions with no unintended destructive overlap.
+
+If that audit is clean, build the combined semantic structural-depth reference from the real projected component outputs and apply it only as a bounded/local structural enhancement to the real photo-derived generic Strasbourg relief. Then produce the next measurable generic-vs-semantic A/B comparison.
+
+Do not start another parameter sweep, portrait work, Phase 8/9, unrelated refactor, or horizontal scope expansion before this exact Phase 7 task is completed.
+
+## Phase 7 Strasbourg Physical Production Checkpoint — 18 August 2026
+
+**Program:** Semantic Relief, Figurative & Kit System V1
+**Phase:** Phase 7 — Architectural Semantic Relief Product V1
+**Status:** `IMPLEMENTATION_ACTIVE`
+
+The official Phase 7 Strasbourg path has now reached the physical-coupon gate. The real photo-derived relief remains the primary identity/form carrier; semantic geometry remains a bounded local structural enhancement and does not replace the photographic architecture.
+
+### Digital product path completed
+
+- Post-registration overlap + signed-depth audit is clean.
+- The real projected semantic component outputs are combined into a structural-depth reference.
+- Bounded/local semantic enhancement is applied only on top of the real photo-derived baseline.
+- Generic-vs-semantic A/B comparison is now measurable from generated evidence:
+  - generic retained semantic evidence score: `0.75`
+  - semantic retained evidence score: `1.00`
+  - semantic readability delta: `+0.25`
+  - comparison report: `PASS`
+- Operator visual review of the semantic A/B remains accepted for the architectural comparison path.
+- Image relief remains the main identity/form carrier.
+- Semantic-only primitive replacement remains rejected.
+
+### Physical production conditioning completed
+
+The initial photo-derived physical coupon exposed excessive high-frequency surface activity in Bambu Studio. The solution was kept product-facing and did not alter source truth.
+
+Locked production conditioning sequence:
+
+1. bounded/local semantic enhancement
+2. architectural physical detail-scale conditioning
+3. polarity-aware positive/negative micro-detail filtering
+4. triangle-safe slope conditioning
+5. closed/manifold physical mesh production
+6. official physical quality report
+
+Locked physical detail-scale contract:
+
+- `minimum_feature_mm = 0.8`
+- `activity_threshold = 0.02`
+- `minimum_density = 0.25`
+
+The previous absolute-value connected-component interpretation produced a percolation defect: one component contained `91,787` pixels and `92.3587%` of active micro-detail. Positive and negative relief polarities are now filtered independently before recomposition.
+
+Polarity-aware result:
+
+- original active micro-detail pixels: `99,381`
+- retained active pixels: `62,232`
+- culled active pixels: `37,149`
+- culled active micro-detail: `37.380385%`
+- positive components: `6,937`
+- negative components: `5,352`
+
+Semantic structural protection remains exact during this product-facing detail conditioning.
+
+### Triangle-safe physical slope gate
+
+The physical slope conditioner is derived from the locked architectural risk profile and the real triangular mesh topology.
+
+- warning slope limit: `55.0 deg`
+- critical slope limit: `75.0 deg`
+- final maximum physical slope: `54.929772603 deg`
+- warning slope samples: `0%`
+- critical slope samples: `0%`
+- warning slope surface area: `0%`
+- critical slope surface area: `0%`
+- official physical quality status: `PASS`
+- `is_print_ready = True`
+
+Final physical topology:
+
+- dimensions: `80 x 120 x 2.6 mm`
+- triangles: `617,600`
+- open edges: `0`
+- non-manifold edges: `0`
+
+Canonical current coupon:
+
+`OUTPUT/RELIEF/strasbourg_cathedral_phase7/strasbourg_cathedral_phase7_polarity_conditioned_physical_coupon_80x120mm.stl`
+
+Canonical current shaded preview:
+
+`OUTPUT/RELIEF/strasbourg_cathedral_phase7/strasbourg_cathedral_phase7_polarity_conditioned_shaded_preview.png`
+
+### Bambu Studio validation
+
+Current slicer validation used:
+
+- Bambu Lab P2S
+- `0.4 mm` nozzle
+- `0.20 mm` layer height
+- total model height: `2.60 mm`
+- 13 layers
+- 0 filament changes
+- approx. `15.94 g`
+- approx. `1 h 14 min`
+
+The polarity-aware coupon has passed the slicer readability gate:
+
+`ACCEPTED_FOR_PHYSICAL_COUPON`
+
+This is NOT physical-object acceptance.
+
+### Validation at this checkpoint
+
+- Strasbourg focused: `18 passed in 69.65s`
+- related regression: `89 passed in 69.13s`
+- full regression: `4180 passed in 86.78s`
+- `git diff --check`: clean
+
+### Remaining Phase 7 gate
+
+Physical coupon printing is currently pending because the printer is occupied.
+
+Therefore:
+
+- `physical_coupon_accepted = False / PENDING`
+- Phase 7 remains `IMPLEMENTATION_ACTIVE`
+- Phase 7 is NOT yet `LOCKED`
+- Phase 8 has NOT started
+
+Exact next physical task when the printer becomes available:
+
+Print the canonical polarity-conditioned Strasbourg coupon, inspect architectural readability and physical feature survival on the real object, and record explicit operator acceptance or rejection.
+
+Do not perform another parameter sweep, unrelated relief tuning, portrait work, or Phase 8/9 production work before that physical gate is resolved.

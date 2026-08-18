@@ -263,3 +263,34 @@ def test_profile_is_immutable():
 def test_profile_rejects_invalid_values(arguments):
     with pytest.raises(ValueError):
         AtlasReliefProductProfile(**arguments)
+
+
+def test_architectural_stone_facade_profile_is_distinct_from_rock_carved_landmark():
+    from CORE.atlas_relief_product_profile_catalog import (
+        ARCHITECTURAL_STONE_FACADE,
+        ROCK_CARVED_LANDMARK,
+    )
+
+    assert ARCHITECTURAL_STONE_FACADE.name == (
+        "architectural-stone-facade"
+    )
+
+    assert (
+        ARCHITECTURAL_STONE_FACADE
+        is not ROCK_CARVED_LANDMARK
+    )
+
+    assert (
+        ARCHITECTURAL_STONE_FACADE.relief_height_mm
+        == 1.8
+    )
+
+    assert (
+        ARCHITECTURAL_STONE_FACADE.form_sigma
+        == 3.2
+    )
+
+    assert (
+        ARCHITECTURAL_STONE_FACADE.detail_sigma
+        == 0.85
+    )

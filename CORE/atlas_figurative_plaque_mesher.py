@@ -1,0 +1,164 @@
+from __future__ import annotations
+
+from CORE.atlas_facade_panel_builder import (
+    AtlasFacadePanelBuilder,
+)
+
+
+class AtlasFigurativePlaqueMesher:
+    DEFAULT_DEPTH_MM = 0.18
+    DEFAULT_EMBED_MM = 0.04
+
+    @staticmethod
+    def _wall_normal(wall_quad):
+        bottom_left = wall_quad[0]
+        bottom_right = wall_quad[1]
+        top_left = wall_quad[3]
+
+        wall_u = (
+            bottom_right[0] - bottom_left[0],
+            bottom_right[1] - bottom_left[1],
+            bottom_right[2] - bottom_left[2],
+        )
+        wall_v = (
+            top_left[0] - bottom_left[0],
+            top_left[1] - bottom_left[1],
+            top_left[2] - bottom_left[2],
+        )
+
+        normal = (
+            wall_u[1] * wall_v[2] - wall_u[2] * wall_v[1],
+            wall_u[2] * wall_v[0] - wall_u[0] * wall_v[2],
+            wall_u[0] * wall_v[1] - wall_u[1] * wall_v[0],
+        )
+
+        length = (
+            normal[0] ** 2
+            + normal[1] ** 2
+            + normal[2] ** 2
+        ) ** 0.5
+
+        if length <= 0.0:
+            raise ValueError("wall_quad is degenerate")
+
+        return (
+            normal[0] / length,
+            normal[1] / length,
+            normal[2] / length,
+        )
+
+    @classmethod
+    def build(
+        cls,
+        *,
+        wall_quad,
+        center_u,
+        center_v,
+        width_ratio,
+        height_ratio,
+        depth_mm=None,
+        embed_mm=None,
+        metadata=None,
+    ):
+        if not wall_quad or len(wall_quad) != 4:
+            raise ValueError(
+                "wall_quad must contain four points"
+            )
+
+        center_u = float(center_u)
+        center_v = float(center_v)
+        width_ratio = float(width_ratio)
+        height_ratio = float(height_ratio)
+        depth_mm = (
+            cls.DEFAULT_DEPTH_MM
+            if depth_mm is None
+            else float(depth_mm)
+        )
+        embed_mm = (
+            cls.DEFAULT_EMBED_MM
+            if embed_mm is None
+            else float(embed_mm)
+        )
+
+        if not 0.0 <= center_u <= 1.0:
+            raise ValueError(
+                "center_u must satisfy 0 <= center_u <= 1"
+            )
+
+        if not 0.0 <= center_v <= 1.0:
+            raise ValueError(
+                "center_v must satisfy 0 <= center_v <= 1"
+            )
+
+        if not 0.0 < width_ratio <= 1.0:
+            raise ValueError(
+                "width_ratio must satisfy 0 < ratio <= 1"
+            )
+
+        if not 0.0 < height_ratio <= 1.0:
+            raise ValueError(
+                "height_ratio must satisfy 0 < ratio <= 1"
+            )
+
+        if depth_mm <= 0.0:
+            raise ValueError(
+                "depth_mm must be greater than zero"
+            )
+
+        if embed_mm < 0.0:
+            raise ValueError(
+                "embed_mm must be non-negative"
+            )
+
+        half_width = width_ratio / 2.0
+        half_height = height_ratio / 2.0
+
+        u_min = center_u - half_width
+        u_max = center_u + half_width
+        v_min = center_v - half_height
+        v_max = center_v + half_height
+
+        if (
+            u_min < 0.0
+            or u_max > 1.0
+            or v_min < 0.0
+            or v_max > 1.0
+        ):
+            raise ValueError(
+                "figurative plaque bounds exceed wall"
+            )
+
+        component_metadata = {
+            "component_type": "figurative_plaque",
+            "content_role": "figurative_carrier",
+            "source_system": "figurative_plaque_mesher",
+        }
+
+        if metadata:
+            component_metadata.update(
+                dict(metadata)
+            )
+
+        component = (
+            AtlasFacadePanelBuilder
+            ._build_panel_prism(
+                wall_quad=wall_quad,
+                normal=cls._wall_normal(wall_quad),
+                u_min=u_min,
+                u_max=u_max,
+                v_min=v_min,
+                v_max=v_max,
+                depth_mm=depth_mm,
+                embed_mm=embed_mm,
+                metadata=component_metadata,
+            )
+        )
+
+        return {
+            "triangles": component["triangles"],
+            "component_meshes": (component,),
+            "plaque_count": 1,
+            "depth_mm": depth_mm,
+            "embed_mm": embed_mm,
+            "geometry_type": "figurative_plaque_system",
+        }
