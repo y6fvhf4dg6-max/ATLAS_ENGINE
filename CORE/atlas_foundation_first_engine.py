@@ -1735,7 +1735,7 @@ class AtlasFoundationFirstEngine:
     """
 
     VERSION = "0.5"
-    BASE_PLATE_HEIGHT_MM = 0.80
+    BASE_PLATE_HEIGHT_MM = 1.60
 
     @staticmethod
     def _resolve_scene_scale(
