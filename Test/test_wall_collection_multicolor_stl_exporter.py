@@ -1,3 +1,4 @@
+import pytest
 from pathlib import Path
 
 from CORE.atlas_wall_collection_multicolor_stl_exporter import (
@@ -635,3 +636,149 @@ def test_multicolor_exporter_uses_physical_palette_names_for_bonn(
         "brick_red",
         "dark_green",
     }
+
+def test_multicolor_exporter_physical_water_is_bed_supported_and_minimum_thickness(monkeypatch, tmp_path):
+    blue = (70, 140, 180)
+    water_mesh = {
+        "type": "narrow_waterway_foundation",
+        "triangles": [
+            ((0.0, 0.0, 3.0), (10.0, 0.0, 3.0), (10.0, 1.0, 3.0)),
+            ((0.0, 0.0, 3.0), (10.0, 1.0, 3.0), (0.0, 1.0, 3.0)),
+            ((0.0, 0.0, 3.1), (10.0, 1.0, 3.1), (10.0, 0.0, 3.1)),
+            ((0.0, 0.0, 3.1), (0.0, 1.0, 3.1), (10.0, 1.0, 3.1)),
+            ((0.0, 0.0, 3.0), (0.0, 0.0, 3.1), (10.0, 0.0, 3.1)),
+            ((0.0, 0.0, 3.0), (10.0, 0.0, 3.1), (10.0, 0.0, 3.0)),
+            ((10.0, 0.0, 3.0), (10.0, 0.0, 3.1), (10.0, 1.0, 3.1)),
+            ((10.0, 0.0, 3.0), (10.0, 1.0, 3.1), (10.0, 1.0, 3.0)),
+            ((10.0, 1.0, 3.0), (10.0, 1.0, 3.1), (0.0, 1.0, 3.1)),
+            ((10.0, 1.0, 3.0), (0.0, 1.0, 3.1), (0.0, 1.0, 3.0)),
+            ((0.0, 1.0, 3.0), (0.0, 1.0, 3.1), (0.0, 0.0, 3.1)),
+            ((0.0, 1.0, 3.0), (0.0, 0.0, 3.1), (0.0, 0.0, 3.0)),
+        ],
+    }
+    scene = {
+        "type": "product_color_preview_scene",
+        "profile_name": "TEST_WATER_PHYSICAL",
+        "material_batches": {
+            "water": {
+                "rgb": blue,
+                "meshes": [water_mesh],
+            },
+        },
+    }
+    writes = []
+    def fake_write(meshes, output_path, solid_name="ATLAS_MODEL"):
+        writes.extend(meshes)
+        return output_path
+    monkeypatch.setattr(
+        "CORE.atlas_wall_collection_multicolor_stl_exporter.AtlasSTLWriter.write",
+        fake_write,
+    )
+    AtlasWallCollectionMulticolorSTLExporter.export_scene(
+        scene=scene,
+        output_directory=tmp_path,
+        product_name="water_physical",
+    )
+    z_values = [
+        float(point[2])
+        for mesh in writes
+        for triangle in mesh["triangles"]
+        for point in triangle
+    ]
+    assert min(z_values) == pytest.approx(2.3)
+    assert max(z_values) == pytest.approx(3.1)
+    assert max(z_values) - min(z_values) >= 0.8 - 1e-9
+
+
+def test_multicolor_exporter_preserves_sloped_water_top_and_extends_downward(monkeypatch, tmp_path):
+    blue = (70, 140, 180)
+    water_mesh = {
+        "type": "narrow_waterway_foundation",
+        "triangles": [
+            ((0.0, 0.0, 2.0), (10.0, 0.0, 3.0), (10.0, 1.0, 3.0)),
+            ((0.0, 0.0, 2.0), (10.0, 1.0, 3.0), (0.0, 1.0, 2.0)),
+            ((0.0, 0.0, 2.1), (10.0, 1.0, 3.1), (10.0, 0.0, 3.1)),
+            ((0.0, 0.0, 2.1), (0.0, 1.0, 2.1), (10.0, 1.0, 3.1)),
+            ((0.0, 0.0, 2.0), (0.0, 0.0, 2.1), (10.0, 0.0, 3.1)),
+            ((0.0, 0.0, 2.0), (10.0, 0.0, 3.1), (10.0, 0.0, 3.0)),
+            ((10.0, 0.0, 3.0), (10.0, 0.0, 3.1), (10.0, 1.0, 3.1)),
+            ((10.0, 0.0, 3.0), (10.0, 1.0, 3.1), (10.0, 1.0, 3.0)),
+            ((10.0, 1.0, 3.0), (10.0, 1.0, 3.1), (0.0, 1.0, 2.1)),
+            ((10.0, 1.0, 3.0), (0.0, 1.0, 2.1), (0.0, 1.0, 2.0)),
+            ((0.0, 1.0, 2.0), (0.0, 1.0, 2.1), (0.0, 0.0, 2.1)),
+            ((0.0, 1.0, 2.0), (0.0, 0.0, 2.1), (0.0, 0.0, 2.0)),
+        ],
+    }
+    scene = {
+        "type": "product_color_preview_scene",
+        "profile_name": "TEST_SLOPED_WATER_PHYSICAL",
+        "material_batches": {"water": {"rgb": blue, "meshes": [water_mesh]}},
+    }
+    writes = []
+    def fake_write(meshes, output_path, solid_name="ATLAS_MODEL"):
+        writes.extend(meshes)
+        return output_path
+    monkeypatch.setattr(
+        "CORE.atlas_wall_collection_multicolor_stl_exporter.AtlasSTLWriter.write",
+        fake_write,
+    )
+    AtlasWallCollectionMulticolorSTLExporter.export_scene(
+        scene=scene,
+        output_directory=tmp_path,
+        product_name="sloped_water_physical",
+    )
+    by_xy = {}
+    for mesh in writes:
+        for triangle in mesh["triangles"]:
+            for x, y, z in triangle:
+                by_xy.setdefault((round(float(x), 6), round(float(y), 6)), set()).add(round(float(z), 6))
+    assert by_xy[(0.0, 0.0)] == {1.3, 2.1}
+    assert by_xy[(0.0, 1.0)] == {1.3, 2.1}
+    assert by_xy[(10.0, 0.0)] == {2.3, 3.1}
+    assert by_xy[(10.0, 1.0)] == {2.3, 3.1}
+
+
+@pytest.mark.parametrize(
+    "mesh_type",
+    ["inland_water_foundation", "coastline_water_foundation"],
+)
+def test_multicolor_exporter_normalizes_all_water_foundation_types(monkeypatch, tmp_path, mesh_type):
+    blue = (70, 140, 180)
+    water_mesh = {
+        "type": mesh_type,
+        "triangles": [
+            ((0.0, 0.0, 3.0), (10.0, 0.0, 3.0), (10.0, 1.0, 3.0)),
+            ((0.0, 0.0, 3.0), (10.0, 1.0, 3.0), (0.0, 1.0, 3.0)),
+            ((0.0, 0.0, 3.1), (10.0, 1.0, 3.1), (10.0, 0.0, 3.1)),
+            ((0.0, 0.0, 3.1), (0.0, 1.0, 3.1), (10.0, 1.0, 3.1)),
+            ((0.0, 0.0, 3.0), (0.0, 0.0, 3.1), (10.0, 0.0, 3.1)),
+            ((0.0, 0.0, 3.0), (10.0, 0.0, 3.1), (10.0, 0.0, 3.0)),
+            ((10.0, 0.0, 3.0), (10.0, 0.0, 3.1), (10.0, 1.0, 3.1)),
+            ((10.0, 0.0, 3.0), (10.0, 1.0, 3.1), (10.0, 1.0, 3.0)),
+            ((10.0, 1.0, 3.0), (10.0, 1.0, 3.1), (0.0, 1.0, 3.1)),
+            ((10.0, 1.0, 3.0), (0.0, 1.0, 3.1), (0.0, 1.0, 3.0)),
+            ((0.0, 1.0, 3.0), (0.0, 1.0, 3.1), (0.0, 0.0, 3.1)),
+            ((0.0, 1.0, 3.0), (0.0, 0.0, 3.1), (0.0, 0.0, 3.0)),
+        ],
+    }
+    scene = {
+        "type": "product_color_preview_scene",
+        "profile_name": "TEST_ALL_WATER_PHYSICAL",
+        "material_batches": {"water": {"rgb": blue, "meshes": [water_mesh]}},
+    }
+    writes = []
+    def fake_write(meshes, output_path, solid_name="ATLAS_MODEL"):
+        writes.extend(meshes)
+        return output_path
+    monkeypatch.setattr(
+        "CORE.atlas_wall_collection_multicolor_stl_exporter.AtlasSTLWriter.write",
+        fake_write,
+    )
+    AtlasWallCollectionMulticolorSTLExporter.export_scene(
+        scene=scene,
+        output_directory=tmp_path,
+        product_name="all_water_physical",
+    )
+    z_values = [float(point[2]) for mesh in writes for triangle in mesh["triangles"] for point in triangle]
+    assert min(z_values) == pytest.approx(2.3)
+    assert max(z_values) == pytest.approx(3.1)

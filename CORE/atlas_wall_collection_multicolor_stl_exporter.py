@@ -54,6 +54,63 @@ class AtlasWallCollectionMulticolorSTLExporter:
         "blue",
     )
 
+    MINIMUM_PHYSICAL_WATER_THICKNESS_MM = 0.80
+
+    @classmethod
+    def _normalize_physical_water_mesh(cls, mesh):
+        if mesh.get("type") not in {
+            "narrow_waterway_foundation",
+            "inland_water_foundation",
+            "coastline_water_foundation",
+        }:
+            return mesh
+
+        triangles = list(mesh.get("triangles", []))
+        if not triangles:
+            return mesh
+
+        z_by_xy = {}
+        for triangle in triangles:
+            for x, y, z in triangle:
+                key = (round(float(x), 9), round(float(y), 9))
+                z_by_xy.setdefault(key, []).append(float(z))
+
+        minimum_z_by_xy = {}
+        target_bottom_by_xy = {}
+        for key, values in z_by_xy.items():
+            minimum_z = min(values)
+            maximum_z = max(values)
+            minimum_z_by_xy[key] = minimum_z
+            current_thickness = maximum_z - minimum_z
+            if current_thickness + 1e-9 < cls.MINIMUM_PHYSICAL_WATER_THICKNESS_MM:
+                target_bottom_by_xy[key] = (
+                    maximum_z - cls.MINIMUM_PHYSICAL_WATER_THICKNESS_MM
+                )
+
+        if not target_bottom_by_xy:
+            return mesh
+
+        normalized = dict(mesh)
+        normalized["triangles"] = [
+            tuple(
+                (
+                    float(x),
+                    float(y),
+                    target_bottom_by_xy.get(key, float(z))
+                    if key in target_bottom_by_xy
+                    and abs(float(z) - minimum_z_by_xy[key]) <= 1e-9
+                    else float(z),
+                )
+                for x, y, z in triangle
+                for key in [(round(float(x), 9), round(float(y), 9))]
+            )
+            for triangle in triangles
+        ]
+        normalized["physical_water_thickness_mm"] = (
+            cls.MINIMUM_PHYSICAL_WATER_THICKNESS_MM
+        )
+        return normalized
+
     @classmethod
     def _resolve_color_name(
         cls,
@@ -161,6 +218,12 @@ class AtlasWallCollectionMulticolorSTLExporter:
                     "physical material batches use "
                     "conflicting RGB values"
                 )
+
+            if batch_name == "water":
+                meshes = [
+                    cls._normalize_physical_water_mesh(mesh)
+                    for mesh in meshes
+                ]
 
             group["meshes"].extend(meshes)
             group["source_batches"].append(
