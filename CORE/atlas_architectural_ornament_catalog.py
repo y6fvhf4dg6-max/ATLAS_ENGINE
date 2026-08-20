@@ -824,7 +824,7 @@ def build_default_architectural_ornament_catalog():
             "oriented_planar",
         ),
         minimum_printable_profile={
-            "minimum_diameter_mm": 0.9,
+            "minimum_diameter_mm": 1.2,
             "minimum_height_mm": 1.2,
         },
         material_role="architectural_ornament",
@@ -1222,8 +1222,8 @@ def build_default_architectural_ornament_catalog():
         minimum_printable_profile={
             "minimum_width_mm": 1.2,
             "minimum_height_mm": 1.2,
-            "minimum_mullion_width_mm": 0.6,
-            "minimum_transom_height_mm": 0.6,
+            "minimum_mullion_width_mm": 1.2,
+            "minimum_transom_height_mm": 1.2,
             "minimum_depth_mm": 0.18,
         },
         material_role="architectural_ornament",

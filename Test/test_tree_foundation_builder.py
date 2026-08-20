@@ -533,3 +533,27 @@ def test_strengthened_canonical_tree_is_closed_and_manifold():
     assert report["edge_count"] > 0
     assert report["open_edge_count"] == 0
     assert report["non_manifold_edge_count"] == 0
+
+def test_canonical_tree_physical_scale_never_reduces_trunk_below_print_minimum():
+    result = (
+        AtlasTreeFoundationBuilder
+        ._build_canonical_tree(
+            x=10.0,
+            y=20.0,
+            base_z=3.0,
+            physical_scale=0.95,
+        )
+    )
+
+    assert result["dimensions"]["trunk_diameter_mm"] >= 1.50
+
+def test_canonical_tree_uses_18_segments_for_smoother_physical_crown():
+    assert AtlasTreeFoundationBuilder.TREE_SEGMENTS == 18
+
+    result = AtlasTreeFoundationBuilder._build_canonical_tree(
+        x=10.0,
+        y=20.0,
+        base_z=3.0,
+    )
+
+    assert len(result["triangles"]) == 396

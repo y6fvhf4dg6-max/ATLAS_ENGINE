@@ -22,7 +22,7 @@ from CORE.atlas_physical_cartographic_exaggeration_resolver import (
 
 
 class AtlasTreeFoundationBuilder:
-    TREE_SEGMENTS = 12
+    TREE_SEGMENTS = 18
 
     CANONICAL_TREE_MIN_CROWN_DIAMETER_MM = 0.60
 
@@ -410,6 +410,11 @@ class AtlasTreeFoundationBuilder:
             )
             for key, value in dimensions.items()
         }
+
+        dimensions["trunk_diameter_mm"] = max(
+            dimensions["trunk_diameter_mm"],
+            1.50,
+        )
 
         segment_count = (
             AtlasTreeFoundationBuilder

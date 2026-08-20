@@ -1944,8 +1944,8 @@ def test_mullion_transom_tracery_catalog_entry_passes_topology_gate():
         parameters={
             "width_mm": 3.0,
             "height_mm": 3.6,
-            "mullion_width_mm": 0.6,
-            "transom_height_mm": 0.6,
+            "mullion_width_mm": 1.2,
+            "transom_height_mm": 1.2,
             "depth_mm": 0.24,
             "embed_mm": 0.04,
         },
@@ -2146,3 +2146,57 @@ def test_default_catalog_contains_repeatable_surface_units_v1():
         assert "assembled" in entry.output_eligibility
         assert "relief" in entry.output_eligibility
         assert "kit" in entry.output_eligibility
+
+def test_classical_round_column_rejects_sub_1_2mm_physical_diameter():
+    entry = build_default_architectural_ornament_catalog().get(
+        component_id="column.classical_round_v1",
+        version="1.0.0",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="diameter_mm violates minimum printable profile",
+    ):
+        entry.bind(
+            parameters={
+                "diameter_mm": 1.0,
+                "height_mm": 4.0,
+                "segments": 12,
+            },
+        )
+
+def test_tracery_rejects_sub_1_2mm_structural_members():
+    entry = build_default_architectural_ornament_catalog().get(
+        component_id="tracery.mullion_transom_v1",
+        version="1.0.0",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="mullion_width_mm violates minimum printable profile",
+    ):
+        entry.bind(
+            parameters={
+                "width_mm": 3.0,
+                "height_mm": 3.6,
+                "mullion_width_mm": 1.0,
+                "transom_height_mm": 1.2,
+                "depth_mm": 0.24,
+                "embed_mm": 0.04,
+            },
+        )
+
+    with pytest.raises(
+        ValueError,
+        match="transom_height_mm violates minimum printable profile",
+    ):
+        entry.bind(
+            parameters={
+                "width_mm": 3.0,
+                "height_mm": 3.6,
+                "mullion_width_mm": 1.2,
+                "transom_height_mm": 1.0,
+                "depth_mm": 0.24,
+                "embed_mm": 0.04,
+            },
+        )
