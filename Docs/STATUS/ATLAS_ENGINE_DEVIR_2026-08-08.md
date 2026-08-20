@@ -10092,17 +10092,33 @@ This is NOT physical-object acceptance.
 
 ### Remaining Phase 7 gate
 
-Physical coupon printing is currently pending because the printer is occupied.
+The canonical Strasbourg V4 physical coupon has now been printed and physically accepted.
 
 Therefore:
 
-- `physical_coupon_accepted = False / PENDING`
-- Phase 7 remains `IMPLEMENTATION_ACTIVE`
-- Phase 7 is NOT yet `LOCKED`
+- `physical_coupon_accepted = True / ACCEPTED`
+- Phase 7 — Architectural Semantic Relief Product V1 is `LOCKED`
 - Phase 8 has NOT started
+- Phase 8 — Canonical Face/Head Decision Gate is the next official roadmap phase
 
-Exact next physical task when the printer becomes available:
+Physical inspection confirmed that the former worm-like high-frequency ridge character is materially reduced while the principal portal hierarchy and useful architectural detail remain readable. No V5 refinement is required for Phase 7 closure.
 
-Print the canonical polarity-conditioned Strasbourg coupon, inspect architectural readability and physical feature survival on the real object, and record explicit operator acceptance or rejection.
+## 20 Aug 2026 — Phase 7 Strasbourg Physical ACCEPT / LOCK
 
-Do not perform another parameter sweep, unrelated relief tuning, portrait work, or Phase 8/9 production work before that physical gate is resolved.
+**Phase:** Phase 7 — Architectural Semantic Relief Product V1
+**Status:** `LOCKED`
+
+- Strasbourg V4 physical coupon: `ACCEPTED`.
+- Digital, topology, slicer and physical gates are complete.
+- Physical smoothing remains locked at `sigma=1.00`, `radius=3`.
+- Photo-derived relief remains the primary identity/form carrier.
+- Bounded semantic correction remains the local structural enhancement layer.
+- STL: `OUTPUT/RELIEF/strasbourg_cathedral_phase7/strasbourg_cathedral_phase7_physical_coupon_v4_smoothed_80x120mm.stl`.
+- Triangle count: `617600`.
+- Open edges: `0`.
+- Non-manifold edges: `0`.
+- Printable topology: `True`.
+- No V5 refinement is required.
+- Phase 7 is formally `LOCKED`.
+- Phase 8 has NOT started.
+- Next official roadmap phase: Phase 8 — Canonical Face/Head Decision Gate.
