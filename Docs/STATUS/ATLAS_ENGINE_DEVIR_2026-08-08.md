@@ -10092,67 +10092,289 @@ This is NOT physical-object acceptance.
 
 ### Remaining Phase 7 gate
 
-The canonical Strasbourg V4 physical coupon has now been printed and physically accepted.
+Physical coupon printing is currently pending because the printer is occupied.
 
 Therefore:
 
-- `physical_coupon_accepted = True / ACCEPTED`
-- Phase 7 — Architectural Semantic Relief Product V1 is `LOCKED`
+- `physical_coupon_accepted = False / PENDING`
+- Phase 7 remains `IMPLEMENTATION_ACTIVE`
+- Phase 7 is NOT yet `LOCKED`
 - Phase 8 has NOT started
-- Phase 8 — Canonical Face/Head Decision Gate is the next official roadmap phase
 
-Physical inspection confirmed that the former worm-like high-frequency ridge character is materially reduced while the principal portal hierarchy and useful architectural detail remain readable. No V5 refinement is required for Phase 7 closure.
+Exact next physical task when the printer becomes available:
+
+Print the canonical polarity-conditioned Strasbourg coupon, inspect architectural readability and physical feature survival on the real object, and record explicit operator acceptance or rejection.
+
+Do not perform another parameter sweep, unrelated relief tuning, portrait work, or Phase 8/9 production work before that physical gate is resolved.
+
+## ATLAS Five-Pillar Product & Production Backend Master Plan — 18 August 2026
+
+**Status:** `STRATEGIC_DIRECTION_LOCKED / EXECUTION_NOT_STARTED`
+**Current execution authority:** existing `Semantic Relief, Figurative & Kit System V1` roadmap
+**Current active phase:** Phase 7 — `Architectural Semantic Relief Product V1`
+
+### Purpose
+
+This master plan defines the post-current-program technical/product direction required to make ATLAS capable of supporting five commercial product pillars from one shared backend and production architecture.
+
+The five product pillars are:
+
+1. **Places**
+   - personalized location, city, terrain, home, university, island, destination and related geospatial products.
+
+2. **People & Memories**
+   - personalized photo, person, family, couple, pet and memory-based relief / figurative products.
+
+3. **Stories**
+   - compositions combining place, person, landmark, date, text, symbol and personal meaning.
+
+4. **Architecture & Collections**
+   - pre-engineered non-personalized landmark, architectural, cultural-heritage and collectible products.
+   - strategic intent: maintain a reusable global digital catalog so an order triggers production rather than redesign from zero.
+
+5. **Model Kits**
+   - pre-engineered multipart architectural/model-building products.
+   - may include hundreds or thousands of numbered parts.
+   - may be pre-colored or paint-ready.
+   - production package may include grouped/bagged parts, assembly instructions, paint specification, adhesive specification and related kit contents.
+
+### Ten-step backend/product master plan
+
+1. **Close Phase 7 — Architectural Semantic Relief Product V1**
+   - complete the existing official Phase 7 physical coupon gate and LOCK Phase 7 only after its official acceptance criteria are satisfied.
+
+2. **Face / Portrait Engine**
+   - execute official Phase 8 `Canonical Face/Head Decision Gate`.
+   - execute official Phase 9 `Identity-Preserving Portrait Relief V1`.
+   - establishes the core backend capability for `People & Memories`.
+
+3. **Figurative Engine**
+   - execute official Phase 10 `Figurative Body, Pose & Prop Grammar V1`.
+
+4. **Personalized Story Engine**
+   - execute official Phase 11 `Personalized Story Composer V1`.
+   - establishes composition across place, person, landmark, date, text, symbol and meaning.
+
+5. **Shared Component & Kit Engine**
+   - execute official Phase 12 `Shared Component Catalog & Kit Contract V1`.
+   - establishes reusable components, part identity and assembly/kit contracts.
+
+6. **Modular Model Kit Engine**
+   - execute official Phase 13 `Modular Architectural Kit Prototype V1`.
+   - establishes decomposition of architectural products into manufacturable assembly kits and validates the `Model Kits` pillar.
+
+7. **Unified Product Orchestration**
+   - execute official Phase 14 `Unified Product Orchestration`.
+   - one backend must orchestrate the five product pillars without duplicating independent product engines.
+
+8. **Commercial Production Gate**
+   - execute official Phase 15 `Commercial Production Gate`.
+   - production readiness must cover geometry, physical printability, topology, material/color identity, QA and production-package requirements.
+
+9. **Global Architecture & Product Catalog**
+   - expand reusable pre-engineered digital inventory after the relevant official engine gates are complete.
+   - intended coverage includes landmarks, cathedrals, churches, mosques, towers, stadiums, castles, bridges, universities, heritage structures, terrain/island products and other validated product families.
+   - catalog growth must reuse canonical engines/components and must not become uncontrolled one-off hard-coding.
+
+10. **Production & Fulfillment Backend**
+    - build the non-customer-facing production infrastructure needed to turn validated product definitions into repeatable manufacturing packages.
+    - intended scope includes job generation/routing, material/color package, kit batching, part grouping/numbering, assembly-document generation, QA records, packaging specification and shipping-ready production output.
+
+### Completion meaning
+
+When all ten steps are completed and accepted, ATLAS should have the technical/product backend required to support all five commercial pillars from one shared production architecture:
+
+- Places
+- People & Memories
+- Stories
+- Architecture & Collections
+- Model Kits
+
+This completion statement explicitly excludes the customer-facing commercial platform.
+
+### Hard execution boundaries — DO NOT VIOLATE
+
+1. **This plan does NOT replace, renumber, shorten, expand or bypass the official `Semantic Relief, Figurative & Kit System V1` roadmap.**
+2. **Official Phase 7–15 order remains authoritative.**
+3. **No later official phase may production-start before the current phase satisfies its documented gate.**
+4. **Phase 8 must not start before Phase 7 is physically accepted and LOCKED.**
+5. **Phase 9–11 remain subject to the official Phase 8 decision gate.**
+6. **Steps 9 and 10 of this master plan are strategic continuation work; they do not authorize premature implementation while official dependency gates remain open.**
+7. **The five commercial pillars are product/business classifications, not permission to create parallel engines or duplicate existing CORE systems.**
+8. **Shared infrastructure must be reused wherever technically valid; horizontal duplication is prohibited without explicit architectural justification.**
+9. **No product-specific hard-code may be promoted into general engine behavior without verified catalog/provenance and an explicit reusable contract.**
+10. **Source truth, semantic identity, physical material identity and commercial output role remain separate concepts.**
+11. **Preview output alone is never physical production proof. Existing topology, printability, slicer and physical validation gates remain mandatory where applicable.**
+12. **Physical parts must satisfy the applicable closed/manifold and production-quality contracts before product-ready status.**
+13. **Customer-facing configurator, storefront, account system, checkout, pricing UI, order UX and marketing platform are explicitly OUT OF SCOPE for this ten-step backend/product master plan.**
+14. **Customer-platform work is a later separate program and must not destabilize or prematurely reshape the production engine.**
+15. **Global catalog expansion must follow validated reusable engines; do not attempt to model the world manually before the corresponding product engine is locked.**
+16. **Model Kit catalog expansion must not begin at scale before Phase 12 and Phase 13 contracts are accepted.**
+17. **Production/Fulfillment automation must consume canonical product outputs; it must not become a second geometry engine.**
+18. **Protected unrelated working-tree work must not be reset, cleaned, restored, deleted or staged as a side effect of this plan.**
+19. **No `git add .`; stage only explicitly reviewed files.**
+20. **At every meaningful milestone: focused tests -> related regression -> `git diff --check` -> full regression -> documentation -> explicit staging -> commit -> push -> HEAD/origin verification.**
+
+### Immediate execution state
+
+This strategic plan is recorded for continuity only.
+
+It does NOT change the current exact task:
+
+- Phase 7 — Architectural Semantic Relief Product V1 is `LOCKED`.
+- Strasbourg digital, slicer and physical coupon gates are complete.
+- Strasbourg V4 physical coupon is `ACCEPTED`.
+- `physical_coupon_accepted = True / ACCEPTED`.
+- Phase 8 has NOT started.
+- Phase 8 — Canonical Face/Head Decision Gate is the next official roadmap phase.
+
+Until that gate is resolved, this new master plan must not trigger additional implementation work.
+
+## 19 Aug 2026 — Phase 7 Strasbourg Physical Coupon V4 Checkpoint
+
+**Phase:** Phase 7 — Architectural Semantic Relief Product V1
+**Status:** `IMPLEMENTATION_ACTIVE`
+
+Strasbourg physical-ground-truth refinement reached V4 while preserving the locked Phase 7 architecture: the real photo-derived relief remains the primary identity/form carrier and bounded semantic correction is still reapplied only after physical photo-carrier conditioning.
+
+### V4 refinement
+
+- Previous V3 physical smoothing: `sigma=0.60`, `radius=2`.
+- V4 physical smoothing: `sigma=1.00`, `radius=3`.
+- Smoothing is applied only to the photo-conditioned carrier before bounded semantic correction.
+- Semantic correction itself is not blurred.
+- Numerical carrier audit showed mean absolute Laplacian decreasing from `0.08180509` at V3 to `0.04744589` at V4, approximately a 42% reduction in high-frequency surface activity.
+- A stronger `sigma=1.20`, `radius=4` candidate was measured but deliberately not adopted because of increased risk of eroding meaningful architectural relief.
+
+### V4 digital / slicer assessment
+
+- The previous worm-like / cable-like micro-ridge appearance is substantially reduced.
+- The surface is visibly calmer without losing the principal Gothic portal hierarchy.
+- Opening, archivolt, central vertical structure, figurative tympanum region and architectural bands remain readable.
+- V4 is therefore the current physical-coupon candidate; no V5 refinement is authorized before physical ground-truth evaluation.
+
+### Validation
+
+- Strasbourg focused V4 contract: `1 passed`.
+- Full Strasbourg reference suite: `20 passed in 105.72s`.
+- Related Phase 7 regression: `94 passed in 103.87s`.
+- Full regression: `4191 passed in 119.98s`.
+- V4 STL: `OUTPUT/RELIEF/strasbourg_cathedral_phase7/strasbourg_cathedral_phase7_physical_coupon_v4_smoothed_80x120mm.stl`.
+- Triangle count: `617600`.
+- Open edges: `0`.
+- Non-manifold edges: `0`.
+- Printable topology: `True`.
+- Quality status: `PASS`.
+
+### Remaining Phase 7 gate
+
+- Physical V4 coupon printing is still `PENDING` because the printer is occupied by the current Dalyan production job.
+- Phase 7 remains `IMPLEMENTATION_ACTIVE` and is NOT `LOCKED`.
+- When the printer becomes available, print V4 and explicitly evaluate:
+  1. survival/removal of the former worm-like micro-ridges on the real object;
+  2. portal readability at normal viewing distance;
+  3. preservation of small architectural/stone detail without muddying;
+  4. overall physical product acceptance or rejection.
+- Phase 8 must not start before this physical acceptance gate is completed.
 
 ## 20 Aug 2026 — Phase 7 Strasbourg Physical ACCEPT / LOCK
 
 **Phase:** Phase 7 — Architectural Semantic Relief Product V1
 **Status:** `LOCKED`
 
-- Strasbourg V4 physical coupon: `ACCEPTED`.
-- Digital, topology, slicer and physical gates are complete.
-- Physical smoothing remains locked at `sigma=1.00`, `radius=3`.
+The canonical Strasbourg V4 physical coupon was printed and physically inspected after the completed digital, topology and slicer gates.
+
+### Physical acceptance
+
+- V4 physical coupon: `ACCEPTED`.
+- The former worm-like / cable-like high-frequency ridge character is materially reduced on the real print.
+- Main portal hierarchy remains physically readable: opening, archivolt, central vertical structure, tympanum region and architectural bands survive.
+- Small architectural/stone detail remains present without unacceptable muddying.
+- No collapsed major region, destructive smoothing failure or print defect invalidating the Phase 7 product contract was observed.
+- V4 therefore satisfies the mandatory Phase 7 physical-ground-truth gate.
+- No V5 refinement is required or authorized for Phase 7 closure.
+
+### Locked V4 production reference
+
+- Physical smoothing: `sigma=1.00`, `radius=3`.
 - Photo-derived relief remains the primary identity/form carrier.
-- Bounded semantic correction remains the local structural enhancement layer.
+- Bounded semantic correction remains a local structural enhancement and is applied after physical photo-carrier conditioning.
 - STL: `OUTPUT/RELIEF/strasbourg_cathedral_phase7/strasbourg_cathedral_phase7_physical_coupon_v4_smoothed_80x120mm.stl`.
 - Triangle count: `617600`.
 - Open edges: `0`.
 - Non-manifold edges: `0`.
 - Printable topology: `True`.
-- No V5 refinement is required.
-- Phase 7 is formally `LOCKED`.
+- Quality status: `PASS`.
+- Physical coupon acceptance: `True`.
+
+### Roadmap transition
+
+- Phase 7 is now formally `LOCKED`.
 - Phase 8 has NOT started.
-- Next official roadmap phase: Phase 8 — Canonical Face/Head Decision Gate.
+- The next official roadmap phase is Phase 8 — Canonical Face/Head Decision Gate.
+- Planned packaging production and the already-open physical-product Defect #4 cleanup may be completed as an operational interlude; they do not renumber, bypass or start Phase 8.
 
-## 20 Aug 2026 — Physical Defect #4 Small Feature Hardening
+## 20 Aug 2026 — ATLAS Full Continuity & Execution Authority
 
-**Status:** `SOFTWARE_FIX_COMPLETE`
+### Continuity purpose
+This record is the handover authority for the next engineer/model. Historical records remain valid; this section binds the current mission, roadmap state, physical evidence, open operational work and exact forward execution so the user does not need to reconstruct project context manually.
 
-The fourth physical-quality defect class — small architectural and vegetation
-features appearing fragile, crude or under-resolved in FDM output — was hardened
-at the shared engine level.
+### ATLAS mission
+ATLAS is one shared generative physical-product engine spanning location, terrain, architecture, semantic relief, human identity, personalized stories and modular kits. The five commercial pillars remain: Places; People & Memories; Stories; Architecture & Collections; Model Kits. Shared CORE infrastructure must be reused; independent one-off product engines and premature horizontal duplication are prohibited.
 
-Locked software changes:
+Canonical backend direction remains: source evidence -> semantic interpretation -> canonical geometry -> physical feature resolution -> composition -> manufacturing validation -> production package -> commercial production gate. Customer-facing storefront/configurator/account/checkout work remains outside the current engine program.
 
-- canonical tree trunk diameter is clamped after physical scaling to a minimum
-  of `1.50 mm`;
-- canonical tree circumferential resolution increased from `12` to `18`
-  segments;
-- `column.classical_round_v1` minimum physical diameter increased from
-  `0.9 mm` to `1.2 mm`;
-- `tracery.mullion_transom_v1` minimum mullion width increased from
-  `0.6 mm` to `1.2 mm`;
-- `tracery.mullion_transom_v1` minimum transom height increased from
-  `0.6 mm` to `1.2 mm`.
+### Official roadmap state
+Semantic Relief, Figurative & Kit System V1 contains 16 phases, 0 through 15. Phases 0-7 are LOCKED. Phase 8 Canonical Face/Head Decision Gate is the next active phase after this documentation checkpoint. Phases 9-15 are NOT STARTED. Phase 9 may not production-start before Phase 8 reaches explicit GO + LOCK.
 
-Validation:
+Roadmap meaning: 0-7 establish semantic/physical world and architectural product generation; 8-11 add human identity and personalized storytelling; 12-15 establish reusable catalog/kit architecture, unified orchestration and commercial production gating.
 
-- related regression: `84 passed`;
-- full regression: `4220 passed`;
-- commit: `bbe59fa Strengthen small physical features`;
-- `HEAD == origin/main == bbe59fae597b1559d7eee3033df11e1b33d1135f`.
+### Phase 7 and physical defect state
+Strasbourg Cathedral V4 is the locked Phase 7 physical reference. Real-photo relief remains the primary identity/form carrier; bounded semantic correction remains local structural enhancement after physical carrier conditioning. V4 sigma=1.00 radius=3 was physically ACCEPTED; topology is closed/manifold with 0 open and 0 non-manifold edges. No V5 is authorized for Phase 7 closure.
 
-This closes the software-hardening work for Defect #4. Physical acceptance of
-the revised behavior remains a separate future full-scene print gate.
+Physical Defects #1 and #2 have permanent software fixes. Defect #3 root-cause software corrections are complete with later physical validation separate. Defect #4 software hardening is complete: final scaled tree trunk minimum 1.50 mm, TREE_SEGMENTS 18, classical round column minimum 1.2 mm, tracery mullion/transom minimum 1.2 mm; related regression 84 passed, full regression 4220 passed; code commit bbe59fa, documentation commit d292f9a. Future full-scene physical acceptance does not reopen Phase 7.
 
-Phase 7 remains `LOCKED`. Phase 8 has NOT started.
+### Existing portrait evidence
+Pre-Phase-8 portrait work is diagnostic evidence, not production portrait capability. Image/luminance depth alone is insufficient as canonical identity geometry. Full-face MediaPipe XYZ replacement was rejected because it softened identity-bearing detail. MediaPipe XYZ may provide bounded low-frequency structural evidence but is not scanned 3D geometry. Diagnostic depth_upper_percentile=99.5 reduced facial peak clipping; strict-local nose/mouth structural correction was diagnostically accepted. AtlasReliefFaceDepthCalibrator remains experimental. No canonical portrait production profile has been locked.
+
+### Phase 8 mission — ATLAS Human Identity Architecture Gate
+Phase 8 must define the canonical identity representation shared by Phase 9 portrait relief, Phase 10 figurative systems, Phase 11 personalized stories and later kit/orchestration work. It is not a single-face demo task.
+
+Current benchmark direction: full-3D rather than 2.5D canonical representation; stable/fixed topology; separate identity, pose, expression, asymmetry and person-specific detail; portrait relief as an output adapter rather than canonical geometry; symmetry only as prior/regularizer; hair as a separate semantic component; explicit insufficient-evidence BLOCKED behavior; commercial license/privacy/runtime evidence before any external model becomes a production dependency.
+
+Preferred architecture candidate for benchmark is hybrid: stable parametric/fixed-topology canonical head plus person-specific detail. This is a preferred candidate, not yet a final dependency decision.
+
+### Phase 8 internal plan
+8.0 Input Evidence Contract — define frontal, 3/4, profile, multi-view, video and single-image fallback evidence classes plus BLOCKED conditions.
+8.1 Canonical Topology Contract — define full-3D stable topology, correspondence and semantic-region boundaries without prematurely binding to one provider.
+8.2 Identity Shape Contract — separate identity-bearing geometry from pose, expression and residual detail.
+8.3 Landmark & Dense Correspondence Contract — define their roles; landmark error alone is not proof of likeness.
+8.4 Camera / Pose Normalization — separate focal/perspective effects, camera pose and head pose from identity geometry.
+8.5 Expression Separation — keep smile, jaw, eyelid and other expression state out of canonical identity shape.
+8.6 Asymmetry Preservation — symmetry may regularize, but meaningful real asymmetry must survive.
+8.7 Head Semantic Boundary — define face, ears, jaw, neck and eyes ownership; hair separate; beard/moustache may be separate detail layers.
+8.8 Identity Confidence Gate — define evidence quality, confidence and failure reasons; architecture decision GO/HOLD/REJECT and production BLOCKED_INSUFFICIENT_IDENTITY_EVIDENCE behavior.
+8.9 Physical Representation Gate — prove one canonical identity can survive conversion to relief, bust, figurine head and story/kit component including physical minimums and LoD.
+8.10 Canonical Benchmark & LOCK — compare parametric/fixed-topology, direct neural dense reconstruction and hybrid canonical+detail approaches. Mandatory evidence includes identity preservation, multi-view consistency, silhouette/profile, head ratios, jaw/chin, nose projection, orbital/cheek volume, expression/pose separation, topology, physical suitability, Apple Silicon/runtime, reproducibility, privacy/data retention, commercial license/model-weight/dataset restrictions and processing cost/time. Close only with explicit GO/HOLD/REJECT; Phase 9 requires GO + LOCK.
+
+### FLAME and external-model status
+The 21 Jul 2026 FLAME 2023 Open selection remains historical/provisional evidence and a strong benchmark candidate, but no longer authorizes production dependency by itself. Phase 8 must re-audit commercial licensing, attribution, model/data/weight restrictions, privacy, runtime, identity preservation and downstream physical suitability. DECA, MICA, EMOCA and similar systems remain research/benchmark references unless a separately verified commercial-use path exists.
+
+### Packaging operational state
+Packaging is an operational interlude and does not alter roadmap numbering. Physically validated gift-box connector contract: male engagement 4.0 mm; female recess depth 4.2 mm; clearance 0.05 mm per side; 28.1 mm female against 28.0 mm male accepted; 28.2/28.3 too loose. Architecture: BASE top male -> MIDDLE bottom female/top male -> LID bottom female.
+
+Tiered support V2 work uses a 28 mm module with shelf levels 7/14/21/28 mm, 2.0 mm wall, 2.0 mm shelf and 8 mm corner engagement while preserving legacy 25/50 behavior. Current gift contains seven scenes, not the earlier eight-scene assumption. Do not lock final MIDDLE height until seven-scene distribution and support stack are recalculated. Do not print final LID until raised personalization is finalized. Full-size BASE has been sent to physical printing using the validated connector contract. Packaging/support changes remain separate from Phase 8 work.
+
+### Working-tree and execution discipline
+Intentional modified/untracked product, packaging, portrait-diagnostic, calibration, preview and source-data work may exist. Never reset/clean/restore/delete unrelated work. Never use git add . Stage only reviewed files. Preserve Data/OSM and other intentional source data.
+
+Meaningful milestones follow: RED contract -> minimal implementation -> focused tests -> related regression -> git diff --check -> full regression -> documentation -> explicit staging -> commit -> push -> HEAD==origin/main verification. Preview quality alone is never production proof; physical outputs require applicable topology, slicer and physical gates.
+
+### Exact forward execution
+1. Commit and push this continuity synchronization without staging unrelated work.
+2. Activate Phase 8 Canonical Face/Head Decision Gate.
+3. Start only Phase 8.0 Input Evidence Contract.
+4. Audit existing face/head source-adapter and portrait diagnostic contracts before creating new CORE abstractions.
+5. Write the first RED evidence-classification and BLOCKED-semantics contract.
+6. Do not begin Phase 9 production portrait implementation.
 

@@ -108,3 +108,15 @@ kapatır.
 Sıradaki üretim paketi:
 
 **`AtlasParametricFaceGeometry` canonical sözleşmesi**
+
+---
+
+## Decision Update - Portrait Canonical Face Geometry Phase 8 Revalidation
+
+**Tarih:** 2026-08-20
+
+The 2026-07-21 FLAME 2023 Open selection is retained as a historical/provisional architecture decision, but it no longer authorizes a production dependency by itself. The active Phase 8 Canonical Face/Head Decision Gate supersedes the earlier finality of that selection.
+
+Before any face/head provider enters the ATLAS commercial production core, Phase 8 must revalidate commercial licensing and attribution, model/data/weight restrictions, privacy and retention, Apple Silicon/runtime compatibility, identity-expression-pose separation, multi-view consistency, stable topology/correspondence, physical relief/bust/figurine suitability, reproducibility and processing cost.
+
+The preferred architecture direction to benchmark is a hybrid full-3D canonical head: stable parametric/fixed topology plus person-specific detail. FLAME-like geometry remains a strong candidate, not an automatic final dependency. Phase 8 closes only through explicit GO/HOLD/REJECT and LOCK. Phase 9 production work is prohibited before Phase 8 GO + LOCK.
