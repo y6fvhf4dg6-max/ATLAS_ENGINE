@@ -38,7 +38,7 @@ def test_foundation_first_engine_exposes_terrain_grid_size():
         "terrain_grid_size"
     ]
 
-    assert parameter.default == 25
+    assert parameter.default is None
 
 
 def test_foundation_first_engine_forwards_terrain_grid_size(

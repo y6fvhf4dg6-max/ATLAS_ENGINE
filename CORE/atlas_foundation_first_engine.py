@@ -1737,6 +1737,43 @@ class AtlasFoundationFirstEngine:
     VERSION = "0.5"
     BASE_PLATE_HEIGHT_MM = 1.60
 
+    MAXIMUM_TERRAIN_CELL_SIZE_MM = 3.125
+
+    @classmethod
+    def _resolve_terrain_grid_size(
+        cls,
+        *,
+        requested_grid_size,
+        size_x_mm,
+        size_y_mm,
+        target_size_mm=None,
+    ):
+        if requested_grid_size is not None:
+            return int(requested_grid_size)
+
+        import math
+
+        resolved_sizes = [
+            float(value)
+            for value in (size_x_mm, size_y_mm)
+            if value is not None
+        ]
+
+        if resolved_sizes:
+            maximum_size_mm = max(resolved_sizes)
+        elif target_size_mm is not None:
+            maximum_size_mm = float(target_size_mm)
+        else:
+            raise ValueError(
+                "Terrain grid resolution requires physical "
+                "scene size or target_size_mm."
+            )
+        interval_count = math.ceil(
+            maximum_size_mm
+            / cls.MAXIMUM_TERRAIN_CELL_SIZE_MM
+        )
+        return max(2, interval_count + 1)
+
     @staticmethod
     def _resolve_scene_scale(
         bbox,
@@ -1905,7 +1942,7 @@ class AtlasFoundationFirstEngine:
         cartographic_lod_level=None,
         city_composition_lod_level=None,
         scene_morphology=None,
-        terrain_grid_size=25,
+        terrain_grid_size=None,
         terrain_presentation_regularization_passes=0,
         terrain_presentation_regularization_strength=0.50,
         debug=True,
@@ -2150,6 +2187,15 @@ class AtlasFoundationFirstEngine:
             z_scale=z_scale,
         )
 
+        resolved_terrain_grid_size = (
+            AtlasFoundationFirstEngine._resolve_terrain_grid_size(
+                requested_grid_size=terrain_grid_size,
+                size_x_mm=size_x_mm,
+                size_y_mm=size_y_mm,
+                target_size_mm=target_size_mm,
+            )
+        )
+
         terrain_slab = AtlasTerrainPipeline.build_terrain_slab(
             bbox=working_bbox,
             target_size_mm=target_size_mm,
@@ -2158,7 +2204,7 @@ class AtlasFoundationFirstEngine:
             z_scale=z_scale,
             base_z=(AtlasFoundationFirstEngine.BASE_PLATE_HEIGHT_MM),
             bottom_z=0.0,
-            grid_size=terrain_grid_size,
+            grid_size=resolved_terrain_grid_size,
             terrain_provider_name=(terrain_provider_name),
             smoothing_passes=terrain_smoothing_passes,
             presentation_regularization_passes=(
