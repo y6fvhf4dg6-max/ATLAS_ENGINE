@@ -6592,3 +6592,73 @@ Phase 8.2 is `LOCKED`.
 
 The next exact sub-phase is **8.3 — Landmark & Dense Correspondence Contract**. It must define stable semantic/index correspondence between observed portrait evidence and the canonical head without coupling ATLAS to a specific provider implementation.
 
+## 20 Aug 2026 — Phase 8.3 Landmark & Dense Correspondence Contract LOCK
+
+**Program:** Semantic Relief, Figurative & Kit System V1
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Sub-phase:** 8.3 — Landmark & Dense Correspondence Contract
+**Status:** `LOCKED`
+
+Phase 8.3 establishes provider-independent correspondence contracts between observed portrait evidence and the canonical head topology locked in Phase 8.1.
+
+### Locked contracts
+
+- `CORE/atlas_canonical_head_landmark_correspondence.py`
+  - immutable sparse correspondence contract;
+  - maps observed landmark IDs to canonical head vertex indices;
+  - bound to an `AtlasCanonicalHeadTopology`;
+  - canonical targets must be unique;
+  - canonical vertex indices must remain inside topology vertex bounds;
+  - exposes deterministic observed landmark ordering, canonical targets, correspondence count and connectivity signature;
+  - does not claim provider identity, confidence, camera fit, identity shape or fit quality.
+
+- `CORE/atlas_canonical_head_dense_correspondence.py`
+  - immutable dense correspondence contract;
+  - maps observed sample indices to canonical head vertex indices;
+  - bound to an `AtlasCanonicalHeadTopology`;
+  - canonical targets must be unique and in range;
+  - exposes correspondence count and canonical coverage ratio;
+  - full canonical coverage reports `1.0`;
+  - preserves the canonical connectivity signature.
+
+### Architectural meaning
+
+Observed portrait indexing and canonical head indexing are now explicitly separated.
+
+`AtlasPortraitIndexedLandmarkResult` remains the provider-independent observation container and intentionally performs no correspondence. Phase 8.3 adds the missing bridge from observed IDs/samples to canonical head vertex identity without embedding provider-specific topology into the canonical head contract.
+
+Sparse and dense correspondence are separate layers:
+
+- sparse correspondence represents semantically selected observed landmark IDs;
+- dense correspondence represents broader indexed sample-to-canonical-vertex coverage.
+
+Both preserve fixed canonical topology and therefore remain compatible with the identity-shape layer from Phase 8.2.
+
+### Explicit non-decisions
+
+Phase 8.3 does NOT:
+
+- perform camera fitting or perspective normalization;
+- define pose normalization;
+- define expression fitting;
+- calculate correspondence fit error or likeness confidence;
+- bind ATLAS to MediaPipe, FLAME or another provider;
+- approve external model licenses, datasets or weights;
+- infer identity shape from correspondence alone.
+
+Camera and pose normalization remain assigned to Phase 8.4.
+
+### Validation
+
+- sparse canonical landmark correspondence: `14 passed in 0.03s`;
+- dense canonical correspondence: `15 passed in 0.03s`;
+- related Phase 8 / portrait regression: `107 passed in 0.20s`;
+- full regression: `4352 passed in 120.93s`;
+- `git diff --check`: `EXIT=0`.
+
+### Gate decision
+
+Phase 8.3 is `LOCKED`.
+
+The next exact sub-phase is **8.4 — Camera / Pose Normalization**. It must normalize observation camera and head pose independently from identity shape and expression while preserving the canonical topology/correspondence contracts established in Phase 8.1–8.3.
+
