@@ -10662,3 +10662,78 @@ Phase 8.3 is `LOCKED`.
 
 The next exact sub-phase is **8.4 — Camera / Pose Normalization**. It must normalize observation camera and head pose independently from identity shape and expression while preserving the canonical topology/correspondence contracts established in Phase 8.1–8.3.
 
+## 20 Aug 2026 — Phase 8.4 Camera / Pose Normalization LOCK
+
+**Program:** Semantic Relief, Figurative & Kit System V1
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Sub-phase:** 8.4 — Camera / Pose Normalization
+**Status:** `LOCKED`
+
+Phase 8.4 establishes provider-independent observation and normalization contracts for head pose and portrait camera state while keeping identity shape and expression separate.
+
+### Locked contracts
+
+- `CORE/atlas_canonical_head_pose_observation.py`
+  - immutable observed head-pose contract;
+  - normalized `pose_id`;
+  - finite yaw, pitch and roll angles in degrees;
+  - canonical neutral pose is explicitly `0 / 0 / 0`;
+  - does not claim camera state, identity shape, expression, provider or confidence.
+
+- `CORE/atlas_canonical_head_camera_observation.py`
+  - immutable provider-independent portrait camera observation;
+  - perspective projection contract;
+  - positive image dimensions;
+  - positive finite focal length in pixels;
+  - finite principal point constrained to image bounds;
+  - exposes normalized principal point coordinates;
+  - camera state remains independent from head pose and identity state.
+
+- `CORE/atlas_canonical_head_pose_normalization.py`
+  - immutable canonical pose-normalization descriptor;
+  - references an observed head pose and camera observation;
+  - exposes inverse yaw / pitch / roll needed to return the observed head orientation to canonical neutral orientation;
+  - target orientation is explicitly `0 / 0 / 0`;
+  - preserves observation contracts without mutating identity geometry or expression state.
+
+### Architectural meaning
+
+Phase 8.4 separates three concerns that must not be conflated:
+
+1. observed head orientation;
+2. observed portrait camera state;
+3. canonical pose normalization.
+
+This establishes the boundary needed to remove observation pose/camera effects before later identity and expression evaluation. Camera normalization is not treated as identity deformation, and head-pose normalization is not allowed to modify identity shape.
+
+The existing `AtlasPortraitInputQualityObservation.perspective_distortion_score` remains an input-quality signal only and is not a camera model. Existing surface-projection and body-pose adapters remain separate product/figurative systems and are not reused as canonical portrait-camera contracts.
+
+### Explicit non-decisions
+
+Phase 8.4 does NOT:
+
+- change canonical identity shape;
+- define or remove facial expression;
+- calculate likeness or identity confidence;
+- bind ATLAS to a provider-specific camera estimator;
+- perform FLAME, DECA, MICA or EMOCA fitting;
+- approve external model licenses, datasets or weights;
+- create final portrait relief, bust or figurine geometry.
+
+Expression separation remains assigned to Phase 8.5.
+
+### Validation
+
+- head-pose observation: `10 passed in 0.02s`;
+- camera observation: `14 passed in 0.02s`;
+- canonical pose normalization: `8 passed in 0.02s`;
+- related Phase 8 regression: `132 passed in 0.23s`;
+- full regression: `4384 passed in 119.85s`;
+- `git diff --check`: `EXIT=0`.
+
+### Gate decision
+
+Phase 8.4 is `LOCKED`.
+
+The next exact sub-phase is **8.5 — Expression Separation**. Work must resume there after the planned pause.
+
