@@ -6453,3 +6453,78 @@ Phase 8.0 is `LOCKED`.
 
 The next exact sub-phase is **8.1 — Canonical Topology Contract**. Before choosing or integrating FLAME or any other provider, 8.1 must define the provider-independent full-3D topology/correspondence/semantic-region contract and preserve the Phase 8 license/runtime decision gate.
 
+## 20 Aug 2026 — Phase 8.1 Canonical Topology Contract LOCK
+
+**Program:** Semantic Relief, Figurative & Kit System V1
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Sub-phase:** 8.1 — Canonical Topology Contract
+**Status:** `LOCKED`
+
+Phase 8.1 establishes the provider-independent canonical full-3D head topology boundary. It deliberately does not select FLAME or another external provider and does not yet define identity parameters, expression, pose, likeness confidence or commercial dependency approval.
+
+### Locked contracts
+
+- `CORE/atlas_canonical_head_topology.py`
+  - immutable provider-independent topology descriptor;
+  - normalized topology identity;
+  - explicit fixed vertex count;
+  - indexed triangular connectivity;
+  - semantic vertex regions;
+  - deterministic SHA-256 connectivity signature derived from vertex count and face connectivity;
+  - connectivity identity is independent of provider naming and future per-person vertex coordinates.
+
+- `CORE/atlas_canonical_head_geometry.py`
+  - immutable full-3D vertex geometry bound to an `AtlasCanonicalHeadTopology`;
+  - vertex array shape must be `(topology.vertex_count, 3)`;
+  - finite coordinates required;
+  - different person-specific geometries may use different vertex coordinates while preserving one canonical topology/connectivity signature;
+  - semantic region vertices can be retrieved without mutating topology;
+  - contract does not claim pose, expression, identity parameters, provider identity or confidence.
+
+- `CORE/atlas_canonical_head_topology_compatibility_gate.py`
+  - provider-independent topology compatibility gate;
+  - minimum canonical semantic regions currently required:
+    - `face`
+    - `nose`
+    - `left_eye`
+    - `right_eye`
+  - missing required regions produce `BLOCKED_MISSING_CANONICAL_SEMANTIC_REGION`;
+  - ear/hair/neck ownership is intentionally deferred to Phase 8.7 rather than prematurely hard-coded here.
+
+### Architectural meaning
+
+Canonical topology and canonical instance geometry are now separate concepts.
+
+Two identities may have different 3D vertex coordinates while remaining topologically compatible when their indexed connectivity signature is identical. This is the foundation required for later identity-shape fitting, expression separation, correspondence and downstream relief/bust/figurine adapters.
+
+The general `AtlasTriangleMeshGeometrySourceAdapter` remains the generic triangle-mesh source boundary and is not duplicated. Phase 8.1 adds human-head topology semantics that generic triangle soup cannot express safely.
+
+### Explicit non-decisions
+
+Phase 8.1 does NOT:
+
+- bind ATLAS to FLAME or another provider;
+- hard-code the historical FLAME vertex/triangle counts;
+- define identity coefficients;
+- define expression or pose parameters;
+- define likeness or identity confidence;
+- approve any external model license, weights or dataset;
+- create portrait relief production geometry.
+
+Those decisions remain assigned to later Phase 8 gates.
+
+### Validation
+
+- canonical topology descriptor: `15 passed in 0.03s`;
+- canonical head geometry: `9 passed in 0.05s`;
+- topology compatibility gate: `8 passed in 0.02s`;
+- related Phase 8 / geometry-source regression: `108 passed in 0.21s`;
+- full regression: `4306 passed in 119.70s`;
+- `git diff --check`: `EXIT=0`.
+
+### Gate decision
+
+Phase 8.1 is `LOCKED`.
+
+The next exact sub-phase is **8.2 — Identity Shape Contract**. It must define identity-bearing canonical geometry separately from expression, pose and residual detail while preserving the fixed topology contract established here.
+
