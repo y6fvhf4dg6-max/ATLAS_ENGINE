@@ -6528,3 +6528,67 @@ Phase 8.1 is `LOCKED`.
 
 The next exact sub-phase is **8.2 — Identity Shape Contract**. It must define identity-bearing canonical geometry separately from expression, pose and residual detail while preserving the fixed topology contract established here.
 
+## 20 Aug 2026 — Phase 8.2 Identity Shape Contract LOCK
+
+**Program:** Semantic Relief, Figurative & Kit System V1
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Sub-phase:** 8.2 — Identity Shape Contract
+**Status:** `LOCKED`
+
+Phase 8.2 establishes the provider-independent identity-bearing shape layer on top of the fixed canonical head topology locked in Phase 8.1.
+
+### Locked contracts
+
+- `CORE/atlas_canonical_head_identity_shape.py`
+  - immutable identity-shape descriptor;
+  - normalized `identity_shape_id`;
+  - references an immutable `AtlasCanonicalHeadGeometry`;
+  - stores person-specific `identity_displacement` as a finite immutable `(N, 3)` array;
+  - resolved geometry is deterministically computed as canonical reference geometry plus identity displacement;
+  - resolved geometry preserves the exact canonical topology and connectivity signature from Phase 8.1.
+
+- `CORE/atlas_canonical_head_identity_shape_compatibility_gate.py`
+  - evaluates a collection of `AtlasCanonicalHeadIdentityShape` instances;
+  - empty collections are rejected;
+  - non-identity-shape members are rejected;
+  - identity shapes sharing one canonical connectivity signature are `ACCEPTED`;
+  - mixed canonical connectivity produces `BLOCKED_MIXED_CANONICAL_HEAD_CONNECTIVITY`;
+  - result exposes compatibility status, blocked reasons, shared connectivity signature and identity-shape count.
+
+### Architectural meaning
+
+Identity shape is now a dedicated layer separate from canonical topology and separate from later transient deformations.
+
+The contract represents identity-bearing 3D shape as a displacement over a canonical reference geometry while preserving fixed vertex correspondence. This allows different individuals to occupy different canonical 3D geometries without changing connectivity.
+
+Different canonical reference geometry instances may still be compatible when their indexed connectivity signature is identical. Phase 8.2 therefore does not require byte-identical reference vertex coordinates; it requires canonical topological compatibility.
+
+### Explicit non-decisions
+
+Phase 8.2 does NOT:
+
+- define expression parameters or expression displacement;
+- define head/body pose;
+- define residual/high-frequency detail;
+- define likeness or identity confidence;
+- bind ATLAS to FLAME, DECA, MICA, EMOCA or another provider;
+- expose provider-specific coefficients;
+- approve external model licenses, weights or datasets;
+- create final portrait relief, bust or figurine production geometry.
+
+Expression separation remains assigned to Phase 8.5. Provider and commercial dependency decisions remain later Phase 8 gate work.
+
+### Validation
+
+- identity-shape contract: `10 passed in 0.05s`;
+- identity-shape compatibility gate: `6 passed in 0.05s`;
+- related Phase 8 / geometry-source regression: `124 passed in 0.29s`;
+- full regression: `4323 passed in 120.98s`;
+- `git diff --check`: `EXIT=0`.
+
+### Gate decision
+
+Phase 8.2 is `LOCKED`.
+
+The next exact sub-phase is **8.3 — Landmark & Dense Correspondence Contract**. It must define stable semantic/index correspondence between observed portrait evidence and the canonical head without coupling ATLAS to a specific provider implementation.
+
