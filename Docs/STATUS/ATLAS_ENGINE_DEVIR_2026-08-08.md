@@ -10122,3 +10122,37 @@ Physical inspection confirmed that the former worm-like high-frequency ridge cha
 - Phase 7 is formally `LOCKED`.
 - Phase 8 has NOT started.
 - Next official roadmap phase: Phase 8 — Canonical Face/Head Decision Gate.
+
+## 20 Aug 2026 — Physical Defect #4 Small Feature Hardening
+
+**Status:** `SOFTWARE_FIX_COMPLETE`
+
+The fourth physical-quality defect class — small architectural and vegetation
+features appearing fragile, crude or under-resolved in FDM output — was hardened
+at the shared engine level.
+
+Locked software changes:
+
+- canonical tree trunk diameter is clamped after physical scaling to a minimum
+  of `1.50 mm`;
+- canonical tree circumferential resolution increased from `12` to `18`
+  segments;
+- `column.classical_round_v1` minimum physical diameter increased from
+  `0.9 mm` to `1.2 mm`;
+- `tracery.mullion_transom_v1` minimum mullion width increased from
+  `0.6 mm` to `1.2 mm`;
+- `tracery.mullion_transom_v1` minimum transom height increased from
+  `0.6 mm` to `1.2 mm`.
+
+Validation:
+
+- related regression: `84 passed`;
+- full regression: `4220 passed`;
+- commit: `bbe59fa Strengthen small physical features`;
+- `HEAD == origin/main == bbe59fae597b1559d7eee3033df11e1b33d1135f`.
+
+This closes the software-hardening work for Defect #4. Physical acceptance of
+the revised behavior remains a separate future full-scene print gate.
+
+Phase 7 remains `LOCKED`. Phase 8 has NOT started.
+
