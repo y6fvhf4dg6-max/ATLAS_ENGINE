@@ -6737,3 +6737,106 @@ Phase 8.4 is `LOCKED`.
 
 The next exact sub-phase is **8.5 — Expression Separation**. Work must resume there after the planned pause.
 
+## Premium Gift Box — 180.8 mm Physical Compatibility System — 21 Aug 2026
+
+Operational gift-box work remains separate from the paused Phase 8 portrait program.
+
+A physical 170 mm Wall Collection box chain is now locked around the already-printed / in-production 180.8 mm BASE geometry. This physical compatibility chain must not be confused with the newer 181.5 mm nominal production-box spec.
+
+### Physical reference BASE
+- outer XY: 180.8 x 180.8 mm
+- inner XY: 176.0 x 176.0 mm
+- total height: 35.4 mm
+- top male connector outer XY: 178.8 x 178.8 mm
+- male engagement: 4.0 mm
+- connector inset: 1.0 mm / side
+- physical fit calibration: 0.05 mm clearance / side
+- mating female opening: 178.9 x 178.9 mm
+- female recess depth: 4.2 mm
+- BASE is currently being physically printed.
+
+### Physical MIDDLE
+- outer XY: 180.8 x 180.8 mm
+- inner XY: 176.0 x 176.0 mm
+- total part height: 50.0 mm
+- bottom connector: female
+- bottom female opening: 178.9 x 178.9 mm
+- female recess depth: 4.2 mm
+- top connector: male
+- top male outer XY: 178.8 x 178.8 mm
+- male engagement: 4.0 mm
+- mesh: 80 triangles
+- open edges: 0
+- non-manifold edges: 0
+- STL:
+  OUTPUT/STL/PREMIUM_GIFT_BOX_170MM_PHYSICAL_180_8/PREMIUM_GIFT_BOX_170MM_MIDDLE_180_8x180_8x50_0.stl
+- Bambu Studio dimensional inspection: accepted.
+- physical print pending.
+
+### Physical tall LID with pull-tab
+- main lid body XY: 180.8 x 180.8 mm
+- total height: 35.0 mm
+- bottom connector: female
+- female opening: 178.9 x 178.9 mm
+- female recess depth: 4.2 mm
+- top thickness: 2.0 mm
+- usable internal height above connector transition: 28.8 mm
+- finger notch concept was rejected.
+- final opening aid is an outward pull-tab / small visor-like lip:
+  - width: 30.0 mm
+  - projection: 4.0 mm
+  - thickness: 3.0 mm
+- pull-tab-inclusive bounding XY: 180.8 x 184.8 mm
+- final mesh: 72 triangles
+- connected components: 1
+- watertight: True
+- open edges: 0
+- non-manifold edges: 0
+- STL:
+  OUTPUT/STL/PREMIUM_GIFT_BOX_170MM_PHYSICAL_180_8/PREMIUM_GIFT_BOX_170MM_LID_PULL_TAB_180_8x184_8x35_0.stl
+- Bambu Studio visual inspection: accepted.
+- physical print pending.
+
+### Modular fit contract
+- BASE male -> MIDDLE female
+- MIDDLE male -> LID female
+- LID may also mount directly on BASE without MIDDLE.
+- main outside body remains flush at 180.8 x 180.8 mm through BASE / MIDDLE / LID.
+- 184.8 mm shown for the LID is only the local total bounding dimension caused by the 4.0 mm outward pull-tab.
+- female clearance remains the physically calibrated 0.05 mm / side.
+
+Do not regenerate these physical-fit parts from the 181.5 mm nominal production factory unless explicitly migrating the physical system. The 180.8 mm chain exists to match the actual BASE currently being printed.
+
+## Phase 8.5 — Expression Separation — LOCK candidate
+
+Phase 8.5 establishes a strict separation between persistent identity shape and temporary facial expression deformation on canonical head topology.
+
+Implemented contracts:
+- CORE/atlas_canonical_head_expression_displacement.py
+- CORE/atlas_canonical_head_expression_compatibility_gate.py
+- CORE/atlas_canonical_head_expression_composition.py
+
+Tests:
+- Test/test_canonical_head_expression_displacement.py
+- Test/test_canonical_head_expression_compatibility_gate.py
+- Test/test_canonical_head_expression_composition.py
+
+Locked behavior:
+- expression is represented as an immutable canonical (N,3) displacement layer;
+- zero displacement is the neutral expression;
+- expression state does not carry identity, pose, camera, provider, confidence, or likeness state;
+- identity and expression may compose only when canonical connectivity signatures match;
+- connectivity mismatch is explicitly blocked with BLOCKED_IDENTITY_EXPRESSION_CONNECTIVITY_MISMATCH;
+- resolved expression geometry is identity resolved geometry plus expression displacement;
+- identity and expression contracts remain immutable and are not mutated during composition.
+
+Validation:
+- focused Phase 8.5: 23 passed in 0.08s
+- related canonical-head regression: 132 passed in 0.26s
+- Phase 8.5 scoped git diff --check: clean
+- full regression: 4409 passed in 121.49s
+
+Phase 8.4 remains LOCKED.
+Phase 8.5 is ready for final commit/push lock.
+Next planned subphase after lock: Phase 8.6 — Asymmetry Preservation.
+
