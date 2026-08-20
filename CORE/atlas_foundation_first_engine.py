@@ -1943,7 +1943,7 @@ class AtlasFoundationFirstEngine:
         city_composition_lod_level=None,
         scene_morphology=None,
         terrain_grid_size=None,
-        terrain_presentation_regularization_passes=0,
+        terrain_presentation_regularization_passes=1,
         terrain_presentation_regularization_strength=0.50,
         debug=True,
     ):

@@ -128,7 +128,7 @@ def test_foundation_first_engine_exposes_presentation_regularization():
         signature.parameters[
             "terrain_presentation_regularization_passes"
         ].default
-        == 0
+        == 1
     )
 
     assert (
