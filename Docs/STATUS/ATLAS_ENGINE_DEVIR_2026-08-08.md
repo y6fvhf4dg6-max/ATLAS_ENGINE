@@ -10378,3 +10378,78 @@ Meaningful milestones follow: RED contract -> minimal implementation -> focused 
 5. Write the first RED evidence-classification and BLOCKED-semantics contract.
 6. Do not begin Phase 9 production portrait implementation.
 
+## 20 Aug 2026 — Phase 8.0 Input Evidence Contract LOCK
+
+**Program:** Semantic Relief, Figurative & Kit System V1
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Sub-phase:** 8.0 — Input Evidence Contract
+**Status:** `LOCKED`
+
+Phase 8 implementation formally started with a provider-independent identity-input evidence boundary. This milestone deliberately does NOT create canonical head geometry or identity confidence.
+
+### Locked architectural separations
+
+- raw portrait input evidence != landmark-provider result;
+- landmark-provider confidence != identity evidence confidence;
+- input usability != identity likeness/confidence;
+- provider-defined landmark Z != canonical metric head depth;
+- evidence coverage != canonical 3D reconstruction;
+- no 8.0 contract claims vertices, faces, head mesh or production portrait geometry.
+
+### New contracts
+
+- `CORE/atlas_portrait_input_evidence.py`
+  - immutable raw evidence identity;
+  - media kind: image/video;
+  - canonical view classes: front, left/right three-quarter, left/right profile, unknown;
+  - dimensions and metadata are normalized without embedding landmark or geometry responsibilities.
+
+- `CORE/atlas_portrait_input_evidence_set.py`
+  - immutable multi-evidence collection;
+  - unique evidence IDs;
+  - deterministic coverage classes:
+    - `high_confidence_multiview`: front + three-quarter + profile;
+    - `multiview_partial`: front + three-quarter;
+    - `single_view_fallback`: front only;
+    - `insufficient`: evidence without adequate frontal identity coverage;
+  - insufficient coverage returns `BLOCKED_INSUFFICIENT_IDENTITY_EVIDENCE`.
+  - coverage-class wording does not constitute final identity confidence.
+
+- `CORE/atlas_portrait_input_quality_observation.py`
+  - immutable provider-independent observations for face detection, face coverage, occlusion, blur and perspective distortion;
+  - observations do not claim identity confidence or geometry.
+
+- `CORE/atlas_portrait_input_usability_gate.py`
+  - combines evidence coverage with matching quality observations;
+  - returns deterministic `ACCEPTED` or `BLOCKED` usability result;
+  - explicit blocked reasons cover missing face, insufficient face coverage, excessive occlusion, excessive blur, excessive perspective distortion and insufficient identity-view evidence;
+  - requires exactly one quality observation for every evidence item.
+
+### Initial usability policy
+
+Current explicit policy constants are:
+
+- minimum face coverage ratio: `0.18`;
+- maximum occlusion ratio: `0.35`;
+- minimum blur score: `0.40`;
+- maximum perspective-distortion score: `0.55`.
+
+These are initial input-usability policy thresholds, not identity-confidence or likeness thresholds. They remain eligible for evidence-based revision during later Phase 8 benchmark work without collapsing the contract boundaries.
+
+### Validation
+
+- new focused contracts:
+  - portrait input evidence: 11 passed;
+  - portrait input evidence set: 12 passed;
+  - portrait quality observation: 21 passed;
+  - portrait usability gate: 10 passed.
+- related portrait / face-head regression: `147 passed in 0.22s`.
+- full regression: `4274 passed in 121.37s`.
+- `git diff --check`: `EXIT=0`.
+
+### Gate decision
+
+Phase 8.0 is `LOCKED`.
+
+The next exact sub-phase is **8.1 — Canonical Topology Contract**. Before choosing or integrating FLAME or any other provider, 8.1 must define the provider-independent full-3D topology/correspondence/semantic-region contract and preserve the Phase 8 license/runtime decision gate.
+
