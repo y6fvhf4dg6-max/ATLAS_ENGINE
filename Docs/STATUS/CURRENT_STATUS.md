@@ -8882,3 +8882,54 @@ Phase 8.7 remains LOCKED.
 Phase 8.8 is ready for final commit/push lock.
 Next planned subphase after lock: Phase 8.9 — Physical Representation Gate.
 
+## Phase 8.9 — Physical Representation Gate — LOCK candidate
+
+Phase 8.9 establishes the provider-independent physical representation gate for carrying one canonical identity into relief, bust, figurine-head and story/kit-component outputs without treating printability alone as proof of identity preservation.
+
+Implemented contracts:
+- CORE/atlas_canonical_head_physical_representation_observation.py
+- CORE/atlas_canonical_head_physical_representation_gate.py
+
+Tests:
+- Test/test_canonical_head_physical_representation_observation.py
+- Test/test_canonical_head_physical_representation_gate.py
+
+Locked representation classes:
+- relief;
+- bust;
+- figurine_head;
+- story_kit_component.
+
+Locked observation channels:
+- target head height in mm;
+- minimum physical feature in mm;
+- LoD level;
+- identity-preservation support;
+- silhouette-preservation support;
+- profile-preservation support.
+
+Locked gate behavior:
+- physical printability and identity preservation are separate requirements;
+- minimum head height is 18.0 mm;
+- minimum physical feature is 0.40 mm;
+- identity-preservation support below 0.50 produces REJECT;
+- identity-preservation support from 0.50 up to but not including 0.70 produces HOLD;
+- required preservation channels at or above 0.70 may produce GO;
+- LoD levels through 4 may pass; LoD 5+ produces HOLD;
+- limited silhouette or profile preservation produces HOLD;
+- GO means the physical identity representation is accepted;
+- HOLD and REJECT remain production BLOCKED;
+- every non-GO result carries BLOCKED_PHYSICAL_IDENTITY_REPRESENTATION;
+- deterministic failure reasons identify physical-size, feature-size, identity, silhouette, profile or LoD limitations;
+- these contracts do not claim geometry generation, provider identity or likeness score.
+
+Validation:
+- focused Phase 8.9: 37 passed in 0.05s
+- related canonical-head regression: 272 passed in 0.45s
+- Phase 8.9 scoped git diff --check: clean
+- full regression: 4549 passed in 121.23s
+
+Phase 8.8 remains LOCKED.
+Phase 8.9 is ready for final commit/push lock.
+Next planned subphase after lock: Phase 8.10 — Canonical Benchmark & LOCK.
+
