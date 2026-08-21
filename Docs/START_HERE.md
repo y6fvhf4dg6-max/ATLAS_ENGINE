@@ -6875,3 +6875,39 @@ Phase 8.5 remains LOCKED.
 Phase 8.6 is ready for final commit/push lock.
 Next planned subphase after lock: Phase 8.7 — Head Semantic Boundary.
 
+## Phase 8.7 — Head Semantic Boundary — LOCK candidate
+
+Phase 8.7 defines provider-independent ownership boundaries between canonical head surface regions, separate semantic components and optional facial-detail layers.
+
+Implemented contracts:
+- CORE/atlas_canonical_head_semantic_boundary.py
+- CORE/atlas_canonical_head_semantic_boundary_compatibility_gate.py
+- CORE/atlas_canonical_head_semantic_region_resolver.py
+
+Tests:
+- Test/test_canonical_head_semantic_boundary.py
+- Test/test_canonical_head_semantic_boundary_compatibility_gate.py
+- Test/test_canonical_head_semantic_region_resolver.py
+
+Locked ownership policy:
+- canonical head surface owns face, left/right ears, jaw, chin, neck and left/right eye regions;
+- hair is a separate semantic component;
+- left/right eyeballs are separate semantic components rather than canonical head-surface regions;
+- beard and moustache are optional detail layers;
+- separate components and optional detail layers are not required canonical topology semantic regions;
+- canonical topology must expose all required canonical-head semantic regions;
+- missing required regions are explicitly blocked with BLOCKED_MISSING_CANONICAL_HEAD_SEMANTIC_REGION;
+- semantic region resolution is deterministic and provider-independent;
+- non-canonical ownership classes cannot be resolved as canonical-head topology vertex regions;
+- these contracts do not claim geometry generation, provider identity, likeness or confidence.
+
+Validation:
+- focused Phase 8.7: 35 passed in 0.07s
+- related canonical-head regression: 190 passed in 0.39s
+- Phase 8.7 scoped git diff --check: clean
+- full regression: 4467 passed in 120.93s
+
+Phase 8.6 remains LOCKED.
+Phase 8.7 is ready for final commit/push lock.
+Next planned subphase after lock: Phase 8.8 — Identity Confidence Gate.
+
