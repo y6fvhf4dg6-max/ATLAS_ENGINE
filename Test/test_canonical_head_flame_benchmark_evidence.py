@@ -167,3 +167,77 @@ def test_catalog_does_not_expose_support_or_phase_9_decision():
         AtlasCanonicalHeadFlameBenchmarkEvidence,
         "phase_9_authorized",
     )
+
+
+def test_exposes_conservative_phase_8_10_evidence_coverage():
+    coverage = (
+        AtlasCanonicalHeadFlameBenchmarkEvidence
+        .coverage()
+    )
+
+    assert coverage.candidate_id == "flame-2023-open"
+
+    assert coverage.identity_preservation_support == "PARTIAL"
+    assert coverage.multi_view_consistency == "MEASURED"
+
+    assert coverage.silhouette_profile_support == "MISSING"
+    assert coverage.head_ratio_support == "MISSING"
+    assert coverage.jaw_chin_support == "MISSING"
+    assert coverage.nose_projection_support == "MISSING"
+    assert coverage.orbital_cheek_volume_support == "MISSING"
+    assert coverage.expression_separation_support == "MISSING"
+
+    assert coverage.pose_separation_support == "PARTIAL"
+
+    assert coverage.topology_suitability == "DIRECT"
+    assert coverage.physical_suitability == "MISSING"
+    assert coverage.apple_silicon_runtime_support == "DIRECT"
+    assert coverage.reproducibility_support == "DIRECT"
+
+
+def test_flame_coverage_does_not_fabricate_candidate_support():
+    coverage = (
+        AtlasCanonicalHeadFlameBenchmarkEvidence
+        .coverage()
+    )
+
+    assert not hasattr(coverage, "decision")
+    assert not hasattr(coverage, "phase_9_authorized")
+    assert not hasattr(coverage, "support_score")
+
+
+def test_exposes_conservative_phase_8_10_evidence_coverage():
+    coverage = (
+        AtlasCanonicalHeadFlameBenchmarkEvidence
+        .coverage()
+    )
+
+    assert coverage.candidate_id == "flame-2023-open"
+
+    assert coverage.identity_preservation_support == "PARTIAL"
+    assert coverage.multi_view_consistency == "MEASURED"
+
+    assert coverage.silhouette_profile_support == "MISSING"
+    assert coverage.head_ratio_support == "MISSING"
+    assert coverage.jaw_chin_support == "MISSING"
+    assert coverage.nose_projection_support == "MISSING"
+    assert coverage.orbital_cheek_volume_support == "MISSING"
+    assert coverage.expression_separation_support == "MISSING"
+
+    assert coverage.pose_separation_support == "PARTIAL"
+
+    assert coverage.topology_suitability == "DIRECT"
+    assert coverage.physical_suitability == "MISSING"
+    assert coverage.apple_silicon_runtime_support == "DIRECT"
+    assert coverage.reproducibility_support == "DIRECT"
+
+
+def test_flame_coverage_does_not_fabricate_candidate_support():
+    coverage = (
+        AtlasCanonicalHeadFlameBenchmarkEvidence
+        .coverage()
+    )
+
+    assert not hasattr(coverage, "decision")
+    assert not hasattr(coverage, "phase_9_authorized")
+    assert not hasattr(coverage, "support_score")

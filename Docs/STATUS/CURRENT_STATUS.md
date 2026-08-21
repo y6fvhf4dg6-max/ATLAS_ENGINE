@@ -9099,3 +9099,62 @@ Next Phase 8.10 requirement:
 - benchmark all three required architecture classes before any final Phase 8 GO / LOCK_READY decision;
 - Phase 9 remains blocked until the complete benchmark explicitly returns GO.
 
+## Phase 8.10 — Benchmark Evidence Coverage Boundary
+
+The raw-measurement-to-support boundary is now explicit. Phase 8.10 does not treat an available measurement, structural property or runtime observation as an automatic `[0,1]` benchmark support score.
+
+New provider-independent contract:
+- `CORE/atlas_canonical_head_benchmark_evidence_coverage.py`
+
+New test:
+- `Test/test_canonical_head_benchmark_evidence_coverage.py`
+
+Evidence coverage states:
+- `MEASURED` — a directly relevant benchmark measurement exists;
+- `PARTIAL` — relevant evidence exists but is insufficient for a complete support claim;
+- `DIRECT` — structural/runtime/reproducibility evidence is directly verified but has not been converted into a support score;
+- `MISSING` — required evidence has not yet been established.
+
+The coverage contract:
+- covers all 13 Phase 8.10 quality channels;
+- exposes missing channels deterministically;
+- carries no normalized support score;
+- carries no GO/HOLD/REJECT decision;
+- carries no Phase 9 authorization.
+
+FLAME 2023 Open conservative coverage:
+- identity preservation: `PARTIAL`;
+- multi-view consistency: `MEASURED`;
+- silhouette/profile: `MISSING`;
+- head ratio: `MISSING`;
+- jaw/chin: `MISSING`;
+- nose projection: `MISSING`;
+- orbital/cheek volume: `MISSING`;
+- expression separation: `MISSING`;
+- pose separation: `PARTIAL`;
+- topology suitability: `DIRECT`;
+- physical suitability: `MISSING`;
+- Apple Silicon runtime: `DIRECT`;
+- reproducibility: `DIRECT`.
+
+Interpretation boundary:
+- `DIRECT` does not mean support `1.0`;
+- `MEASURED` does not by itself define a support calibration;
+- 2D reprojection and cross-view consistency do not prove volumetric identity;
+- missing 3D ground truth prevents unsupported jaw/chin, nose-projection and orbital/cheek-volume claims;
+- current evidence therefore cannot yet instantiate a complete FLAME candidate observation for the Phase 8.10 decision gate.
+
+Validation:
+- evidence coverage focused tests: `16 passed in 0.03s`;
+- coverage + FLAME focused integration: `26 passed in 0.05s`;
+- related Phase 8.10 regression: `132 passed in 0.15s`;
+- full regression: `4681 passed in 120.85s`;
+- scoped tracked diff check: clean;
+- staged diff check remains required because the new coverage contract/test are currently untracked.
+
+Next Phase 8.10 requirement:
+- close the remaining evidence gaps before assigning calibrated support values;
+- do not fabricate volumetric, physical or expression evidence from the current two-subject photo benchmark;
+- retain the required three-architecture benchmark boundary;
+- Phase 9 remains NOT AUTHORIZED.
+

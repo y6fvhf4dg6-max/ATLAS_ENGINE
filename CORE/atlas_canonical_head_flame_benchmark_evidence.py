@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from CORE.atlas_canonical_head_benchmark_evidence_coverage import (
+    AtlasCanonicalHeadBenchmarkEvidenceCoverage,
+)
 from CORE.atlas_canonical_head_benchmark_measurement_observation import (
     AtlasCanonicalHeadBenchmarkMeasurementObservation,
 )
@@ -120,4 +123,26 @@ class AtlasCanonicalHeadFlameBenchmarkEvidence:
         return any(
             measurement.volumetric_identity_proven
             for measurement in cls._MEASUREMENTS
+        )
+
+
+    @classmethod
+    def coverage(
+        cls,
+    ) -> AtlasCanonicalHeadBenchmarkEvidenceCoverage:
+        return AtlasCanonicalHeadBenchmarkEvidenceCoverage(
+            candidate_id=cls.CANDIDATE_ID,
+            identity_preservation_support="PARTIAL",
+            multi_view_consistency="MEASURED",
+            silhouette_profile_support="MISSING",
+            head_ratio_support="MISSING",
+            jaw_chin_support="MISSING",
+            nose_projection_support="MISSING",
+            orbital_cheek_volume_support="MISSING",
+            expression_separation_support="MISSING",
+            pose_separation_support="PARTIAL",
+            topology_suitability="DIRECT",
+            physical_suitability="MISSING",
+            apple_silicon_runtime_support="DIRECT",
+            reproducibility_support="DIRECT",
         )
