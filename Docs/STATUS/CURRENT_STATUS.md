@@ -8933,3 +8933,72 @@ Phase 8.8 remains LOCKED.
 Phase 8.9 is ready for final commit/push lock.
 Next planned subphase after lock: Phase 8.10 — Canonical Benchmark & LOCK.
 
+## Phase 8.10 — Canonical Benchmark & LOCK — LOCK candidate
+
+Phase 8.10 establishes the final provider-independent canonical-head benchmark decision architecture for Phase 8. It compares parametric/fixed-topology, direct neural dense reconstruction and hybrid canonical+detail approaches under one evidence contract and prevents Phase 9 authorization unless a complete benchmark produces an explicit GO result.
+
+Implemented contracts:
+- CORE/atlas_canonical_head_benchmark_candidate_observation.py
+- CORE/atlas_canonical_head_benchmark_candidate_gate.py
+- CORE/atlas_canonical_head_benchmark_decision_gate.py
+
+Tests:
+- Test/test_canonical_head_benchmark_candidate_observation.py
+- Test/test_canonical_head_benchmark_candidate_gate.py
+- Test/test_canonical_head_benchmark_decision_gate.py
+
+Locked benchmark architecture classes:
+- parametric_fixed_topology;
+- direct_neural_dense;
+- hybrid_canonical_detail.
+
+Locked benchmark evidence:
+- identity preservation;
+- multi-view consistency;
+- silhouette/profile support;
+- head-ratio support;
+- jaw/chin support;
+- nose-projection support;
+- orbital/cheek-volume support;
+- expression separation;
+- pose separation;
+- topology suitability;
+- physical suitability;
+- Apple Silicon/runtime support;
+- reproducibility;
+- commercial-license acceptability;
+- privacy/data-retention acceptability;
+- model-weight restriction acceptability;
+- dataset restriction acceptability;
+- processing time and processing cost.
+
+Locked candidate behavior:
+- policy failures for commercial license, privacy/data retention, model weights or dataset restrictions are hard REJECT conditions;
+- benchmark quality below 0.50 produces REJECT;
+- benchmark quality from 0.50 up to but not including 0.70 produces HOLD;
+- required quality channels at or above 0.70 may produce GO;
+- strong geometric evidence cannot override topology, policy, physical-suitability, runtime or reproducibility failure;
+- processing time/cost do not outrank identity quality and are used only as late tie-break evidence.
+
+Locked final benchmark behavior:
+- all three architecture classes are required for a complete canonical benchmark;
+- duplicate architecture classes are rejected;
+- only candidate-level GO observations are eligible for final selection;
+- no candidate-level GO means Phase 8 remains HOLD/BLOCKED;
+- final selection is deterministic and prioritizes identity preservation, physical suitability, topology suitability, reproducibility and Apple Silicon/runtime before processing time/cost;
+- final GO returns LOCK_READY and authorizes Phase 9;
+- incomplete benchmark or absence of a GO candidate cannot authorize Phase 9;
+- provider implementation and real external-model dependency selection remain separate from this provider-independent decision contract.
+
+Validation:
+- focused Phase 8.10: 66 passed in 0.07s
+- related canonical-head regression: 338 passed in 0.52s
+- Phase 8.10 scoped git diff --check: clean
+- full regression: 4615 passed in 120.45s
+
+Phase 8.9 remains LOCKED.
+Phase 8.10 is ready for final commit/push lock.
+
+Important closure condition:
+Phase 8 contract architecture is ready to LOCK, but this contract milestone alone does not fabricate real benchmark evidence for FLAME, DECA, MICA, EMOCA or another external implementation. Any production dependency still requires the documented commercial-license, privacy, runtime, reproducibility and physical-identity evidence audit. Phase 9 authorization requires a real complete benchmark result with explicit GO.
+
