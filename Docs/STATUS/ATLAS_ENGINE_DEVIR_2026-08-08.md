@@ -10911,3 +10911,48 @@ Phase 8.6 remains LOCKED.
 Phase 8.7 is ready for final commit/push lock.
 Next planned subphase after lock: Phase 8.8 — Identity Confidence Gate.
 
+## Phase 8.8 — Identity Confidence Gate — LOCK candidate
+
+Phase 8.8 establishes a provider-independent identity-confidence decision boundary. Input usability, landmark support and successful geometry generation are not treated as proof that a reconstructed head reliably preserves a specific person identity.
+
+Implemented contracts:
+- CORE/atlas_canonical_head_identity_confidence_observation.py
+- CORE/atlas_canonical_head_identity_confidence_gate.py
+
+Tests:
+- Test/test_canonical_head_identity_confidence_observation.py
+- Test/test_canonical_head_identity_confidence_gate.py
+
+Locked observation channels:
+- view coverage support;
+- multi-view consistency;
+- silhouette support;
+- profile support;
+- identity-shape support;
+- landmark support;
+- asymmetry support.
+
+Locked decision behavior:
+- identity evidence is not collapsed into one opaque confidence scalar;
+- landmark support is recorded separately and cannot override weak identity-shape, profile or multi-view evidence;
+- GO means production identity evidence is accepted;
+- HOLD means evidence is limited and production remains BLOCKED;
+- REJECT means critical identity evidence is insufficient and production remains BLOCKED;
+- every non-GO result carries BLOCKED_INSUFFICIENT_IDENTITY_EVIDENCE;
+- deterministic channel-specific failure reasons explain HOLD/REJECT results;
+- critical-channel values below 0.35 produce REJECT;
+- critical-channel values from 0.35 up to but not including 0.70 produce HOLD;
+- required decision channels at or above 0.70 produce GO;
+- asymmetry weakness alone may force HOLD but does not by itself force REJECT;
+- confidence contracts do not claim geometry, provider identity or likeness score.
+
+Validation:
+- focused Phase 8.8: 45 passed in 0.05s
+- related canonical-head regression: 235 passed in 0.44s
+- Phase 8.8 scoped git diff --check: clean
+- full regression: 4512 passed in 120.26s
+
+Phase 8.7 remains LOCKED.
+Phase 8.8 is ready for final commit/push lock.
+Next planned subphase after lock: Phase 8.9 — Physical Representation Gate.
+
