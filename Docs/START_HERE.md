@@ -7232,3 +7232,123 @@ Next Phase 8.10 requirement:
 - retain the required three-architecture benchmark boundary;
 - Phase 9 remains NOT AUTHORIZED.
 
+
+## Phase 8.10 — FLAME Leave-One-View-Out Benchmark C — RAW EVIDENCE COMPLETE
+
+The FLAME 2023 Open `parametric_fixed_topology` candidate now has a
+completed leave-one-view-out multi-view generalization benchmark over
+the current two-subject / three-view real-photo evidence set.
+
+New provider-independent observation contracts:
+- `CORE/atlas_canonical_head_shared_identity_fit_observation.py`
+- `CORE/atlas_canonical_head_held_out_view_observation.py`
+
+Tests:
+- `Test/test_canonical_head_shared_identity_fit_observation.py`
+- `Test/test_canonical_head_held_out_view_observation.py`
+
+FLAME deterministic evidence catalog integration:
+- `CORE/atlas_canonical_head_flame_benchmark_evidence.py`
+- `Test/test_canonical_head_flame_benchmark_evidence.py`
+
+Benchmark C protocol:
+- each subject has `front`, `side_a` and `side_b`;
+- exactly two views train one shared 90-component FLAME identity;
+- expression remains fixed neutral;
+- the third view is completely excluded from identity training;
+- held-out identity is then locked;
+- only held-out root pose and weak-perspective camera are resolved;
+- the same 105 MediaPipe-to-FLAME barycentric correspondences are used;
+- reprojection is normalized independently by outer-eye IOD and by the
+  full 478-landmark MediaPipe 2D bounding-box diagonal;
+- perspective focal fitting is not used because focal length is not
+  identifiable from the current source photographs.
+
+Verified held-out raw measurements:
+
+Subject 01:
+- held-out `front`, training `side_a + side_b`:
+  - IOD-NME `0.025737053`;
+  - bbox-NME `0.009386448`;
+  - identity bound hits `0`;
+  - held-out pose bound hits `0`;
+  - processing time `10.257207 s`.
+- held-out `side_a`, training `front + side_b`:
+  - IOD-NME `0.042736096`;
+  - bbox-NME `0.010860442`;
+  - identity bound hits `1`;
+  - held-out pose bound hits `0`;
+  - processing time `10.775558 s`.
+- held-out `side_b`, training `front + side_a`:
+  - IOD-NME `0.038976068`;
+  - bbox-NME `0.010278185`;
+  - identity bound hits `0`;
+  - held-out pose bound hits `0`;
+  - processing time `10.701019 s`.
+
+Subject 02:
+- held-out `front`, training `side_a + side_b`:
+  - IOD-NME `0.038987713`;
+  - bbox-NME `0.014025643`;
+  - identity bound hits `0`;
+  - held-out pose bound hits `0`;
+  - processing time `16.549599 s`.
+- held-out `side_a`, training `front + side_b`:
+  - IOD-NME `0.037416831`;
+  - bbox-NME `0.011151774`;
+  - identity bound hits `4`;
+  - held-out pose bound hits `0`;
+  - processing time `13.301181 s`.
+- held-out `side_b`, training `front + side_a`:
+  - IOD-NME `0.031452767`;
+  - bbox-NME `0.008749089`;
+  - identity bound hits `4`;
+  - held-out pose bound hits `0`;
+  - processing time `11.974395 s`.
+
+Verified subject aggregates:
+- Subject 01 mean held-out IOD-NME: `0.035816406`;
+- Subject 01 mean held-out bbox-NME: `0.010175025`;
+- Subject 02 mean held-out IOD-NME: `0.035952437`;
+- Subject 02 mean held-out bbox-NME: `0.011308835`.
+
+Verified six-case aggregate:
+- leave-one-view-out combinations completed: `6/6`;
+- optimizer success: `6/6`;
+- held-out pose bound hits: `0/6`;
+- mean held-out IOD-NME: `0.035884421`;
+- mean held-out bbox-NME: `0.010741930`.
+
+Interpretation boundary:
+- Benchmark C establishes real unseen-view reprojection/generalization
+  evidence for a shared FLAME identity under the current protocol;
+- successful 2D held-out reprojection is not metric 3D identity proof;
+- the current source photographs have no 3D ground-truth scan;
+- shared-identity training must not be interpreted as an independent
+  cross-view identity-shape success metric;
+- no normalized `[0,1]` support score is assigned by this milestone;
+- no FLAME candidate GO/HOLD/REJECT decision is issued by this milestone;
+- no missing silhouette/profile, metric facial-volume, expression or
+  physical-print evidence is fabricated from these results;
+- the required three-architecture Phase 8.10 benchmark boundary remains
+  unchanged;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Validation:
+- held-out contract + FLAME evidence focused validation:
+  `37 passed in 0.05s`;
+- Phase 8.10 evidence/observation related regression:
+  `94 passed in 0.11s`;
+- scoped `git diff --check`: clean;
+- full regression:
+  `4723 passed in 121.14s`.
+
+Next Phase 8.10 requirement:
+- preserve these measurements as raw evidence;
+- continue closing the explicitly missing benchmark evidence channels
+  without converting incomplete evidence into fabricated support values;
+- complete the required `direct_neural_dense` and
+  `hybrid_canonical_detail` architecture-class evidence before any final
+  Phase 8 GO / `LOCK_READY` decision;
+- Phase 9 remains blocked until the complete canonical benchmark
+  explicitly returns GO.
