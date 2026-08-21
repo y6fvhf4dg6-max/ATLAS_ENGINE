@@ -11076,3 +11076,100 @@ Phase 8.10 is ready for final commit/push lock.
 Important closure condition:
 Phase 8 contract architecture is ready to LOCK, but this contract milestone alone does not fabricate real benchmark evidence for FLAME, DECA, MICA, EMOCA or another external implementation. Any production dependency still requires the documented commercial-license, privacy, runtime, reproducibility and physical-identity evidence audit. Phase 9 authorization requires a real complete benchmark result with explicit GO.
 
+## Phase 8.10 — FLAME 2023 Open Real Raw Benchmark Evidence — ACTIVE EVIDENCE
+
+The first real Phase 8.10 benchmark evidence has now been established for the `parametric_fixed_topology` architecture using FLAME 2023 Open. This evidence does not yet constitute a candidate GO decision and does not authorize Phase 9.
+
+New provider-independent raw-evidence contracts:
+- CORE/atlas_canonical_head_focal_identifiability_observation.py
+- CORE/atlas_canonical_head_benchmark_measurement_observation.py
+- CORE/atlas_canonical_head_flame_benchmark_evidence.py
+
+Tests:
+- Test/test_canonical_head_focal_identifiability_observation.py
+- Test/test_canonical_head_benchmark_measurement_observation.py
+- Test/test_canonical_head_flame_benchmark_evidence.py
+
+Verified FLAME model evidence:
+- model: FLAME 2023 Open;
+- architecture class: `parametric_fixed_topology`;
+- canonical topology: 5023 vertices / 9976 triangles;
+- identity model capacity: 300 components;
+- selected active benchmark identity capacity: 90 components;
+- expression capacity: 100 components, held neutral for this benchmark;
+- benchmark input: two real subjects, each with front + two opposing head-turn views;
+- MediaPipe detection: 6/6 views successful;
+- dense correspondence count: 105 MediaPipe-to-FLAME barycentric correspondences.
+
+Identity-capacity audit:
+- historical 20-component baseline was insufficient;
+- 20 -> 90 produced substantial reprojection improvement;
+- 90 -> 300 produced only marginal additional reprojection improvement while runtime increased by approximately 7x;
+- 90 active identity components are therefore the selected fair FLAME benchmark capacity for the current Phase 8.10 evidence protocol.
+
+Perspective-camera identifiability audit:
+- benchmark source photos contain no usable focal-length EXIF data;
+- optimized focal length was tested under 5000, 10000 and 20000 px upper bounds;
+- in both subjects and all views the fitted focal length tracked the active upper bound exactly;
+- focal length is therefore not identifiable from the current image evidence;
+- bound-dependent optimized focal values are not accepted as canonical camera evidence.
+
+Verified raw subject measurements:
+
+Subject 01:
+- view count: 3;
+- landmarks per view: 105;
+- mean reprojection IOD-NME: 0.027984;
+- mean reprojection bbox-NME: 0.007818;
+- independent-view canonical identity-shape NME: 0.059630;
+- focal identifiable: false;
+- 3D ground truth available: false;
+- volumetric identity proven: false;
+- primary 90D shared-identity processing time: 1.407287 s.
+
+Subject 02:
+- view count: 3;
+- landmarks per view: 105;
+- mean reprojection IOD-NME: 0.023456;
+- mean reprojection bbox-NME: 0.007082;
+- independent-view canonical identity-shape NME: 0.064978;
+- focal identifiable: false;
+- 3D ground truth available: false;
+- volumetric identity proven: false;
+- primary 90D shared-identity processing time: 1.457528 s.
+
+Verified aggregate raw measurements:
+- mean reprojection IOD-NME: 0.025720;
+- mean cross-view canonical identity-shape NME: 0.062304;
+- all focal lengths identifiable: false;
+- any volumetric identity proven: false.
+
+Cross-view protocol note:
+- independent-view identity consistency was rerun with the historical staged FLAME fitting chain from the pre-removal implementation snapshot;
+- root pose was resolved first from the 17-point semantic correspondence set;
+- root pose was then held fixed during 90-component dense identity fitting using the 105-point embedding;
+- this replaced an invalid exploratory spike that jointly optimized pose and identity and drove pose/identity variables to bounds;
+- invalid exploratory values 0.175878 and 0.186543 are not benchmark evidence and must not be reused.
+
+Evidence-boundary rule:
+- raw measurement != normalized support != candidate decision;
+- no [0,1] benchmark support values have been assigned from these measurements;
+- no FLAME candidate GO/HOLD/REJECT decision has yet been issued from this evidence;
+- no volumetric identity claim is allowed without appropriate 3D ground-truth evidence;
+- Phase 9 remains NOT AUTHORIZED.
+
+Validation for this raw-evidence milestone:
+- focal-identifiability focused tests: 14 passed;
+- raw measurement focused tests: 26 passed;
+- deterministic FLAME evidence catalog tests: 8 passed;
+- related Phase 8.10 benchmark regression: 114 passed in 0.13s;
+- canonical-head related regression before evidence catalog: 378 passed in 0.60s;
+- scoped git diff --check: clean;
+- full regression: 4663 passed in 120.58s.
+
+Next Phase 8.10 requirement:
+- continue the real benchmark evidence program without fabricating support values;
+- establish the remaining evidence required to calibrate raw measurements into benchmark support channels;
+- benchmark all three required architecture classes before any final Phase 8 GO / LOCK_READY decision;
+- Phase 9 remains blocked until the complete benchmark explicitly returns GO.
+
