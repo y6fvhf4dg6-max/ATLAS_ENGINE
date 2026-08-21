@@ -10840,3 +10840,38 @@ Phase 8.4 remains LOCKED.
 Phase 8.5 is ready for final commit/push lock.
 Next planned subphase after lock: Phase 8.6 — Asymmetry Preservation.
 
+## Phase 8.6 — Asymmetry Preservation — LOCK candidate
+
+Phase 8.6 preserves meaningful person-specific asymmetry instead of forcing canonical identity geometry into bilateral symmetry. Symmetry remains a possible prior or regularizer, not a destructive final-shape requirement.
+
+Implemented contracts:
+- CORE/atlas_canonical_head_asymmetry_displacement.py
+- CORE/atlas_canonical_head_asymmetry_compatibility_gate.py
+- CORE/atlas_canonical_head_asymmetry_composition.py
+
+Tests:
+- Test/test_canonical_head_asymmetry_displacement.py
+- Test/test_canonical_head_asymmetry_compatibility_gate.py
+- Test/test_canonical_head_asymmetry_composition.py
+
+Locked behavior:
+- asymmetry is represented as an immutable canonical (N,3) displacement layer;
+- zero displacement represents no preserved asymmetry;
+- nonzero displacement may preserve meaningful real identity asymmetry;
+- asymmetry state does not carry expression, pose, camera, provider, confidence, or likeness state;
+- identity and asymmetry may compose only when canonical connectivity signatures match;
+- connectivity mismatch is explicitly blocked with BLOCKED_IDENTITY_ASYMMETRY_CONNECTIVITY_MISMATCH;
+- resolved asymmetric geometry is identity resolved geometry plus asymmetry displacement;
+- identity and asymmetry contracts remain immutable and are not mutated during composition;
+- symmetry is not encoded as a mandatory final geometry constraint.
+
+Validation:
+- focused Phase 8.6: 23 passed in 0.08s
+- related canonical-head regression: 155 passed in 0.32s
+- Phase 8.6 scoped git diff --check: clean
+- full regression: 4432 passed in 120.47s
+
+Phase 8.5 remains LOCKED.
+Phase 8.6 is ready for final commit/push lock.
+Next planned subphase after lock: Phase 8.7 — Head Semantic Boundary.
+
