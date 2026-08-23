@@ -11352,3 +11352,100 @@ Next Phase 8.10 requirement:
   Phase 8 GO / `LOCK_READY` decision;
 - Phase 9 remains blocked until the complete canonical benchmark
   explicitly returns GO.
+
+## Phase 8.10 — PRNet Direct-Neural-Dense Silhouette/Profile Evidence Checkpoint
+
+The PRNet `direct_neural_dense` candidate now has deterministic raw
+silhouette/lateral-view benchmark evidence over the current two-subject /
+three-view real-photo evidence set.
+
+New provider-specific evidence catalog:
+- `CORE/atlas_canonical_head_prnet_benchmark_evidence.py`
+
+New test:
+- `Test/test_canonical_head_prnet_benchmark_evidence.py`
+
+External persistent PRNet evidence:
+- `/Users/Kubi/ATLAS_PRNET_SPIKE/EVIDENCE/phase8_10_prnet_2026-08-22/`
+- persistent evidence file count: `29`;
+- manifest entry count: `28`;
+- manifest verification: `VERIFY_EXIT=0`;
+- manifest SHA256:
+  `b9c6c1dcf955cda612e975455e9887c90f4b1eb99a5c6600840ba9951f0286bd`.
+
+Verified PRNet topology:
+- canonical vertex count: `43867`;
+- triangle count: `86906`;
+- all six exported OBJ cases preserve the same topology.
+
+Silhouette/lateral-view raw measurement protocol:
+- the reference contour is the existing Atlas MediaPipe `face_oval`
+  landmark chain;
+- reference landmarks are transformed with the exact PRNet
+  256 × 256 crop similarity transform;
+- PRNet reconstructed silhouettes are rasterized from the preserved
+  `43867`-vertex / `86906`-triangle topology;
+- this reference is a MediaPipe face-oval projection, not 3D ground truth
+  and not manual silhouette segmentation;
+- `side_a` / `side_b` names are not treated as canonical profile
+  classifications;
+- lateral-view geometry is measured independently from file naming using
+  bilateral landmark asymmetry.
+
+Verified aggregate measurements:
+- front case count: `2`;
+- lateral case count: `4`;
+- front mean silhouette IoU: `0.8580595773782285`;
+- lateral mean silhouette IoU: `0.7694332569672948`;
+- lateral minimum silhouette IoU: `0.7140243158622372`;
+- lateral mean absolute normalized nose offset:
+  `0.5696098447867725`.
+
+Conservative Phase 8.10 PRNet evidence coverage:
+- identity preservation: `MISSING`;
+- multi-view consistency: `MISSING`;
+- silhouette/profile: `PARTIAL`;
+- head ratio: `MISSING`;
+- jaw/chin: `MISSING`;
+- nose projection: `MISSING`;
+- orbital/cheek volume: `MISSING`;
+- expression separation: `MISSING`;
+- pose separation: `MISSING`;
+- topology suitability: `DIRECT`;
+- physical suitability: `MISSING`;
+- Apple Silicon runtime: `DIRECT`;
+- reproducibility: `DIRECT`.
+
+Interpretation boundary:
+- silhouette measurement is directly established;
+- the combined silhouette/profile channel remains `PARTIAL` because
+  canonical `profile_left` / `profile_right` classification has not yet
+  been established for the lateral benchmark cases;
+- raw IoU or lateral-offset values are not normalized support scores;
+- no metric 3D identity, facial-volume, expression or physical-print
+  evidence is inferred from this checkpoint;
+- no PRNet candidate observation with calibrated support values is created;
+- no PRNet GO/HOLD/REJECT decision is issued;
+- the required three-architecture Phase 8.10 benchmark boundary remains
+  unchanged;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Validation:
+- PRNet evidence focused validation:
+  `7 passed in 0.02s`;
+- PRNet + coverage + FLAME related regression:
+  `43 passed in 0.07s`;
+- broad Phase 8.10 regression:
+  `152 passed in 0.17s`;
+- scoped PRNet `git diff --check`: clean;
+- scoped documentation `git diff --check`: clean.
+
+Next Phase 8.10 requirement:
+- continue closing the remaining PRNet evidence gaps without converting
+  incomplete raw evidence into fabricated support values;
+- preserve the `silhouette/profile = PARTIAL` boundary until canonical
+  profile classification or equivalent direct profile evidence exists;
+- continue required `direct_neural_dense` evidence closure, then complete
+  the `hybrid_canonical_detail` architecture-class evidence;
+- Phase 9 remains blocked until the complete Phase 8 benchmark explicitly
+  returns GO and is locked.
