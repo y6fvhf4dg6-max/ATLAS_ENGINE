@@ -9635,3 +9635,46 @@ Next exact Phase 8.10 task:
   residual-detail observation plus dense correspondence and produces a
   canonical per-vertex scalar detail vector while preserving explicit
   confidence and amplitude-policy boundaries.
+
+## Phase 8.10 — Canonical Residual-Detail Scalar-Amplitude Resolver — IMPLEMENTED
+
+The hybrid canonical-detail path now has a provider-independent resolver that
+moves compatible indexed residual-detail observations into canonical vertex
+space while preserving raw scalar detail and confidence as separate channels.
+
+New contract:
+- `CORE/atlas_canonical_head_residual_detail_amplitude_resolver.py`
+
+Test:
+- `Test/test_canonical_head_residual_detail_amplitude_resolver.py`
+
+Architectural behavior:
+- consumes `AtlasCanonicalHeadResidualDetailObservation` plus
+  `AtlasCanonicalHeadDenseCorrespondence`;
+- reuses the existing residual-detail correspondence compatibility gate;
+- produces canonical-length raw scalar-detail and confidence arrays;
+- unmapped canonical vertices remain zero;
+- raw scalar detail is not multiplied by confidence;
+- canonical connectivity signature is preserved;
+- result arrays are immutable snapshots.
+
+Validation:
+- focused amplitude resolver: `8 passed in 0.05s`;
+- related residual-detail regression: `82 passed in 0.20s`;
+- broad canonical-head regression: `521 passed in 0.82s`;
+- scoped `git diff --check`: clean.
+
+Interpretation boundary:
+- no confidence weighting policy is applied;
+- no maximum-amplitude policy or clipping is applied;
+- no visibility or occlusion decision is performed;
+- no camera or pose projection is performed;
+- no residual displacement or geometry is produced;
+- no provider identity is embedded;
+- the `hybrid_canonical_detail` benchmark candidate remains incomplete;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- define the residual-detail amplitude policy layer that can apply explicit
+  confidence weighting and bounded amplitude limits without mixing those
+  policy decisions into observation, correspondence, or canonical mapping.
