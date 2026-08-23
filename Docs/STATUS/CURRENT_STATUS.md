@@ -9723,3 +9723,53 @@ Next exact Phase 8.10 task:
   observation evidence, dense correspondence and the existing amplitude
   resolver/policy chain while preserving explicit projection/visibility
   boundaries.
+
+## Phase 8.10 — View-to-Canonical Residual-Detail Bridge — IMPLEMENTED
+
+The hybrid canonical-detail path now has a provider-independent orchestration
+bridge that connects one residual-detail view observation to canonical vertex
+space through the already separated correspondence, amplitude-resolver and
+amplitude-policy layers.
+
+New contract:
+- `CORE/atlas_canonical_head_view_residual_detail_bridge.py`
+
+Test:
+- `Test/test_canonical_head_view_residual_detail_bridge.py`
+
+Architectural behavior:
+- consumes `AtlasCanonicalHeadResidualDetailObservation`;
+- consumes `AtlasCanonicalHeadDenseCorrespondence`;
+- delegates canonical scalar/confidence mapping to the existing amplitude
+  resolver;
+- delegates confidence weighting and symmetric amplitude bounding to the
+  existing amplitude-policy layer;
+- preserves observation identity, source-view identity, canonical connectivity
+  signature and mapped vertex count;
+- returns immutable snapshots of raw scalar detail, confidence, weighted
+  amplitude and bounded amplitude;
+- does not mutate the source observation.
+
+Validation:
+- focused view-to-canonical bridge: `9 passed in 0.05s`;
+- related hybrid-detail regression: `90 passed in 0.22s`;
+- broad canonical-head regression: `544 passed in 0.86s`;
+- scoped `git diff --check`: clean.
+
+Interpretation boundary:
+- this bridge performs orchestration only;
+- no camera projection is performed;
+- no pose normalization is performed;
+- no visibility or occlusion decision is performed;
+- no normal direction is selected;
+- no canonical residual displacement is generated;
+- no geometry is generated;
+- no provider identity is embedded;
+- this does not yet constitute real DSINE-to-canonical benchmark evidence;
+- the `hybrid_canonical_detail` benchmark candidate remains incomplete;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- connect real held benchmark-view residual-detail evidence into this bridge
+  through an explicit image/view sampling boundary, while keeping camera,
+  visibility and projection assumptions separately auditable.
