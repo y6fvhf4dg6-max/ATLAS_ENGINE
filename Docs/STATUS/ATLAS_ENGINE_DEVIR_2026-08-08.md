@@ -11893,3 +11893,50 @@ Next exact Phase 8.10 task:
   residual-detail scalar/confidence field source and feed those fields through
   this sampling boundary without collapsing provider provenance, projection or
   visibility assumptions into the generic sampler.
+
+## Phase 8.10 — DSINE Residual-Detail Field Source — IMPLEMENTED
+
+The hybrid canonical-detail path now has a bounded interpretation source that
+converts a DSINE-style normal field into a residual scalar-detail field while
+preserving confidence as a separate channel.
+
+New contract:
+- `CORE/atlas_canonical_head_dsine_residual_detail_field_source.py`
+
+Test:
+- `Test/test_canonical_head_dsine_residual_detail_field_source.py`
+
+Architectural behavior:
+- consumes a finite `(H, W, 3)` normal field;
+- consumes an explicit shape-matched confidence field;
+- reuses `AtlasReliefNormalStructureDetailDecomposer` to isolate residual
+  detail normals;
+- reuses `AtlasReliefNormalHeightIntegrator` with
+  `normalize_output=False`;
+- zero-centers the resulting residual scalar-detail field;
+- preserves confidence unchanged as a separate immutable channel;
+- does not confidence-weight the scalar-detail field at this stage.
+
+Validation:
+- focused DSINE residual-detail field source: `13 passed in 0.05s`;
+- related normal/detail regression: `99 passed in 0.18s`;
+- broad canonical-head regression: `567 passed in 0.90s`;
+- scoped `git diff --check`: clean.
+
+Interpretation boundary:
+- DSINE normals are not canonical identity geometry;
+- DSINE normals are not 3D ground truth;
+- confidence is not inferred from DSINE normals;
+- confidence weighting is intentionally deferred to the existing canonical
+  amplitude-policy layer to avoid double weighting;
+- no image sampling is performed here;
+- no camera, pose, visibility or occlusion reasoning is performed;
+- no dense canonical correspondence is performed;
+- no canonical displacement or geometry is generated;
+- the `hybrid_canonical_detail` benchmark candidate remains incomplete;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- run the real six-view DSINE benchmark evidence through this field source and
+  the existing image-sampling boundary, producing auditable real residual-detail
+  observations before canonical correspondence and bounded bridge evaluation.

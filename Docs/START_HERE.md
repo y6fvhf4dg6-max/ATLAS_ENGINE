@@ -7352,3 +7352,193 @@ Next Phase 8.10 requirement:
   Phase 8 GO / `LOCK_READY` decision;
 - Phase 9 remains blocked until the complete canonical benchmark
   explicitly returns GO.
+
+## Phase 8.10 — Hybrid Canonical Detail Continuity — 23 August 2026
+
+Phase 8 remains the active Human Identity architecture gate.
+Phase 9 remains `NOT AUTHORIZED`.
+
+Current safe pushed checkpoint:
+
+- `HEAD == origin/main == 21bea372a35a827cfab70d5bda1a902a50b30ad3`
+- commit:
+  `21bea37 Add residual detail image sampling boundary`
+- last safely pushed full regression:
+  `4831 passed in 120.26s`
+
+The existing unrelated working-tree changes remain intentionally preserved.
+They must not be bulk-staged, reset or deleted as part of Phase 8.10 work.
+
+### Hybrid canonical-detail architecture boundary
+
+The active hybrid candidate follows this interpretation:
+
+- canonical identity geometry remains owned by the canonical-head architecture;
+- DSINE normals are not canonical identity geometry;
+- DSINE normals are not metric 3D ground truth;
+- DSINE may contribute only bounded low-amplitude residual detail;
+- observation, sampling, correspondence, confidence, amplitude policy,
+  projection and geometry composition remain separate auditable layers.
+
+### Completed and pushed residual-detail milestones
+
+`f6b2ed2 Add canonical residual detail composition layer`
+
+- canonical residual-detail displacement;
+- residual-detail compatibility gate;
+- residual-detail composition;
+- full regression: `4752 passed`.
+
+`dd5386f Add canonical normal residual detail projection`
+
+- canonical vertex-normal evaluator;
+- normal residual-detail projector;
+- full regression: `4767 passed`.
+
+`0f360e4 Add residual detail observation correspondence boundary`
+
+- residual-detail observation contract;
+- observation/dense-correspondence compatibility gate;
+- full regression: `4790 passed`.
+
+`4a244bc Add canonical residual detail amplitude resolver`
+
+- maps raw residual scalar detail and confidence into canonical vertex space;
+- raw scalar detail and confidence remain separate;
+- no confidence weighting or clipping in the resolver;
+- full regression: `4798 passed`.
+
+`d7882b1 Add canonical residual detail amplitude policy`
+
+- explicit confidence weighting;
+- symmetric bounded amplitude policy;
+- no visibility, projection or geometry generation;
+- full regression: `4812 passed`.
+
+`8115a85 Add canonical view residual detail bridge`
+
+- orchestrates observation;
+- dense correspondence;
+- canonical amplitude resolution;
+- bounded amplitude policy;
+- does not claim camera, pose, visibility, displacement or geometry;
+- full regression: `4821 passed`.
+
+`21bea37 Add residual detail image sampling boundary`
+
+- provider-independent bilinear image/view sampling;
+- converts scalar-detail field + separate confidence field +
+  normalized sample coordinates into residual-detail observations;
+- does not apply confidence weighting;
+- full regression: `4831 passed`.
+
+### Real six-view DSINE evidence
+
+Evidence root:
+
+`/Users/Kubi/ATLAS_HYBRID_SPIKE/EVIDENCE/phase8_10_hybrid_dsine_2026-08-23/`
+
+Available normal fields:
+
+- `subject_01_front_dsine_normals.npy`
+- `subject_01_side_a_dsine_normals.npy`
+- `subject_01_side_b_dsine_normals.npy`
+- `subject_02_front_dsine_normals.npy`
+- `subject_02_side_a_dsine_normals.npy`
+- `subject_02_side_b_dsine_normals.npy`
+
+All six verified as:
+
+- shape `(1152, 1536, 3)`;
+- dtype `float32`;
+- finite;
+- mean normal length `1.0`.
+
+Evidence provenance records:
+
+- architecture class:
+  `hybrid_canonical_detail`;
+- detail role:
+  `bounded_low_amplitude_residual_detail_source_only`;
+- DSINE normals are not canonical identity geometry;
+- DSINE normals are not 3D ground truth;
+- hybrid candidate remains incomplete;
+- Phase 9 is not authorized.
+
+Evidence manifest SHA256:
+
+`cd6dbf999899fd50fe8c222070cf465ac55120092756138d0437ea277756eceb`
+
+### Current PRE-COMMIT milestone
+
+The following new Phase 8.10 contract is implemented and currently staged,
+but is not yet committed or pushed:
+
+- `CORE/atlas_canonical_head_dsine_residual_detail_field_source.py`
+- `Test/test_canonical_head_dsine_residual_detail_field_source.py`
+
+Purpose:
+
+`DSINE normal field`
+→ `structure/detail decomposition`
+→ `detail normals`
+→ `unnormalized residual scalar-detail field`
+
+Implementation boundary:
+
+- reuses `AtlasReliefNormalStructureDetailDecomposer`;
+- reuses `AtlasReliefNormalHeightIntegrator`;
+- uses `normalize_output=False`;
+- zero-centers the residual scalar field;
+- explicit confidence is supplied separately;
+- confidence is preserved unchanged;
+- confidence is not applied during field generation;
+- this prevents double confidence weighting because confidence weighting is
+  owned by the later canonical amplitude-policy layer.
+
+Current validation:
+
+- focused DSINE field-source:
+  `13 passed in 0.05s`;
+- related normal/detail regression:
+  `99 passed in 0.18s`;
+- broad canonical-head regression:
+  `567 passed in 0.90s`;
+- full regression:
+  `4844 passed in 119.90s`;
+- staged diff check:
+  clean.
+
+This milestone is not safely locked until commit, push and
+`HEAD == origin/main` are verified.
+
+### Exact next Phase 8.10 work
+
+After this PRE-COMMIT milestone is safely pushed:
+
+1. run the six real DSINE normal fields through the new field source;
+2. preserve explicit confidence as a separate channel;
+3. feed scalar-detail + confidence fields through the existing image sampler;
+4. create real residual-detail observations;
+5. connect those observations through dense correspondence;
+6. run the canonical amplitude resolver;
+7. apply the bounded amplitude policy;
+8. run the view-to-canonical bridge;
+9. record quantitative real hybrid-detail evidence;
+10. close remaining benchmark evidence gaps;
+11. perform architecture-class comparison;
+12. issue final Phase 8 `GO / HOLD / REJECT`;
+13. only an explicit GO may authorize Phase 9.
+
+### Current gate status
+
+- Phase 8.10: `ACTIVE`
+- FLAME benchmark evidence: `AVAILABLE`
+- direct-neural PRNet evidence: `AVAILABLE`
+- six-view DSINE normal evidence: `AVAILABLE`
+- hybrid residual-detail infrastructure: `IMPLEMENTED`
+- real DSINE → canonical bounded-detail run: `PENDING`
+- final architecture comparison: `PENDING`
+- final Phase 8 decision: `PENDING`
+- Phase 8 LOCK: `PENDING`
+- Phase 9: `NOT AUTHORIZED`
