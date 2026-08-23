@@ -9459,3 +9459,77 @@ Next Phase 8.10 requirement:
 - then complete the `hybrid_canonical_detail` architecture-class evidence;
 - Phase 9 remains blocked until the complete Phase 8 benchmark explicitly
   returns GO and is locked.
+
+## Phase 8.10 — Hybrid Canonical Detail Residual-Detail Contract — IMPLEMENTED
+
+The required `hybrid_canonical_detail` architecture class now has a
+provider-independent canonical residual-detail composition layer.
+
+New contracts:
+- `CORE/atlas_canonical_head_residual_detail_displacement.py`
+- `CORE/atlas_canonical_head_residual_detail_compatibility_gate.py`
+- `CORE/atlas_canonical_head_residual_detail_composition.py`
+
+Tests:
+- `Test/test_canonical_head_residual_detail_displacement.py`
+- `Test/test_canonical_head_residual_detail_compatibility_gate.py`
+- `Test/test_canonical_head_residual_detail_composition.py`
+
+Architectural behavior:
+- residual detail is represented as an immutable finite `(N, 3)`
+  displacement bound to canonical head topology;
+- residual detail remains separate from identity shape, expression,
+  asymmetry, pose, camera, provider state, confidence and likeness;
+- compatibility is determined by canonical connectivity signature rather
+  than topology object identity;
+- mixed identity/detail connectivity is explicitly blocked with
+  `BLOCKED_IDENTITY_RESIDUAL_DETAIL_CONNECTIVITY_MISMATCH`;
+- composition resolves canonical identity geometry plus residual-detail
+  displacement without mutating either source contract;
+- canonical topology and connectivity signature are preserved.
+
+Verified validation:
+- residual-detail focused validation: `21 passed in 0.08s`;
+- related canonical displacement regression: `83 passed in 0.24s`;
+- broad canonical-head regression: `475 passed in 0.73s`;
+- scoped `git diff --check`: clean.
+
+Hybrid evidence boundary:
+- six Phase 8.10 benchmark photographs now have real DSINE float32 normal
+  evidence generated on Apple Silicon MPS in the external hybrid evidence
+  workspace;
+- DSINE normals are restricted to the role
+  `bounded_low_amplitude_residual_detail_source_only`;
+- DSINE normals are not canonical identity geometry;
+- DSINE normals are not 3D ground truth;
+- DSINE normals are not identity-preservation or pose-separation proof;
+- the DSINE-to-canonical residual-detail projection/correspondence bridge
+  is not yet implemented;
+- the `hybrid_canonical_detail` benchmark candidate is therefore not yet
+  complete;
+- no normalized support score or GO/HOLD/REJECT decision is issued by
+  this milestone;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+External hybrid evidence provenance:
+- evidence directory:
+  `/Users/Kubi/ATLAS_HYBRID_SPIKE/EVIDENCE/phase8_10_hybrid_dsine_2026-08-23/`;
+- DSINE repo commit:
+  `ef0c2afa32b4dd19cb8ca4567c652802cd92591c`;
+- DSINE architecture: `v02`;
+- runtime: Python `3.12.13`, Torch `2.13.0`, Apple Silicon MPS;
+- benchmark cases completed: `6/6`;
+- all normal fields: shape `1152 x 1536 x 3`, dtype `float32`, finite,
+  mean normal length `1.0`;
+- evidence manifest verification: `VERIFY_EXIT=0`;
+- manifest SHA256:
+  `cd6dbf999899fd50fe8c222070cf465ac55120092756138d0437ea277756eceb`.
+
+Next Phase 8.10 requirement:
+- define and validate the deterministic bridge from bounded image-space
+  residual-detail observations to canonical-head vertex displacement;
+- preserve canonical topology and prevent appearance-to-geometry leakage;
+- then evaluate hybrid candidate evidence under the same Phase 8.10
+  benchmark channels;
+- Phase 9 remains blocked until the complete canonical benchmark
+  explicitly returns GO.
