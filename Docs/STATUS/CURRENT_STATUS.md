@@ -9773,3 +9773,49 @@ Next exact Phase 8.10 task:
 - connect real held benchmark-view residual-detail evidence into this bridge
   through an explicit image/view sampling boundary, while keeping camera,
   visibility and projection assumptions separately auditable.
+
+## Phase 8.10 — Residual-Detail Image/View Sampling Boundary — IMPLEMENTED
+
+The hybrid canonical-detail path now has a provider-independent image/view
+sampling boundary that converts two-dimensional scalar-detail and confidence
+fields into `AtlasCanonicalHeadResidualDetailObservation` samples.
+
+New contract:
+- `CORE/atlas_canonical_head_residual_detail_image_sampler.py`
+
+Test:
+- `Test/test_canonical_head_residual_detail_image_sampler.py`
+
+Architectural behavior:
+- consumes one 2D scalar-detail field;
+- consumes one shape-matched 2D confidence field;
+- consumes normalized image-space sample coordinates;
+- performs deterministic bilinear sampling;
+- preserves scalar detail and confidence as separate channels;
+- returns the existing immutable residual-detail observation contract;
+- derives image width and height from the sampled fields;
+- does not apply confidence weighting to scalar detail.
+
+Validation:
+- focused image/view sampler: `10 passed in 0.05s`;
+- related view/detail contracts: `64 passed in 0.14s`;
+- broad canonical-head regression: `554 passed in 0.88s`;
+- scoped `git diff --check`: clean.
+
+Interpretation boundary:
+- no DSINE file loading is performed;
+- no provider-specific normal decoding is performed;
+- no camera or pose projection is performed;
+- no visibility or occlusion decision is performed;
+- no dense canonical correspondence is performed;
+- no amplitude weighting or clipping is performed;
+- no canonical displacement or geometry is generated;
+- this is not yet real held-view hybrid benchmark evidence;
+- the `hybrid_canonical_detail` benchmark candidate remains incomplete;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- connect the real held benchmark-view DSINE normal evidence to an explicit
+  residual-detail scalar/confidence field source and feed those fields through
+  this sampling boundary without collapsing provider provenance, projection or
+  visibility assumptions into the generic sampler.
