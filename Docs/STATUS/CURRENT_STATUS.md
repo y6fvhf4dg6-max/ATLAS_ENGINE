@@ -9678,3 +9678,48 @@ Next exact Phase 8.10 task:
 - define the residual-detail amplitude policy layer that can apply explicit
   confidence weighting and bounded amplitude limits without mixing those
   policy decisions into observation, correspondence, or canonical mapping.
+
+## Phase 8.10 — Residual-Detail Amplitude Policy Layer — IMPLEMENTED
+
+The hybrid canonical-detail path now has a separate policy layer that applies
+confidence weighting and a bounded symmetric amplitude limit after canonical
+scalar-detail mapping.
+
+New contract:
+- `CORE/atlas_canonical_head_residual_detail_amplitude_policy.py`
+
+Test:
+- `Test/test_canonical_head_residual_detail_amplitude_policy.py`
+
+Architectural behavior:
+- consumes `AtlasCanonicalHeadResidualDetailAmplitudeResult`;
+- computes weighted amplitude as raw canonical scalar detail multiplied by
+  canonical confidence;
+- zero confidence removes residual-detail contribution;
+- applies a symmetric `±maximum_absolute_amplitude` bound;
+- preserves canonical connectivity signature and mapped vertex count;
+- does not mutate the upstream amplitude-resolver result;
+- weighted and bounded amplitude arrays are immutable snapshots.
+
+Validation:
+- focused amplitude-policy validation: `14 passed in 0.05s`;
+- related amplitude/residual-detail regression: `81 passed in 0.21s`;
+- broad canonical-head regression: `535 passed in 0.84s`;
+- scoped `git diff --check`: clean.
+
+Interpretation boundary:
+- this layer owns confidence weighting and amplitude bounding only;
+- no visibility or occlusion decision is performed;
+- no camera or pose projection is performed;
+- no normal-space direction is selected;
+- no canonical residual displacement is produced here;
+- no geometry is generated;
+- no provider identity is embedded;
+- the `hybrid_canonical_detail` benchmark candidate remains incomplete;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- define the view-to-canonical residual-detail bridge that combines real
+  observation evidence, dense correspondence and the existing amplitude
+  resolver/policy chain while preserving explicit projection/visibility
+  boundaries.
