@@ -9533,3 +9533,53 @@ Next Phase 8.10 requirement:
   benchmark channels;
 - Phase 9 remains blocked until the complete canonical benchmark
   explicitly returns GO.
+
+## Phase 8.10 — Canonical Normal-Directed Residual Detail Primitive — IMPLEMENTED
+
+The hybrid canonical-detail path now has provider-independent geometry
+primitives for restricting residual detail to canonical surface-normal
+motion.
+
+New contracts:
+- `CORE/atlas_canonical_head_vertex_normal_evaluator.py`
+- `CORE/atlas_canonical_head_normal_residual_detail_projector.py`
+
+Tests:
+- `Test/test_canonical_head_vertex_normal_evaluator.py`
+- `Test/test_canonical_head_normal_residual_detail_projector.py`
+
+Architectural behavior:
+- canonical vertex normals are deterministically derived from canonical
+  geometry and topology face winding;
+- face cross-products are accumulated at incident vertices and normalized;
+- degenerate faces or unresolved degenerate vertex normals are rejected;
+- returned normal and displacement arrays are immutable float64 snapshots;
+- residual-detail amplitudes are scalar values with one value per canonical
+  vertex;
+- scalar amplitudes are converted to `(N, 3)` displacement only along the
+  canonical vertex-normal direction;
+- this primitive does not permit arbitrary tangential residual-detail
+  displacement;
+- the primitive carries no provider, camera, pose, confidence, likeness or
+  Phase 9 authorization state.
+
+Validation:
+- focused vertex-normal/projector validation: `15 passed in 0.06s`;
+- related geometry/residual-detail regression: `60 passed in 0.16s`;
+- broad canonical-head regression: `490 passed in 0.77s`;
+- scoped `git diff --check`: clean.
+
+Interpretation boundary:
+- this does not yet map DSINE image-space observations to canonical vertices;
+- this does not define image sampling, visibility, camera projection or
+  multi-view fusion;
+- this does not establish a residual-detail amplitude bound or confidence
+  policy;
+- DSINE remains only a bounded low-amplitude residual-detail evidence source;
+- the `hybrid_canonical_detail` benchmark candidate remains incomplete;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- define the provider-independent observation/correspondence boundary that
+  maps bounded image-space residual-detail evidence onto canonical vertex
+  scalar amplitudes before normal-directed projection.
