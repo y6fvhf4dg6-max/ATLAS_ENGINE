@@ -11657,3 +11657,55 @@ Next exact Phase 8.10 task:
 - define the provider-independent observation/correspondence boundary that
   maps bounded image-space residual-detail evidence onto canonical vertex
   scalar amplitudes before normal-directed projection.
+
+## Phase 8.10 — Residual Detail Observation / Correspondence Boundary — IMPLEMENTED
+
+The hybrid canonical-detail path now has a provider-independent image-space
+residual-detail observation contract and a separate compatibility boundary to
+canonical dense correspondence.
+
+New contracts:
+- `CORE/atlas_canonical_head_residual_detail_observation.py`
+- `CORE/atlas_canonical_head_residual_detail_correspondence_gate.py`
+
+Tests:
+- `Test/test_canonical_head_residual_detail_observation.py`
+- `Test/test_canonical_head_residual_detail_correspondence_gate.py`
+
+Architectural behavior:
+- residual-detail evidence is represented as indexed image-space samples;
+- each observation stores normalized image coordinates, scalar residual-detail
+  values and per-sample confidence;
+- image coordinates are independent from canonical vertex identity;
+- canonical vertex mapping remains owned by the existing
+  `AtlasCanonicalHeadDenseCorrespondence` contract;
+- the compatibility gate accepts only correspondence sample IDs that exist in
+  the observation;
+- observations may contain additional unmapped samples;
+- unknown correspondence sample IDs are explicitly blocked with
+  `BLOCKED_RESIDUAL_DETAIL_OBSERVATION_SAMPLE_MISMATCH`;
+- the compatibility result exposes matched observation sample IDs, canonical
+  vertex IDs and the canonical connectivity signature.
+
+Validation:
+- focused observation/correspondence validation: `23 passed in 0.07s`;
+- related residual-detail contracts: `67 passed in 0.16s`;
+- broad canonical-head regression: `513 passed in 0.79s`;
+- scoped `git diff --check`: clean.
+
+Interpretation boundary:
+- no provider identity is embedded in the canonical observation contract;
+- no DSINE-specific logic is present;
+- no camera projection, visibility or occlusion decision is performed;
+- no confidence weighting is applied to scalar detail;
+- no amplitude bound is applied;
+- no canonical `(N,)` amplitude vector is generated yet;
+- no residual displacement is produced by this boundary;
+- the `hybrid_canonical_detail` benchmark candidate remains incomplete;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- define the canonical scalar-amplitude resolver that consumes a compatible
+  residual-detail observation plus dense correspondence and produces a
+  canonical per-vertex scalar detail vector while preserving explicit
+  confidence and amplitude-policy boundaries.
