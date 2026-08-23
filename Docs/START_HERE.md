@@ -7583,8 +7583,134 @@ Evidence interpretation:
 - DSINE normals remain bounded residual-detail evidence only;
 - Phase 9 remains `NOT AUTHORIZED`.
 
+## Phase 8.10 — Real Six-View DSINE Residual-Detail Observation Run — VERIFIED
+
+The real six-view benchmark evidence has now been run through the
+landmark-derived support/confidence path, DSINE residual-detail field source and
+image-sampling boundary without creating canonical correspondence or canonical
+geometry.
+
+Verified pipeline:
+- existing MediaPipe 478-point landmark JSON is converted to absolute image-space
+  coordinates;
+- `AtlasReliefMediaPipeLandmarkAdapter` produces the semantic landmark groups;
+- `AtlasReliefFaceLandmarkRegions` derives `face_oval -> face_interior`;
+- `face_interior` is used as explicit landmark-derived face support;
+- `AtlasReliefFaceStructureConfidenceMap` produces the separate semantic
+  confidence field;
+- real DSINE normals are processed by
+  `AtlasCanonicalHeadDsineResidualDetailFieldSource`;
+- resulting scalar-detail and confidence fields are sampled by
+  `AtlasCanonicalHeadResidualDetailImageSampler`;
+- each view produces 478 real residual-detail samples.
+
+Verified real six-view measurements:
+- `subject_01_front`: support `77019`, confidence mean `0.798674`,
+  detail range `-1.357800 .. 3.942569`;
+- `subject_01_side_a`: support `39351`, confidence mean `0.863371`,
+  detail range `-3.354918 .. 3.404447`;
+- `subject_01_side_b`: support `27231`, confidence mean `0.873235`,
+  detail range `-2.572433 .. 5.402657`;
+- `subject_02_front`: support `178146`, confidence mean `0.832813`,
+  detail range `-2.293613 .. 3.930144`;
+- `subject_02_side_a`: support `29739`, confidence mean `0.846852`,
+  detail range `-3.183855 .. 3.890012`;
+- `subject_02_side_b`: support `27691`, confidence mean `0.856909`,
+  detail range `-2.626679 .. 5.148389`.
+
+Validation facts:
+- all six DSINE normal fields match `(1152, 1536, 3)`;
+- all generated support/confidence/detail outputs are finite;
+- residual detail outside explicit face support is exactly `0.0` for all six
+  views;
+- all six observations contain `478` samples;
+- confidence remains a separate channel and is not multiplied into scalar detail
+  at field-source or sampling stage.
+
+Interpretation boundary:
+- the support is landmark-derived face support, not an independently observed
+  segmentation mask;
+- the MediaPipe top-level provider confidence is not treated as identity evidence
+  confidence;
+- the 478 sampled points are image-space residual-detail observations, not dense
+  canonical correspondence;
+- DSINE normals remain bounded residual-detail evidence only;
+- no canonical vertex displacement has been produced;
+- no hybrid candidate GO/HOLD/REJECT decision has been issued;
+- Phase 9 remains `NOT AUTHORIZED`.
+
 Next exact Phase 8.10 task:
-- build landmark-derived face support and semantic detail-confidence fields for
-  all six real benchmark views, then run those views through the DSINE
-  residual-detail field source and image sampler to produce real residual-detail
-  observations.
+- resolve the correct canonical correspondence boundary for the real residual
+  observations;
+- do not reinterpret the existing 105 MediaPipe-to-FLAME barycentric face
+  correspondences as direct canonical-vertex mappings;
+- once correspondence semantics are explicit, run the canonical amplitude
+  resolver, bounded amplitude policy and view-to-canonical bridge and record
+  quantitative hybrid evidence.
+
+
+## Phase 8.10 — Canonical Surface/Barycentric Correspondence Boundary — IMPLEMENTED
+
+The canonical-head correspondence boundary now explicitly supports observed
+samples whose canonical targets lie on triangle surfaces rather than directly on
+canonical vertices.
+
+Why this boundary was required:
+- the existing `AtlasCanonicalHeadDenseCorrespondence` and
+  `AtlasCanonicalHeadLandmarkCorrespondence` contracts represent direct
+  observed-sample/landmark -> canonical-vertex mappings;
+- the real FLAME MediaPipe embedding instead provides
+  observed landmark -> FLAME face index + barycentric weights;
+- reinterpreting those 105 FLAME correspondences as direct canonical vertices
+  would therefore be semantically and geometrically incorrect;
+- the existing `AtlasSurfaceProjectionEngine` contains internal barycentric
+  projection mathematics, but it is not a canonical-head correspondence
+  contract.
+
+Implementation:
+- added `AtlasCanonicalHeadSurfaceCorrespondence`;
+- each observed sample maps to:
+  - one canonical triangle/face index;
+  - exactly three barycentric weights;
+- the contract is bound directly to `AtlasCanonicalHeadTopology`;
+- canonical face indices must be inside the topology face range;
+- barycentric weights must be finite and inside `0.0..1.0`;
+- barycentric weights must sum to `1.0` within numerical tolerance;
+- multiple observed samples may validly target the same canonical face;
+- the canonical topology connectivity signature is preserved;
+- the contract does not claim provider, camera, pose, visibility, identity
+  confidence, scalar detail, displacement, geometry or Phase 9 authorization.
+
+Files:
+- `CORE/atlas_canonical_head_surface_correspondence.py`
+- `Test/test_canonical_head_surface_correspondence.py`
+
+Validation:
+- focused surface-correspondence contract: `9 passed in 0.03s`;
+- related canonical correspondence/residual-detail regression:
+  `75 passed in 0.16s`;
+- broad canonical-head regression: `580 passed in 0.91s`;
+- full ATLAS regression: `4857 passed in 125.44s`;
+- scoped `git diff --check`: clean.
+
+Architecture boundary:
+- existing direct-vertex correspondence contracts remain unchanged;
+- existing residual-detail amplitude resolver and view bridge remain
+  direct-vertex based and have not yet been modified;
+- this milestone only establishes the missing provider-independent canonical
+  surface correspondence semantics;
+- no FLAME barycentric embedding has yet been coerced into a vertex mapping;
+- no canonical residual displacement has yet been produced from the real
+  six-view DSINE observations;
+- no hybrid candidate `GO / HOLD / REJECT` has been issued;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- define the smallest explicit bridge from canonical surface correspondence to
+  canonical residual-detail amplitude representation;
+- preserve the existing confidence-weighting and bounded-amplitude policy
+  boundaries;
+- then run the real 105 MediaPipe-to-FLAME barycentric correspondences through
+  the six-view residual-detail evidence path;
+- record quantitative hybrid canonical-detail evidence before any architecture
+  decision.
