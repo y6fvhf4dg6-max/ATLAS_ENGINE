@@ -98,6 +98,7 @@ class AtlasCanonicalHeadDsineResidualDetailFieldSource:
         *,
         normals: Any,
         confidence_field: Any,
+        mask: Any | None = None,
         structure_radius: int = 5,
     ) -> AtlasCanonicalHeadDsineResidualDetailFieldResult:
         try:
@@ -168,10 +169,54 @@ class AtlasCanonicalHeadDsineResidualDetailFieldSource:
                 "in the 0.0..1.0 range."
             )
 
+        if mask is None:
+            active_mask = None
+        else:
+            try:
+                active_mask = np.asarray(
+                    mask,
+                    dtype=np.float64,
+                )
+            except (
+                TypeError,
+                ValueError,
+            ) as exc:
+                raise ValueError(
+                    "mask must be numeric."
+                ) from exc
+
+            if active_mask.shape != normal_array.shape[:2]:
+                raise ValueError(
+                    "mask shape must match "
+                    "the normal field."
+                )
+
+            if not np.isfinite(
+                active_mask
+            ).all():
+                raise ValueError(
+                    "mask must contain only finite values."
+                )
+
+            active_mask = np.clip(
+                active_mask,
+                0.0,
+                1.0,
+            )
+
+            if not np.any(
+                active_mask > 0.0
+            ):
+                raise ValueError(
+                    "mask must contain at least "
+                    "one active pixel."
+                )
+
         _, detail_normals = (
             AtlasReliefNormalStructureDetailDecomposer
             .decompose(
                 normal_array,
+                mask=active_mask,
                 structure_radius=structure_radius,
             )
         )
@@ -180,6 +225,7 @@ class AtlasCanonicalHeadDsineResidualDetailFieldSource:
             AtlasReliefNormalHeightIntegrator
             .integrate(
                 detail_normals,
+                mask=active_mask,
                 normalize_output=False,
             )
         )
@@ -189,14 +235,34 @@ class AtlasCanonicalHeadDsineResidualDetailFieldSource:
             dtype=np.float64,
         )
 
-        scalar_detail_field = (
-            scalar_detail_field
-            - float(
-                np.mean(
-                    scalar_detail_field
+        if active_mask is None:
+            scalar_detail_field = (
+                scalar_detail_field
+                - float(
+                    np.mean(
+                        scalar_detail_field
+                    )
                 )
             )
-        )
+        else:
+            active = (
+                active_mask > 0.0
+            )
+
+            active_mean = float(
+                np.mean(
+                    scalar_detail_field[
+                        active
+                    ]
+                )
+            )
+
+            scalar_detail_field = np.where(
+                active,
+                scalar_detail_field
+                - active_mean,
+                0.0,
+            )
 
         return (
             AtlasCanonicalHeadDsineResidualDetailFieldResult(

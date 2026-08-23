@@ -338,3 +338,116 @@ def test_source_does_not_claim_identity_geometry_or_downstream_policy():
     assert not hasattr(result, "bounded_amplitude")
     assert not hasattr(result, "displacement")
     assert not hasattr(result, "phase_9_authorized")
+
+
+def test_explicit_face_support_mask_limits_residual_field():
+    normals = _synthetic_normals()
+
+    confidence = np.ones(
+        normals.shape[:2],
+        dtype=np.float64,
+    )
+
+    mask = np.zeros(
+        normals.shape[:2],
+        dtype=np.float64,
+    )
+    mask[4:17, 5:20] = 1.0
+
+    result = (
+        AtlasCanonicalHeadDsineResidualDetailFieldSource
+        .build(
+            normals=normals,
+            confidence_field=confidence,
+            mask=mask,
+            structure_radius=3,
+        )
+    )
+
+    outside = mask <= 0.0
+    inside = mask > 0.0
+
+    assert np.allclose(
+        result.scalar_detail_field[outside],
+        0.0,
+        atol=1e-12,
+    )
+
+    assert np.ptp(
+        result.scalar_detail_field[inside]
+    ) > 0.0
+
+
+def test_mask_does_not_modify_explicit_confidence_channel():
+    normals = _synthetic_normals()
+
+    confidence = np.linspace(
+        0.0,
+        1.0,
+        normals.shape[0] * normals.shape[1],
+        dtype=np.float64,
+    ).reshape(
+        normals.shape[:2]
+    )
+
+    mask = np.zeros(
+        normals.shape[:2],
+        dtype=np.float64,
+    )
+    mask[4:17, 5:20] = 1.0
+
+    result = (
+        AtlasCanonicalHeadDsineResidualDetailFieldSource
+        .build(
+            normals=normals,
+            confidence_field=confidence,
+            mask=mask,
+            structure_radius=3,
+        )
+    )
+
+    assert np.array_equal(
+        result.confidence_field,
+        confidence,
+    )
+
+
+def test_rejects_mask_shape_mismatch():
+    with pytest.raises(
+        ValueError,
+        match="mask",
+    ):
+        AtlasCanonicalHeadDsineResidualDetailFieldSource.build(
+            normals=_synthetic_normals(),
+            confidence_field=np.ones(
+                (21, 25),
+                dtype=np.float64,
+            ),
+            mask=np.ones(
+                (20, 25),
+                dtype=np.float64,
+            ),
+            structure_radius=3,
+        )
+
+
+def test_rejects_nonfinite_mask():
+    mask = np.ones(
+        (21, 25),
+        dtype=np.float64,
+    )
+    mask[0, 0] = np.nan
+
+    with pytest.raises(
+        ValueError,
+        match="mask",
+    ):
+        AtlasCanonicalHeadDsineResidualDetailFieldSource.build(
+            normals=_synthetic_normals(),
+            confidence_field=np.ones(
+                (21, 25),
+                dtype=np.float64,
+            ),
+            mask=mask,
+            structure_radius=3,
+        )

@@ -9866,3 +9866,49 @@ Next exact Phase 8.10 task:
 - run the real six-view DSINE benchmark evidence through this field source and
   the existing image-sampling boundary, producing auditable real residual-detail
   observations before canonical correspondence and bounded bridge evaluation.
+
+## Phase 8.10 — DSINE Residual-Detail Explicit Face-Support Mask Boundary — IMPLEMENTED
+
+The DSINE residual-detail field source now accepts an explicit face-support mask.
+
+Purpose:
+- keep residual-detail decomposition and integration constrained to explicit face support;
+- prevent background normal regions from contributing to the residual scalar field;
+- preserve the confidence channel independently from the support mask.
+
+Implementation:
+- `AtlasCanonicalHeadDsineResidualDetailFieldSource.build(...)` now accepts
+  optional `mask=`;
+- mask shape must match the DSINE normal field;
+- mask values must be finite;
+- mask values are clipped to `0.0..1.0`;
+- the mask must contain at least one active pixel;
+- the mask is forwarded to
+  `AtlasReliefNormalStructureDetailDecomposer.decompose(...)`;
+- the same mask is forwarded to
+  `AtlasReliefNormalHeightIntegrator.integrate(...)`;
+- zero-centering is computed only over active mask pixels;
+- scalar residual detail outside the mask is forced to `0.0`;
+- explicit confidence is not altered by the mask.
+
+Validation:
+- focused DSINE field-source: `17 passed in 0.05s`;
+- related normal/detail regression: `103 passed in 0.18s`;
+- broad canonical-head regression: `571 passed in 0.90s`;
+- scoped `git diff --check`: clean.
+
+Evidence interpretation:
+- the current six-view benchmark does not contain independent subject-mask evidence;
+- therefore no full-image `np.ones()` mask may be silently substituted;
+- the next real six-view run will derive explicit face support from the existing
+  MediaPipe landmark `face_oval -> face_interior` path;
+- that support must be recorded as `landmark-derived face support`, not as an
+  independently observed segmentation mask;
+- DSINE normals remain bounded residual-detail evidence only;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- build landmark-derived face support and semantic detail-confidence fields for
+  all six real benchmark views, then run those views through the DSINE
+  residual-detail field source and image sampler to produce real residual-detail
+  observations.
