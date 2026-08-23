@@ -7714,3 +7714,72 @@ Next exact Phase 8.10 task:
   the six-view residual-detail evidence path;
 - record quantitative hybrid canonical-detail evidence before any architecture
   decision.
+
+
+## Phase 8.10 — Canonical Surface-to-Vertex Residual-Detail Amplitude Resolver — IMPLEMENTED
+
+The canonical residual-detail path now has an explicit bridge from barycentric
+canonical-surface observations to the existing per-canonical-vertex amplitude
+representation.
+
+Why this bridge is required:
+- `AtlasCanonicalHeadSurfaceCorrespondence` correctly represents an observed
+  sample as canonical face index + barycentric weights;
+- downstream residual-detail policy, normal projection and displacement
+  contracts operate on one scalar amplitude per canonical vertex;
+- a barycentric surface observation therefore must not be coerced into one
+  arbitrary canonical vertex;
+- the bridge must solve the surface constraints explicitly before the existing
+  amplitude-policy layer is entered.
+
+Implementation:
+- added `AtlasCanonicalHeadSurfaceResidualDetailAmplitudeResolver`;
+- reuses the existing
+  `AtlasCanonicalHeadResidualDetailAmplitudeResult` output contract;
+- builds the barycentric linear system only over canonical vertices supported by
+  the supplied surface correspondences;
+- resolves raw canonical vertex scalar detail with deterministic
+  `numpy.linalg.lstsq`;
+- unmapped canonical vertices remain exactly zero;
+- canonical confidence remains a separate channel;
+- confidence is transferred to supported vertices by barycentric support-weighted
+  averaging and is not multiplied into raw scalar detail;
+- confidence weighting of amplitude remains owned exclusively by
+  `AtlasCanonicalHeadResidualDetailAmplitudePolicy`;
+- topology connectivity signature is preserved;
+- unknown observation sample references are blocked.
+
+Files:
+- `CORE/atlas_canonical_head_surface_residual_detail_amplitude_resolver.py`
+- `Test/test_canonical_head_surface_residual_detail_amplitude_resolver.py`
+
+Validation:
+- focused surface-amplitude resolver: `7 passed in 0.05s`;
+- related surface/residual-detail regression: `91 passed in 0.22s`;
+- broad canonical-head regression: `587 passed in 0.94s`;
+- full ATLAS regression: `4864 passed in 126.95s`;
+- scoped `git diff --check`: clean.
+
+Architecture boundary:
+- the existing direct-vertex amplitude resolver remains unchanged;
+- the existing bounded-amplitude policy remains unchanged;
+- the existing normal residual-detail projector remains unchanged;
+- the existing residual-detail displacement/composition contracts remain
+  unchanged;
+- no provider-specific FLAME logic is embedded in this resolver;
+- no camera, pose, visibility or identity claim is introduced;
+- no real six-view FLAME/DSINE canonical amplitude evidence has yet been
+  produced by this new bridge;
+- no hybrid candidate `GO / HOLD / REJECT` has been issued;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- connect the real 105 MediaPipe-to-FLAME face+barycentric embedding to the
+  canonical surface correspondence contract;
+- run the six real DSINE residual-detail observations through the new
+  surface-to-vertex amplitude resolver;
+- apply the existing bounded-amplitude policy and canonical normal projection
+  boundaries;
+- record quantitative hybrid canonical-detail evidence;
+- only after that evidence is audited may the remaining benchmark gaps and final
+  three-architecture comparison proceed.
