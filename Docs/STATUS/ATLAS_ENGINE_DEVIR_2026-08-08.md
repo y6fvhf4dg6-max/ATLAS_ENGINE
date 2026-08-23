@@ -11449,3 +11449,87 @@ Next Phase 8.10 requirement:
   the `hybrid_canonical_detail` architecture-class evidence;
 - Phase 9 remains blocked until the complete Phase 8 benchmark explicitly
   returns GO and is locked.
+
+## Phase 8.10 — PRNet Direct-Neural-Dense Multi-View Consistency Checkpoint
+
+The PRNet `direct_neural_dense` candidate now has deterministic raw
+multi-view geometric consistency evidence over the current two-subject /
+three-view real-photo evidence set.
+
+Persistent external PRNet evidence:
+- `/Users/Kubi/ATLAS_PRNET_SPIKE/EVIDENCE/phase8_10_prnet_2026-08-22/`
+- multi-view measurement script:
+  `prnet_phase8_10_multiview_consistency_measurement.py`;
+- multi-view measurement artifact:
+  `prnet_phase8_10_multiview_consistency_measurement.json`;
+- manifest verification: `VERIFY_EXIT=0`;
+- manifest SHA256:
+  `6970201f05dfe43e2bf27b3193b09bfa2dfc7944b5353456fc6a6adb84759404`.
+
+Measurement protocol:
+- each subject contributes `front`, `side_a` and `side_b` PRNet
+  reconstructions;
+- all reconstructions preserve the same PRNet canonical UV topology with
+  `43867` corresponded vertices;
+- each view pair is aligned in 3D with deterministic similarity alignment;
+- translation, rotation and uniform scale are removed;
+- reflection is not allowed;
+- residual error is computed vertex-to-corresponding-vertex over the shared
+  canonical topology;
+- residual RMS is normalized by the target mesh RMS radius.
+
+Verified measurements:
+- subject count: `2`;
+- view count per subject: `3`;
+- pair count: `6`;
+- Subject 01 mean pairwise normalized residual:
+  `0.036128559369067476`;
+- Subject 02 mean pairwise normalized residual:
+  `0.03721806460958436`;
+- aggregate mean pairwise normalized residual:
+  `0.03667331198932592`;
+- aggregate maximum pairwise normalized residual:
+  `0.04595704484272138`.
+
+Interpretation boundary:
+- this is direct PRNet multi-view geometric consistency evidence;
+- this is not the FLAME `cross_view_identity_shape_nme` metric;
+- this is not identity-preservation proof;
+- this is not 3D ground-truth error;
+- these raw residuals are not normalized support scores;
+- no PRNet candidate GO/HOLD/REJECT decision is issued by this milestone;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Updated conservative PRNet Phase 8.10 evidence coverage:
+- identity preservation: `MISSING`;
+- multi-view consistency: `MEASURED`;
+- silhouette/profile: `PARTIAL`;
+- head ratio: `MISSING`;
+- jaw/chin: `MISSING`;
+- nose projection: `MISSING`;
+- orbital/cheek volume: `MISSING`;
+- expression separation: `MISSING`;
+- pose separation: `MISSING`;
+- topology suitability: `DIRECT`;
+- physical suitability: `MISSING`;
+- Apple Silicon runtime: `DIRECT`;
+- reproducibility: `DIRECT`.
+
+Validation:
+- PRNet focused evidence validation:
+  `8 passed in 0.03s`;
+- PRNet + coverage + FLAME related regression:
+  `44 passed in 0.07s`;
+- broad Phase 8.10 regression:
+  `153 passed in 0.18s`;
+- scoped `git diff --check`: clean.
+
+Next Phase 8.10 requirement:
+- continue closing the remaining PRNet evidence gaps without converting
+  multi-view consistency into unsupported identity claims;
+- preserve `silhouette/profile = PARTIAL` until direct profile evidence
+  exists;
+- continue required `direct_neural_dense` evidence closure;
+- then complete the `hybrid_canonical_detail` architecture-class evidence;
+- Phase 9 remains blocked until the complete Phase 8 benchmark explicitly
+  returns GO and is locked.

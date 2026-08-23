@@ -58,6 +58,32 @@ def test_preserves_silhouette_measurement_interpretation_boundary():
     assert evidence.SIDE_CASES_CANONICALLY_CLASSIFIED_AS_PROFILE is False
 
 
+def test_records_verified_multiview_consistency_measurements():
+    evidence = AtlasCanonicalHeadPrnetBenchmarkEvidence
+
+    assert evidence.MULTIVIEW_SUBJECT_COUNT == 2
+    assert evidence.MULTIVIEW_PAIR_COUNT == 6
+
+    assert (
+        evidence.MULTIVIEW_MEAN_PAIRWISE_NORMALIZED_RESIDUAL
+        == pytest.approx(
+            0.03667331198932592
+        )
+    )
+    assert (
+        evidence.MULTIVIEW_MAX_PAIRWISE_NORMALIZED_RESIDUAL
+        == pytest.approx(
+            0.04595704484272138
+        )
+    )
+
+    assert evidence.MULTIVIEW_MEASUREMENT_KIND == (
+        "topology_corresponded_3d_similarity_aligned_residual"
+    )
+    assert evidence.MULTIVIEW_IS_IDENTITY_PRESERVATION_PROOF is False
+    assert evidence.MULTIVIEW_IS_FLAME_CROSS_VIEW_IDENTITY_SHAPE_NME is False
+
+
 def test_exposes_conservative_phase_8_10_evidence_coverage():
     coverage = (
         AtlasCanonicalHeadPrnetBenchmarkEvidence
@@ -67,7 +93,7 @@ def test_exposes_conservative_phase_8_10_evidence_coverage():
     assert coverage.candidate_id == "prnet"
 
     assert coverage.identity_preservation_support == "MISSING"
-    assert coverage.multi_view_consistency == "MISSING"
+    assert coverage.multi_view_consistency == "MEASURED"
 
     assert coverage.silhouette_profile_support == "PARTIAL"
 

@@ -37,6 +37,22 @@ class AtlasCanonicalHeadPrnetBenchmarkEvidence:
     SILHOUETTE_REFERENCE_IS_MANUAL_SEGMENTATION = False
     SIDE_CASES_CANONICALLY_CLASSIFIED_AS_PROFILE = False
 
+    MULTIVIEW_SUBJECT_COUNT = 2
+    MULTIVIEW_PAIR_COUNT = 6
+
+    MULTIVIEW_MEAN_PAIRWISE_NORMALIZED_RESIDUAL = (
+        0.03667331198932592
+    )
+    MULTIVIEW_MAX_PAIRWISE_NORMALIZED_RESIDUAL = (
+        0.04595704484272138
+    )
+
+    MULTIVIEW_MEASUREMENT_KIND = (
+        "topology_corresponded_3d_similarity_aligned_residual"
+    )
+    MULTIVIEW_IS_IDENTITY_PRESERVATION_PROOF = False
+    MULTIVIEW_IS_FLAME_CROSS_VIEW_IDENTITY_SHAPE_NME = False
+
     @classmethod
     def coverage(
         cls,
@@ -44,7 +60,7 @@ class AtlasCanonicalHeadPrnetBenchmarkEvidence:
         return AtlasCanonicalHeadBenchmarkEvidenceCoverage(
             candidate_id=cls.CANDIDATE_ID,
             identity_preservation_support="MISSING",
-            multi_view_consistency="MISSING",
+            multi_view_consistency="MEASURED",
             silhouette_profile_support="PARTIAL",
             head_ratio_support="MISSING",
             jaw_chin_support="MISSING",
