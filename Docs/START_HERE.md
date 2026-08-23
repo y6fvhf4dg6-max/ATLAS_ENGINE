@@ -7783,3 +7783,63 @@ Next exact Phase 8.10 task:
 - record quantitative hybrid canonical-detail evidence;
 - only after that evidence is audited may the remaining benchmark gaps and final
   three-architecture comparison proceed.
+
+
+## Phase 8.10 — FLAME Barycentric Floating-Point Boundary Tolerance — IMPLEMENTED
+
+The canonical surface-correspondence contract now safely accepts the tiny
+floating-point boundary noise present in the real FLAME MediaPipe embedding
+without weakening the barycentric validity rules.
+
+Observed real FLAME evidence:
+- `lmk_face_idx`: 105 entries;
+- `lmk_b_coords`: shape `(105, 3)`;
+- `landmark_indices`: 105 unique MediaPipe landmark IDs;
+- barycentric weight sums range from
+  `0.9999999999999999` to `1.0000000000000002`;
+- minimum observed weight is
+  `-1.3322676295501878e-15`;
+- this negative value is floating-point roundoff around mathematical zero, not
+  a meaningful negative barycentric coordinate.
+
+Implementation:
+- `AtlasCanonicalHeadSurfaceCorrespondence` now permits only tiny barycentric
+  boundary excursions within `1e-12`;
+- values below `0.0` or above `1.0` within that tolerance are clamped to the
+  valid interval;
+- the clamped triplet is deterministically renormalized so the final weights
+  sum to exactly the canonical barycentric unit total within numerical
+  precision;
+- materially invalid barycentric weights outside the tolerance remain rejected;
+- the existing provider-independent surface-correspondence semantics remain
+  unchanged.
+
+Validation:
+- focused surface-correspondence tests: `10 passed in 0.03s`;
+- related surface correspondence/amplitude regression:
+  `69 passed in 0.17s`;
+- broad canonical-head regression: `588 passed in 0.95s`;
+- full ATLAS regression: `4865 passed in 119.64s`.
+
+Evidence interpretation:
+- this change is required by the actual FLAME embedding data;
+- it does not approximate or reinterpret the 105 correspondences as canonical
+  vertices;
+- it does not change the surface-to-vertex least-squares amplitude resolver;
+- it does not alter confidence weighting;
+- it does not introduce provider, camera, pose, visibility or identity claims;
+- no real six-view canonical hybrid-detail amplitude evidence has yet been
+  produced;
+- no hybrid candidate `GO / HOLD / REJECT` has been issued;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- construct the real canonical FLAME topology from the verified
+  `flame2023_Open.pkl` face connectivity;
+- bind the real 105 MediaPipe landmark IDs to their verified FLAME face indices
+  and barycentric weights through
+  `AtlasCanonicalHeadSurfaceCorrespondence`;
+- verify all six real landmark observations contain the required 105 landmark
+  IDs;
+- only then run the six DSINE residual-detail observations through the
+  surface-to-vertex amplitude resolver and existing bounded-amplitude policy.

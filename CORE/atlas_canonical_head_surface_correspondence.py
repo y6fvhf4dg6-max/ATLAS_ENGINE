@@ -245,9 +245,11 @@ class AtlasCanonicalHeadSurfaceCorrespondence:
                     "barycentric weights must be finite."
                 )
 
+            tolerance = 1e-12
+
             if (
-                weight < 0.0
-                or weight > 1.0
+                weight < -tolerance
+                or weight > 1.0 + tolerance
             ):
                 raise ValueError(
                     "barycentric weights must be "
@@ -255,15 +257,21 @@ class AtlasCanonicalHeadSurfaceCorrespondence:
                 )
 
             weights.append(
-                weight
+                min(
+                    1.0,
+                    max(
+                        0.0,
+                        weight,
+                    ),
+                )
             )
 
-        normalized = tuple(
+        weight_sum = sum(
             weights
         )
 
         if not math.isclose(
-            sum(normalized),
+            weight_sum,
             1.0,
             rel_tol=0.0,
             abs_tol=1e-9,
@@ -271,6 +279,11 @@ class AtlasCanonicalHeadSurfaceCorrespondence:
             raise ValueError(
                 "barycentric weights must sum to 1.0."
             )
+
+        normalized = tuple(
+            weight / weight_sum
+            for weight in weights
+        )
 
         return normalized
 

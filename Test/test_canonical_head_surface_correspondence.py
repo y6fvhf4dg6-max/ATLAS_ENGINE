@@ -115,6 +115,38 @@ def test_rejects_invalid_surface_locations(
         )
 
 
+def test_accepts_tiny_floating_point_barycentric_boundary_noise():
+    correspondence = AtlasCanonicalHeadSurfaceCorrespondence(
+        correspondence_id="floating-point-boundary",
+        topology=_topology(),
+        observed_sample_to_canonical_surface={
+            10: (
+                0,
+                (
+                    -1.3322676295501878e-15,
+                    0.25,
+                    0.7500000000000013,
+                ),
+            ),
+        },
+    )
+
+    face_index, weights = correspondence.canonical_surface_location(
+        10
+    )
+
+    assert face_index == 0
+    assert weights == pytest.approx(
+        (0.0, 0.25, 0.75),
+        abs=1e-15,
+    )
+    assert sum(weights) == pytest.approx(
+        1.0,
+        abs=1e-15,
+    )
+
+
+
 def test_rejects_invalid_sample_index():
     with pytest.raises(
         (TypeError, ValueError),
