@@ -21,8 +21,8 @@ class AtlasCanonicalHeadBenchmarkGapClosureEvidence:
             architecture_kind="parametric_fixed_topology",
             coverage=AtlasCanonicalHeadFlameBenchmarkEvidence.coverage(),
             commercial_license_state="ACCEPTABLE",
-            privacy_data_retention_state="UNRESOLVED",
-            model_weight_restrictions_state="UNRESOLVED",
+            privacy_data_retention_state="ACCEPTABLE",
+            model_weight_restrictions_state="ACCEPTABLE",
             dataset_restrictions_state="UNRESOLVED",
             evidence_limitations=(
                 "NO_METRIC_3D_GROUND_TRUTH",
@@ -40,7 +40,7 @@ class AtlasCanonicalHeadBenchmarkGapClosureEvidence:
             architecture_kind="direct_neural_dense",
             coverage=AtlasCanonicalHeadPrnetBenchmarkEvidence.coverage(),
             commercial_license_state="BLOCKED",
-            privacy_data_retention_state="UNRESOLVED",
+            privacy_data_retention_state="ACCEPTABLE",
             model_weight_restrictions_state="BLOCKED",
             dataset_restrictions_state="BLOCKED",
             evidence_limitations=(

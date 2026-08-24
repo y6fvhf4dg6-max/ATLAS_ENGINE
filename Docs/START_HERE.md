@@ -8647,3 +8647,45 @@ Original Phase 8.10 checklist status:
 Phase 8.10 remains `ACTIVE`.
 Phase 8 remains not yet LOCKED.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD FLAME Policy Evidence Update
+
+Post-HOLD blocker reduction work verified two additional FLAME policy
+channels without changing the Phase 8 HOLD decision.
+
+Current FLAME policy states:
+- commercial license: `ACCEPTABLE`;
+- privacy / data retention: `ACCEPTABLE`;
+- model-weight restrictions: `ACCEPTABLE`;
+- dataset restrictions: `UNRESOLVED`.
+
+Privacy / data-retention evidence:
+- the active FLAME benchmark/fitting path was audited for network, upload,
+  cloud, telemetry, remote-service and subprocess behavior;
+- no such runtime path was found;
+- the verified benchmark path reads local model, embedding, landmark and
+  residual-detail evidence files only;
+- this acceptance applies to the local ATLAS runtime path and does not make
+  broader claims about external FLAME web services.
+
+Model-weight evidence:
+- the FLAME 2023 Open model remains the verified model candidate;
+- its model-license path permits commercial use subject to the applicable
+  attribution requirements;
+- the model-weight restriction state is therefore `ACCEPTABLE`.
+
+Remaining dataset/provenance gap:
+- `mediapipe_landmark_embedding.npz` remains an active benchmark dependency;
+- local metadata and git history do not establish its source provenance;
+- it is not a direct copy of `flame_static_embedding.pkl`;
+- therefore dataset/provenance restrictions remain `UNRESOLVED`;
+- no provenance or policy state is fabricated.
+
+Validation:
+- FLAME policy focused tests:
+  `5 passed in 0.03s`;
+- related gap/comparison/final-decision regression:
+  `19 passed in 0.08s`.
+
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 9 remains `NOT AUTHORIZED`.

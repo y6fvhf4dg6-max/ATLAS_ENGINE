@@ -51,3 +51,19 @@ def test_records_verified_policy_states_without_final_candidate_decision():
 
     assert not hasattr(flame, "decision")
     assert not hasattr(prnet, "decision")
+
+def test_flame_local_runtime_privacy_state_is_acceptable():
+    flame = (
+        AtlasCanonicalHeadBenchmarkGapClosureEvidence
+        .flame_candidate()
+    )
+
+    assert flame.privacy_data_retention_state == "ACCEPTABLE"
+
+def test_flame_model_weight_restrictions_are_acceptable():
+    flame = (
+        AtlasCanonicalHeadBenchmarkGapClosureEvidence
+        .flame_candidate()
+    )
+
+    assert flame.model_weight_restrictions_state == "ACCEPTABLE"
