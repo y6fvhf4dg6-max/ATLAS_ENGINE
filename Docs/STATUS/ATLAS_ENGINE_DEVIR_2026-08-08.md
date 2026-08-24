@@ -12745,3 +12745,106 @@ Exact next Phase 8.10 task:
 
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Checklist Item 9 Quantitative Real Hybrid-Detail Evidence — VERIFIED
+
+The original Phase 8.10 checklist item 9,
+`record quantitative real hybrid-detail evidence`, is now verified.
+
+New raw evidence contracts:
+- `CORE/atlas_canonical_head_hybrid_detail_measurement_observation.py`;
+- `AtlasCanonicalHeadHybridDetailMeasurementObservation`;
+- `CORE/atlas_canonical_head_hybrid_detail_benchmark_evidence.py`;
+- `AtlasCanonicalHeadHybridDetailBenchmarkEvidence`.
+
+Evidence boundary:
+- records raw quantitative hybrid-detail measurements only;
+- does not convert measurements into benchmark support scores;
+- does not create `AtlasCanonicalHeadBenchmarkCandidateObservation`;
+- does not perform architecture comparison;
+- does not issue GO / HOLD / REJECT;
+- does not authorize Phase 9.
+
+Real six-view quantitative evidence:
+- architecture kind: `hybrid_canonical_detail`;
+- view count: `6`;
+- mapped vertex count per view: `264`;
+- aggregate active vertex count: `1268`;
+- aggregate clipped vertex count: `1`;
+- aggregate clipped fraction:
+  `0.0007886435331230284`
+  (`0.07886435331230284%`);
+- connectivity signature count: `1`;
+- canonical reference span:
+  `0.16373484421605985`;
+- selected maximum absolute amplitude:
+  `0.0016373484421605986`
+  (`1.0%` of canonical reference span).
+
+Per-view active / clipped counts:
+- `subject_01_front`: `264 / 0`;
+- `subject_01_side_a`: `135 / 0`;
+- `subject_01_side_b`: `167 / 0`;
+- `subject_02_front`: `264 / 0`;
+- `subject_02_side_a`: `227 / 1`;
+- `subject_02_side_b`: `211 / 0`.
+
+The only clipped real measurement:
+- `subject_02_side_a`;
+- weighted absolute max:
+  `0.0034050619741867834`;
+- bounded absolute max:
+  `0.0016373484421605986`.
+
+Reproducibility:
+- the evidence catalog is cross-checked against a recomputed real six-view
+  chain:
+  DSINE residual detail
+  -> reference-span normalization
+  -> FLAME barycentric surface correspondence
+  -> surface-aware view-to-canonical bridge
+  -> confidence weighting
+  -> bounded amplitude policy;
+- catalog values reproduce image span, canonical span, scale factor,
+  mapped/active/clipped counts, raw max, weighted max, bounded max,
+  weighted P95/P99 and connectivity signature.
+
+Validation:
+- measurement contract:
+  `43 passed in 0.04s`;
+- evidence catalog focused validation:
+  `10 passed in 0.03s`;
+- real catalog cross-check:
+  `54 passed, 2 warnings in 2.90s`;
+- related regression:
+  `102 passed, 11 warnings in 14.11s`;
+- broad canonical-head regression:
+  `669 passed, 11 warnings in 15.03s`;
+- full ATLAS regression:
+  `4946 passed, 11 warnings in 134.93s`;
+- scoped `git diff --check`:
+  clean.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — DONE;
+7. apply bounded amplitude policy — DONE;
+8. run view-to-canonical bridge — DONE;
+9. record quantitative real hybrid-detail evidence — DONE;
+10. close remaining benchmark evidence gaps — NEXT;
+11. perform architecture-class comparison — PENDING;
+12. issue final Phase 8 GO / HOLD / REJECT — PENDING;
+13. only explicit GO may authorize Phase 9 — PENDING.
+
+Exact next work after the planned pause:
+- Phase 8.10 checklist item 10;
+- audit and close remaining benchmark evidence gaps;
+- do not start Phase 9.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 8 remains not yet LOCKED.
+Phase 9 remains `NOT AUTHORIZED`.
