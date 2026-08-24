@@ -8591,3 +8591,59 @@ Original Phase 8.10 checklist status:
 Phase 8.10 remains `ACTIVE`.
 Phase 8 remains not yet LOCKED.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Checklist Item 12 Final Phase 8 Decision — HOLD
+
+The original Phase 8.10 checklist item 12,
+`issue final Phase 8 GO / HOLD / REJECT`, is now evaluated.
+
+Final current decision:
+- decision: `HOLD`;
+- status: `BLOCKED`;
+- selected candidate: none;
+- selected architecture: none;
+- Phase 9 authorized: `False`.
+
+Decision basis:
+- final scoring evidence remains incomplete;
+- FLAME 2023 Open still has unresolved quality / policy evidence;
+- PRNet remains policy-blocked;
+- Hybrid remains architecture-level evidence only;
+- the current DSINE dependency remains non-commercial and therefore
+  policy-blocked for the commercial candidate path;
+- no unsupported candidate score was fabricated;
+- no GO candidate exists from the currently verified evidence.
+
+New final-decision boundary:
+- `CORE/atlas_canonical_head_phase8_final_decision.py`;
+- `AtlasCanonicalHeadPhase8FinalDecision`.
+
+Verified blocked reasons:
+- `INCOMPLETE_FINAL_SCORING_EVIDENCE`;
+- `PRNET_POLICY_BLOCKED`;
+- `HYBRID_DSINE_LICENSE_BLOCKED`.
+
+Validation:
+- focused final-decision tests:
+  `3 passed in 0.03s`;
+- related benchmark regression:
+  `83 passed in 0.15s`.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — DONE;
+7. apply bounded amplitude policy — DONE;
+8. run view-to-canonical bridge — DONE;
+9. record quantitative real hybrid-detail evidence — DONE;
+10. close remaining benchmark evidence gaps — DONE;
+11. perform architecture-class comparison — DONE;
+12. issue final Phase 8 GO / HOLD / REJECT — HOLD;
+13. only explicit GO may authorize Phase 9 — NOT SATISFIED.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 8 remains not yet LOCKED.
+Phase 9 remains `NOT AUTHORIZED`.
