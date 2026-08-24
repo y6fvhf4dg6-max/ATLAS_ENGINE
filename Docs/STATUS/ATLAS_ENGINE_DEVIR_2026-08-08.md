@@ -12310,3 +12310,91 @@ Next exact Phase 8.10 task:
   reference span and the corresponding canonical FLAME reference span;
 - then run the normalized observations through the existing canonical
   surface-to-vertex amplitude resolver.
+
+## Phase 8.10 — Checklist Item 5 Real FLAME Surface Correspondence — VERIFIED
+
+The original Phase 8.10 `Exact next Phase 8.10 work` checklist item 5,
+`connect those observations through dense correspondence`, is now satisfied
+through the corrected provider-independent canonical surface correspondence
+boundary.
+
+Important architecture clarification:
+- the real FLAME MediaPipe embedding is not a direct canonical-vertex map;
+- the verified path is:
+  `MediaPipe sample -> FLAME face index + barycentric weights -> canonical surface`;
+- `AtlasCanonicalHeadSurfaceCorrespondence` remains the authoritative boundary;
+- no 105 MediaPipe landmark is reinterpreted as a canonical FLAME vertex.
+
+Real evidence verified:
+- six benchmark views;
+- 478 real MediaPipe samples per view;
+- all six views contain the required FLAME embedding landmark set:
+  `105 / 105`;
+- real FLAME MediaPipe embedding:
+  - 105 landmark IDs;
+  - 105 FLAME face indices;
+  - 105 barycentric triplets;
+- real FLAME topology:
+  - 5023 canonical vertices;
+  - 9976 triangular faces;
+- six real DSINE normal artifacts are available from the persistent hybrid
+  evidence directory;
+- DSINE artifact integrity audit:
+  - 6 / 6 files present;
+  - shape `(1152, 1536, 3)`;
+  - dtype `float32`;
+  - all finite;
+  - SHA-256 values match the persistent `SHA256SUMS.txt` manifest;
+- each real DSINE observation contains 478 finite scalar-detail/confidence
+  samples;
+- the required 105 samples from every real observation bind successfully to
+  the verified FLAME face+barycentric canonical surface correspondence;
+- confidence remains a separate channel.
+
+New real-data integration test:
+- `Test/test_phase8_10_real_flame_surface_correspondence.py`
+
+Validation:
+- focused real correspondence integration:
+  `3 passed, 3 warnings in 2.89s`;
+- related correspondence/residual-detail regression:
+  `64 passed, 3 warnings in 2.98s`;
+- broad canonical-head regression:
+  `604 passed, 3 warnings in 3.83s`;
+- full ATLAS regression:
+  `4881 passed, 3 warnings in 123.16s`;
+- scoped `git diff --check`:
+  clean.
+
+Warning note:
+- the three warnings are NumPy deprecation warnings emitted while loading the
+  historical FLAME pickle (`numpy.core.numeric`);
+- they do not change the verified correspondence behavior and are not a Phase
+  8.10 blocker.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — NEXT;
+7. apply bounded amplitude policy — PENDING;
+8. run view-to-canonical bridge — PENDING;
+9. record quantitative real hybrid-detail evidence — PENDING;
+10. close remaining benchmark evidence gaps — PENDING;
+11. perform architecture-class comparison — PENDING;
+12. issue final Phase 8 GO / HOLD / REJECT — PENDING;
+13. only explicit GO may authorize Phase 9 — PENDING.
+
+Exact next Phase 8.10 task:
+- checklist item 6;
+- run the six real, 105-sample FLAME-surface-bound residual-detail observations
+  through the existing
+  `AtlasCanonicalHeadSurfaceResidualDetailAmplitudeResolver`;
+- preserve confidence as a separate channel;
+- do not yet apply the bounded-amplitude policy or issue any hybrid
+  GO / HOLD / REJECT decision.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
