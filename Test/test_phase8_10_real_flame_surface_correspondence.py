@@ -443,3 +443,183 @@ def test_real_six_view_dsine_observations_bind_to_flame_surface():
                 1.0,
                 abs=1e-12,
             )
+
+from CORE.atlas_canonical_head_correspondence_reference_span_resolver import (
+    AtlasCanonicalHeadCorrespondenceReferenceSpanResolver,
+)
+from CORE.atlas_canonical_head_geometry import (
+    AtlasCanonicalHeadGeometry,
+)
+from CORE.atlas_canonical_head_residual_detail_scale_normalizer import (
+    AtlasCanonicalHeadResidualDetailScaleNormalizer,
+)
+from CORE.atlas_canonical_head_surface_residual_detail_amplitude_resolver import (
+    AtlasCanonicalHeadSurfaceResidualDetailAmplitudeResolver,
+)
+
+
+def _load_real_flame_reference_geometry():
+    with FLAME_MODEL_PATH.open("rb") as stream:
+        flame = pickle.load(
+            stream,
+            encoding="latin1",
+        )
+
+    topology = _load_real_flame_topology()
+
+    vertices = np.asarray(
+        flame["v_template"],
+        dtype=np.float64,
+    )
+
+    assert vertices.shape == (
+        topology.vertex_count,
+        3,
+    )
+
+    return AtlasCanonicalHeadGeometry(
+        topology=topology,
+        vertices=vertices,
+    )
+
+
+def test_real_six_view_normalized_detail_runs_canonical_amplitude_resolver():
+    geometry = _load_real_flame_reference_geometry()
+
+    correspondence = AtlasCanonicalHeadSurfaceCorrespondence(
+        correspondence_id=(
+            "phase8-10-real-normalized-dsine-to-flame-surface"
+        ),
+        topology=geometry.topology,
+        observed_sample_to_canonical_surface=(
+            _load_real_flame_surface_mapping()
+        ),
+    )
+
+    expected_supported_vertices = {
+        vertex_index
+        for sample_index in correspondence.observed_sample_indices
+        for vertex_index, weight in zip(
+            geometry.topology.faces[
+                correspondence.canonical_surface_location(
+                    sample_index
+                )[0]
+            ],
+            correspondence.canonical_surface_location(
+                sample_index
+            )[1],
+            strict=True,
+        )
+        if weight > 0.0
+    }
+
+    assert expected_supported_vertices
+
+    for case_id in CASES:
+        observation = (
+            _load_real_residual_detail_observation(
+                case_id
+            )
+        )
+
+        spans = (
+            AtlasCanonicalHeadCorrespondenceReferenceSpanResolver
+            .resolve(
+                observation=observation,
+                correspondence=correspondence,
+                geometry=geometry,
+            )
+        )
+
+        assert spans.image_reference_span_px > 0.0
+        assert spans.canonical_reference_span > 0.0
+
+        normalized = (
+            AtlasCanonicalHeadResidualDetailScaleNormalizer
+            .normalize(
+                observation=observation,
+                image_reference_span_px=(
+                    spans.image_reference_span_px
+                ),
+                canonical_reference_span=(
+                    spans.canonical_reference_span
+                ),
+            )
+        )
+
+        amplitude = (
+            AtlasCanonicalHeadSurfaceResidualDetailAmplitudeResolver
+            .resolve(
+                observation=normalized.observation,
+                correspondence=correspondence,
+            )
+        )
+
+        assert normalized.scale_factor > 0.0
+
+        assert amplitude.mapped_vertex_count == len(
+            expected_supported_vertices
+        )
+
+        assert amplitude.canonical_scalar_detail.shape == (
+            geometry.vertex_count,
+        )
+        assert amplitude.canonical_confidence.shape == (
+            geometry.vertex_count,
+        )
+
+        assert np.all(
+            np.isfinite(
+                amplitude.canonical_scalar_detail
+            )
+        )
+        assert np.all(
+            np.isfinite(
+                amplitude.canonical_confidence
+            )
+        )
+
+        assert np.all(
+            amplitude.canonical_confidence >= 0.0
+        )
+        assert np.all(
+            amplitude.canonical_confidence <= 1.0
+        )
+
+        assert np.any(
+            np.abs(
+                amplitude.canonical_scalar_detail
+            ) > 0.0
+        )
+
+        assert (
+            amplitude.connectivity_signature
+            == geometry.connectivity_signature
+            == correspondence.connectivity_signature
+        )
+
+        unsupported = np.ones(
+            geometry.vertex_count,
+            dtype=bool,
+        )
+        unsupported[
+            np.asarray(
+                sorted(
+                    expected_supported_vertices
+                ),
+                dtype=np.int64,
+            )
+        ] = False
+
+        assert np.all(
+            amplitude.canonical_scalar_detail[
+                unsupported
+            ]
+            == 0.0
+        )
+        assert np.all(
+            amplitude.canonical_confidence[
+                unsupported
+            ]
+            == 0.0
+        )

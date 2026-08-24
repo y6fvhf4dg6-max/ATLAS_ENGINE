@@ -8000,3 +8000,105 @@ Exact next Phase 8.10 task:
 
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Checklist Item 6 Real Canonical Surface Amplitude — VERIFIED
+
+The original Phase 8.10 `Exact next Phase 8.10 work` checklist item 6,
+`run the canonical amplitude resolver`, is now verified with the six real
+DSINE benchmark views through the FLAME barycentric canonical-surface path.
+
+Scale-reference boundary:
+- raw DSINE scalar-detail is not interpreted directly as canonical model-space
+  displacement;
+- no undocumented historical IOD formula is reused;
+- a provider-independent correspondence reference-span boundary was added;
+- image reference span is the 2D bounding-box diagonal of the corresponded
+  observation samples in pixels;
+- canonical reference span is the 3D bounding-box diagonal of the same
+  barycentric canonical-surface samples;
+- the resulting spans are passed through the existing
+  `AtlasCanonicalHeadResidualDetailScaleNormalizer`.
+
+Implementation:
+- `CORE/atlas_canonical_head_correspondence_reference_span_resolver.py`;
+- immutable `AtlasCanonicalHeadCorrespondenceReferenceSpanResult`;
+- `AtlasCanonicalHeadCorrespondenceReferenceSpanResolver`;
+- topology compatibility is required;
+- missing observation samples are blocked;
+- only correspondence-owned samples affect the reference spans.
+
+Real six-view amplitude path verified:
+- six real DSINE normal fields;
+- 478 real residual-detail samples per view;
+- 105 verified MediaPipe samples required by the FLAME embedding;
+- FLAME face+barycentric canonical-surface correspondence;
+- per-view correspondence-derived scale normalization;
+- canonical surface-to-vertex amplitude resolution;
+- canonical scalar detail and confidence remain separate;
+- outputs are finite;
+- unmapped canonical vertices remain exactly zero;
+- connectivity signature is preserved.
+
+Real FLAME support audit:
+- 105 referenced FLAME faces contain 265 distinct face-member vertices;
+- normalized strictly-positive barycentric support covers 264 vertices;
+- vertex `1224` is excluded because sample `387`, face `276`, has raw weight
+  `-1.3322676295501878e-15`;
+- this previously verified floating-point boundary noise is correctly clamped
+  to `0.0`;
+- real resolver result therefore uses `mapped_vertex_count = 264`.
+
+Tests:
+- `Test/test_canonical_head_correspondence_reference_span_resolver.py`;
+- extended:
+  `Test/test_phase8_10_real_flame_surface_correspondence.py`.
+
+Validation:
+- focused reference-span resolver: `4 passed in 0.05s`;
+- real six-view normalized amplitude integration:
+  `4 passed, 5 warnings in 5.64s`;
+- related regression:
+  `82 passed, 5 warnings in 5.79s`;
+- broad canonical-head regression:
+  `609 passed, 5 warnings in 6.64s`;
+- full ATLAS regression:
+  `4886 passed, 5 warnings in 126.14s`;
+- scoped `git diff --check`: clean.
+
+Warning note:
+- warnings are NumPy deprecation warnings while loading the historical FLAME
+  pickle through `numpy.core.numeric`;
+- they do not alter the verified amplitude behavior and are not a Phase 8.10
+  blocker.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — DONE;
+7. apply bounded amplitude policy — NEXT;
+8. run view-to-canonical bridge — PENDING;
+9. record quantitative real hybrid-detail evidence — PENDING;
+10. close remaining benchmark evidence gaps — PENDING;
+11. perform architecture-class comparison — PENDING;
+12. issue final Phase 8 GO / HOLD / REJECT — PENDING;
+13. only explicit GO may authorize Phase 9 — PENDING.
+
+Architecture boundary:
+- bounded physical amplitude policy is not applied yet;
+- canonical normal displacement is not applied yet;
+- final geometry is not composed;
+- no hybrid GO / HOLD / REJECT decision is issued;
+- Phase 9 remains NOT AUTHORIZED.
+
+Exact next Phase 8.10 task:
+- checklist item 7;
+- apply the existing bounded amplitude policy to the six real canonical
+  scalar-detail/confidence results;
+- preserve confidence-separation semantics;
+- quantify clipping/bounding behavior before checklist item 8.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
