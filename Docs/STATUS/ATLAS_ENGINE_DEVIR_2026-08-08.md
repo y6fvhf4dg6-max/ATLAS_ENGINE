@@ -12848,3 +12848,81 @@ Exact next work after the planned pause:
 Phase 8.10 remains `ACTIVE`.
 Phase 8 remains not yet LOCKED.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Checklist Item 10 Benchmark Evidence Gap Closure — VERIFIED
+
+The original Phase 8.10 checklist item 10,
+`close remaining benchmark evidence gaps`, is now verified as an
+explicit evidence-gap closure boundary.
+
+New provider-independent gap-closure contracts:
+- `CORE/atlas_canonical_head_benchmark_gap_closure_observation.py`;
+- `AtlasCanonicalHeadBenchmarkGapClosureObservation`;
+- `CORE/atlas_canonical_head_benchmark_gap_closure_evidence.py`;
+- `AtlasCanonicalHeadBenchmarkGapClosureEvidence`.
+
+Boundary:
+- missing or partial quality channels are preserved explicitly;
+- verified policy blockers are preserved separately from unresolved policy;
+- no unsupported numeric benchmark support score is fabricated;
+- no `AtlasCanonicalHeadBenchmarkCandidateObservation` is created from
+  incomplete evidence;
+- no architecture-class comparison is performed here;
+- no GO / HOLD / REJECT decision is issued here;
+- Phase 9 is not authorized.
+
+FLAME 2023 Open gap closure:
+- candidate: `flame-2023-open`;
+- architecture: `parametric_fixed_topology`;
+- commercial model license state: `ACCEPTABLE`;
+- remaining policy states for privacy/data retention, model-weight
+  restrictions and dataset restrictions remain `UNRESOLVED`;
+- current evidence still lacks metric 3D ground truth, expression-variation
+  benchmark evidence and candidate-specific physical evidence;
+- existing missing / partial quality channels remain explicit rather than
+  being converted into unsupported numeric scores.
+
+PRNet gap closure:
+- candidate: `prnet`;
+- architecture: `direct_neural_dense`;
+- commercial license state: `BLOCKED`;
+- model-weight restrictions state: `BLOCKED`;
+- dataset restrictions state: `BLOCKED`;
+- privacy/data-retention state remains `UNRESOLVED`;
+- the current pretrained-model training-data provenance is not acceptable
+  for a commercial candidate;
+- current geometric limitations remain explicit.
+
+Hybrid gap closure:
+- architecture: `hybrid_canonical_detail`;
+- no standalone hybrid candidate id is fabricated;
+- no final candidate observation is created;
+- real six-view bounded-detail evidence remains architecture-level evidence;
+- the current DSINE dependency carries a verified non-commercial license
+  blocker;
+- hybrid evidence therefore remains non-authorizing.
+
+Validation:
+- focused gap-closure tests:
+  `10 passed in 0.05s`;
+- related benchmark regression:
+  `120 passed in 0.17s`.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — DONE;
+7. apply bounded amplitude policy — DONE;
+8. run view-to-canonical bridge — DONE;
+9. record quantitative real hybrid-detail evidence — DONE;
+10. close remaining benchmark evidence gaps — DONE;
+11. perform architecture-class comparison — NEXT;
+12. issue final Phase 8 GO / HOLD / REJECT — PENDING;
+13. only explicit GO may authorize Phase 9 — PENDING.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 8 remains not yet LOCKED.
+Phase 9 remains `NOT AUTHORIZED`.
