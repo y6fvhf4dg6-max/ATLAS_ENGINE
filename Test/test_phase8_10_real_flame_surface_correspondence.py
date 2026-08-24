@@ -782,3 +782,133 @@ def test_real_six_view_bounded_amplitude_policy_uses_one_percent_canonical_span(
     ) == pytest.approx(
         0.07886435331230283
     )
+
+from CORE.atlas_canonical_head_surface_view_residual_detail_bridge import (
+    AtlasCanonicalHeadSurfaceViewResidualDetailBridge,
+)
+
+
+def test_real_six_view_surface_bridge_matches_verified_amplitude_policy_chain():
+    geometry = _load_real_flame_reference_geometry()
+
+    correspondence = AtlasCanonicalHeadSurfaceCorrespondence(
+        correspondence_id=(
+            "phase8-10-real-surface-view-bridge"
+        ),
+        topology=geometry.topology,
+        observed_sample_to_canonical_surface=(
+            _load_real_flame_surface_mapping()
+        ),
+    )
+
+    for case_id in CASES:
+        observation = (
+            _load_real_residual_detail_observation(
+                case_id
+            )
+        )
+
+        spans = (
+            AtlasCanonicalHeadCorrespondenceReferenceSpanResolver
+            .resolve(
+                observation=observation,
+                correspondence=correspondence,
+                geometry=geometry,
+            )
+        )
+
+        normalized = (
+            AtlasCanonicalHeadResidualDetailScaleNormalizer
+            .normalize(
+                observation=observation,
+                image_reference_span_px=(
+                    spans.image_reference_span_px
+                ),
+                canonical_reference_span=(
+                    spans.canonical_reference_span
+                ),
+            )
+        )
+
+        maximum = (
+            spans.canonical_reference_span
+            * PHASE8_10_HYBRID_MAXIMUM_AMPLITUDE_FRACTION
+        )
+
+        direct_amplitude = (
+            AtlasCanonicalHeadSurfaceResidualDetailAmplitudeResolver
+            .resolve(
+                observation=normalized.observation,
+                correspondence=correspondence,
+            )
+        )
+
+        direct_policy = (
+            AtlasCanonicalHeadResidualDetailAmplitudePolicy
+            .apply(
+                amplitude_result=direct_amplitude,
+                maximum_absolute_amplitude=maximum,
+            )
+        )
+
+        bridge = (
+            AtlasCanonicalHeadSurfaceViewResidualDetailBridge
+            .resolve(
+                observation=normalized.observation,
+                correspondence=correspondence,
+                maximum_absolute_amplitude=maximum,
+            )
+        )
+
+        assert bridge.observation_id == (
+            normalized.observation.observation_id
+        )
+        assert bridge.source_view_id == (
+            normalized.observation.source_view_id
+        )
+
+        np.testing.assert_allclose(
+            bridge.canonical_scalar_detail,
+            direct_amplitude.canonical_scalar_detail,
+        )
+
+        np.testing.assert_allclose(
+            bridge.canonical_confidence,
+            direct_amplitude.canonical_confidence,
+        )
+
+        np.testing.assert_allclose(
+            bridge.weighted_amplitude,
+            direct_policy.weighted_amplitude,
+        )
+
+        np.testing.assert_allclose(
+            bridge.bounded_amplitude,
+            direct_policy.bounded_amplitude,
+        )
+
+        assert (
+            bridge.maximum_absolute_amplitude
+            == pytest.approx(
+                maximum
+            )
+        )
+
+        assert (
+            bridge.mapped_vertex_count
+            == direct_policy.mapped_vertex_count
+            == 264
+        )
+
+        assert (
+            bridge.connectivity_signature
+            == direct_policy.connectivity_signature
+            == geometry.connectivity_signature
+        )
+
+        assert np.all(
+            np.abs(
+                bridge.bounded_amplitude
+            )
+            <= maximum + 1e-12
+        )

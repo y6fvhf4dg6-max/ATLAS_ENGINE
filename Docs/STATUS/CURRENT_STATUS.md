@@ -10559,3 +10559,115 @@ Exact next Phase 8.10 task:
 
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Checklist Item 8 Real Surface View-to-Canonical Bridge — VERIFIED
+
+The original Phase 8.10 `Exact next Phase 8.10 work` checklist item 8,
+`run the view-to-canonical bridge`, is now verified for the real FLAME
+barycentric surface-correspondence path.
+
+Architecture decision:
+- the existing `AtlasCanonicalHeadViewResidualDetailBridge` remains unchanged;
+- that bridge intentionally accepts
+  `AtlasCanonicalHeadDenseCorrespondence`;
+- the real Phase 8.10 FLAME embedding is face+barycentric surface
+  correspondence and is not reinterpreted as direct canonical-vertex mapping;
+- a parallel provider-independent surface-aware orchestration boundary was
+  therefore added.
+
+Implementation:
+- added
+  `CORE/atlas_canonical_head_surface_view_residual_detail_bridge.py`;
+- added
+  `AtlasCanonicalHeadSurfaceViewResidualDetailBridge`;
+- the bridge consumes:
+  - `AtlasCanonicalHeadResidualDetailObservation`;
+  - `AtlasCanonicalHeadSurfaceCorrespondence`;
+  - explicit `maximum_absolute_amplitude`;
+- it reuses:
+  - `AtlasCanonicalHeadSurfaceResidualDetailAmplitudeResolver`;
+  - `AtlasCanonicalHeadResidualDetailAmplitudePolicy`;
+  - existing `AtlasCanonicalHeadViewResidualDetailBridgeResult`.
+
+Behavior:
+- surface/barycentric mapping is resolved to canonical scalar detail and
+  canonical confidence;
+- confidence weighting remains owned by the amplitude-policy layer;
+- symmetric bounded amplitude remains owned by the amplitude-policy layer;
+- observation identity and source-view identity are preserved;
+- mapped vertex count and connectivity signature are preserved;
+- no dense-vertex correspondence is fabricated;
+- upstream observations and correspondence contracts are not mutated.
+
+Real six-view verification:
+- six real normalized DSINE residual-detail observations were passed through
+  the new surface-aware bridge;
+- the verified Phase 8.10 bound remains
+  `1.0%` of canonical correspondence reference span;
+- for every view, bridge outputs match the already verified direct
+  surface-amplitude-resolver plus bounded-policy chain;
+- canonical scalar detail matches;
+- canonical confidence matches;
+- weighted amplitude matches;
+- bounded amplitude matches;
+- all six real runs preserve `mapped_vertex_count = 264`;
+- bounded amplitudes remain inside the explicit per-view maximum;
+- FLAME connectivity signature is preserved.
+
+Tests:
+- `Test/test_canonical_head_surface_view_residual_detail_bridge.py`;
+- extended real integration coverage in
+  `Test/test_phase8_10_real_flame_surface_correspondence.py`.
+
+Validation:
+- focused surface-aware bridge:
+  `4 passed in 0.05s`;
+- focused + real six-view bridge integration:
+  `10 passed, 9 warnings in 11.21s`;
+- related bridge/residual-detail regression:
+  `57 passed, 9 warnings in 11.34s`;
+- broad canonical-head regression:
+  `615 passed, 9 warnings in 12.21s`;
+- full ATLAS regression:
+  `4892 passed, 9 warnings in 132.88s`;
+- scoped `git diff --check`:
+  clean.
+
+Warning note:
+- warnings are NumPy deprecation warnings emitted while loading the historical
+  FLAME pickle through `numpy.core.numeric`;
+- they do not alter the verified bridge behavior and are not a Phase 8.10
+  blocker.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — DONE;
+7. apply bounded amplitude policy — DONE;
+8. run view-to-canonical bridge — DONE;
+9. record quantitative real hybrid-detail evidence — NEXT;
+10. close remaining benchmark evidence gaps — PENDING;
+11. perform architecture-class comparison — PENDING;
+12. issue final Phase 8 GO / HOLD / REJECT — PENDING;
+13. only explicit GO may authorize Phase 9 — PENDING.
+
+Architecture boundary:
+- the bridge does not claim camera, pose, visibility or occlusion resolution;
+- it does not select normal direction;
+- it does not create canonical displacement geometry;
+- it does not compose final identity geometry;
+- no hybrid GO / HOLD / REJECT decision is issued;
+- Phase 9 remains NOT AUTHORIZED.
+
+Exact next Phase 8.10 task:
+- checklist item 9;
+- record quantitative real hybrid-detail evidence from the verified six-view
+  surface-aware bridge outputs;
+- preserve raw, weighted and bounded amplitude statistics separately;
+- only after that evidence is audited proceed to remaining benchmark gaps.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
