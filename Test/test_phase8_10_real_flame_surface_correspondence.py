@@ -623,3 +623,162 @@ def test_real_six_view_normalized_detail_runs_canonical_amplitude_resolver():
             ]
             == 0.0
         )
+
+from CORE.atlas_canonical_head_residual_detail_amplitude_policy import (
+    AtlasCanonicalHeadResidualDetailAmplitudePolicy,
+)
+
+
+PHASE8_10_HYBRID_MAXIMUM_AMPLITUDE_FRACTION = 0.01
+
+
+def test_real_six_view_bounded_amplitude_policy_uses_one_percent_canonical_span():
+    geometry = _load_real_flame_reference_geometry()
+
+    correspondence = AtlasCanonicalHeadSurfaceCorrespondence(
+        correspondence_id=(
+            "phase8-10-real-bounded-dsine-to-flame-surface"
+        ),
+        topology=geometry.topology,
+        observed_sample_to_canonical_surface=(
+            _load_real_flame_surface_mapping()
+        ),
+    )
+
+    expected_clipped_by_case = {
+        "subject_01_front": 0,
+        "subject_01_side_a": 0,
+        "subject_01_side_b": 0,
+        "subject_02_front": 0,
+        "subject_02_side_a": 1,
+        "subject_02_side_b": 0,
+    }
+
+    aggregate_active = 0
+    aggregate_clipped = 0
+
+    for case_id in CASES:
+        observation = (
+            _load_real_residual_detail_observation(
+                case_id
+            )
+        )
+
+        spans = (
+            AtlasCanonicalHeadCorrespondenceReferenceSpanResolver
+            .resolve(
+                observation=observation,
+                correspondence=correspondence,
+                geometry=geometry,
+            )
+        )
+
+        normalized = (
+            AtlasCanonicalHeadResidualDetailScaleNormalizer
+            .normalize(
+                observation=observation,
+                image_reference_span_px=(
+                    spans.image_reference_span_px
+                ),
+                canonical_reference_span=(
+                    spans.canonical_reference_span
+                ),
+            )
+        )
+
+        amplitude = (
+            AtlasCanonicalHeadSurfaceResidualDetailAmplitudeResolver
+            .resolve(
+                observation=normalized.observation,
+                correspondence=correspondence,
+            )
+        )
+
+        maximum = (
+            spans.canonical_reference_span
+            * PHASE8_10_HYBRID_MAXIMUM_AMPLITUDE_FRACTION
+        )
+
+        policy = (
+            AtlasCanonicalHeadResidualDetailAmplitudePolicy
+            .apply(
+                amplitude_result=amplitude,
+                maximum_absolute_amplitude=maximum,
+            )
+        )
+
+        active_mask = (
+            amplitude.canonical_confidence > 0.0
+        )
+
+        active_count = int(
+            np.count_nonzero(
+                active_mask
+            )
+        )
+
+        clipped_mask = (
+            np.abs(
+                policy.weighted_amplitude
+            )
+            > maximum + 1e-15
+        ) & active_mask
+
+        clipped_count = int(
+            np.count_nonzero(
+                clipped_mask
+            )
+        )
+
+        assert clipped_count == (
+            expected_clipped_by_case[
+                case_id
+            ]
+        )
+
+        assert float(
+            np.max(
+                np.abs(
+                    policy.bounded_amplitude
+                )
+            )
+        ) <= maximum + 1e-12
+
+        np.testing.assert_allclose(
+            policy.weighted_amplitude,
+            (
+                amplitude.canonical_scalar_detail
+                * amplitude.canonical_confidence
+            ),
+        )
+
+        assert (
+            policy.maximum_absolute_amplitude
+            == pytest.approx(
+                maximum
+            )
+        )
+
+        assert (
+            policy.mapped_vertex_count
+            == amplitude.mapped_vertex_count
+        )
+
+        assert (
+            policy.connectivity_signature
+            == amplitude.connectivity_signature
+        )
+
+        aggregate_active += active_count
+        aggregate_clipped += clipped_count
+
+    assert aggregate_active == 1268
+    assert aggregate_clipped == 1
+
+    assert (
+        100.0
+        * aggregate_clipped
+        / aggregate_active
+    ) == pytest.approx(
+        0.07886435331230283
+    )

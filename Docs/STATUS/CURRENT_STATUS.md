@@ -10426,3 +10426,136 @@ Exact next Phase 8.10 task:
 
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Checklist Item 7 Real Bounded Amplitude Policy — VERIFIED
+
+The original Phase 8.10 `Exact next Phase 8.10 work` checklist item 7,
+`apply the bounded amplitude policy`, is now verified against the six real
+DSINE benchmark views after canonical surface correspondence, reference-span
+normalization and surface-to-vertex amplitude resolution.
+
+Real limit-selection evidence:
+- no fixture amplitude such as `0.15` or `1.0` is reused as a real benchmark
+  limit;
+- no undocumented physical-millimeter interpretation is introduced;
+- the real six-view weighted-amplitude distribution was measured before
+  selecting the bound;
+- aggregate active weighted-amplitude count: `1268`;
+- aggregate absolute maximum:
+  `0.0034050619741867834`;
+- aggregate percentiles:
+  - P50 `4.487979690317351e-05`;
+  - P90 `0.0003373176398647061`;
+  - P95 `0.0005265063861895659`;
+  - P99 `0.0009101237261288755`;
+  - P99.5 `0.001220223767185876`.
+
+Sensitivity audit:
+- `0.5%` canonical reference span:
+  `20 / 1268` clipped, `1.5773%`;
+- `1.0%` canonical reference span:
+  `1 / 1268` clipped, `0.0789%`;
+- `1.5%` canonical reference span:
+  `1 / 1268` clipped, `0.0789%`;
+- `2.0%` canonical reference span:
+  `1 / 1268` clipped, `0.0789%`.
+
+Selected Phase 8.10 hybrid bounded-detail rule:
+- `maximum_absolute_amplitude =
+  canonical_reference_span * 0.01`;
+- the `1.0%` rule is the lowest tested non-aggressive bound that preserves all
+  but the single measured extreme tail vertex;
+- increasing the tested limit to `1.5%` or `2.0%` preserves no additional
+  active vertex;
+- the rule remains canonical model-space relative and is not claimed as a
+  physical-millimeter production limit.
+
+Real six-view policy result:
+- `subject_01_front`: `0` clipped;
+- `subject_01_side_a`: `0` clipped;
+- `subject_01_side_b`: `0` clipped;
+- `subject_02_front`: `0` clipped;
+- `subject_02_side_a`: `1` clipped;
+- `subject_02_side_b`: `0` clipped;
+- aggregate active weighted amplitudes: `1268`;
+- aggregate clipped amplitudes: `1`;
+- aggregate clipping ratio:
+  `0.07886435331230283%`.
+
+Policy semantics preserved:
+- confidence weighting occurs only in
+  `AtlasCanonicalHeadResidualDetailAmplitudePolicy`;
+- weighted amplitude equals raw canonical scalar detail multiplied by canonical
+  confidence;
+- zero confidence removes residual-detail contribution;
+- symmetric bounding is applied after confidence weighting;
+- bounded amplitudes do not exceed the selected maximum;
+- upstream canonical amplitude results are not mutated;
+- mapped vertex count is preserved;
+- connectivity signature is preserved.
+
+Real integration coverage:
+- extended
+  `Test/test_phase8_10_real_flame_surface_correspondence.py`;
+- real chain:
+  DSINE normal evidence
+  -> residual-detail observation
+  -> 105 FLAME barycentric surface correspondences
+  -> correspondence-derived reference spans
+  -> canonical scale normalization
+  -> surface-to-vertex amplitude resolution
+  -> confidence weighting
+  -> bounded amplitude policy.
+
+Validation:
+- real six-view bounded-policy integration:
+  `5 passed, 7 warnings in 8.42s`;
+- related residual-detail/policy regression:
+  `53 passed, 7 warnings in 8.52s`;
+- broad canonical-head regression:
+  `610 passed, 7 warnings in 9.42s`;
+- full ATLAS regression:
+  `4887 passed, 7 warnings in 128.98s`;
+- scoped `git diff --check`:
+  clean.
+
+Warning note:
+- warnings are NumPy deprecation warnings emitted while loading the historical
+  FLAME pickle through `numpy.core.numeric`;
+- they do not alter the verified bounded-amplitude behavior and are not a
+  Phase 8.10 blocker.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — DONE;
+7. apply bounded amplitude policy — DONE;
+8. run view-to-canonical bridge — NEXT;
+9. record quantitative real hybrid-detail evidence — PENDING;
+10. close remaining benchmark evidence gaps — PENDING;
+11. perform architecture-class comparison — PENDING;
+12. issue final Phase 8 GO / HOLD / REJECT — PENDING;
+13. only explicit GO may authorize Phase 9 — PENDING.
+
+Architecture boundary:
+- this milestone selects a Phase 8.10 benchmark-relative bounded-detail rule;
+- it does not define a final physical-millimeter production displacement limit;
+- canonical normal projection is not yet run in this checklist milestone;
+- final geometry is not composed;
+- no hybrid GO / HOLD / REJECT decision is issued;
+- Phase 9 remains NOT AUTHORIZED.
+
+Exact next Phase 8.10 task:
+- checklist item 8;
+- run the existing view-to-canonical residual-detail bridge against the six
+  real normalized/corresponded observations using the verified `1.0%`
+  canonical-reference-span amplitude bound;
+- preserve visibility/projection boundaries;
+- then record the quantitative real hybrid-detail evidence required by
+  checklist item 9.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
