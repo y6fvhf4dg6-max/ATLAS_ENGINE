@@ -8528,3 +8528,66 @@ Original Phase 8.10 checklist status:
 Phase 8.10 remains `ACTIVE`.
 Phase 8 remains not yet LOCKED.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Checklist Item 11 Architecture-Class Comparison — VERIFIED
+
+The original Phase 8.10 checklist item 11,
+`perform architecture-class comparison`, is now verified.
+
+New comparison contract:
+- `CORE/atlas_canonical_head_benchmark_architecture_comparison.py`;
+- `AtlasCanonicalHeadBenchmarkArchitectureComparison`.
+
+Comparison boundary:
+- compares exactly the three required architecture classes:
+  `parametric_fixed_topology`,
+  `direct_neural_dense`,
+  `hybrid_canonical_detail`;
+- reuses verified Item 10 evidence-gap closure records;
+- does not fabricate numeric support scores;
+- does not fabricate a standalone hybrid candidate id;
+- does not create final candidate observations from incomplete evidence;
+- does not select a winner while evidence remains incomplete;
+- does not issue the final Phase 8 decision;
+- does not authorize Phase 9.
+
+Current comparison result:
+- FLAME 2023 Open is represented at candidate level as
+  `flame-2023-open / parametric_fixed_topology`;
+- its commercial model-license state is `ACCEPTABLE`, while unresolved
+  quality and policy evidence remains explicit;
+- PRNet is represented at candidate level as
+  `prnet / direct_neural_dense`;
+- its verified commercial-license, model-weight and dataset policy blockers
+  remain explicit;
+- Hybrid remains architecture-level evidence only;
+- no hybrid candidate id is fabricated;
+- the current DSINE dependency retains its verified non-commercial
+  policy blocker;
+- `selected_architecture_kind()` therefore returns `None`;
+- `comparison_complete_for_final_scoring()` is `False`.
+
+Validation:
+- focused architecture-comparison tests:
+  `4 passed in 0.03s`;
+- related benchmark regression:
+  `108 passed in 0.16s`.
+
+Original Phase 8.10 checklist status:
+1. run six real DSINE normal fields through field source — DONE;
+2. preserve explicit confidence separately — DONE;
+3. scalar-detail + confidence through image sampler — DONE;
+4. create real residual-detail observations — DONE;
+5. connect observations through correspondence — DONE;
+6. run canonical amplitude resolver — DONE;
+7. apply bounded amplitude policy — DONE;
+8. run view-to-canonical bridge — DONE;
+9. record quantitative real hybrid-detail evidence — DONE;
+10. close remaining benchmark evidence gaps — DONE;
+11. perform architecture-class comparison — DONE;
+12. issue final Phase 8 GO / HOLD / REJECT — NEXT;
+13. only explicit GO may authorize Phase 9 — PENDING.
+
+Phase 8.10 remains `ACTIVE`.
+Phase 8 remains not yet LOCKED.
+Phase 9 remains `NOT AUTHORIZED`.
