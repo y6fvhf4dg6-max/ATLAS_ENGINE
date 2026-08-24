@@ -12241,3 +12241,72 @@ Next exact Phase 8.10 task:
   IDs;
 - only then run the six DSINE residual-detail observations through the
   surface-to-vertex amplitude resolver and existing bounded-amplitude policy.
+
+
+## Phase 8.10 — Residual-Detail Scale Normalization Boundary — IMPLEMENTED
+
+The hybrid canonical-detail path now has an explicit provider-independent
+normalization boundary between image-space residual-detail measurements and
+canonical model-space amplitude.
+
+Problem resolved:
+- DSINE residual scalar-detail is produced by integrating image-space normal
+  gradients over pixel steps;
+- therefore the raw scalar-detail magnitude is resolution- and image-scale
+  dependent;
+- FLAME canonical geometry exists in a separate canonical model-space scale;
+- raw DSINE scalar-detail must not be interpreted directly as canonical vertex
+  displacement amplitude.
+
+Normalization rule:
+- `scale_factor = canonical_reference_span / image_reference_span_px`;
+- normalized canonical residual detail is
+  `image_space_scalar_detail * scale_factor`;
+- the image reference span and canonical reference span are explicit caller
+  inputs;
+- scaling both the image-space residual magnitude and the image reference span
+  by the same resolution factor leaves the normalized canonical residual detail
+  unchanged.
+
+Implementation:
+- added
+  `CORE/atlas_canonical_head_residual_detail_scale_normalizer.py`;
+- added
+  `AtlasCanonicalHeadResidualDetailScaleNormalizer`;
+- added immutable
+  `AtlasCanonicalHeadResidualDetailScaleNormalizationResult`;
+- observation identity, source-view identity, sample indices, normalized sample
+  coordinates and confidence are preserved;
+- confidence remains a separate channel and is not modified by scale
+  normalization;
+- source observations are not mutated;
+- invalid, non-finite or non-positive reference spans are rejected.
+
+Test:
+- `Test/test_canonical_head_residual_detail_scale_normalizer.py`
+
+Validation:
+- focused scale-normalizer tests: `13 passed in 0.05s`;
+- related residual-detail regression: `79 passed in 0.17s`;
+- broad canonical-head regression: `601 passed in 0.99s`;
+- full ATLAS regression: `4878 passed in 120.83s`.
+
+Architecture boundary:
+- this contract defines scale normalization only;
+- it does not select a physical millimeter amplitude limit;
+- it does not apply confidence weighting;
+- it does not perform barycentric surface-to-vertex resolution;
+- it does not perform normal projection or geometry composition;
+- no provider-specific FLAME or DSINE behavior is embedded;
+- no hybrid `GO / HOLD / REJECT` decision is issued;
+- Phase 9 remains `NOT AUTHORIZED`.
+
+Next exact Phase 8.10 task:
+- produce the six real residual-detail observations from the existing DSINE
+  normal evidence and MediaPipe landmark data;
+- select the verified 105 MediaPipe landmark samples required by the FLAME
+  barycentric embedding;
+- apply this scale-normalization boundary using an explicit per-view image
+  reference span and the corresponding canonical FLAME reference span;
+- then run the normalized observations through the existing canonical
+  surface-to-vertex amplitude resolver.
