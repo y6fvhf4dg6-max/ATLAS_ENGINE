@@ -8689,3 +8689,58 @@ Validation:
 
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD FLAME Quality Blocker Audit
+
+Post-HOLD audit verified the remaining FLAME quality-evidence boundary
+without fabricating support values and without adding a new blocker contract.
+
+Existing blocker representation is sufficient:
+- `AtlasCanonicalHeadBenchmarkGapClosureObservation.unresolved_quality_channels`
+  already derives every `PARTIAL` / `MISSING` quality channel;
+- `blocked_policy_channels` and `unresolved_policy_channels` separately
+  preserve policy blockers;
+- no additional CORE blocker field or contract is required.
+
+Verified remaining FLAME quality boundaries:
+- identity preservation: `PARTIAL`;
+- multi-view consistency: `MEASURED`;
+- silhouette / profile: `MISSING`;
+- head ratio: `MISSING`;
+- jaw / chin: `MISSING`;
+- nose projection: `MISSING`;
+- orbital / cheek volume: `MISSING`;
+- expression separation: `MISSING`;
+- pose separation: `PARTIAL`;
+- topology suitability: `DIRECT`;
+- physical suitability: `MISSING`;
+- Apple Silicon / runtime: `DIRECT`;
+- reproducibility: `DIRECT`.
+
+Audit conclusions:
+- silhouette/profile cannot be promoted from current evidence: the historical
+  FLAME fitting/projection/visible-boundary implementation exists in git
+  history, but no committed six-view fitted-mesh/camera artifact or benchmark
+  runner remains; the historical visibility stage was front-facing winding
+  only and did not provide occlusion-aware ground-truth silhouette evidence;
+- head-ratio evidence has no independent calibrated benchmark measurement in
+  the active Phase 8.10 evidence path; a simple landmark width/height ratio is
+  not treated as sufficient evidence;
+- jaw/chin, nose projection and orbital/cheek volume remain blocked by the
+  absence of appropriate metric 3D ground truth;
+- expression separation remains missing because all six held-out FLAME
+  observations use `expression_fixed_neutral=True`; there is no expression-
+  variation benchmark;
+- pose separation remains intentionally `PARTIAL`: held-out identity is locked
+  and only root pose plus weak-perspective camera are solved, but this is not
+  promoted beyond the verified evidence boundary;
+- physical suitability remains missing because no candidate-specific physical
+  representation observation exists; the Phase 8.9 gate requires calibrated
+  identity, silhouette and profile preservation supports rather than
+  printability alone;
+- `mediapipe_landmark_embedding.npz` provenance remains unresolved, so FLAME
+  dataset restrictions remain `UNRESOLVED`.
+
+No CORE change is justified by this audit.
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 9 remains `NOT AUTHORIZED`.
