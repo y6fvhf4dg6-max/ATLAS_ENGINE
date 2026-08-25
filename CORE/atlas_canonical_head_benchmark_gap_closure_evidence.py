@@ -23,8 +23,9 @@ class AtlasCanonicalHeadBenchmarkGapClosureEvidence:
             commercial_license_state="ACCEPTABLE",
             privacy_data_retention_state="ACCEPTABLE",
             model_weight_restrictions_state="ACCEPTABLE",
-            dataset_restrictions_state="UNRESOLVED",
+            dataset_restrictions_state="ACCEPTABLE",
             evidence_limitations=(
+                "BENCHMARK_MEDIAPIPE_EMBEDDING_PROVENANCE_UNRESOLVED",
                 "NO_METRIC_3D_GROUND_TRUTH",
                 "NO_EXPRESSION_VARIATION_BENCHMARK",
                 "NO_CANDIDATE_SPECIFIC_PHYSICAL_EVIDENCE",

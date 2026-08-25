@@ -13338,3 +13338,39 @@ Validation:
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD FLAME Evaluation-Only Embedding Policy Boundary
+
+The FLAME candidate policy boundary was corrected so that the
+`mediapipe_landmark_embedding.npz` benchmark artifact is not treated as a
+production/runtime dataset dependency.
+
+Verified boundary:
+- the embedding remains a Phase 8.10 benchmark/evaluation artifact;
+- its exact source-license provenance remains unresolved;
+- that unresolved provenance is preserved explicitly as
+  `BENCHMARK_MEDIAPIPE_EMBEDDING_PROVENANCE_UNRESOLVED`;
+- it is not promoted into a production dependency;
+- therefore FLAME candidate `dataset_restrictions_state` is now `ACCEPTABLE`;
+- `dataset_restrictions_state` is no longer present in FLAME
+  `unresolved_policy_channels`;
+- the general candidate policy gate was not weakened or changed;
+- PRNet and Hybrid policy states were not changed.
+
+This supersedes the earlier interpretation that unresolved provenance of the
+evaluation-only MediaPipe-to-FLAME embedding must itself keep the FLAME
+candidate production dataset-policy state `UNRESOLVED`.
+
+Validation:
+- focused FLAME gap-closure evidence: `6 passed in 0.03s`;
+- related Phase 8.10 policy/gap regression: `83 passed in 0.13s`;
+- scoped `git diff --check`: clean;
+- full regression: `5001 passed, 11 warnings in 133.82s`.
+
+Important decision boundary:
+- this removes one FLAME policy blocker only;
+- it does not fabricate missing quality support values;
+- remaining quality evidence gaps still prevent a candidate-level GO;
+- Phase 8 final decision therefore remains `HOLD / BLOCKED`;
+- Phase 8.10 remains `ACTIVE`;
+- Phase 9 remains `NOT AUTHORIZED`.

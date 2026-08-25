@@ -67,3 +67,19 @@ def test_flame_model_weight_restrictions_are_acceptable():
     )
 
     assert flame.model_weight_restrictions_state == "ACCEPTABLE"
+
+def test_flame_evaluation_only_embedding_does_not_block_candidate_dataset_policy():
+    flame = (
+        AtlasCanonicalHeadBenchmarkGapClosureEvidence
+        .flame_candidate()
+    )
+
+    assert flame.dataset_restrictions_state == "ACCEPTABLE"
+    assert (
+        "BENCHMARK_MEDIAPIPE_EMBEDDING_PROVENANCE_UNRESOLVED"
+        in flame.evidence_limitations
+    )
+    assert (
+        "dataset_restrictions_state"
+        not in flame.unresolved_policy_channels
+    )
