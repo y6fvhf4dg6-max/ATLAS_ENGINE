@@ -13208,3 +13208,33 @@ Validation:
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD Metric Rigid Alignment Boundary
+
+A provider-independent rigid 3D alignment boundary was added for the
+metric ground-truth evaluator.
+
+New contract:
+- `AtlasCanonicalHeadMetricRigidAlignment`;
+- solves rotation and translation from matched 3D point correspondences;
+- requires at least three correspondences;
+- preserves scale exactly at `1.0`;
+- rejects mismatched or non-finite point sets;
+- corrects improper reflection solutions;
+- does not mutate source or target point arrays.
+
+Important boundary:
+- this milestone does not estimate scale;
+- it does not perform ICP or nearest-surface correspondence;
+- it has not yet been applied to the HSRD-100 spike sample;
+- no scan-to-mesh distance or benchmark support score is claimed.
+
+Validation:
+- focused rigid-alignment tests:
+  `4 passed in 0.05s`;
+- related metric/evidence regression:
+  `73 passed in 0.16s`.
+
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
