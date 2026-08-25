@@ -13238,3 +13238,36 @@ Validation:
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD Point-to-Surface Metric Boundary
+
+A provider-independent exact point-to-triangle surface-distance boundary was
+added for the metric 3D ground-truth evaluator.
+
+New contract:
+- `AtlasCanonicalHeadMetricPointToSurfaceDistance`;
+- measures source-point distance to target triangle surfaces;
+- handles triangle interiors, edges and vertices;
+- returns per-point distances in millimetres;
+- reports global mean and maximum raw geometric error;
+- rejects non-finite source geometry and invalid target triangle indices.
+
+Important boundary:
+- this milestone is a raw geometric measurement layer only;
+- it does not perform rigid alignment internally;
+- it does not perform ICP or semantic correspondence;
+- it has not yet been applied to the real HSRD-100 spike sample;
+- no regional jaw/chin, nose or orbital/cheek metric is claimed yet;
+- no `[0,1]` benchmark support score is claimed;
+- the current exact implementation prioritizes correctness; real-mesh
+  performance/scalability remains a separate validation boundary.
+
+Validation:
+- focused point-to-surface tests:
+  `4 passed in 0.05s`;
+- related metric/evidence regression:
+  `77 passed in 0.18s`.
+
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
