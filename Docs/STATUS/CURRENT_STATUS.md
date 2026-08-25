@@ -11103,3 +11103,34 @@ Validation:
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD Metric Mesh Unit Normalization Boundary
+
+A provider-independent metric mesh unit-normalization boundary was added for
+metric 3D ground-truth evaluation.
+
+New contract:
+- `AtlasCanonicalHeadMetricMeshUnitNormalizer`;
+- accepts only explicit metric source units: `mm`, `cm`, `m`;
+- normalizes vertices into millimetres;
+- exposes the applied `scale_factor`;
+- preserves the source vertex array without mutation;
+- rejects unsupported units and non-finite geometry.
+
+Important boundary:
+- the normalizer never infers source units from geometry dimensions;
+- HSRD-100 `HSR0015-Body-035` has been inspected as a candidate metric-GT
+  spike sample, but its OBJ file contains no explicit unit declaration;
+- therefore HSRD source units are not yet promoted to verified evidence;
+- no silent `x1000` conversion is authorized;
+- no scan-to-mesh or support-score evidence is claimed by this milestone.
+
+Validation:
+- focused metric mesh unit-normalizer tests:
+  `7 passed in 0.05s`;
+- related metric-GT/evidence regression:
+  `69 passed in 0.14s`.
+
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
