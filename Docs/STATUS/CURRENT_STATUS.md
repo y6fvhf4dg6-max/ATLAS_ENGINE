@@ -11300,3 +11300,79 @@ Important decision boundary:
 - Phase 8 final decision therefore remains `HOLD / BLOCKED`;
 - Phase 8.10 remains `ACTIVE`;
 - Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — 25 Aug 2026 HSRD Metric-GT HOLD Closure
+
+The real HSRD-100 A03 metric ground-truth investigation was completed through
+the full 3/4 investigation branch and 4/4 HOLD-closure decision audit.
+
+Final scientific disposition:
+- A03 metric-GT branch:
+  `CLOSED_AS_INADMISSIBLE_ALIGNMENT`;
+- Step 3/4:
+  `COMPLETE_WITH_NEGATIVE_EVIDENCE`;
+- camera path:
+  `UNRESOLVED_GLOBAL_CONVENTION`;
+- metric admissibility firewall:
+  `INADMISSIBLE_ALIGNMENT`;
+- A03 evidence class:
+  `DIAGNOSTIC_NEGATIVE_EVIDENCE`;
+- A03 metric-GT claim:
+  `NOT_ADMISSIBLE`;
+- no strict-face millimetre error value was computed or claimed.
+
+Verified positive boundaries:
+- native metric units were explicitly normalized to millimetres;
+- the real HSRD GT scan and FLAME reconstruction were both available;
+- the official FLAME semantic `strict_face` evaluation support was fixed;
+- registration and evaluation supports were kept disjoint;
+- scale remained fixed at exactly `1.0`;
+- similarity alignment remained forbidden;
+- nonrigid alignment remained forbidden;
+- independent registration-stability methods agreed that the current rigid
+  transform was not admissible.
+
+Verified negative evidence:
+- no single globally validated HSRD camera convention was established;
+- region-balanced leave-one-region-out rigid registration was unstable:
+  maximum rotation delta `75.187773 deg`,
+  maximum translation delta `79.058976 mm`;
+- ICP-free closed-form translation anchors were also unstable:
+  pairwise median disagreement `48.761583 mm`,
+  pairwise maximum disagreement `125.909685 mm`;
+- therefore a unique, defensible scale-fixed rigid transform was not
+  established;
+- strict-face metric execution remained unauthorized.
+
+Important interpretation:
+- this HOLD does not prove that FLAME geometry is poor;
+- it proves that the current A03 evidence cannot support a defensible
+  FLAME-vs-GT strict-face millimetre error claim;
+- the metric firewall correctly prevented a false precision claim.
+
+Final decision:
+- Phase 8 final decision: `HOLD / BLOCKED`;
+- current HSRD HOLD evidence branch:
+  `EVIDENCE_COMPLETE_FOR_CURRENT_HOLD_BRANCH`;
+- Phase 9: `NOT AUTHORIZED / NOT STARTED`;
+- a new independently admissible metric-GT evidence route is required before
+  the Phase 8 GO gate can be reconsidered.
+
+Persistent evidence:
+- directory:
+  `/Users/Kubi/ATLAS_HSRD_SPIKE/EVIDENCE/phase8_10_hsrd_hold_2026-08-25/`;
+- verified evidence files: `110`;
+- manifest:
+  `SHA256SUMS.txt`;
+- manifest SHA256:
+  `fd652d4392fccbcc5f9c0b8cb84393f8ce8b43462aaddb8b443846ec2dfa2f51`;
+- A03 final disposition SHA256:
+  `b6924f00b8a9040cde3599a86ea3845ffae0908922b2704362151bc745e07d86`;
+- Phase 8 HOLD closure SHA256:
+  `57974f47c79ee79c8a625ab57d01ab326730f677b95f927893e6b2c6b79fc56a`.
+
+Repository boundary at closure:
+- safe pushed checkpoint before this documentation update:
+  `c9c40fa5b40829001733f44d8f7dde9254ccca7d`;
+- unrelated dirty working-tree files were not modified, staged or cleaned by
+  the HSRD HOLD investigation.
