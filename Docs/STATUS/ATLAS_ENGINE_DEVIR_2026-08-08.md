@@ -13142,3 +13142,38 @@ Audit conclusions:
 No CORE change is justified by this audit.
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 9 remains `NOT AUTHORIZED`.
+## Phase 8.10 — Post-HOLD Metric 3D Ground-Truth Evaluation Boundary
+
+Post-HOLD blocker reduction opened the provider-independent metric 3D
+ground-truth evaluation boundary required by the remaining FLAME quality gaps.
+
+New contract:
+- `AtlasCanonicalHeadMetricGroundTruthObservation`;
+- carries metric ground-truth mesh and reconstruction mesh separately;
+- requires physical units to be `mm`;
+- rejects non-finite vertex data and invalid triangle indices;
+- keeps benchmark source identity explicit through `source_id`;
+- distinguishes benchmark-only evaluation use from production dependency use
+  through `evaluation_use_only`;
+- records benchmark-source provenance separately through
+  `source_provenance_state = VERIFIED | UNRESOLVED`;
+- records benchmark evaluation-license state separately through
+  `evaluation_license_state = ACCEPTABLE | BLOCKED | UNRESOLVED`.
+
+Important boundary:
+- benchmark/evaluation dataset provenance and license state are not treated as
+  the candidate model's production/commercial dependency policy;
+- no external metric 3D dataset has yet been accepted or integrated;
+- no scan-to-mesh, alignment, regional error or support-score calculation is
+  claimed by this milestone;
+- no `[0,1]` benchmark support values are fabricated.
+
+Validation:
+- focused metric-GT observation tests:
+  `8 passed in 0.04s`;
+- related benchmark/evidence regression:
+  `62 passed in 0.13s`.
+
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
