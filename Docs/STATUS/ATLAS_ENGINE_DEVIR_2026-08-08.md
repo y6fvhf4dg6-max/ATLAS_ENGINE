@@ -13305,3 +13305,36 @@ Validation:
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD Region-Wise Raw Distance Metric Boundary
+
+A semantic region-wise raw metric aggregation boundary was added on top of
+the global point-to-surface distance metric.
+
+New contract:
+- `AtlasCanonicalHeadMetricRegionDistanceAggregate`;
+- consumes global per-sample distances in millimetres;
+- consumes explicit semantic region -> sample-index mappings;
+- normalizes semantic region names;
+- computes an independent `AtlasCanonicalHeadMetricDistanceAggregate`
+  for each named region;
+- rejects empty region maps, empty sample sets, non-integer indices and
+  out-of-bounds indices;
+- keeps region aggregates immutable through a read-only mapping.
+
+Important boundary:
+- semantic region membership must be supplied explicitly;
+- the contract does not infer facial regions from geometry;
+- it does not create correspondence or alignment;
+- it does not yet apply the metric to real HSRD-100 geometry;
+- it does not convert regional raw errors into `[0,1]` benchmark support.
+
+Validation:
+- focused region-wise metric tests:
+  `5 passed in 0.05s`;
+- related metric/evidence regression:
+  `89 passed in 0.22s`.
+
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
