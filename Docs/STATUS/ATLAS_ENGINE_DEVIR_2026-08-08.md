@@ -13271,3 +13271,37 @@ Validation:
 Phase 8 final decision remains `HOLD / BLOCKED`.
 Phase 8.10 remains `ACTIVE`.
 Phase 9 remains `NOT AUTHORIZED`.
+
+## Phase 8.10 — Post-HOLD Global Raw Distance Metric Boundary
+
+A provider-independent raw metric aggregation boundary was added on top of
+point-to-surface distance evidence.
+
+New contract:
+- `AtlasCanonicalHeadMetricDistanceAggregate`;
+- consumes nonnegative per-point distances in millimetres;
+- reports sample count;
+- reports mean distance;
+- reports median distance;
+- reports RMSE distance;
+- reports p95 distance;
+- reports maximum distance;
+- rejects empty, non-finite, negative or non-1D distance arrays;
+- does not mutate the source distance array.
+
+Important boundary:
+- this milestone aggregates raw geometric evidence only;
+- it does not perform alignment or surface correspondence itself;
+- it does not create semantic regional metrics yet;
+- it has not yet been applied to the real HSRD-100 spike sample;
+- it does not convert raw metric values into `[0,1]` benchmark support.
+
+Validation:
+- focused raw-distance aggregate tests:
+  `7 passed in 0.05s`;
+- related metric/evidence regression:
+  `84 passed in 0.21s`.
+
+Phase 8 final decision remains `HOLD / BLOCKED`.
+Phase 8.10 remains `ACTIVE`.
+Phase 9 remains `NOT AUTHORIZED`.
