@@ -13450,3 +13450,281 @@ Repository boundary at closure:
   `c9c40fa5b40829001733f44d8f7dde9254ccca7d`;
 - unrelated dirty working-tree files were not modified, staged or cleaned by
   the HSRD HOLD investigation.
+
+## Phase 8.10 — 26 Aug 2026 Personal Multiview Silhouette / Recovery Update
+
+This section records the previously unpersisted personal-multiview FLAME
+silhouette/profile investigation and the Step61AF recovery boundary.
+
+Phase state remains unchanged:
+
+- Phase 8 / Phase 8.10: `ACTIVE`;
+- Phase 8 final decision: `HOLD / BLOCKED`;
+- Phase 9: `NOT AUTHORIZED / NOT STARTED`;
+- none of the results below constitute a Phase 8 GO decision.
+
+### 1. Corrected image-coordinate contract
+
+The personal-multiview audit established that target normalized coordinates
+must be converted to pixels with `[W-1, H-1]`.
+
+The earlier `[W,H]` target scaling introduced an approximately `0.866 px`
+systematic mean delta across the 63 jaw observations.
+
+### 2. Static105 / silhouette correspondence boundary
+
+The 105 static MediaPipe-to-FLAME barycentric correspondences do not contain
+the 21 lower-jaw MediaPipe IDs used by the silhouette experiment.
+
+The static105 set also has zero overlap with the complete 36-point MediaPipe
+face oval.
+
+Therefore static105 does not directly constrain the jaw / visible silhouette
+contour.
+
+### 3. Corrected cross-side transferred-target evidence
+
+With the corrected pixel contract and transferred target-curve
+parameterization:
+
+- `turn_right` visible pointwise error:
+  `14.8749502083 px -> 5.74889830225 px`,
+  approximately `61.35%` reduction;
+- `turn_left` visible pointwise error:
+  `21.1256531544 px -> 8.10962204034 px`,
+  approximately `61.61%` reduction.
+
+This is silhouette/profile evidence only and is not identity proof.
+
+### 4. Normalized silhouette scale
+
+Diagonal-normalized transferred-target mean error:
+
+- `turn_right`: approximately `0.0029964`;
+- `turn_left`: approximately `0.00422684`.
+
+Static shared-identity coordinate RMSE was approximately `0.00260971`.
+
+### 5. Objective-energy audit
+
+Static105 objective:
+
+- coordinate count: `630`;
+- SSE: `0.004290672838`.
+
+Visible side-silhouette objective:
+
+- coordinate count: `50`;
+- unweighted SSE: `0.001081767111`;
+- unweighted silhouette/static energy ratio: `0.25212`.
+
+Derived silhouette residual weights:
+
+- 2.4% -> `0.0951925299576`;
+- 2.5% -> `0.0991588853725`;
+- 2.6% -> `0.1031255207874`;
+- 2.7% -> `0.1070915962023`;
+- 2.8% -> `0.1110579516172`;
+- 3.0% -> `0.1189906624470`;
+- 3.5% -> `0.1388224395215`;
+- 4.0% -> `0.1586542165960`;
+- 5.0% -> `0.198317770745`;
+- 10.0% -> `0.396635541491`.
+
+### 6. Silhouette-weight candidate sweep
+
+| Energy | Identity L2 | Bound hits | Front px | Right px | Left px | Right transfer | Left transfer | 3-view dynamic |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0% | 12.660953 | - | 10.081836 | 14.874950 | 21.125653 | 5.748898 | 8.109622 | 44.657495 |
+| 2.4% | 13.494390 | 6 | 10.159214 | 11.853075 | 17.132544 | 4.467208 | 7.609798 | 35.305151 |
+| 2.5% | 13.546543 | 6 | 10.240553 | 11.796885 | 17.028959 | 4.460669 | 7.601278 | 35.088429 |
+| 2.6% | 13.598742 | 6 | 10.322652 | 11.742466 | 16.928821 | 4.454447 | 7.593379 | 34.878950 |
+| 2.7% | 13.649544 | 7 | 10.403375 | 11.689790 | 16.833018 | 4.448618 | 7.586214 | 34.677250 |
+| 2.8% | 13.699676 | 7 | 10.483471 | 11.638790 | 16.740851 | 4.443130 | 7.579623 | 34.482500 |
+| 3.0% | 13.797590 | 8 | 10.656342 | 11.550107 | 16.574997 | 4.433134 | 7.567609 | 34.135362 |
+| 3.5% | 14.024314 | 7 | 11.157368 | 11.397306 | 16.263528 | 4.414511 | 7.545906 | 33.493117 |
+| 4.0% | 14.196729 | 9 | 11.332241 | 11.306038 | 16.016323 | 4.389005 | 7.507306 | 33.065063 |
+| 5.0% | 14.510363 | 10 | 11.597580 | 11.173570 | 15.616450 | 4.367959 | 7.449340 | 32.355438 |
+| 10.0% | 15.928964 | 12 | 12.247499 | 10.994083 | 14.718174 | 4.618289 | 7.438853 | 30.020194 |
+
+Observed trade-off:
+
+- side-profile and raw 3-view dynamic error improve as silhouette energy rises;
+- identity L2 and front-view error degrade;
+- no scalar mathematical optimum was established;
+- 3.5% and above are increasingly profile-biased.
+
+### 7. Preferred local candidate
+
+The preferred local conservative silhouette-energy candidate is `2.5%`.
+
+This selection is only the preferred candidate for the next
+identity-preservation audit.
+
+It is explicitly:
+
+- not a Phase 8 GO;
+- not identity-preservation proof;
+- not a mathematically unique knee.
+
+The 2.4% candidate has slightly better identity/front metrics and slightly
+weaker profile correction.
+
+### 8. Silhouette-objective architecture
+
+The verified candidate architecture uses:
+
+- static105 reprojection residuals;
+- visible side-silhouette residuals only for `turn_right` and `turn_left`;
+- identity regularization;
+- front silhouette excluded from the optimization objective;
+- weak-perspective camera analytically re-solved from static105 only;
+- silhouette residual does not influence the camera solve;
+- per-view root poses fixed from Step22;
+- neutral expression;
+- active identity component count `90`;
+- identity bounds `±3`;
+- regularization weight `1e-5`.
+
+### 9. Step21 / Step22 state boundary
+
+Step21 and Step22 shared identity parameter vectors were exactly equal.
+
+Their per-view root poses differed.
+
+A previous Step61J7/J8 audit caught an early candidate using Step21 poses.
+Subsequent clean silhouette experiments used Step22 poses.
+
+### 10. Step22 baseline evidence
+
+Recorded Step22 baseline metrics:
+
+- identity L2: `12.6609528884`;
+- front visible: `10.0818356599 px`;
+- turn_right visible: `14.8749502083 px`;
+- turn_left visible: `21.1256531544 px`;
+- turn_right transferred-target: `5.74889830225 px`;
+- turn_left transferred-target: `8.10962204034 px`;
+- 3-view dynamic raw: `44.65749537595`.
+
+### 11. Step61AF temporary-state loss
+
+During the identity-preservation pre-audit it was discovered that critical
+historical experiment state previously held only in `/tmp` was no longer
+present.
+
+Missing temporary state includes the expected:
+
+- Step22 pose-convergence NPZ;
+- 2.5% candidate NPZ / JSON;
+- Step11 initializer NPZ;
+- temporary personal-multiview landmark working directory;
+- several ad-hoc experiment scripts.
+
+This is a reproducibility/evidence loss, not a loss of the ATLAS repository.
+
+### 12. Python bytecode recovery
+
+Persistent Python cache remnants were recovered for the 2.4% and 2.6%
+candidate scripts.
+
+Python 3.9.6 disassembly of the 2.4% bytecode recovered the experiment
+orchestration, including:
+
+- Step22 NPZ as the direct starting state;
+- active identity count `90`;
+- identity parameter limit `±3.0`;
+- regularization weight `1e-5`;
+- `scipy.optimize.least_squares`, method `trf`;
+- maximum function evaluations `60`;
+- `ftol = xtol = gtol = 1e-10`;
+- fixed Step22 root poses;
+- neutral expression;
+- static105-only analytic camera solve;
+- side-only silhouette residual;
+- `[image_width-1, image_height-1]` pixel scaling;
+- 21 MediaPipe lower-jaw source IDs;
+- expected FLAME dynamic-contour count `17`;
+- exact 2.4% residual weight `0.0951925299576`.
+
+Recovered view IDs:
+
+- front: `0B54D8DA-6E72-4E5F-9850-DC6250CAE81F`;
+- turn_right: `4E2C4BF5-6BB5-456A-8B98-C79B46CA0EC3`;
+- turn_left: `7995EE35-F4AA-48DD-85B0-E83985291297`.
+
+The cached scripts also confirmed that historical output/banner names could
+remain `5%-ENERGY` even when the actual candidate weight differed. Candidate
+identity state and unique output provenance therefore take precedence over the
+legacy banner text.
+
+### 13. Recovery searches completed
+
+No exact Step22 numerical state was recovered from the searched:
+
+- current `/tmp`;
+- Git history / committed FLAME orchestration source;
+- `.zsh_history`;
+- `.zsh_sessions`;
+- Spotlight filename search;
+- available local Time Machine snapshots;
+- ordinary readable `/Users/Kubi/Library` content;
+- broader Python-cache reference search;
+- persistent filesystem search for the recovered three view IDs.
+
+These searches do not prove that the original portrait photographs are lost.
+They establish that the searched locations did not expose the required
+temporary Step22 / landmark experiment state.
+
+### 14. No-guess recovery rule
+
+The historical Step22 identity vector and per-view pose state must not be
+approximated or fabricated.
+
+If exact state cannot be recovered, the valid path is a new, explicitly
+labelled reproducibility run from verified source inputs.
+
+Only the personal-multiview Step22-to-silhouette-candidate chain would need
+reconstruction; Phase 8 and the ATLAS project are not restarted from scratch.
+
+### 15. Persistent experiment-state rule
+
+Effective 26 Aug 2026:
+
+A critical experiment artefact or intermediate state that becomes an input to
+a later experiment must never have its only copy in `/tmp`.
+
+For meaningful validated state:
+
+- critical NPZ / JSON / equivalent state must be persisted;
+- provenance / manifest information must accompany it;
+- hashes must be recorded;
+- `/tmp` is scratch / diagnostic storage only;
+- repository and persistent-project writes remain controlled and deliberate.
+
+Exact next scientific task after persistence closure:
+
+`identity-preservation audit of the preferred 2.5% candidate versus the
+Step22 baseline and held-out evidence`, using recovered exact state if found,
+otherwise an explicitly labelled reproducibility run.
+
+Repository checkpoint at this documentation update:
+
+- branch: `main`;
+- HEAD before update:
+  `60948bb43a4e6ccfb7fd1957aadce272c4b8b347`;
+- origin/main before update:
+  `60948bb43a4e6ccfb7fd1957aadce272c4b8b347`;
+- unrelated dirty working-tree files were not modified, staged or cleaned by
+  this documentation operation.
+
+Persistent evidence for this update:
+
+- directory:
+  `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/`;
+- evidence file:
+  `PHASE8_10_PERSONAL_MULTIVIEW_SILHOUETTE_RECOVERY_EVIDENCE.md`;
+- evidence SHA256:
+  `b51a5b3796a58703d50078990faaa97043672512be7adeac94d889a96fceae57`;
+- manifest:
+  `SHA256SUMS.txt`.
