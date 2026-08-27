@@ -15969,3 +15969,331 @@ Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
   scoped `git diff --check`: `EXIT=0`.
 - Phase 8 final decision remains undecided.
 - Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM10_METRIC_GROUND_TRUTH_RESEARCH_AUGMENTATION_APPROVED_2026_08_27
+
+### Status
+
+`APPROVED / LOCKED AS ITEM-10 RESEARCH AUGMENTATION`
+
+The existing Main Checklist Item 10 structure remains numbered `10.1` through
+`10.15`. No new roadmap branch or standalone 10.16+ subphase is introduced by
+this augmentation.
+
+The purpose of this update is to strengthen the existing Metric Ground-Truth
+Layer using the completed university, benchmark, metrology and engineering
+research before Item 10.1 execution begins.
+
+### Research basis
+
+The augmentation was informed by open academic / technical evidence including:
+
+- Carnegie Mellon University facial reconstruction / scan-ground-truth work;
+- ETH Zurich high-fidelity facial capture research;
+- MIT, Stanford, Cambridge and Oxford work on monocular ambiguity,
+  reconstruction supervision, correspondence and shape/pose separation;
+- NoW metric and non-metric evaluation protocols;
+- REALY region-aware 3D face reconstruction evaluation;
+- TUM NeRSemble surface-distance and normal-consistency evaluation;
+- NIST metrological traceability guidance;
+- BIPM / VIM definitions for accuracy, trueness, precision and uncertainty;
+- DICOM metric coordinate / spacing conventions;
+- structured-light, stereophotogrammetry, optical/laser and CT/CBCT
+  validation literature;
+- implementation caution evidence from ICP / registration engineering practice.
+
+Forum / issue-tracker evidence remains engineering caution only and is NOT
+promoted to academic or metrological ground truth.
+
+### Approved strengthening of Item 10.1 — Ground-Truth Source Qualification
+
+Retain the existing source-qualification fields and additionally distinguish:
+
+- acquisition modality;
+- raw sensor-derived surface;
+- registered sensor-derived surface;
+- model-fitted-to-scan geometry;
+- generated or inferred geometry;
+- capture pose and expression;
+- subject-match state;
+- capture-session relation;
+- GT surface admissibility / strength.
+
+A fitted or generated mesh MUST NOT be silently promoted to raw sensor ground
+truth.
+
+### Approved strengthening of Item 10.2 — Unit Certainty
+
+Retain the no-inferred-unit rule.
+
+Additionally distinguish:
+
+- unit value;
+- unit source / provenance;
+- format-standard-defined units;
+- metadata-declared units;
+- calibration-derived units;
+- unresolved units.
+
+Declared `mm` MUST NOT automatically be equated with metrological traceability.
+
+### Approved strengthening of Item 10.3 — Scale Calibration
+
+Additionally record where evidence permits:
+
+- calibration-reference identity;
+- known reference dimension;
+- reference uncertainty;
+- calibration state / date;
+- scale-transform provenance;
+- whether scale was measured, declared, optimized or inferred;
+- scale uncertainty propagation.
+
+Similarity-alignment scale MUST NOT be relabelled as physical scanner
+calibration.
+
+### Approved strengthening of Item 10.4 — Coordinate-System Contract
+
+Additionally record:
+
+- source coordinate frame;
+- target / evaluation coordinate frame;
+- transform provenance;
+- transform order;
+- axis permutation;
+- reflection application;
+- canonical-pose transform;
+- round-trip / invertibility checks where applicable.
+
+Known metric units do NOT imply a known coordinate convention.
+
+### Approved strengthening of Item 10.5 — Rigid Alignment
+
+Metric claims require scale-fixed alignment unless the claim is explicitly
+classified as non-metric.
+
+Additionally audit:
+
+- alignment admissibility;
+- anchor sufficiency;
+- initialization;
+- reflection state;
+- ICP refinement state;
+- multiple-initialization sensitivity;
+- anchor-subset sensitivity;
+- solver / transform stability;
+- ICP versus ICP-free agreement where appropriate.
+
+A mathematically computable transform is not automatically an admissible
+metric transform.
+
+### Approved strengthening of Item 10.6 — Alignment Landmark Independence
+
+Additionally record:
+
+- alignment features;
+- evaluation features;
+- feature overlap;
+- alignment regions;
+- evaluation regions;
+- region overlap;
+- evaluation-induced alignment-bias / leakage risk.
+
+An evaluation region MUST NOT obtain an artificially favorable result because
+the same region was used to optimize registration without that dependency being
+made explicit.
+
+### Approved strengthening of Item 10.7 — Surface Correspondence
+
+Retain closest-point, barycentric and bidirectional capabilities while keeping
+their claim boundaries separate.
+
+Correspondence evidence classes may distinguish:
+
+- dense anatomical correspondence;
+- verified semantic barycentric correspondence;
+- sparse landmark correspondence;
+- geometric closest-point correspondence;
+- unresolved correspondence.
+
+Geometric nearest-point correspondence MUST NOT be called anatomical homology.
+
+Also record where applicable:
+
+- source / target sampling density;
+- resampling method;
+- area weighting;
+- correspondence direction;
+- density-normalization assumptions.
+
+### Approved strengthening of Item 10.8 — Global Metric Error
+
+Retain mean, median, RMS, P95, maximum / outlier and coverage.
+
+Additionally support where legitimate:
+
+- GT-to-prediction direction;
+- prediction-to-GT direction;
+- symmetric / bidirectional aggregate;
+- valid correspondence count;
+- evaluation coverage denominator;
+- missing-surface fraction;
+- normal-orientation / angular discrepancy.
+
+A symmetric metric may be reported only when both directions are admissible.
+
+### Approved strengthening of Item 10.9 — Region-Wise Metric Error
+
+For every facial region additionally track where applicable:
+
+- region-definition origin;
+- GT region mapping;
+- prediction region mapping;
+- correspondence evidence class;
+- valid sample count;
+- coverage ratio;
+- region-alignment overlap;
+- expression compatibility;
+- posture compatibility;
+- regional metric admissibility.
+
+Item 8 H2 barycentric-anchor-supported nose footprints remain bounded mappings
+and MUST NOT be promoted to dense anatomical metric ground truth.
+
+### Approved strengthening of Item 10.10 — Measurement Uncertainty
+
+Explicitly introduce the concept of a `GT uncertainty floor`.
+
+Where evidence permits, uncertainty sources remain separable:
+
+- acquisition / scanner;
+- calibration;
+- segmentation;
+- landmark localization;
+- alignment;
+- correspondence;
+- sampling;
+- expression / posture mismatch;
+- prediction / reconstruction;
+- repeat capture.
+
+No numerical uncertainty component may be fabricated when evidence is absent.
+
+A reconstruction-to-GT difference smaller than or comparable to the GT
+uncertainty floor MUST NOT be overclaimed as precisely known anatomical error.
+
+### Approved strengthening of Item 10.11 — Repeat Capture / Repeatability
+
+Distinguish where datasets permit:
+
+- repeated sensor acquisition;
+- repeated preprocessing;
+- repeated reconstruction;
+- repeated registration / evaluation;
+- intra-run repeatability;
+- inter-run repeatability;
+- inter-capture repeatability;
+- inter-operator repeatability where relevant.
+
+### Item 10.12 — Trueness vs Precision
+
+Existing structure retained.
+
+Accuracy, trueness and precision remain separate concepts.
+Repeatability MUST NOT be relabelled as accuracy.
+
+### Approved strengthening of Item 10.13 — Ground-Truth Leakage Audit
+
+In addition to fitting, tuning and model-selection use, audit:
+
+- subject / training overlap;
+- validation overlap;
+- registration leakage;
+- correspondence leakage;
+- evaluation-region leakage;
+- post-hoc region selection;
+- repeated benchmark adaptation where applicable.
+
+Evaluation GT MUST remain independent from training / tuning / registration
+claims unless the dependency is explicitly classified.
+
+### Approved strengthening of Item 10.14 — Dataset Coverage
+
+Additionally record where legitimately known:
+
+- same-subject confirmation;
+- same-session versus cross-session relation;
+- scan expression;
+- image expression;
+- expression compatibility;
+- scan posture;
+- image / head pose;
+- posture / gravity compatibility;
+- camera-calibration availability;
+- raw-scan availability;
+- source-image / multiview availability;
+- valid facial-surface coverage;
+- missing surface regions;
+- failure / exclusion count.
+
+Demographic or phenotypic attributes MUST NOT be inferred from images.
+
+### Approved strengthening of Item 10.15 — Item 10 Closure
+
+Closure remains claim-specific rather than being reduced to one global metric.
+
+For every intended metric claim, evaluate the prerequisite state of:
+
+- GT admissibility;
+- unit certainty;
+- scale / traceability;
+- coordinate-system certainty;
+- alignment admissibility;
+- correspondence admissibility;
+- uncertainty;
+- coverage;
+- leakage.
+
+Permitted evidence states remain:
+
+- `supported`;
+- `partial`;
+- `missing`;
+- `blocked`.
+
+A global metric result MUST NOT compensate for an unresolved prerequisite of a
+material regional claim.
+
+Unresolved units, inadmissible alignment, unverified correspondence or
+unqualified GT remain explicit blockers to the corresponding millimetre /
+anatomical claim.
+
+### Cross-cutting commercial / scientific boundary
+
+This augmentation is intended to support production-quality decisions, not to
+turn ATLAS into an academic exercise.
+
+Metric evidence is valuable when it improves:
+
+- identity-preserving reconstruction decisions;
+- automatic acceptance / review routing;
+- detection of region-specific likeness risk;
+- reduction of avoidable manual correction;
+- reproducible physical-product validation;
+- defensible technical and commercial claims.
+
+Research-dataset usability and commercial-production dependency remain separate
+license decisions.
+
+A research dataset or model that permits evaluation MUST NOT automatically be
+treated as commercially usable training data, production dependency or
+redistributable asset.
+
+### Phase boundary
+
+- Main Checklist Item 9 remains closed as `BOUNDED_PASS`.
+- Item 10 execution has NOT yet started by this documentation update.
+- The next execution target remains `10.1 — Ground-Truth Source Qualification`.
+- Phase 8 final decision remains undecided.
+- Phase 8 `GO + LOCK` is NOT established.
+- Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
