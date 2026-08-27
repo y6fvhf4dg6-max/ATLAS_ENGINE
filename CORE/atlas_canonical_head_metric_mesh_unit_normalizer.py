@@ -14,6 +14,10 @@ class AtlasCanonicalHeadMetricMeshUnitNormalizationResult:
     source_units: str
     target_units: str
     scale_factor: float
+    unit_provenance: str
+    unit_provenance_reference: str
+    unit_transform_kind: str
+    metrological_traceability_established: bool
 
     def __post_init__(self) -> None:
         vertices = np.asarray(
@@ -88,6 +92,67 @@ class AtlasCanonicalHeadMetricMeshUnitNormalizationResult:
             scale_factor,
         )
 
+        unit_provenance = str(
+            self.unit_provenance
+        ).strip().upper()
+
+        if unit_provenance not in (
+            "FORMAT_STANDARD_DEFINED",
+            "METADATA_DECLARED",
+            "CALIBRATION_DERIVED",
+        ):
+            raise ValueError(
+                "unit_provenance must be one of "
+                "('FORMAT_STANDARD_DEFINED', 'METADATA_DECLARED', "
+                "'CALIBRATION_DERIVED')."
+            )
+
+        unit_provenance_reference = str(
+            self.unit_provenance_reference
+        ).strip()
+
+        if (
+            not unit_provenance_reference
+            or unit_provenance_reference.upper() == "UNRESOLVED"
+        ):
+            raise ValueError(
+                "unit_provenance_reference must be resolved."
+            )
+
+        unit_transform_kind = str(
+            self.unit_transform_kind
+        ).strip().upper()
+
+        if unit_transform_kind != "EXPLICIT_METRIC_UNIT_CONVERSION":
+            raise ValueError(
+                "unit_transform_kind must be "
+                "'EXPLICIT_METRIC_UNIT_CONVERSION'."
+            )
+
+        if not isinstance(
+            self.metrological_traceability_established,
+            bool,
+        ):
+            raise TypeError(
+                "metrological_traceability_established must be boolean."
+            )
+
+        object.__setattr__(
+            self,
+            "unit_provenance",
+            unit_provenance,
+        )
+        object.__setattr__(
+            self,
+            "unit_provenance_reference",
+            unit_provenance_reference,
+        )
+        object.__setattr__(
+            self,
+            "unit_transform_kind",
+            unit_transform_kind,
+        )
+
 
 class AtlasCanonicalHeadMetricMeshUnitNormalizer:
     SCALE_TO_MM = {
@@ -102,6 +167,8 @@ class AtlasCanonicalHeadMetricMeshUnitNormalizer:
         *,
         vertices: object,
         source_units: object,
+        unit_provenance: object,
+        unit_provenance_reference: object,
     ) -> AtlasCanonicalHeadMetricMeshUnitNormalizationResult:
         source_units = str(
             source_units
@@ -109,7 +176,35 @@ class AtlasCanonicalHeadMetricMeshUnitNormalizer:
 
         if source_units not in cls.SCALE_TO_MM:
             raise ValueError(
-                "source_units must be one of ('mm', 'cm', 'm')."
+                "source_units must be one of ('mm', 'cm', 'm'); "
+                "unresolved units must not be inferred."
+            )
+
+        normalized_unit_provenance = str(
+            unit_provenance
+        ).strip().upper()
+
+        if normalized_unit_provenance not in (
+            "FORMAT_STANDARD_DEFINED",
+            "METADATA_DECLARED",
+            "CALIBRATION_DERIVED",
+        ):
+            raise ValueError(
+                "unit_provenance must be one of "
+                "('FORMAT_STANDARD_DEFINED', 'METADATA_DECLARED', "
+                "'CALIBRATION_DERIVED')."
+            )
+
+        normalized_unit_provenance_reference = str(
+            unit_provenance_reference
+        ).strip()
+
+        if (
+            not normalized_unit_provenance_reference
+            or normalized_unit_provenance_reference.upper() == "UNRESOLVED"
+        ):
+            raise ValueError(
+                "unit_provenance_reference must be resolved."
             )
 
         array = np.asarray(
@@ -147,4 +242,8 @@ class AtlasCanonicalHeadMetricMeshUnitNormalizer:
             source_units=source_units,
             target_units="mm",
             scale_factor=scale_factor,
+            unit_provenance=normalized_unit_provenance,
+            unit_provenance_reference=normalized_unit_provenance_reference,
+            unit_transform_kind="EXPLICIT_METRIC_UNIT_CONVERSION",
+            metrological_traceability_established=False,
         )

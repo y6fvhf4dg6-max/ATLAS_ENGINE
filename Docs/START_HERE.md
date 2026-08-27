@@ -14301,3 +14301,55 @@ Closure boundary:
   `10.2 — Unit Certainty`;
 - Phase 8 final decision remains undecided;
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+## Phase 8 — Item 10.2 Unit Certainty — FINAL CLOSURE
+
+Marker:
+
+`PHASE8_ITEM10_2_UNIT_CERTAINTY_FINAL_CLOSURE_2026_08_27`
+
+Item 10.2 completed its dedicated Closure Challenge.
+
+Verified contract boundary:
+
+- permitted source units remain explicit `mm`, `cm`, or `m`;
+- unresolved units are rejected and MUST NOT be inferred;
+- no silent `x1000` path exists;
+- unit value and unit provenance are separate;
+- supported provenance classes:
+  - `FORMAT_STANDARD_DEFINED`;
+  - `METADATA_DECLARED`;
+  - `CALIBRATION_DERIVED`;
+- resolved unit provenance requires a resolved provenance reference;
+- every accepted conversion records:
+  - source units;
+  - target units;
+  - scale factor;
+  - unit provenance;
+  - provenance reference;
+  - `EXPLICIT_METRIC_UNIT_CONVERSION`;
+- declared `mm` does NOT establish metrological traceability by itself;
+- `metrological_traceability_established` remains false at this normalization
+  boundary.
+
+Validation:
+
+- Item 10.2 RED: `9 failed, 7 passed`;
+- focused GREEN: `16 passed in 0.05s`;
+- related regression: `75 passed in 0.14s`;
+- full regression: `5326 passed, 11 warnings in 137.28s`;
+- Closure Challenge focused recheck: `16 passed in 0.06s`;
+- target `git diff --check`: clean.
+
+Closure boundary:
+
+- Item 10.2 establishes explicit unit certainty and transformation provenance;
+- it does NOT establish physical scale calibration;
+- it does NOT establish scanner calibration;
+- it does NOT establish measurement uncertainty;
+- similarity/alignment scale is not treated as physical calibration;
+- Main Checklist Item 10 remains ACTIVE;
+- next checklist item after commit/push verification:
+  `10.3 — Scale Calibration`;
+- Phase 8 final decision remains undecided;
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
