@@ -12881,3 +12881,68 @@ Current global state remains:
   full regression `5056 passed, 11 warnings in 134.52s`.
 - Phase 8 final decision unchanged.
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+### PHASE8_ITEM9_4_NOSE_QUALITY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.4 — Nose Quality bounded evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_nose_quality_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_nose_quality_evidence.py`
+- Exact Item 9.4 criteria represented:
+  `bridge`, `dorsum_body`, `base`, `tip_projection`, `alar_width`,
+  `nasolabial_relation`, `profile_projection`, `bilateral_consistency`,
+  `cross_view_consistency`.
+- Evaluation-space boundary retained:
+  `2d_observation`, `canonical_model`, `metric_3d_ground_truth`,
+  `physical_output`.
+- Evidence statuses:
+  `bounded_model_space`, `bounded_negative_not_established`, `blocked`.
+- Evidence-origin states:
+  `directly_observed`, `multiview_constrained`, `model_prior_inferred`,
+  `generated_completion`, `unresolved`.
+- Verified Item 8 H2 mapping scope retained:
+  - `nose_bridge`: frozen 12-vertex ATLAS-derived barycentric-anchor-supported
+    FLAME topology footprint;
+  - `nose_body`: frozen 13-vertex ATLAS-derived barycentric-anchor-supported
+    FLAME topology footprint;
+  - `nose_base`: frozen 6-vertex ATLAS-derived barycentric-anchor-supported
+    FLAME topology footprint.
+- These footprints are not dense anatomical segmentations and are not
+  provider-authored finer nose regions.
+- Item 9.4 bounded classification:
+  - bridge: `BOUNDED_MODEL_SPACE`;
+  - dorsum/body: `BOUNDED_NEGATIVE_NOT_ESTABLISHED`;
+  - base: `BOUNDED_MODEL_SPACE`;
+  - tip projection: `BLOCKED`;
+  - alar width: `BLOCKED`;
+  - nasolabial relation: `BLOCKED`;
+  - profile projection: `BLOCKED`;
+  - bilateral consistency: `BLOCKED`;
+  - cross-view consistency: `BOUNDED_NEGATIVE_NOT_ESTABLISHED`.
+- Mandatory retained failure evidence:
+  `nose_body` observation-space degradation occurs in `3/3` held-out pose views.
+- H2 further establishes that non-zero candidate-vs-baseline canonical-model
+  geometry change is present on the frozen `nose_body` footprint in all three
+  held-out cases; the H1 effect therefore cannot be reduced to analytic-camera
+  / reprojection variation alone.
+- This does NOT establish true metric 3D anatomical nose degradation because
+  no independent metric 3D ground-truth correctness target exists for the
+  finer nose footprint.
+- Historical FLAME and PRNet benchmark coverage records
+  `nose_projection_support=MISSING`; synthetic candidate-gate fixture scores
+  are not treated as nose-quality evidence.
+- `nose_base` is not silently promoted to `nose_base_tip`.
+- Signed canonical-axis displacement is not relabelled as tip projection,
+  profile projection, alar width, bilateral consistency or anatomical
+  correctness.
+- No millimetre claim is made.
+- No global nose-quality PASS is claimed.
+- No acceptance threshold, confidence score, Phase 8 decision or Phase 9
+  authorization is introduced by this contract.
+- Verification:
+  focused `19 passed in 0.03s`;
+  related canonical-head regression `792 passed, 2 warnings in 4.17s`;
+  full regression `5075 passed, 11 warnings in 135.29s`.
+- Phase 8 final decision unchanged.
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
