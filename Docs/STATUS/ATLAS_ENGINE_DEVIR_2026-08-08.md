@@ -18636,3 +18636,66 @@ This still does NOT establish poor FLAME geometry.
 - Phase 8 final decision remains undecided;
 - Phase 8 `GO + LOCK` is NOT established;
 - Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## Phase 8 — Item 10.1 Ground-Truth Source Qualification — FINAL CLOSURE
+
+Marker:
+
+`PHASE8_ITEM10_1_GROUND_TRUTH_SOURCE_QUALIFICATION_FINAL_CLOSURE_2026_08_27`
+
+Item 10.1 completed a dedicated Closure Challenge after the earlier V2
+implementation checkpoint.
+
+Final verified contract coverage:
+
+- acquisition modality;
+- acquisition system;
+- acquisition manufacturer;
+- source identity;
+- subject identity;
+- metric unit state;
+- physical-resolution state and reference;
+- calibration state;
+- reconstruction modality;
+- reconstruction software and version;
+- capture date;
+- source-provenance state and reference;
+- evaluation-license state;
+- license reference and restrictions;
+- ground-truth surface origin;
+- ground-truth strength;
+- capture expression;
+- capture pose;
+- subject-match state;
+- capture-session relation;
+- ground-truth admissibility state.
+
+Final cross-field qualification invariants now reject:
+
+- incompatible ground-truth surface-origin / strength combinations;
+- VERIFIED physical resolution with an UNRESOLVED resolution reference;
+- VERIFIED provenance with an UNRESOLVED provenance reference;
+- ACCEPTABLE evaluation-license state with unresolved license evidence.
+
+Validation history for the final closure:
+
+- invariant RED: `8 failed, 36 passed`;
+- corrected focused GREEN: `44 passed in 0.06s`;
+- Closure Challenge re-run: all required 10.1 fields PRESENT;
+- required invariant checks PRESENT;
+- focused contract status: `44 passed in 0.06s`;
+- target `git diff --check`: clean.
+
+Closure boundary:
+
+- Item 10.1 qualifies source metadata and epistemic admissibility only;
+- it does NOT establish metric anatomical accuracy;
+- it does NOT establish valid HSRD A03 alignment;
+- it does NOT authorize millimetre error claims beyond separately verified
+  metric/unit evidence;
+- HSRD A03 remains blocked by its existing inadmissible-alignment boundary;
+- Main Checklist Item 10 remains ACTIVE;
+- next checklist item after commit/push verification:
+  `10.2 — Unit Certainty`;
+- Phase 8 final decision remains undecided;
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.

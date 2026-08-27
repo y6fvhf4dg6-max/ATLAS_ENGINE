@@ -280,6 +280,55 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             uppercase=False,
         )
 
+        compatible_strength_by_surface_origin = {
+            "RAW_SENSOR_DERIVED_SURFACE": "RAW_SENSOR",
+            "REGISTERED_SENSOR_DERIVED_SURFACE": "REGISTERED_SENSOR",
+            "RECONSTRUCTED_SENSOR_DERIVED_SURFACE": "DERIVED_SENSOR",
+            "MODEL_FITTED_TO_SCAN_GEOMETRY": "MODEL_FITTED",
+            "GENERATED_OR_INFERRED_GEOMETRY": "GENERATED_OR_INFERRED",
+        }
+
+        expected_strength = compatible_strength_by_surface_origin.get(
+            ground_truth_surface_origin
+        )
+
+        if (
+            expected_strength is not None
+            and ground_truth_strength_state != expected_strength
+        ):
+            raise ValueError(
+                "ground_truth_surface_origin and "
+                "ground_truth_strength_state are incompatible."
+            )
+
+        if (
+            physical_resolution_state == "VERIFIED"
+            and physical_resolution_reference.upper() == "UNRESOLVED"
+        ):
+            raise ValueError(
+                "verified physical_resolution_state requires a resolved "
+                "physical_resolution_reference."
+            )
+
+        if (
+            source_provenance_state == "VERIFIED"
+            and source_provenance_reference.upper() == "UNRESOLVED"
+        ):
+            raise ValueError(
+                "verified source_provenance_state requires a resolved "
+                "source_provenance_reference."
+            )
+
+        if evaluation_license_state == "ACCEPTABLE":
+            if (
+                license_reference.upper() == "UNRESOLVED"
+                or license_restrictions.upper() == "UNRESOLVED"
+            ):
+                raise ValueError(
+                    "acceptable evaluation_license_state requires resolved "
+                    "license_reference and license_restrictions."
+                )
+
         for field_name, value in (
             ("acquisition_modality", acquisition_modality),
             ("acquisition_system", acquisition_system),

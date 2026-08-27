@@ -35,7 +35,7 @@ def _observation(**overrides):
             (0, 1, 2),
         ),
         "source_provenance_state": "VERIFIED",
-        "evaluation_license_state": "ACCEPTABLE",
+        "evaluation_license_state": "UNRESOLVED",
         "evaluation_use_only": True,
         "acquisition_modality": "MULTIVIEW_IMAGE_CAPTURE",
         "acquisition_system": "UNRESOLVED",
@@ -70,7 +70,7 @@ def test_accepts_metric_ground_truth_observation():
     assert observation.source_id == "benchmark-source-a"
     assert observation.units == "mm"
     assert observation.source_provenance_state == "VERIFIED"
-    assert observation.evaluation_license_state == "ACCEPTABLE"
+    assert observation.evaluation_license_state == "UNRESOLVED"
     assert observation.evaluation_use_only is True
 
 
@@ -114,6 +114,8 @@ def test_normalizes_metric_ground_truth_policy_states():
     observation = _observation(
         source_provenance_state=" verified ",
         evaluation_license_state=" acceptable ",
+        license_reference="provider-license-reference",
+        license_restrictions="evaluation use permitted",
     )
 
     assert observation.source_provenance_state == "VERIFIED"
@@ -224,6 +226,8 @@ def test_allows_explicit_unresolved_complete_source_qualification():
         physical_resolution_state="UNRESOLVED",
         physical_resolution_reference="UNRESOLVED",
         calibration_state="UNRESOLVED",
+        source_provenance_state="UNRESOLVED",
+        evaluation_license_state="UNRESOLVED",
         source_provenance_reference="UNRESOLVED",
         license_reference="UNRESOLVED",
         license_restrictions="UNRESOLVED",
@@ -242,19 +246,93 @@ def test_allows_explicit_unresolved_complete_source_qualification():
 
 
 @pytest.mark.parametrize(
-    "surface_origin",
+    ("surface_origin", "strength_state"),
     (
-        "RAW_SENSOR_DERIVED_SURFACE",
-        "REGISTERED_SENSOR_DERIVED_SURFACE",
-        "RECONSTRUCTED_SENSOR_DERIVED_SURFACE",
-        "MODEL_FITTED_TO_SCAN_GEOMETRY",
-        "GENERATED_OR_INFERRED_GEOMETRY",
-        "UNRESOLVED",
+        ("RAW_SENSOR_DERIVED_SURFACE", "RAW_SENSOR"),
+        ("REGISTERED_SENSOR_DERIVED_SURFACE", "REGISTERED_SENSOR"),
+        ("RECONSTRUCTED_SENSOR_DERIVED_SURFACE", "DERIVED_SENSOR"),
+        ("MODEL_FITTED_TO_SCAN_GEOMETRY", "MODEL_FITTED"),
+        ("GENERATED_OR_INFERRED_GEOMETRY", "GENERATED_OR_INFERRED"),
+        ("UNRESOLVED", "UNRESOLVED"),
     ),
 )
-def test_accepts_explicit_ground_truth_surface_origin_classes(surface_origin):
+def test_accepts_explicit_ground_truth_surface_origin_classes(
+    surface_origin,
+    strength_state,
+):
     observation = _observation(
         ground_truth_surface_origin=surface_origin,
+        ground_truth_strength_state=strength_state,
     )
 
     assert observation.ground_truth_surface_origin == surface_origin
+    assert observation.ground_truth_strength_state == strength_state
+
+# === ITEM 10.1 CROSS-FIELD QUALIFICATION INVARIANTS ===
+
+
+@pytest.mark.parametrize(
+    ("surface_origin", "strength_state"),
+    (
+        ("GENERATED_OR_INFERRED_GEOMETRY", "RAW_SENSOR"),
+        ("MODEL_FITTED_TO_SCAN_GEOMETRY", "REGISTERED_SENSOR"),
+        ("RAW_SENSOR_DERIVED_SURFACE", "GENERATED_OR_INFERRED"),
+    ),
+)
+def test_rejects_incompatible_surface_origin_and_ground_truth_strength(
+    surface_origin,
+    strength_state,
+):
+    with pytest.raises(
+        ValueError,
+        match="ground_truth_surface_origin|ground_truth_strength_state",
+    ):
+        _observation(
+            ground_truth_surface_origin=surface_origin,
+            ground_truth_strength_state=strength_state,
+        )
+
+
+def test_verified_physical_resolution_requires_resolved_reference():
+    with pytest.raises(
+        ValueError,
+        match="physical_resolution",
+    ):
+        _observation(
+            physical_resolution_state="VERIFIED",
+            physical_resolution_reference="UNRESOLVED",
+        )
+
+
+def test_verified_source_provenance_requires_resolved_reference():
+    with pytest.raises(
+        ValueError,
+        match="source_provenance",
+    ):
+        _observation(
+            source_provenance_state="VERIFIED",
+            source_provenance_reference="UNRESOLVED",
+        )
+
+
+@pytest.mark.parametrize(
+    ("license_reference", "license_restrictions"),
+    (
+        ("UNRESOLVED", "evaluation only"),
+        ("provider-license-page", "UNRESOLVED"),
+        ("UNRESOLVED", "UNRESOLVED"),
+    ),
+)
+def test_acceptable_evaluation_license_requires_resolved_license_evidence(
+    license_reference,
+    license_restrictions,
+):
+    with pytest.raises(
+        ValueError,
+        match="license",
+    ):
+        _observation(
+            evaluation_license_state="ACCEPTABLE",
+            license_reference=license_reference,
+            license_restrictions=license_restrictions,
+        )
