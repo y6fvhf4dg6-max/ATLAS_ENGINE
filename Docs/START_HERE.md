@@ -13201,3 +13201,74 @@ Current global state remains:
   full regression `5144 passed, 11 warnings in 135.88s`.
 - Phase 8 final decision unchanged.
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+## PHASE8_ITEM9_9_HEAD_RATIO_ANTHROPOMETRIC_QUALITY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+Phase 8 / Main Checklist Item 9.9 — Head Ratios / Anthropometric Proportions
+evidence contract is implemented and verified.
+
+Contract:
+- CORE/atlas_canonical_head_head_ratio_anthropometric_quality_evidence.py
+- Test/test_canonical_head_head_ratio_anthropometric_quality_evidence.py
+
+Exact Item 9.9 criteria:
+- facial_width_height
+- bizygomatic_relation
+- bigonial_relation
+- interocular_relation
+- nose_width_height
+- mouth_width
+- upper_lower_facial_proportions
+- cranial_to_facial_relationship
+
+Evidence classification:
+- facial_width_height: BOUNDED_2D_OBSERVATION_ONLY
+- bizygomatic_relation: BLOCKED
+- bigonial_relation: BOUNDED_2D_OBSERVATION_ONLY
+- interocular_relation: BOUNDED_2D_OBSERVATION_ONLY
+- nose_width_height: BOUNDED_2D_OBSERVATION_ONLY; exact denominator semantics remain unresolved
+- mouth_width: BOUNDED_2D_OBSERVATION_ONLY
+- upper_lower_facial_proportions: BLOCKED
+- cranial_to_facial_relationship: BLOCKED
+
+Verified source boundary:
+- AtlasFrontalFaceMeasurer provides deterministic subject-specific normalized
+  two-dimensional frontal-landmark measurements for face width, face height,
+  eye spacing, nose width, nose length, mouth width, jaw width and forehead height.
+- These measurements support bounded 2D observation-space proportions/surrogates only.
+- They do not establish metric 3D anthropometric truth, canonical surface accuracy,
+  subject anatomical ground truth or physical-output accuracy.
+- Existing SYNTHETIC_NEUTRAL frontal reference ratios are calibration/reference priors only.
+- Population/reference averages MUST NOT be promoted to identity targets.
+- Existing jaw-width landmark measurement is only a 2D surrogate and MUST NOT be
+  promoted to anatomical gonion-to-gonion ground truth.
+- Existing eye-spacing measurement is 2D landmark evidence and MUST NOT be promoted
+  to orbital or metric 3D anatomy.
+- No verified subject-specific bizygomatic, upper/lower facial decomposition or
+  cranial-to-facial measurement evidence exists in the audited evidence.
+- FLAME benchmark head_ratio_support remains MISSING.
+- PRNet benchmark head_ratio_support remains MISSING.
+- No millimetre accuracy, population threshold, confidence score, benchmark score,
+  global anthropometric PASS, Phase 8 final decision or Phase 9 authorization is claimed.
+
+Evaluation spaces remain explicitly separated:
+- 2d_observation
+- canonical_model
+- metric_3d_ground_truth
+- physical_output
+
+Evidence-origin states:
+- directly_observed
+- multiview_constrained
+- model_prior_inferred
+- generated_completion
+- unresolved
+
+Verification:
+- focused: 19 passed
+- related canonical-head: 886 passed, 11 warnings
+- full regression: 5163 passed, 11 warnings
+- warnings are existing NumPy pickle/deprecation warnings in the FLAME test path.
+
+Phase 8 final decision remains unchanged.
+Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
