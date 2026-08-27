@@ -16677,3 +16677,78 @@ Closure boundary:
   `10.3 — Scale Calibration`;
 - Phase 8 final decision remains undecided;
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+## Phase 8 — Item 10.3 Scale Calibration — FINAL CLOSURE
+
+Marker:
+
+`PHASE8_ITEM10_3_SCALE_CALIBRATION_FINAL_CLOSURE_2026_08_27`
+
+Item 10.3 completed its final Closure Challenge.
+
+Verified contract boundary:
+
+- calibration-reference identity is explicit;
+- known physical reference dimension is explicit where applicable;
+- reference uncertainty is represented separately;
+- calibration date is explicit;
+- reconstruction scale factor is explicit and must be finite and positive;
+- scale-transform provenance is explicit;
+- scale source is classified as:
+  - `MEASURED`;
+  - `DECLARED`;
+  - `OPTIMIZED`;
+  - `INFERRED`;
+  - `UNRESOLVED`;
+- scale uncertainty and uncertainty propagation are explicit;
+- `VERIFIED` physical calibration requires:
+  - resolved calibration reference;
+  - resolved calibration date;
+  - resolved scale-transform provenance;
+  - resolved scale source;
+- `DECLARED`, `OPTIMIZED`, `INFERRED`, and `UNRESOLVED` scale sources
+  cannot establish `VERIFIED` physical calibration;
+- therefore `VERIFIED` physical calibration is restricted to `MEASURED`
+  scale evidence;
+- measured scale with a resolved calibration reference requires a known
+  physical reference dimension;
+- stated scale uncertainty requires resolved uncertainty propagation;
+- similarity/alignment optimized scale MUST NOT be relabelled as physical
+  scanner calibration;
+- declared metric units alone do NOT establish physical scale calibration.
+
+Validation history:
+
+- initial Item 10.3 RED: `11 failed, 44 passed`;
+- initial focused GREEN: `55 passed`;
+- initial related regression: `86 passed`;
+- initial full regression: `5337 passed, 11 warnings`;
+- first Closure Challenge identified two cross-field gaps;
+- corrective RED: `2 failed, 55 passed`;
+- corrective focused GREEN: `57 passed`;
+- corrective related regression: `88 passed`;
+- corrective full regression: `5339 passed, 11 warnings`;
+- declared-scale firewall RED: `1 failed, 57 passed`;
+- final focused GREEN: `58 passed in 0.07s`;
+- final related regression: `89 passed in 0.15s`;
+- final full regression: `5340 passed, 11 warnings in 136.00s`;
+- final Closure Challenge V2 focused recheck:
+  `58 passed in 0.07s`;
+- target `git diff --check`: clean.
+
+Closure boundary:
+
+- Item 10.3 establishes scale-calibration provenance and admissibility
+  semantics;
+- it does NOT itself prove that the current HSRD source has verified physical
+  calibration;
+- RealityCapture/provider-declared metric units remain declared metadata unless
+  independent measured calibration evidence exists;
+- coordinate convention remains Item 10.4;
+- rigid alignment remains Item 10.5;
+- measurement uncertainty remains Item 10.10;
+- Main Checklist Item 10 remains ACTIVE;
+- next checklist item after commit/push verification:
+  `10.4 — Coordinate-System Contract`;
+- Phase 8 final decision remains undecided;
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.

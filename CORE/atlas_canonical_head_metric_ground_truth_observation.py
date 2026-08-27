@@ -41,6 +41,15 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
     physical_resolution_state: str
     physical_resolution_reference: str
     calibration_state: str
+    calibration_reference: str
+    known_reference_dimension_mm: float | None
+    reference_uncertainty_mm: float | None
+    calibration_date: str
+    reconstruction_scale_factor: float
+    scale_transform_provenance: str
+    scale_source: str
+    scale_uncertainty_mm: float | None
+    scale_uncertainty_propagation: str
     source_provenance_reference: str
     license_reference: str
     license_restrictions: str
@@ -214,6 +223,17 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 "UNRESOLVED",
             ),
         )
+        scale_source = self._normalize_state(
+            self.scale_source,
+            name="scale_source",
+            allowed=(
+                "MEASURED",
+                "DECLARED",
+                "OPTIMIZED",
+                "INFERRED",
+                "UNRESOLVED",
+            ),
+        )
         ground_truth_admissibility_state = self._normalize_state(
             self.ground_truth_admissibility_state,
             name="ground_truth_admissibility_state",
@@ -264,6 +284,26 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             name="physical_resolution_reference",
             uppercase=False,
         )
+        calibration_reference = self._normalize_required_text(
+            self.calibration_reference,
+            name="calibration_reference",
+            uppercase=False,
+        )
+        calibration_date = self._normalize_required_text(
+            self.calibration_date,
+            name="calibration_date",
+            uppercase=False,
+        )
+        scale_transform_provenance = self._normalize_required_text(
+            self.scale_transform_provenance,
+            name="scale_transform_provenance",
+            uppercase=False,
+        )
+        scale_uncertainty_propagation = self._normalize_required_text(
+            self.scale_uncertainty_propagation,
+            name="scale_uncertainty_propagation",
+            uppercase=False,
+        )
         source_provenance_reference = self._normalize_required_text(
             self.source_provenance_reference,
             name="source_provenance_reference",
@@ -279,6 +319,114 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             name="license_restrictions",
             uppercase=False,
         )
+
+        def normalize_optional_nonnegative(
+            value: object,
+            *,
+            name: str,
+        ) -> float | None:
+            if value is None:
+                return None
+
+            normalized = float(value)
+
+            if (
+                not np.isfinite(normalized)
+                or normalized < 0.0
+            ):
+                raise ValueError(
+                    f"{name} must be finite and non-negative when provided."
+                )
+
+            return normalized
+
+        known_reference_dimension_mm = (
+            normalize_optional_nonnegative(
+                self.known_reference_dimension_mm,
+                name="known_reference_dimension_mm",
+            )
+        )
+
+        if (
+            known_reference_dimension_mm is not None
+            and known_reference_dimension_mm <= 0.0
+        ):
+            raise ValueError(
+                "known_reference_dimension_mm must be greater than zero "
+                "when provided."
+            )
+
+        reference_uncertainty_mm = normalize_optional_nonnegative(
+            self.reference_uncertainty_mm,
+            name="reference_uncertainty_mm",
+        )
+        scale_uncertainty_mm = normalize_optional_nonnegative(
+            self.scale_uncertainty_mm,
+            name="scale_uncertainty_mm",
+        )
+
+        reconstruction_scale_factor = float(
+            self.reconstruction_scale_factor
+        )
+
+        if (
+            not np.isfinite(reconstruction_scale_factor)
+            or reconstruction_scale_factor <= 0.0
+        ):
+            raise ValueError(
+                "reconstruction_scale_factor must be finite and "
+                "greater than zero."
+            )
+
+        if calibration_state == "VERIFIED":
+            if (
+                calibration_reference.upper() == "UNRESOLVED"
+                or calibration_date.upper() == "UNRESOLVED"
+            ):
+                raise ValueError(
+                    "VERIFIED calibration requires resolved "
+                    "calibration_reference and calibration_date."
+                )
+
+            if scale_transform_provenance.upper() == "UNRESOLVED":
+                raise ValueError(
+                    "VERIFIED calibration requires resolved "
+                    "scale_transform_provenance."
+                )
+
+            if scale_source == "UNRESOLVED":
+                raise ValueError(
+                    "VERIFIED calibration requires resolved scale_source."
+                )
+
+            if scale_source in (
+                "DECLARED",
+                "OPTIMIZED",
+                "INFERRED",
+            ):
+                raise ValueError(
+                    "scale_source DECLARED, OPTIMIZED or INFERRED cannot "
+                    "establish VERIFIED physical calibration."
+                )
+
+        if (
+            scale_source == "MEASURED"
+            and calibration_reference.upper() != "UNRESOLVED"
+            and known_reference_dimension_mm is None
+        ):
+            raise ValueError(
+                "MEASURED scale with a resolved calibration_reference "
+                "requires known_reference_dimension_mm."
+            )
+
+        if (
+            scale_uncertainty_mm is not None
+            and scale_uncertainty_propagation.upper() == "UNRESOLVED"
+        ):
+            raise ValueError(
+                "scale_uncertainty_propagation must be resolved when "
+                "scale_uncertainty_mm is provided."
+            )
 
         compatible_strength_by_surface_origin = {
             "RAW_SENSOR_DERIVED_SURFACE": "RAW_SENSOR",
@@ -352,6 +500,17 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 physical_resolution_reference,
             ),
             ("calibration_state", calibration_state),
+            ("calibration_reference", calibration_reference),
+            ("calibration_date", calibration_date),
+            (
+                "scale_transform_provenance",
+                scale_transform_provenance,
+            ),
+            ("scale_source", scale_source),
+            (
+                "scale_uncertainty_propagation",
+                scale_uncertainty_propagation,
+            ),
             (
                 "source_provenance_reference",
                 source_provenance_reference,
@@ -368,6 +527,27 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 field_name,
                 value,
             )
+
+        object.__setattr__(
+            self,
+            "known_reference_dimension_mm",
+            known_reference_dimension_mm,
+        )
+        object.__setattr__(
+            self,
+            "reference_uncertainty_mm",
+            reference_uncertainty_mm,
+        )
+        object.__setattr__(
+            self,
+            "reconstruction_scale_factor",
+            reconstruction_scale_factor,
+        )
+        object.__setattr__(
+            self,
+            "scale_uncertainty_mm",
+            scale_uncertainty_mm,
+        )
 
         ground_truth_vertices = self._normalize_vertices(
             self.ground_truth_vertices,

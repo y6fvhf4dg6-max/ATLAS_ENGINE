@@ -53,6 +53,15 @@ def _observation(**overrides):
         "physical_resolution_state": "UNRESOLVED",
         "physical_resolution_reference": "UNRESOLVED",
         "calibration_state": "UNRESOLVED",
+        "calibration_reference": "UNRESOLVED",
+        "known_reference_dimension_mm": None,
+        "reference_uncertainty_mm": None,
+        "calibration_date": "UNRESOLVED",
+        "reconstruction_scale_factor": 1.0,
+        "scale_transform_provenance": "UNRESOLVED",
+        "scale_source": "UNRESOLVED",
+        "scale_uncertainty_mm": None,
+        "scale_uncertainty_propagation": "UNRESOLVED",
         "source_provenance_reference": "HSRD-100/HSR0015-Body-035",
         "license_reference": "UNRESOLVED",
         "license_restrictions": "UNRESOLVED",
@@ -335,4 +344,214 @@ def test_acceptable_evaluation_license_requires_resolved_license_evidence(
             evaluation_license_state="ACCEPTABLE",
             license_reference=license_reference,
             license_restrictions=license_restrictions,
+        )
+
+# === PHASE 8 ITEM 10.3 SCALE CALIBRATION ===
+
+
+def test_accepts_explicit_scale_calibration_metadata():
+    observation = _observation(
+        calibration_reference="provider-calibration-record",
+        known_reference_dimension_mm=100.0,
+        reference_uncertainty_mm=0.25,
+        calibration_date="2026-08-25",
+        reconstruction_scale_factor=1.0,
+        scale_transform_provenance="provider-declared-metric-coordinate-system",
+        scale_source="DECLARED",
+        scale_uncertainty_mm=0.25,
+        scale_uncertainty_propagation="REFERENCE_UNCERTAINTY_CARRIED_FORWARD",
+    )
+
+    assert observation.calibration_reference == "provider-calibration-record"
+    assert observation.known_reference_dimension_mm == pytest.approx(100.0)
+    assert observation.reference_uncertainty_mm == pytest.approx(0.25)
+    assert observation.calibration_date == "2026-08-25"
+    assert observation.reconstruction_scale_factor == pytest.approx(1.0)
+    assert observation.scale_transform_provenance == (
+        "provider-declared-metric-coordinate-system"
+    )
+    assert observation.scale_source == "DECLARED"
+    assert observation.scale_uncertainty_mm == pytest.approx(0.25)
+    assert observation.scale_uncertainty_propagation == (
+        "REFERENCE_UNCERTAINTY_CARRIED_FORWARD"
+    )
+
+
+@pytest.mark.parametrize(
+    "scale_source",
+    (
+        "MEASURED",
+        "DECLARED",
+        "OPTIMIZED",
+        "INFERRED",
+        "UNRESOLVED",
+    ),
+)
+def test_accepts_explicit_scale_source_states(scale_source):
+    observation = _observation(
+        calibration_reference="UNRESOLVED",
+        known_reference_dimension_mm=None,
+        reference_uncertainty_mm=None,
+        calibration_date="UNRESOLVED",
+        reconstruction_scale_factor=1.0,
+        scale_transform_provenance="UNRESOLVED",
+        scale_source=scale_source,
+        scale_uncertainty_mm=None,
+        scale_uncertainty_propagation="UNRESOLVED",
+    )
+
+    assert observation.scale_source == scale_source
+
+
+def test_verified_calibration_requires_resolved_reference_and_date():
+    with pytest.raises(
+        ValueError,
+        match="calibration",
+    ):
+        _observation(
+            calibration_state="VERIFIED",
+            calibration_reference="UNRESOLVED",
+            known_reference_dimension_mm=100.0,
+            reference_uncertainty_mm=0.25,
+            calibration_date="UNRESOLVED",
+            reconstruction_scale_factor=1.0,
+            scale_transform_provenance="verified-transform",
+            scale_source="MEASURED",
+            scale_uncertainty_mm=0.25,
+            scale_uncertainty_propagation="verified-propagation",
+        )
+
+
+def test_measured_scale_requires_known_reference_dimension():
+    with pytest.raises(
+        ValueError,
+        match="known_reference_dimension",
+    ):
+        _observation(
+            calibration_reference="physical-reference-a",
+            known_reference_dimension_mm=None,
+            reference_uncertainty_mm=0.25,
+            calibration_date="2026-08-25",
+            reconstruction_scale_factor=1.0,
+            scale_transform_provenance="measured-reference-scale",
+            scale_source="MEASURED",
+            scale_uncertainty_mm=0.25,
+            scale_uncertainty_propagation="verified-propagation",
+        )
+
+
+def test_inferred_scale_cannot_establish_verified_calibration():
+    with pytest.raises(
+        ValueError,
+        match="scale_source|calibration",
+    ):
+        _observation(
+            calibration_state="VERIFIED",
+            calibration_reference="physical-reference-a",
+            known_reference_dimension_mm=100.0,
+            reference_uncertainty_mm=0.25,
+            calibration_date="2026-08-25",
+            reconstruction_scale_factor=1.0,
+            scale_transform_provenance="typical-head-size-assumption",
+            scale_source="INFERRED",
+            scale_uncertainty_mm=0.25,
+            scale_uncertainty_propagation="verified-propagation",
+        )
+
+
+def test_optimized_scale_cannot_be_relabelled_as_verified_physical_calibration():
+    with pytest.raises(
+        ValueError,
+        match="scale_source|calibration",
+    ):
+        _observation(
+            calibration_state="VERIFIED",
+            calibration_reference="physical-reference-a",
+            known_reference_dimension_mm=100.0,
+            reference_uncertainty_mm=0.25,
+            calibration_date="2026-08-25",
+            reconstruction_scale_factor=1.03,
+            scale_transform_provenance="similarity-alignment-optimized-scale",
+            scale_source="OPTIMIZED",
+            scale_uncertainty_mm=0.25,
+            scale_uncertainty_propagation="verified-propagation",
+        )
+
+
+def test_scale_uncertainty_requires_traceable_propagation():
+    with pytest.raises(
+        ValueError,
+        match="scale_uncertainty_propagation",
+    ):
+        _observation(
+            calibration_reference="physical-reference-a",
+            known_reference_dimension_mm=100.0,
+            reference_uncertainty_mm=0.25,
+            calibration_date="2026-08-25",
+            reconstruction_scale_factor=1.0,
+            scale_transform_provenance="measured-reference-scale",
+            scale_source="MEASURED",
+            scale_uncertainty_mm=0.25,
+            scale_uncertainty_propagation="UNRESOLVED",
+        )
+
+# === PHASE 8 ITEM 10.3 CLOSURE CHALLENGE CORRECTIVE RED ===
+
+
+def test_verified_calibration_requires_resolved_scale_transform_provenance():
+    with pytest.raises(
+        ValueError,
+        match="scale_transform_provenance|calibration",
+    ):
+        _observation(
+            calibration_state="VERIFIED",
+            calibration_reference="physical-reference-a",
+            known_reference_dimension_mm=100.0,
+            reference_uncertainty_mm=0.25,
+            calibration_date="2026-08-25",
+            reconstruction_scale_factor=1.0,
+            scale_transform_provenance="UNRESOLVED",
+            scale_source="MEASURED",
+            scale_uncertainty_mm=0.25,
+            scale_uncertainty_propagation="verified-propagation",
+        )
+
+
+def test_verified_calibration_requires_resolved_scale_source():
+    with pytest.raises(
+        ValueError,
+        match="scale_source|calibration",
+    ):
+        _observation(
+            calibration_state="VERIFIED",
+            calibration_reference="physical-reference-a",
+            known_reference_dimension_mm=100.0,
+            reference_uncertainty_mm=0.25,
+            calibration_date="2026-08-25",
+            reconstruction_scale_factor=1.0,
+            scale_transform_provenance="physical-reference-scale-transform",
+            scale_source="UNRESOLVED",
+            scale_uncertainty_mm=0.25,
+            scale_uncertainty_propagation="verified-propagation",
+        )
+
+# === PHASE 8 ITEM 10.3 DECLARED SCALE CALIBRATION FIREWALL ===
+
+
+def test_declared_scale_cannot_establish_verified_physical_calibration():
+    with pytest.raises(
+        ValueError,
+        match="scale_source|calibration",
+    ):
+        _observation(
+            calibration_state="VERIFIED",
+            calibration_reference="provider-declared-coordinate-units",
+            known_reference_dimension_mm=None,
+            reference_uncertainty_mm=None,
+            calibration_date="2026-08-25",
+            reconstruction_scale_factor=1.0,
+            scale_transform_provenance="provider-declared-metric-scale",
+            scale_source="DECLARED",
+            scale_uncertainty_mm=None,
+            scale_uncertainty_propagation="UNRESOLVED",
         )
