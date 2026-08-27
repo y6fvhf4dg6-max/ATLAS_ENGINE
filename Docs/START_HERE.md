@@ -12825,3 +12825,59 @@ Current global state remains:
   full regression `5038 passed, 11 warnings in 134.90s`.
 - Phase 8 final decision unchanged.
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+### PHASE8_ITEM9_3_JAW_CHIN_QUALITY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.3 — Jaw / Chin Quality bounded evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_jaw_chin_quality_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_jaw_chin_quality_evidence.py`
+- Exact Item 9.3 criteria represented:
+  `mandibular_width`, `jaw_angle`, `chin_width`, `chin_projection`,
+  `chin_vertical_position`, `left_right_contour`, `frontal_consistency`,
+  `profile_consistency`, `cross_view_stability`.
+- Evaluation-space boundary retained:
+  `2d_observation`, `canonical_model`, `metric_3d_ground_truth`,
+  `physical_output`.
+- Evidence statuses:
+  `bounded_positive`, `bounded_negative_not_established`,
+  `bounded_aggregate_only`, `blocked`.
+- Evidence-origin states:
+  `directly_observed`, `multiview_constrained`, `model_prior_inferred`,
+  `generated_completion`, `unresolved`.
+- Verified machine-readable jaw/silhouette source:
+  `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/expression_separation_8_8/REPRODUCIBILITY_ITEM8_9_REGION_WISE.json`
+- Verified source SHA256:
+  `f5a5cc438d003c1a4186d8782aa3ad008105a8a9800325ca56415b9247eaa7ca`.
+- Item 9.3 bounded classification:
+  - mandibular width: `BLOCKED`;
+  - jaw angle: `BLOCKED`;
+  - chin width: `BLOCKED`;
+  - chin projection: `BLOCKED`;
+  - chin vertical position: `BLOCKED`;
+  - left/right contour: bounded positive 2D silhouette/profile evidence;
+  - frontal consistency: bounded negative / not established;
+  - profile consistency: bounded positive 2D evidence;
+  - cross-view stability: bounded aggregate-only; feature-specific stability
+    is not established.
+- Verified side-contour evidence:
+  `turn_right` approximately 61.35% reduction;
+  `turn_left` approximately 61.61% reduction.
+- Preferred 2.5% silhouette-energy candidate improves side-profile evidence
+  but increases front-view contour error relative to baseline; the trade-off
+  remains explicit.
+- `static105` has zero overlap with the 21 lower-jaw IDs and the full
+  36-point face oval.
+- Verified FLAME jaw/chin vertex-level semantic mapping remains unavailable.
+- Therefore no guessed FLAME vertex indices, dense jaw/chin anatomy,
+  metric 3D/mm accuracy, identity-preservation proof, or feature-specific
+  cross-view stability claim is permitted.
+- No acceptance threshold, confidence score, Phase 8 decision, or Phase 9
+  authorization is introduced by this contract.
+- Verification:
+  focused `18 passed in 0.03s`;
+  related canonical-head regression `773 passed, 2 warnings in 4.35s`;
+  full regression `5056 passed, 11 warnings in 134.52s`.
+- Phase 8 final decision unchanged.
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
