@@ -25,6 +25,16 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
     evaluation_license_state: str
     evaluation_use_only: bool
 
+    acquisition_modality: str
+    acquisition_system: str
+    acquisition_manufacturer: str
+    ground_truth_surface_origin: str
+    capture_expression: str
+    capture_pose: str
+    capture_session_state: str
+    calibration_state: str
+    ground_truth_admissibility_state: str
+
     def __post_init__(self) -> None:
         for field_name in (
             "observation_id",
@@ -106,6 +116,117 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 "evaluation_use_only must be boolean."
             )
 
+        acquisition_modality = self._normalize_state(
+            self.acquisition_modality,
+            name="acquisition_modality",
+            allowed=(
+                "IMAGE_BASED_MULTIVIEW_RECONSTRUCTION",
+                "UNRESOLVED",
+            ),
+        )
+        ground_truth_surface_origin = self._normalize_state(
+            self.ground_truth_surface_origin,
+            name="ground_truth_surface_origin",
+            allowed=(
+                "RECONSTRUCTED_SENSOR_DERIVED_SURFACE",
+                "UNRESOLVED",
+            ),
+        )
+        capture_session_state = self._normalize_state(
+            self.capture_session_state,
+            name="capture_session_state",
+            allowed=(
+                "VERIFIED",
+                "PARTIAL",
+                "UNRESOLVED",
+            ),
+        )
+        calibration_state = self._normalize_state(
+            self.calibration_state,
+            name="calibration_state",
+            allowed=(
+                "VERIFIED",
+                "PARTIAL",
+                "UNRESOLVED",
+            ),
+        )
+        ground_truth_admissibility_state = self._normalize_state(
+            self.ground_truth_admissibility_state,
+            name="ground_truth_admissibility_state",
+            allowed=(
+                "ACCEPTABLE",
+                "BLOCKED",
+                "UNRESOLVED",
+            ),
+        )
+
+        acquisition_system = self._normalize_required_text(
+            self.acquisition_system,
+            name="acquisition_system",
+            uppercase=False,
+        )
+        acquisition_manufacturer = self._normalize_required_text(
+            self.acquisition_manufacturer,
+            name="acquisition_manufacturer",
+            uppercase=False,
+        )
+        capture_expression = self._normalize_required_text(
+            self.capture_expression,
+            name="capture_expression",
+            uppercase=True,
+        )
+        capture_pose = self._normalize_required_text(
+            self.capture_pose,
+            name="capture_pose",
+            uppercase=True,
+        )
+
+        object.__setattr__(
+            self,
+            "acquisition_modality",
+            acquisition_modality,
+        )
+        object.__setattr__(
+            self,
+            "acquisition_system",
+            acquisition_system,
+        )
+        object.__setattr__(
+            self,
+            "acquisition_manufacturer",
+            acquisition_manufacturer,
+        )
+        object.__setattr__(
+            self,
+            "ground_truth_surface_origin",
+            ground_truth_surface_origin,
+        )
+        object.__setattr__(
+            self,
+            "capture_expression",
+            capture_expression,
+        )
+        object.__setattr__(
+            self,
+            "capture_pose",
+            capture_pose,
+        )
+        object.__setattr__(
+            self,
+            "capture_session_state",
+            capture_session_state,
+        )
+        object.__setattr__(
+            self,
+            "calibration_state",
+            calibration_state,
+        )
+        object.__setattr__(
+            self,
+            "ground_truth_admissibility_state",
+            ground_truth_admissibility_state,
+        )
+
         ground_truth_vertices = self._normalize_vertices(
             self.ground_truth_vertices,
             name="ground_truth_vertices",
@@ -146,6 +267,41 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             "reconstruction_faces",
             reconstruction_faces,
         )
+
+    @staticmethod
+    def _normalize_state(
+        value: object,
+        *,
+        name: str,
+        allowed: tuple[str, ...],
+    ) -> str:
+        normalized = str(value).strip().upper()
+
+        if normalized not in allowed:
+            raise ValueError(
+                f"{name} must be one of {allowed}."
+            )
+
+        return normalized
+
+    @staticmethod
+    def _normalize_required_text(
+        value: object,
+        *,
+        name: str,
+        uppercase: bool,
+    ) -> str:
+        normalized = str(value).strip()
+
+        if not normalized:
+            raise ValueError(
+                f"{name} must be non-blank."
+            )
+
+        if uppercase:
+            normalized = normalized.upper()
+
+        return normalized
 
     @staticmethod
     def _normalize_vertices(

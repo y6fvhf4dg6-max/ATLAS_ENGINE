@@ -16292,8 +16292,103 @@ redistributable asset.
 ### Phase boundary
 
 - Main Checklist Item 9 remains closed as `BOUNDED_PASS`.
-- Item 10 execution has NOT yet started by this documentation update.
-- The next execution target remains `10.1 — Ground-Truth Source Qualification`.
+- Main Checklist Item 10 is `ACTIVE`.
+- Item `10.1 — Ground-Truth Source Qualification` is complete.
+- The next execution target is `10.2 — Unit Certainty`.
 - Phase 8 final decision remains undecided.
 - Phase 8 `GO + LOCK` is NOT established.
+- Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## Phase 8 — Item 10.1 Ground-Truth Source Qualification — 27 Aug 2026
+
+Marker:
+
+`PHASE8_ITEM10_1_GROUND_TRUTH_SOURCE_QUALIFICATION_COMPLETE_2026_08_27`
+
+Item 10.1 extended the existing
+`AtlasCanonicalHeadMetricGroundTruthObservation` contract rather than creating
+a parallel source-qualification contract.
+
+The contract now records explicit source-qualification state for:
+
+- acquisition modality;
+- acquisition system;
+- acquisition manufacturer;
+- ground-truth surface origin;
+- capture expression;
+- capture pose;
+- capture-session state;
+- calibration state;
+- ground-truth admissibility state.
+
+Explicit `UNRESOLVED` states are permitted where evidence is absent. Unknown
+free-form states are rejected. Missing evidence is not silently inferred.
+
+### HSRD-100 / HSR0015-Body-035 qualification evidence
+
+Verified evidence:
+
+- source/product identity: `HSR0015-Body-035`;
+- source asset: `HSR0015-Body-035_LOD0.obj`;
+- LOD0 geometry: `499853` vertices and `999858` faces;
+- RealityCapture project version: `1.4.2.117426`;
+- RealityCapture project contains `112` referenced JPG inputs;
+- reconstruction provenance is therefore bounded as
+  `IMAGE_BASED_MULTIVIEW_RECONSTRUCTION`;
+- distributed GT asset is classified as
+  `RECONSTRUCTED_SENSOR_DERIVED_SURFACE`;
+- provider metadata records expression `NEUTRAL`;
+- provider metadata records pose `WALKING`;
+- RealityCapture configuration explicitly declares work/output units as
+  `meter`; unit normalization to millimetres remains explicit and traceable.
+
+Unresolved / bounded evidence:
+
+- exact physical acquisition technology is `UNRESOLVED`;
+- acquisition hardware / rig / scanner manufacturer is `UNRESOLVED`;
+- camera / sensor model is `UNRESOLVED`;
+- raw sensor-surface availability is not established;
+- capture-session identity/date is `UNRESOLVED`;
+- scanner/capture calibration evidence and calibration-reference chain are
+  `UNRESOLVED`;
+- exact provider/publisher provenance is only partial;
+- archive fields such as `Price Commercial` / `Price Personal` are NOT treated
+  as a license grant;
+- exact commercial/evaluation rights therefore remain `UNRESOLVED`.
+
+### Source qualification versus metric admissibility
+
+Source qualification and downstream metric admissibility remain separate.
+
+The HSRD source is usable as bounded, reconstructed metric-source evidence, but
+the existing real A03 metric comparison remains:
+
+- branch: `CLOSED_AS_INADMISSIBLE_ALIGNMENT`;
+- camera path: `UNRESOLVED_GLOBAL_CONVENTION`;
+- metric firewall: `INADMISSIBLE_ALIGNMENT`;
+- evidence class: `DIAGNOSTIC_NEGATIVE_EVIDENCE`;
+- metric-GT claim: `NOT_ADMISSIBLE`.
+
+This does NOT establish poor FLAME geometry and does NOT authorize a
+strict-face millimetre accuracy claim.
+
+### Validation
+
+- RED before implementation: `19 failed`;
+- focused source-qualification tests after implementation:
+  `19 passed in 0.05s`;
+- related metric-GT regression:
+  `46 passed in 0.16s`;
+- full regression:
+  `5292 passed, 11 warnings in 135.50s`;
+- `git diff --check` clean for the Item 10.1 implementation/test files.
+
+### Item state
+
+- `10.1 — Ground-Truth Source Qualification`: COMPLETE;
+- Main Checklist Item 10 remains ACTIVE;
+- next execution target: `10.2 — Unit Certainty`;
+- no Item 10 closure is claimed;
+- Phase 8 final decision remains undecided;
+- Phase 8 `GO + LOCK` is NOT established;
 - Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.

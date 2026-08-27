@@ -37,6 +37,15 @@ def _observation(**overrides):
         "source_provenance_state": "VERIFIED",
         "evaluation_license_state": "ACCEPTABLE",
         "evaluation_use_only": True,
+        "acquisition_modality": "IMAGE_BASED_MULTIVIEW_RECONSTRUCTION",
+        "acquisition_system": "RealityCapture 1.4.2.117426",
+        "acquisition_manufacturer": "UNRESOLVED",
+        "ground_truth_surface_origin": "RECONSTRUCTED_SENSOR_DERIVED_SURFACE",
+        "capture_expression": "NEUTRAL",
+        "capture_pose": "WALKING",
+        "capture_session_state": "UNRESOLVED",
+        "calibration_state": "UNRESOLVED",
+        "ground_truth_admissibility_state": "BLOCKED",
     }
     values.update(overrides)
     return AtlasCanonicalHeadMetricGroundTruthObservation(**values)
@@ -108,3 +117,69 @@ def test_rejects_unknown_source_provenance_state():
 def test_rejects_unknown_evaluation_license_state():
     with pytest.raises(ValueError, match="evaluation_license_state"):
         _observation(evaluation_license_state="MAYBE")
+
+def test_accepts_source_qualification_metadata():
+    observation = _observation()
+
+    assert observation.acquisition_modality == "IMAGE_BASED_MULTIVIEW_RECONSTRUCTION"
+    assert observation.acquisition_system == "RealityCapture 1.4.2.117426"
+    assert observation.acquisition_manufacturer == "UNRESOLVED"
+    assert observation.ground_truth_surface_origin == "RECONSTRUCTED_SENSOR_DERIVED_SURFACE"
+    assert observation.capture_expression == "NEUTRAL"
+    assert observation.capture_pose == "WALKING"
+    assert observation.capture_session_state == "UNRESOLVED"
+    assert observation.calibration_state == "UNRESOLVED"
+    assert observation.ground_truth_admissibility_state == "BLOCKED"
+
+
+@pytest.mark.parametrize(
+    ("field_name", "value"),
+    (
+        ("acquisition_modality", "MAYBE"),
+        ("ground_truth_surface_origin", "MAYBE"),
+        ("capture_session_state", "MAYBE"),
+        ("calibration_state", "MAYBE"),
+        ("ground_truth_admissibility_state", "MAYBE"),
+    ),
+)
+def test_rejects_unknown_source_qualification_states(field_name, value):
+    with pytest.raises(ValueError, match=field_name):
+        _observation(**{field_name: value})
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    (
+        "acquisition_system",
+        "acquisition_manufacturer",
+        "capture_expression",
+        "capture_pose",
+    ),
+)
+def test_rejects_blank_source_qualification_text(field_name):
+    with pytest.raises(ValueError, match=field_name):
+        _observation(**{field_name: "   "})
+
+
+def test_allows_explicit_unresolved_source_qualification():
+    observation = _observation(
+        acquisition_modality="UNRESOLVED",
+        acquisition_system="UNRESOLVED",
+        acquisition_manufacturer="UNRESOLVED",
+        ground_truth_surface_origin="UNRESOLVED",
+        capture_expression="UNRESOLVED",
+        capture_pose="UNRESOLVED",
+        capture_session_state="UNRESOLVED",
+        calibration_state="UNRESOLVED",
+        ground_truth_admissibility_state="UNRESOLVED",
+    )
+
+    assert observation.acquisition_modality == "UNRESOLVED"
+    assert observation.acquisition_system == "UNRESOLVED"
+    assert observation.acquisition_manufacturer == "UNRESOLVED"
+    assert observation.ground_truth_surface_origin == "UNRESOLVED"
+    assert observation.capture_expression == "UNRESOLVED"
+    assert observation.capture_pose == "UNRESOLVED"
+    assert observation.capture_session_state == "UNRESOLVED"
+    assert observation.calibration_state == "UNRESOLVED"
+    assert observation.ground_truth_admissibility_state == "UNRESOLVED"
