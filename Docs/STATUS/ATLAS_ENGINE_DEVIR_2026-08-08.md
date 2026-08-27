@@ -17180,3 +17180,46 @@ Current global state remains:
 - Phase 8 final decision: NOT MADE;
 - Phase 8 GO + LOCK: FALSE;
 - Phase 9: NOT AUTHORIZED / NOT STARTED.
+
+### PHASE8_ITEM9_2_SEMANTIC_REGION_MAPPING_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.2 — Semantic Region Mapping Audit executable evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_semantic_region_mapping_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_semantic_region_mapping_evidence.py`
+- Exact required Item 9.2 regions:
+  `jaw`, `chin`, `nose_bridge`, `nose_body`, `nose_base_tip`,
+  `left_orbital`, `right_orbital`, `left_cheek`, `right_cheek`,
+  `upper_lip`, `lower_lip`, `perioral`, `forehead`,
+  `cranial_head_envelope`.
+- Exact mapping states:
+  `provider_verified`,
+  `independently_verified_atlas_derived`,
+  `anchor_supported_only`,
+  `unresolved_blocked`.
+- Exact evidence-origin states:
+  `directly_observed`,
+  `multiview_constrained`,
+  `model_prior_inferred`,
+  `generated_completion`,
+  `unresolved`.
+- Contract carries explicit `mapping_scope`, source reference,
+  permitted claim and prohibited claims.
+- Contract does NOT derive vertex mappings, create semantic aliases,
+  claim dense anatomical ground truth, claim metric 3D/mm accuracy,
+  assign confidence/threshold scores, or make Phase decisions.
+- Existing H2 nose mappings remain bounded to the exact
+  ATLAS-derived barycentric-anchor-supported FLAME topology footprint;
+  they are not provider-authored dense anatomy.
+- Existing provider `left_eye_region` / `right_eye_region` evidence is
+  not silently relabelled as orbital anatomy.
+- Existing provider `lips` evidence is not silently split into dense
+  upper/lower/perioral topology regions.
+- `nose_base` evidence is not silently promoted to `nose_base_tip`.
+- Verification:
+  focused `23 passed in 0.03s`;
+  related canonical-head regression `755 passed, 2 warnings in 4.13s`;
+  full regression `5038 passed, 11 warnings in 134.90s`.
+- Phase 8 final decision unchanged.
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
