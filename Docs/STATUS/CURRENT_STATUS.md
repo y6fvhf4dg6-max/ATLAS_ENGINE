@@ -15270,3 +15270,66 @@ Current global state remains:
   full regression `5075 passed, 11 warnings in 135.29s`.
 - Phase 8 final decision unchanged.
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+### PHASE8_ITEM9_5_ORBITAL_EYE_SOCKET_QUALITY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.5 — Orbital / Eye-Socket Quality bounded evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_orbital_quality_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_orbital_quality_evidence.py`
+- Exact Item 9.5 criteria represented:
+  `inter_orbital_relation`, `orbital_rim`, `eye_socket_form_depth`,
+  `upper_orbital_contour`, `lower_orbital_contour`,
+  `left_right_asymmetry`, `eye_region_nose_bridge_relation`.
+- Evaluation-space boundary retained:
+  `2d_observation`, `canonical_model`, `metric_3d_ground_truth`,
+  `physical_output`.
+- Evidence statuses:
+  `bounded_not_established`, `blocked`.
+- Evidence-origin states:
+  `directly_observed`, `multiview_constrained`, `model_prior_inferred`,
+  `generated_completion`, `unresolved`.
+- Verified provider FLAME masks:
+  - `left_eye_region`: 287 unique vertices;
+  - `right_eye_region`: 287 unique vertices.
+- Verified observation-to-provider anchor support:
+  - left eye: 6/6 embedded anchors fully supported by `left_eye_region`;
+  - right eye: 6/6 embedded anchors fully supported by `right_eye_region`.
+- Provider `eye_region` evidence is NOT promoted to orbital anatomy.
+- Item 9.5 bounded classification:
+  - inter-orbital relation: `BOUNDED_NOT_ESTABLISHED`;
+  - orbital rim: `BLOCKED`;
+  - eye-socket form/depth: `BLOCKED`;
+  - upper orbital contour: `BLOCKED`;
+  - lower orbital contour: `BLOCKED`;
+  - left/right asymmetry: `BOUNDED_NOT_ESTABLISHED`;
+  - eye-region to nose-bridge relation: `BOUNDED_NOT_ESTABLISHED`.
+- Real held-out 2D eye-region evidence remains view-dependent:
+  - held_out_front:
+    right_eye delta `+0.062302674623 px`,
+    left_eye delta `+0.179408183345 px`;
+  - held_out_turn_left:
+    right_eye delta `-0.053835099557 px`,
+    left_eye delta `-0.058580004479 px`;
+  - held_out_turn_right:
+    right_eye delta `+0.005074152054 px`,
+    left_eye delta `-0.041701365010 px`.
+- Therefore uniform orbital/eye-region stability is NOT established.
+- Parametric `EYE_SOCKET_*` constants are model-prior/generated geometry and
+  are not treated as subject-observed orbital quality evidence.
+- Historical FLAME and PRNet benchmark coverage remains
+  `orbital_cheek_volume_support=MISSING`.
+- No orbital-rim mapping, socket-depth ground truth, upper/lower orbital
+  contour mapping, subject-specific anatomical asymmetry metric, or explicit
+  eye-region to nose-bridge spatial-relation metric is claimed.
+- No metric millimetre claim is made.
+- No global orbital-quality PASS is claimed.
+- No acceptance threshold, confidence score, Phase 8 decision, or Phase 9
+  authorization is introduced by this contract.
+- Verification:
+  focused `17 passed in 0.03s`;
+  related canonical-head regression `809 passed, 2 warnings in 4.51s`;
+  full regression `5092 passed, 11 warnings in 135.24s`.
+- Phase 8 final decision unchanged.
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
