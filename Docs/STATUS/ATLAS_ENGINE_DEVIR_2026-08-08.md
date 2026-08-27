@@ -17848,3 +17848,63 @@ Verification:
 - related canonical-head regression: 923 passed, 2 warnings;
 - full regression: 5206 passed, 11 warnings;
 - target diff check: exit 0.
+
+## Phase 8 / Main Checklist Item 9.12 — Regional Surface Error
+
+Marker: `PHASE8_ITEM9_12_REGIONAL_SURFACE_ERROR_EVIDENCE_CONTRACT_COMPLETE_2026_08_27`
+
+Status: COMPLETE — `CAPABILITY_PRESENT_METRIC_RESULT_BLOCKED`.
+
+Implemented:
+- `CORE/atlas_canonical_head_regional_surface_error_evidence.py`
+- `Test/test_canonical_head_regional_surface_error_evidence.py`
+
+Verified capability:
+- provider-independent point-to-surface distance implementation exists;
+- raw metric aggregation supports mean, median, RMS, P95 and maximum;
+- semantic region-wise raw aggregation capability exists when explicit
+  region-to-sample mappings are legitimately supplied.
+
+Current real metric-result boundary:
+- no admissible real subject-specific regional surface-error result is available;
+- HSRD-100 A03 branch is `CLOSED_AS_INADMISSIBLE_ALIGNMENT`;
+- A03 metric-GT claim is `NOT_ADMISSIBLE`;
+- strict-face millimetre execution remained unauthorized;
+- no unique defensible scale-fixed rigid transform was established;
+- Item 9 semantic regions have not been legitimately mapped to metric-GT
+  scan samples with verified correspondence.
+
+Item 9.12 classifications:
+- `point_to_surface_distance` → `capability_present`;
+- `mean_distance` → `capability_present`;
+- `median_distance` → `capability_present`;
+- `rms_distance` → `capability_present`;
+- `p95_distance` → `capability_present`;
+- `maximum_outlier_characterization` → `capability_present`;
+- `bidirectional_symmetric_surface_error` → `not_established`;
+- `surface_normal_discrepancy` → `not_established`;
+- `real_metric_regional_result` →
+  `capability_present_metric_result_blocked`.
+
+Primary blocker states:
+- `alignment_inadmissible`;
+- `regional_correspondence_unverified`;
+- `region_mapping_unverified`.
+
+Claim boundaries retained:
+- capability presence is not real-GT execution;
+- synthetic/unit-test millimetre values are not subject-specific accuracy evidence;
+- no jaw, chin, nose, orbital, cheek or other facial-region millimetre error
+  may be claimed from current evidence;
+- HSRD HOLD does not establish that FLAME geometry is poor;
+- anchor-supported FLAME mappings are not scan-GT regional mappings;
+- no metric surface-accuracy acceptance claim;
+- no arbitrary threshold or fabricated confidence score;
+- no Phase 8 GO/HOLD decision is made by Item 9.12;
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+Verification:
+- focused: 24 passed;
+- related canonical-head regression: 947 passed, 2 warnings;
+- full regression: 5230 passed, 11 warnings;
+- target diff check: exit 0.
