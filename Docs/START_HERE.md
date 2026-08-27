@@ -13062,3 +13062,79 @@ Current global state remains:
   full regression `5110 passed, 11 warnings in 134.36s`.
 - Phase 8 final decision unchanged.
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+### PHASE8_ITEM9_7_MOUTH_PERIORAL_QUALITY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.7 — Mouth / Perioral Quality evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_mouth_perioral_quality_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_mouth_perioral_quality_evidence.py`
+- Exact Item 9.7 criteria represented:
+  `mouth_width`, `upper_lower_lip_relation`, `philtrum_region`,
+  `lip_projection`, `commissures`,
+  `neutral_geometry_vs_expression_deformation`,
+  `nasolabial_perioral_contamination`.
+- Evaluation-space boundary retained:
+  `2d_observation`, `canonical_model`, `metric_3d_ground_truth`,
+  `physical_output`.
+- Evidence-status states retained:
+  `bounded_not_established`, `bounded_structural`, `blocked`.
+- Evidence-origin states retained:
+  `directly_observed`, `multiview_constrained`, `model_prior_inferred`,
+  `generated_completion`, `unresolved`.
+- Provider FLAME semantic coverage contains one broad `lips` mask with
+  250 unique vertices; provider evidence does NOT split this mask into
+  upper lip, lower lip, philtrum, commissures, or dense perioral anatomy.
+- H2 observation/provider anchor audit:
+  upper_lip has 8/8 embedded anchors fully supported by the provider
+  `lips` mask; lower_lip has 7 embedded anchors fully supported by the
+  provider `lips` mask while historical region-wise coverage remains
+  `partial_static105_overlap` because the requested lower-lip set is 7/8.
+- Held-out 2D observation evidence:
+  upper_lip improves in all three held-out pose views:
+  front `-0.596790245425 px`,
+  turn-left `-0.195223703135 px`,
+  turn-right `-0.293216107193 px`.
+- Held-out lower_lip also improves in all three held-out pose views:
+  front `-0.418135292306 px`,
+  turn-left `-0.124998030645 px`,
+  turn-right `-0.076177947174 px`,
+  with partial static105 overlap.
+- These lip results are bounded 2D landmark/reprojection evidence only;
+  they do NOT establish explicit upper-to-lower lip geometry relation,
+  lip surface accuracy, lip projection, commissure accuracy, or metric
+  3D anatomy.
+- Item 9.7 criterion classification:
+  - mouth_width: `BLOCKED`;
+  - upper_lower_lip_relation: `BOUNDED_NOT_ESTABLISHED`;
+  - philtrum_region: `BLOCKED`;
+  - lip_projection: `BLOCKED`;
+  - commissures: `BLOCKED`;
+  - neutral_geometry_vs_expression_deformation: `BOUNDED_STRUCTURAL`;
+  - nasolabial_perioral_contamination: `BLOCKED`.
+- `mouth_width` measurement/deformation machinery and
+  `mouth_left`/`mouth_right` landmarks exist, but no persisted
+  subject-specific validated mouth-width quality measurement was found.
+- Parametric `upper_lip_projection`, `lower_lip_projection`, and
+  `philtrum_depth` values are model-prior/generated geometry and are NOT
+  treated as subject-observed quality evidence.
+- Relief philtrum/lip masks and suppression/confidence maps remain
+  2.5D relief semantics and are NOT promoted to canonical 3D ground truth.
+- H3 counterfactual evidence supports bounded structural separation:
+  expression-dependent geometry changes while locked identity parameter
+  state and identity-only canonical geometry remain invariant.
+- H3 does NOT provide mouth-specific regional accuracy, dense perioral
+  anatomy, or proof of leakage absence in every future optimizer.
+- No dedicated commissure-quality, philtrum-surface,
+  nasolabial/perioral-contamination, or metric lip-projection measurement
+  is currently established.
+- No millimetre claim, regional surface-accuracy claim, acceptance
+  threshold, confidence score, global mouth-quality pass, Phase 8 decision,
+  or Phase 9 authorization is introduced.
+- Verification:
+  focused `17 passed in 0.03s`;
+  related canonical-head regression `850 passed, 11 warnings in 15.47s`;
+  full regression `5127 passed, 11 warnings in 134.26s`.
+- Phase 8 final decision unchanged.
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
