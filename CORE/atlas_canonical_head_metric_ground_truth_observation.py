@@ -28,11 +28,22 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
     acquisition_modality: str
     acquisition_system: str
     acquisition_manufacturer: str
+    reconstruction_modality: str
+    reconstruction_software: str
+    reconstruction_software_version: str
     ground_truth_surface_origin: str
+    ground_truth_strength_state: str
+    subject_match_state: str
+    capture_session_relation: str
     capture_expression: str
     capture_pose: str
-    capture_session_state: str
+    capture_date: str
+    physical_resolution_state: str
+    physical_resolution_reference: str
     calibration_state: str
+    source_provenance_reference: str
+    license_reference: str
+    license_restrictions: str
     ground_truth_admissibility_state: str
 
     def __post_init__(self) -> None:
@@ -120,7 +131,25 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             self.acquisition_modality,
             name="acquisition_modality",
             allowed=(
+                "MULTIVIEW_IMAGE_CAPTURE",
+                "STRUCTURED_LIGHT_CAPTURE",
+                "STEREOPHOTOGRAMMETRIC_CAPTURE",
+                "LASER_SCAN_CAPTURE",
+                "CT_CAPTURE",
+                "CBCT_CAPTURE",
+                "OTHER_VERIFIED_CAPTURE",
+                "UNRESOLVED",
+            ),
+        )
+        reconstruction_modality = self._normalize_state(
+            self.reconstruction_modality,
+            name="reconstruction_modality",
+            allowed=(
                 "IMAGE_BASED_MULTIVIEW_RECONSTRUCTION",
+                "DIRECT_SENSOR_SURFACE",
+                "REGISTERED_SENSOR_SURFACE",
+                "MODEL_FITTED_RECONSTRUCTION",
+                "GENERATED_OR_INFERRED_RECONSTRUCTION",
                 "UNRESOLVED",
             ),
         )
@@ -128,13 +157,48 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             self.ground_truth_surface_origin,
             name="ground_truth_surface_origin",
             allowed=(
+                "RAW_SENSOR_DERIVED_SURFACE",
+                "REGISTERED_SENSOR_DERIVED_SURFACE",
                 "RECONSTRUCTED_SENSOR_DERIVED_SURFACE",
+                "MODEL_FITTED_TO_SCAN_GEOMETRY",
+                "GENERATED_OR_INFERRED_GEOMETRY",
                 "UNRESOLVED",
             ),
         )
-        capture_session_state = self._normalize_state(
-            self.capture_session_state,
-            name="capture_session_state",
+        ground_truth_strength_state = self._normalize_state(
+            self.ground_truth_strength_state,
+            name="ground_truth_strength_state",
+            allowed=(
+                "RAW_SENSOR",
+                "REGISTERED_SENSOR",
+                "DERIVED_SENSOR",
+                "MODEL_FITTED",
+                "GENERATED_OR_INFERRED",
+                "UNRESOLVED",
+            ),
+        )
+        subject_match_state = self._normalize_state(
+            self.subject_match_state,
+            name="subject_match_state",
+            allowed=(
+                "VERIFIED",
+                "PARTIAL",
+                "UNRESOLVED",
+            ),
+        )
+        capture_session_relation = self._normalize_state(
+            self.capture_session_relation,
+            name="capture_session_relation",
+            allowed=(
+                "SAME_SESSION_VERIFIED",
+                "CROSS_SESSION_VERIFIED",
+                "PARTIAL",
+                "UNRESOLVED",
+            ),
+        )
+        physical_resolution_state = self._normalize_state(
+            self.physical_resolution_state,
+            name="physical_resolution_state",
             allowed=(
                 "VERIFIED",
                 "PARTIAL",
@@ -170,6 +234,16 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             name="acquisition_manufacturer",
             uppercase=False,
         )
+        reconstruction_software = self._normalize_required_text(
+            self.reconstruction_software,
+            name="reconstruction_software",
+            uppercase=False,
+        )
+        reconstruction_software_version = self._normalize_required_text(
+            self.reconstruction_software_version,
+            name="reconstruction_software_version",
+            uppercase=False,
+        )
         capture_expression = self._normalize_required_text(
             self.capture_expression,
             name="capture_expression",
@@ -180,52 +254,71 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             name="capture_pose",
             uppercase=True,
         )
+        capture_date = self._normalize_required_text(
+            self.capture_date,
+            name="capture_date",
+            uppercase=False,
+        )
+        physical_resolution_reference = self._normalize_required_text(
+            self.physical_resolution_reference,
+            name="physical_resolution_reference",
+            uppercase=False,
+        )
+        source_provenance_reference = self._normalize_required_text(
+            self.source_provenance_reference,
+            name="source_provenance_reference",
+            uppercase=False,
+        )
+        license_reference = self._normalize_required_text(
+            self.license_reference,
+            name="license_reference",
+            uppercase=False,
+        )
+        license_restrictions = self._normalize_required_text(
+            self.license_restrictions,
+            name="license_restrictions",
+            uppercase=False,
+        )
 
-        object.__setattr__(
-            self,
-            "acquisition_modality",
-            acquisition_modality,
-        )
-        object.__setattr__(
-            self,
-            "acquisition_system",
-            acquisition_system,
-        )
-        object.__setattr__(
-            self,
-            "acquisition_manufacturer",
-            acquisition_manufacturer,
-        )
-        object.__setattr__(
-            self,
-            "ground_truth_surface_origin",
-            ground_truth_surface_origin,
-        )
-        object.__setattr__(
-            self,
-            "capture_expression",
-            capture_expression,
-        )
-        object.__setattr__(
-            self,
-            "capture_pose",
-            capture_pose,
-        )
-        object.__setattr__(
-            self,
-            "capture_session_state",
-            capture_session_state,
-        )
-        object.__setattr__(
-            self,
-            "calibration_state",
-            calibration_state,
-        )
-        object.__setattr__(
-            self,
-            "ground_truth_admissibility_state",
-            ground_truth_admissibility_state,
-        )
+        for field_name, value in (
+            ("acquisition_modality", acquisition_modality),
+            ("acquisition_system", acquisition_system),
+            ("acquisition_manufacturer", acquisition_manufacturer),
+            ("reconstruction_modality", reconstruction_modality),
+            ("reconstruction_software", reconstruction_software),
+            (
+                "reconstruction_software_version",
+                reconstruction_software_version,
+            ),
+            ("ground_truth_surface_origin", ground_truth_surface_origin),
+            ("ground_truth_strength_state", ground_truth_strength_state),
+            ("subject_match_state", subject_match_state),
+            ("capture_session_relation", capture_session_relation),
+            ("capture_expression", capture_expression),
+            ("capture_pose", capture_pose),
+            ("capture_date", capture_date),
+            ("physical_resolution_state", physical_resolution_state),
+            (
+                "physical_resolution_reference",
+                physical_resolution_reference,
+            ),
+            ("calibration_state", calibration_state),
+            (
+                "source_provenance_reference",
+                source_provenance_reference,
+            ),
+            ("license_reference", license_reference),
+            ("license_restrictions", license_restrictions),
+            (
+                "ground_truth_admissibility_state",
+                ground_truth_admissibility_state,
+            ),
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                value,
+            )
 
         ground_truth_vertices = self._normalize_vertices(
             self.ground_truth_vertices,

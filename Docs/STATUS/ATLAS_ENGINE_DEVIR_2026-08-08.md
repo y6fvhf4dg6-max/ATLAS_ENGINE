@@ -18459,8 +18459,178 @@ strict-face millimetre accuracy claim.
 
 ### Item state
 
-- `10.1 — Ground-Truth Source Qualification`: COMPLETE;
+- `10.1 — Ground-Truth Source Qualification`: HISTORICAL INITIAL CLOSURE — SUPERSEDED;
 - Main Checklist Item 10 remains ACTIVE;
+- Item 10.1 was reopened before 10.2 execution; historical next-target record superseded;
+- no Item 10 closure is claimed;
+- Phase 8 final decision remains undecided;
+- Phase 8 `GO + LOCK` is NOT established;
+- Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+### Supersession notice — Item 10.1 initial closure
+
+The earlier marker:
+
+`PHASE8_ITEM10_1_GROUND_TRUTH_SOURCE_QUALIFICATION_COMPLETE_2026_08_27`
+
+is retained as historical evidence of the first implementation checkpoint but
+is **SUPERSEDED** by the completed Item 10.1 schema below.
+
+Reason: the initial implementation did not yet represent the full approved
+source-qualification boundary. In particular, it conflated reconstruction
+software with acquisition system and did not yet carry reconstruction
+provenance, subject-match state, capture-session relation, physical-resolution
+state/reference, provenance reference, license reference/restrictions, or
+ground-truth strength classification.
+
+The earlier commit remains valid as an intermediate checkpoint; history is not
+rewritten.
+
+
+## Phase 8 — Item 10.1 Ground-Truth Source Qualification — Final corrected closure
+
+Marker:
+
+`PHASE8_ITEM10_1_GROUND_TRUTH_SOURCE_QUALIFICATION_COMPLETE_V2_2026_08_27`
+
+Item 10.1 is now implemented against the complete approved source-qualification
+boundary in the existing
+`AtlasCanonicalHeadMetricGroundTruthObservation` contract.
+
+### Corrected acquisition / reconstruction separation
+
+The contract now keeps physical acquisition and reconstruction provenance
+separate:
+
+- `acquisition_modality`;
+- `acquisition_system`;
+- `acquisition_manufacturer`;
+- `reconstruction_modality`;
+- `reconstruction_software`;
+- `reconstruction_software_version`.
+
+For HSRD-100 / `HSR0015-Body-035`:
+
+- acquisition modality: `MULTIVIEW_IMAGE_CAPTURE`;
+- acquisition hardware/system: `UNRESOLVED`;
+- acquisition manufacturer: `UNRESOLVED`;
+- reconstruction modality:
+  `IMAGE_BASED_MULTIVIEW_RECONSTRUCTION`;
+- reconstruction software: `RealityCapture`;
+- reconstruction software version: `1.4.2.117426`.
+
+RealityCapture is therefore no longer misclassified as acquisition hardware.
+
+### GT surface-origin / strength classification
+
+The contract explicitly distinguishes:
+
+- `RAW_SENSOR_DERIVED_SURFACE`;
+- `REGISTERED_SENSOR_DERIVED_SURFACE`;
+- `RECONSTRUCTED_SENSOR_DERIVED_SURFACE`;
+- `MODEL_FITTED_TO_SCAN_GEOMETRY`;
+- `GENERATED_OR_INFERRED_GEOMETRY`;
+- `UNRESOLVED`.
+
+Ground-truth strength is independently classified as:
+
+- `RAW_SENSOR`;
+- `REGISTERED_SENSOR`;
+- `DERIVED_SENSOR`;
+- `MODEL_FITTED`;
+- `GENERATED_OR_INFERRED`;
+- `UNRESOLVED`.
+
+HSRD is bounded as:
+
+- surface origin: `RECONSTRUCTED_SENSOR_DERIVED_SURFACE`;
+- strength: `DERIVED_SENSOR`.
+
+No reconstructed/fitted/generated geometry is silently promoted to raw sensor
+ground truth.
+
+### Subject / session / capture qualification
+
+The contract now also carries:
+
+- `subject_match_state`;
+- `capture_session_relation`;
+- `capture_expression`;
+- `capture_pose`;
+- `capture_date`.
+
+For the current HSRD evidence:
+
+- subject match: `VERIFIED` at the bounded product/source identity level;
+- capture-session relation: `UNRESOLVED`;
+- expression: `NEUTRAL`;
+- pose: `WALKING`;
+- capture date: `UNRESOLVED`.
+
+### Physical resolution boundary
+
+The contract now distinguishes mesh sampling from physical acquisition
+resolution through:
+
+- `physical_resolution_state`;
+- `physical_resolution_reference`.
+
+The HSRD LOD0 mesh has `499853` vertices and `999858` faces, but those values
+remain mesh-density/sampling facts only.
+
+They are NOT scanner resolution and are NOT physical accuracy.
+
+For HSRD:
+
+- physical resolution state: `UNRESOLVED`;
+- physical resolution reference: `UNRESOLVED`.
+
+### Provenance and license traceability
+
+The contract now carries explicit:
+
+- `source_provenance_reference`;
+- `license_reference`;
+- `license_restrictions`.
+
+Source provenance state, evaluation-license state and evaluation-use-only
+policy remain separate from those references.
+
+For HSRD:
+
+- the archive / RealityCapture / product-identity chain provides bounded
+  source provenance;
+- exact commercial/evaluation license rights remain `UNRESOLVED`;
+- provider price metadata is not treated as a legal license grant.
+
+### Calibration / admissibility boundary
+
+`calibration_state` and `ground_truth_admissibility_state` remain explicit and
+separate.
+
+For the current HSRD A03 metric path:
+
+- calibration evidence remains `UNRESOLVED`;
+- alignment remains `INADMISSIBLE_ALIGNMENT`;
+- camera convention remains `UNRESOLVED_GLOBAL_CONVENTION`;
+- metric claim remains `NOT_ADMISSIBLE`;
+- evidence class remains `DIAGNOSTIC_NEGATIVE_EVIDENCE`.
+
+This still does NOT establish poor FLAME geometry.
+
+### Validation — corrected closure
+
+- reopened RED: `36 failed in 0.13s`;
+- focused GREEN: `36 passed in 0.05s`;
+- related metric regression: `63 passed in 0.16s`;
+- full regression: `5309 passed, 11 warnings in 134.69s`;
+- target `git diff --check`: clean.
+
+### Item state
+
+- `10.1 — Ground-Truth Source Qualification`: **COMPLETE V2**;
+- previous Item 10.1 closure: **SUPERSEDED**, retained historically;
+- Main Checklist Item 10 remains `ACTIVE`;
 - next execution target: `10.2 — Unit Certainty`;
 - no Item 10 closure is claimed;
 - Phase 8 final decision remains undecided;
