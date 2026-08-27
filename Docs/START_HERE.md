@@ -13399,3 +13399,54 @@ Verification:
 
 Phase 8 final decision remains unchanged.
 Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+## Phase 8 / Main Checklist Item 9.11 — Cross-Region Compensation Audit
+
+Marker: `PHASE8_ITEM9_11_CROSS_REGION_COMPENSATION_AUDIT_COMPLETE_2026_08_27`
+
+Status: COMPLETE — bounded evidence/claim-boundary contract implemented and verified.
+
+Implemented:
+- `CORE/atlas_canonical_head_cross_region_compensation_evidence.py`
+- `Test/test_canonical_head_cross_region_compensation_evidence.py`
+
+Verified Item 9.11 classifications:
+- `global_improvement_with_local_degradation` → `bounded_positive`
+  - held-out global IOD-NME and bbox-NME improve in 3/3 views;
+  - regional observation-space audit remains mixed: 12/21 improved, 9/21 degraded;
+  - `nose_body` degraded in 3/3 held-out views;
+  - global improvement does not establish uniform regional success.
+- `camera_compensation` → `bounded_positive`
+  - persisted H1 factorial/isolation evidence verifies material analytic weak-perspective camera compensation in all three held-out views;
+  - this is observation-space compensation, not physical 3D correction and not proof of structural identity-camera leakage.
+- `pose_compensation` → `not_established_as_primary_explanation`
+  - pose-only effects do not reproduce the complete three-view `nose_body` regression pattern;
+  - H3 pose-only counterfactuals preserve canonical identity state and identity-only canonical geometry exactly.
+- `cross_region_compensation` → `bounded_mixed`
+  - simultaneous regional improvements/degradations establish measurable cross-region performance trade-off;
+  - no causal claim that one facial region compensates for another is established.
+- `alignment_concealing_local_failure` → `bounded_positive`
+  - the tested held-out root-pose + analytic weak-perspective camera-resolved evaluation path can reduce aggregate reprojection error while local `nose_body` failure remains visible;
+  - this is not a universal claim about all alignment methods.
+
+H3 boundary retained:
+- pose may alter posed geometry without mutating canonical identity;
+- expression may alter expression-dependent geometry without mutating canonical identity;
+- weak-perspective camera changes projection while fixed 3D geometry and identity remain invariant;
+- unconstrained identity refitting under nuisance stress was not tested;
+- therefore global absence of optimizer leakage is not established.
+
+Claim boundaries retained:
+- 2D reprojection/landmark evidence is not metric 3D anatomical truth;
+- no millimetre claim;
+- no metric surface-accuracy claim;
+- no arbitrary threshold or fabricated score;
+- H2 anchor-supported nose footprints remain bounded and are not dense anatomy;
+- Item 9.11 does not make a Phase 8 GO/HOLD decision;
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+Verification:
+- focused: 21 passed;
+- related canonical-head regression: 923 passed, 2 warnings;
+- full regression: 5206 passed, 11 warnings;
+- target diff check: exit 0.
