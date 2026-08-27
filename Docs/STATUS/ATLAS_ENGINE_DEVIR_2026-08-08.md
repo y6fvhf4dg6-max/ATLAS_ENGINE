@@ -17908,3 +17908,52 @@ Verification:
 - related canonical-head regression: 947 passed, 2 warnings;
 - full regression: 5230 passed, 11 warnings;
 - target diff check: exit 0.
+
+## Phase 8 / Main Checklist Item 9.13 — Landmark-vs-Surface Agreement Audit
+
+Marker: `PHASE8_ITEM9_13_LANDMARK_SURFACE_AGREEMENT_EVIDENCE_CONTRACT_COMPLETE_2026_08_27`
+
+Status: COMPLETE — bounded agreement/disagreement evidence contract implemented and verified.
+
+Implemented:
+- `CORE/atlas_canonical_head_landmark_surface_agreement_evidence.py`
+- `Test/test_canonical_head_landmark_surface_agreement_evidence.py`
+
+Verified Item 9.13 classifications:
+- `landmark_success_with_surface_failure` → `not_established`
+  - landmark/reprojection success exists in bounded 2D observation-space channels;
+  - no same-region independent admissible metric surface failure is currently available;
+  - canonical-model displacement alone is not surface failure.
+- `surface_success_with_landmark_failure` → `not_established`
+  - no admissible real subject-specific metric regional surface-success result exists;
+  - synthetic point-to-surface tests are not subject-specific surface-success evidence.
+- `local_landmark_localization_uncertainty` → `unresolved`
+  - current held-out and correspondence contracts do not expose verified per-landmark
+    sigma, variance, covariance or equivalent localization-uncertainty evidence;
+  - MediaPipe top-level provider confidence is not per-landmark uncertainty;
+  - DSINE confidence is a separate residual-detail confidence channel.
+- `regional_measurement_confidence_limitations` → `bounded_negative`
+  - 9/21 held-out regional comparisons use `partial_static105_overlap`;
+  - static105 has zero overlap with the 21 lower-jaw IDs and full 36-point face oval;
+  - eye-region landmark evidence is not orbital anatomical surface evidence;
+  - H2 nose footprints remain barycentric-anchor-supported bounded mappings;
+  - real regional metric surface GT remains blocked.
+
+Claim boundaries retained:
+- `landmark_fit -> surface_accuracy` remains forbidden;
+- `2d_reprojection -> metric_3d_accuracy` remains forbidden;
+- landmark success is not surface success;
+- canonical model-space geometry change is not metric anatomical failure;
+- regional surface success/failure is not claimed without admissible metric GT;
+- partial landmark coverage is not promoted to full semantic-region coverage;
+- unknown landmark uncertainty is not treated as zero uncertainty;
+- no surface-error millimetre result, landmark uncertainty number, arbitrary threshold,
+  confidence score, Phase 8 final decision or Phase 9 authorization is introduced.
+
+Verification:
+- focused: 19 passed;
+- related canonical-head regression: 966 passed, 2 warnings;
+- full regression: 5249 passed, 11 warnings;
+- target diff check: exit 0.
+
+Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
