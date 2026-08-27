@@ -15333,3 +15333,56 @@ Current global state remains:
   full regression `5092 passed, 11 warnings in 135.24s`.
 - Phase 8 final decision unchanged.
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+### PHASE8_ITEM9_6_CHEEK_MIDFACE_QUALITY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.6 — Cheek / Midface Quality evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_cheek_midface_quality_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_cheek_midface_quality_evidence.py`
+- Exact Item 9.6 criteria represented:
+  `zygomatic_width`, `cheek_prominence`, `anterior_projection`,
+  `midface_fullness`, `cheek_to_nose_transition`,
+  `cheek_to_jaw_transition`, `bilateral_asymmetry`.
+- Evaluation-space boundary retained:
+  `2d_observation`, `canonical_model`, `metric_3d_ground_truth`,
+  `physical_output`.
+- Current evidence status for all seven criteria is `blocked`.
+- Evidence-origin states retained:
+  `directly_observed`, `multiview_constrained`, `model_prior_inferred`,
+  `generated_completion`, `unresolved`.
+- Item 9.2 cheek mapping evidence remains unresolved:
+  `left_cheek` / `right_cheek` are required semantic regions but no verified
+  subject-specific canonical cheek mapping was found.
+- Persistent Item 8 H2 evidence contains no cheek/midface-specific mapping
+  or regional quality measurement.
+- `REPRODUCIBILITY_ITEM8_9_REGION_WISE.json` contains no cheek/midface
+  region-wise held-out keys.
+- FLAME and PRNet benchmark coverage remains
+  `orbital_cheek_volume_support=MISSING`.
+- Existing parametric `CHEEK_*` constants and `cheek_projection` values are
+  model-prior/generated geometry and are NOT treated as subject-observed
+  cheek/midface quality evidence.
+- Existing 2.5D relief `left_cheek` / `right_cheek` masks are NOT promoted
+  to canonical 3D cheek/midface ground truth.
+- No verified subject-specific evidence currently establishes:
+  - zygomatic width;
+  - cheek prominence;
+  - anterior projection;
+  - midface fullness;
+  - cheek-to-nose transition;
+  - cheek-to-jaw transition;
+  - bilateral cheek/midface asymmetry.
+- `zygomatic_width` remains Item 9.6 regional geometry scope.
+- `bizygomatic_relation` remains separately reserved for Item 9.9
+  anthropometric/proportional evaluation and is not promoted into Item 9.6.
+- No regional surface-accuracy, anatomical-ground-truth, metric-millimetre,
+  threshold, confidence-score, Phase 8 decision, or Phase 9 authorization
+  claim is introduced.
+- Verification:
+  focused `18 passed in 0.03s`;
+  related canonical-head regression `827 passed, 2 warnings in 4.23s`;
+  full regression `5110 passed, 11 warnings in 134.36s`.
+- Phase 8 final decision unchanged.
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
