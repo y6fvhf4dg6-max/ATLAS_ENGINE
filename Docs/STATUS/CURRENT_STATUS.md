@@ -15922,3 +15922,50 @@ Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
   scoped `git diff --check`: `EXIT=0`.
 - Phase 8 final decision remains unchanged.
 - Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM9_15_FACIAL_REGION_QUALITY_CLOSURE_BOUNDED_PASS_2026_08_27
+
+- Main Checklist Item 9 — Facial Region Geometry Quality officially closed as
+  `BOUNDED_PASS`.
+- Closure contract:
+  `CORE/atlas_canonical_head_facial_region_quality_closure.py`
+- Focused test:
+  `Test/test_canonical_head_facial_region_quality_closure.py`
+- Permitted Item 9 final classes remain:
+  `PASS`, `BOUNDED_PASS`, `HOLD`, `REVISION_REQUIRED`.
+- Selected class:
+  `BOUNDED_PASS`.
+- This classification records the verified evidence state on `2026-08-27`;
+  it is NOT an irreversible architectural lock.
+- Retained limitations remain explicit:
+  - `nose_body` degrades in `3/3` held-out observation-space views;
+  - jaw/chin front-versus-profile trade-off remains;
+  - orbital customer-visible likeness risk remains unresolved;
+  - cheek/midface customer-visible likeness risk remains unresolved;
+  - forehead/cranial quality remains blocked;
+  - regional metric surface result remains blocked;
+  - customer-visible risk remains potential, not verified.
+- `PASS` is not supported because significant regional evidence remains
+  blocked/unresolved and metric/physical likeness validation is incomplete.
+- `HOLD` is not supported because current evidence does NOT establish verified
+  customer-visible identity degradation or verified metric anatomical failure.
+- `REVISION_REQUIRED` is not supported because no verified mandatory
+  architecture/implementation defect has been established by Item 9 evidence.
+- Reopen/supersede boundary:
+  later stronger evidence from Item 10 metric ground truth, Item 11 physical
+  representation, Item 14 three-class architecture comparison, Item 15 final
+  Phase 8 decision, or an explicit user-authorized plan revision MAY reopen or
+  explicitly supersede individual Item 9 regional conclusions.
+- Historical-record rule:
+  the `2026-08-27` Item 9 closure record must remain preserved; later evidence
+  must supersede it explicitly and must not silently rewrite historical state.
+- Item 9 `BOUNDED_PASS` does NOT establish metric anatomical correctness,
+  commercial likeness acceptance, Phase 8 `GO + LOCK`, or Phase 9 authorization.
+- No arbitrary numerical acceptance threshold or fabricated score was introduced.
+- Verification:
+  focused `11 passed in 0.03s`;
+  related canonical-head regression `998 passed, 2 warnings in 4.58s`;
+  full regression `5281 passed, 11 warnings in 135.88s`;
+  scoped `git diff --check`: `EXIT=0`.
+- Phase 8 final decision remains undecided.
+- Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
