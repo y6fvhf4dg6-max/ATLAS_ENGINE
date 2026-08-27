@@ -17536,3 +17536,66 @@ Current global state remains:
   full regression `5127 passed, 11 warnings in 134.26s`.
 - Phase 8 final decision unchanged.
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+### PHASE8_ITEM9_8_FOREHEAD_CRANIAL_QUALITY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.8 — Forehead / Cranial Quality evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_forehead_cranial_quality_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_forehead_cranial_quality_evidence.py`
+- Exact Item 9.8 criteria represented:
+  `forehead_height`, `forehead_slope`, `frontal_curvature`,
+  `temple_transition`, `cranial_width`, `cranial_depth`,
+  `overall_skull_head_envelope`.
+- Evaluation-space boundary retained:
+  `2d_observation`, `canonical_model`, `metric_3d_ground_truth`,
+  `physical_output`.
+- Current evidence status for all seven criteria is `blocked`.
+- Evidence-origin states retained:
+  `directly_observed`, `multiview_constrained`, `model_prior_inferred`,
+  `generated_completion`, `unresolved`.
+- Provider FLAME semantic coverage includes:
+  `forehead` with 133 unique vertices and
+  `scalp` with 489 unique vertices.
+- Provider semantic masks are region descriptors only and are NOT treated
+  as criterion-specific quality measurements.
+- H2 FLAME mask geometry sanity measurements remain model-space geometry
+  descriptions and are NOT promoted to subject-specific anatomical truth.
+- Item 8 region-wise / held-out evidence contains no dedicated forehead or
+  cranial quality channel.
+- Existing personal-multiview silhouette/profile evidence uses the
+  lower-jaw visible contour channel with 21 MediaPipe lower-jaw source IDs.
+  It is therefore NOT promoted to forehead, cranial-width, cranial-depth,
+  or global skull/head-envelope quality evidence.
+- Existing `forehead_height` measurement / parameter / reference-profile
+  machinery exists, but no persisted subject-specific validated
+  forehead-height quality measurement was found.
+- No criterion-specific subject evidence was found for:
+  - forehead slope;
+  - frontal curvature;
+  - temple transition;
+  - cranial width;
+  - cranial depth;
+  - overall skull/head envelope.
+- `cranial_head_envelope` remains a required semantic region in the Item 9.2
+  contract, but this audit does not establish a verified criterion-specific
+  mapping or quality measurement for Item 9.8.
+- Item 9.8 criterion classification:
+  - forehead_height: `BLOCKED`;
+  - forehead_slope: `BLOCKED`;
+  - frontal_curvature: `BLOCKED`;
+  - temple_transition: `BLOCKED`;
+  - cranial_width: `BLOCKED`;
+  - cranial_depth: `BLOCKED`;
+  - overall_skull_head_envelope: `BLOCKED`.
+- No millimetre claim, subject-anatomical-truth claim, regional
+  surface-accuracy claim, acceptance threshold, confidence score,
+  global forehead/cranial pass, Phase 8 decision, or Phase 9 authorization
+  is introduced.
+- Verification:
+  focused `17 passed in 0.03s`;
+  related canonical-head regression `867 passed, 11 warnings in 15.36s`;
+  full regression `5144 passed, 11 warnings in 135.88s`.
+- Phase 8 final decision unchanged.
+- Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
