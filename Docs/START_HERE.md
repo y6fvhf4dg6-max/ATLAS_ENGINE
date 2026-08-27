@@ -13272,3 +13272,130 @@ Verification:
 
 Phase 8 final decision remains unchanged.
 Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+## PHASE8_ITEM9_10_CROSS_VIEW_REGIONAL_CONSISTENCY_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+Phase 8 / Main Checklist Item 9.10 — Cross-View Regional Consistency
+evidence contract is implemented and verified.
+
+Contract:
+- CORE/atlas_canonical_head_cross_view_regional_consistency_evidence.py
+- Test/test_canonical_head_cross_view_regional_consistency_evidence.py
+
+Locked Item 9.10 criteria:
+- same_region_across_views
+- view_conditioned_residual_behavior
+- consistent_regional_improvement
+- consistent_regional_degradation
+- mixed_view_conditioned_behavior
+- profile_sensitive_region_behavior
+- coverage_consistency
+- uniform_regional_success
+
+Primary persistent evidence:
+- REPRODUCIBILITY_ITEM8_9_REGION_WISE.json
+- ITEM8_H1_NOSE_BODY_PER_LANDMARK_DIAGNOSIS.json
+- ITEM8_H2_CANONICAL_3D_REGION_MEASUREMENT_RESULT.json
+- ITEM8_H2_BOUNDED_3D_MAPPING_INTERPRETATION.json
+
+Held-out protocol boundary:
+- views: front, turn_left, turn_right
+- measured regional comparisons: 21
+- improved comparisons: 12
+- degraded comparisons: 9
+- unchanged comparisons: 0
+- these are two-dimensional landmark/reprojection observation-space comparisons;
+  they are NOT metric 3D anatomical measurements or regional surface-error measurements.
+
+Coverage boundary:
+- full coverage: 12/21 comparisons
+  - left_eye: 3/3 full
+  - right_eye: 3/3 full
+  - nose_bridge: 3/3 full
+  - upper_lip: 3/3 full
+  - aggregate: 8 improved, 4 degraded
+- partial_static105_overlap: 9/21 comparisons
+  - lower_lip: 3/3 partial
+  - nose_base: 3/3 partial
+  - nose_body: 3/3 partial
+  - aggregate: 4 improved, 5 degraded
+- partial overlap MUST NOT be promoted to full semantic-region support or dense
+  anatomical regional coverage.
+
+Exact cross-view regional behavior:
+- upper_lip:
+  - CONSISTENT_IMPROVEMENT, full coverage, 3/3 views
+  - front delta_px = -0.596790245425
+  - turn_left delta_px = -0.195223703135
+  - turn_right delta_px = -0.293216107193
+- lower_lip:
+  - CONSISTENT_IMPROVEMENT, partial_static105_overlap, 3/3 views
+  - front delta_px = -0.418135292306
+  - turn_left delta_px = -0.124998030645
+  - turn_right delta_px = -0.076177947174
+- nose_body:
+  - CONSISTENT_DEGRADATION, partial_static105_overlap, 3/3 views
+  - front delta_px = +0.529442151973
+  - turn_left delta_px = +0.213729300156
+  - turn_right delta_px = +0.313909213145
+  - the Item 8 H1 nose_body 3/3 negative evidence therefore remains explicitly visible
+- left_eye:
+  - MIXED_VIEW_CONDITIONED, full coverage
+  - 2 improved / 1 degraded
+- right_eye:
+  - MIXED_VIEW_CONDITIONED, full coverage
+  - 1 improved / 2 degraded
+- nose_bridge:
+  - MIXED_VIEW_CONDITIONED, full coverage
+  - 2 improved / 1 degraded
+- nose_base:
+  - MIXED_VIEW_CONDITIONED, partial_static105_overlap
+  - 1 improved / 2 degraded
+
+Claim boundary:
+- aggregate multi-view consistency does NOT establish uniform regional consistency.
+- 12/21 improving regional comparisons do NOT establish a global facial-region PASS.
+- eye-region landmark evidence MUST NOT be promoted to orbital anatomical accuracy.
+- nose_body partial-static105 evidence MUST NOT be promoted to dense anatomical
+  nose-body segmentation.
+- the repeated nose_body regression is bounded observation-space evidence; without
+  independent metric 3D ground truth it MUST NOT be called true anatomical degradation.
+- H2 canonical nose footprints remain barycentric-anchor-supported bounded mappings,
+  not dense anatomical ground truth.
+- jaw silhouette evidence remains a separate contour channel and is not promoted
+  to canonical regional consistency.
+- no millimetre accuracy, metric 3D regional consistency, regional surface accuracy,
+  arbitrary threshold, global facial-quality PASS, Phase 8 final decision or
+  Phase 9 authorization is claimed.
+- profile-sensitive behavior remains bounded/partial; view-conditioned behavior alone
+  is not promoted to verified anatomical profile correctness.
+
+Evidence statuses:
+- bounded_positive
+- bounded_negative
+- bounded_mixed
+- bounded_partial
+- not_established
+
+Evaluation spaces remain explicitly separated:
+- 2d_observation
+- canonical_model
+- metric_3d_ground_truth
+- physical_output
+
+Evidence-origin states:
+- directly_observed
+- multiview_constrained
+- model_prior_inferred
+- generated_completion
+- unresolved
+
+Verification:
+- focused: 22 passed
+- related canonical-head: 902 passed, 2 warnings
+- full regression: 5185 passed, 11 warnings
+- warnings are existing NumPy/FLAME pickle deprecation warnings and are not introduced
+  by the Item 9.10 contract.
+
+Phase 8 final decision remains unchanged.
+Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
