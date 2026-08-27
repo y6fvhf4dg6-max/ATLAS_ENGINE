@@ -13559,3 +13559,42 @@ Verification:
 - target diff check: exit 0.
 
 Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+## PHASE8_ITEM9_14_CUSTOMER_VISIBLE_LIKENESS_RISK_EVIDENCE_CONTRACT_COMPLETE_2026_08_27
+
+- Main Checklist Item 9.14 — Customer-Visible Likeness Risk evidence contract added.
+- New contract:
+  `CORE/atlas_canonical_head_customer_visible_likeness_risk_evidence.py`
+- New focused test:
+  `Test/test_canonical_head_customer_visible_likeness_risk_evidence.py`
+- Exact critical regions represented:
+  `nose`, `jaw_chin`, `orbital_region`, `cheek_midface`,
+  `head_silhouette_profile`.
+- Region risk classifications:
+  - nose: `BOUNDED_POTENTIAL_LIKENESS_RISK`;
+  - jaw/chin: `BOUNDED_MIXED_LIKENESS_RISK`;
+  - orbital region: `UNRESOLVED_LIKENESS_RISK`;
+  - cheek/midface: `UNRESOLVED_LIKENESS_RISK`;
+  - head silhouette/profile: `BOUNDED_MIXED_LIKENESS_RISK`.
+- Overall Item 9.14 interpretation:
+  `POTENTIAL_CUSTOMER_VISIBLE_RISK_NOT_VERIFIED`.
+- Retained negative signal:
+  `nose_body` degrades in `3/3` held-out observation-space views.
+- Retained silhouette/profile trade-off:
+  side-profile contour evidence improves while front-view contour error
+  increases relative to baseline for the preferred bounded candidate.
+- Current evidence does NOT establish verified customer-visible identity
+  degradation, commercial likeness rejection, or metric anatomical failure.
+- Pre-Phase-8 portrait visual rejection remains historical diagnostic evidence
+  and is NOT promoted to rejection of the current canonical-head candidate.
+- Academic geometric/landmark error is NOT equated automatically with
+  commercial likeness acceptance or rejection.
+- No customer-visible score, likeness score, acceptance threshold, commercial
+  acceptance flag, Phase 8 decision, or Phase 9 authorization is introduced.
+- Verification:
+  focused `21 passed in 0.03s`;
+  related canonical-head regression `987 passed, 2 warnings in 4.52s`;
+  full regression `5270 passed, 11 warnings in 134.96s`;
+  scoped `git diff --check`: `EXIT=0`.
+- Phase 8 final decision remains unchanged.
+- Official Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
