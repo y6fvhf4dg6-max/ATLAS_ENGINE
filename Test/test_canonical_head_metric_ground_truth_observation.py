@@ -62,6 +62,36 @@ def _observation(**overrides):
         "scale_source": "UNRESOLVED",
         "scale_uncertainty_mm": None,
         "scale_uncertainty_propagation": "UNRESOLVED",
+        "source_coordinate_frame": "UNRESOLVED",
+        "target_coordinate_frame": "UNRESOLVED",
+        "source_handedness": "UNRESOLVED",
+        "target_handedness": "UNRESOLVED",
+        "source_axis_definitions": (
+            "UNRESOLVED_X",
+            "UNRESOLVED_Y",
+            "UNRESOLVED_Z",
+        ),
+        "target_axis_definitions": (
+            "UNRESOLVED_X",
+            "UNRESOLVED_Y",
+            "UNRESOLVED_Z",
+        ),
+        "source_coordinate_origin": "UNRESOLVED",
+        "target_coordinate_origin": "UNRESOLVED",
+        "source_orientation": "UNRESOLVED",
+        "target_orientation": "UNRESOLVED",
+        "canonical_pose": "UNRESOLVED",
+        "coordinate_transform_provenance": "UNRESOLVED",
+        "transform_order": (
+            "AXIS_PERMUTATION",
+            "REFLECTION",
+            "CANONICAL_POSE",
+        ),
+        "axis_permutation": (0, 1, 2),
+        "reflection_state": "UNRESOLVED",
+        "reflection_applied": None,
+        "canonical_pose_transform": np.eye(4, dtype=np.float64),
+        "round_trip_invertibility_state": "UNRESOLVED",
         "source_provenance_reference": "HSRD-100/HSR0015-Body-035",
         "license_reference": "UNRESOLVED",
         "license_restrictions": "UNRESOLVED",
@@ -555,3 +585,183 @@ def test_declared_scale_cannot_establish_verified_physical_calibration():
             scale_uncertainty_mm=None,
             scale_uncertainty_propagation="UNRESOLVED",
         )
+
+# === PHASE 8 ITEM 10.4 COORDINATE-SYSTEM CONTRACT ===
+
+
+def _coordinate_contract(**overrides):
+    values = {
+        "source_coordinate_frame": "HSRD_NATIVE_FRAME",
+        "target_coordinate_frame": "ATLAS_METRIC_EVALUATION_FRAME",
+        "source_handedness": "RIGHT_HANDED",
+        "target_handedness": "RIGHT_HANDED",
+        "source_axis_definitions": ("RIGHT", "UP", "FORWARD"),
+        "target_axis_definitions": ("RIGHT", "UP", "FORWARD"),
+        "source_coordinate_origin": "SOURCE_DEFINED",
+        "target_coordinate_origin": "EVALUATION_DEFINED",
+        "source_orientation": "SOURCE_NATIVE",
+        "target_orientation": "CANONICAL_HEAD",
+        "canonical_pose": "CANONICAL_HEAD",
+        "coordinate_transform_provenance": "explicit-test-coordinate-contract",
+        "transform_order": (
+            "AXIS_PERMUTATION",
+            "REFLECTION",
+            "CANONICAL_POSE",
+        ),
+        "axis_permutation": (0, 1, 2),
+        "reflection_state": "NOT_APPLIED",
+        "reflection_applied": False,
+        "canonical_pose_transform": np.eye(4, dtype=np.float64),
+        "round_trip_invertibility_state": "VERIFIED",
+    }
+    values.update(overrides)
+    return values
+
+
+def test_accepts_explicit_coordinate_system_contract():
+    values = _coordinate_contract()
+    observation = _observation(**values)
+
+    assert observation.source_coordinate_frame == "HSRD_NATIVE_FRAME"
+    assert (
+        observation.target_coordinate_frame
+        == "ATLAS_METRIC_EVALUATION_FRAME"
+    )
+    assert observation.source_handedness == "RIGHT_HANDED"
+    assert observation.target_handedness == "RIGHT_HANDED"
+    assert observation.source_axis_definitions == (
+        "RIGHT",
+        "UP",
+        "FORWARD",
+    )
+    assert observation.target_axis_definitions == (
+        "RIGHT",
+        "UP",
+        "FORWARD",
+    )
+    assert observation.axis_permutation == (0, 1, 2)
+    assert observation.reflection_state == "NOT_APPLIED"
+    assert observation.reflection_applied is False
+    assert observation.round_trip_invertibility_state == "VERIFIED"
+    np.testing.assert_allclose(
+        observation.canonical_pose_transform,
+        np.eye(4),
+    )
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    (
+        "source_coordinate_frame",
+        "target_coordinate_frame",
+        "source_coordinate_origin",
+        "target_coordinate_origin",
+        "source_orientation",
+        "target_orientation",
+        "canonical_pose",
+        "coordinate_transform_provenance",
+    ),
+)
+def test_coordinate_contract_requires_nonblank_text_fields(field_name):
+    values = _coordinate_contract(**{field_name: "   "})
+
+    with pytest.raises(
+        ValueError,
+        match=field_name,
+    ):
+        _observation(**values)
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    (
+        "source_handedness",
+        "target_handedness",
+    ),
+)
+def test_coordinate_contract_rejects_unknown_handedness(field_name):
+    values = _coordinate_contract(**{field_name: "MAYBE_HANDED"})
+
+    with pytest.raises(
+        ValueError,
+        match=field_name,
+    ):
+        _observation(**values)
+
+
+def test_axis_permutation_must_be_an_exact_permutation():
+    values = _coordinate_contract(
+        axis_permutation=(0, 0, 2),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="axis_permutation",
+    ):
+        _observation(**values)
+
+
+def test_reflection_state_and_applied_flag_must_agree():
+    values = _coordinate_contract(
+        reflection_state="APPLIED",
+        reflection_applied=False,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="reflection",
+    ):
+        _observation(**values)
+
+
+def test_unresolved_reflection_cannot_claim_boolean_application_state():
+    values = _coordinate_contract(
+        reflection_state="UNRESOLVED",
+        reflection_applied=False,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="reflection",
+    ):
+        _observation(**values)
+
+
+def test_canonical_pose_transform_must_be_finite_four_by_four():
+    values = _coordinate_contract(
+        canonical_pose_transform=np.eye(3),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="canonical_pose_transform",
+    ):
+        _observation(**values)
+
+
+def test_verified_round_trip_requires_invertible_canonical_pose_transform():
+    transform = np.eye(4, dtype=np.float64)
+    transform[2, 2] = 0.0
+
+    values = _coordinate_contract(
+        canonical_pose_transform=transform,
+        round_trip_invertibility_state="VERIFIED",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="invertib|round_trip",
+    ):
+        _observation(**values)
+
+
+def test_transform_order_must_explicitly_account_for_axis_and_reflection_steps():
+    values = _coordinate_contract(
+        transform_order=("CANONICAL_POSE",),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="transform_order",
+    ):
+        _observation(**values)

@@ -14428,3 +14428,54 @@ Closure boundary:
   `10.4 — Coordinate-System Contract`;
 - Phase 8 final decision remains undecided;
 - Official Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+## PHASE8_ITEM10_4_COORDINATE_SYSTEM_CONTRACT_FINAL_CLOSURE_2026_08_27
+
+Phase 8 Main Checklist Item 10.4 — Coordinate-System Contract reached final
+technical closure after RED-first implementation and an explicit Closure
+Challenge.
+
+Locked contract coverage now records and validates:
+
+- source and target / evaluation coordinate frames;
+- source and target handedness;
+- source and target axis definitions;
+- source and target coordinate origins;
+- source and target orientations;
+- canonical pose;
+- coordinate-transform provenance;
+- explicit transform order;
+- axis permutation;
+- reflection state and reflection application;
+- canonical-pose transform;
+- round-trip / invertibility state.
+
+Critical invariants:
+
+- axis permutation must be an exact permutation of `(0, 1, 2)`;
+- transform order is explicit as
+  `AXIS_PERMUTATION -> REFLECTION -> CANONICAL_POSE`;
+- reflection state and boolean application state must agree;
+- unresolved reflection cannot silently claim applied/not-applied;
+- canonical-pose transform must be finite 4x4;
+- `VERIFIED` round-trip / invertibility requires an invertible transform;
+- known metric units do not establish a known coordinate convention;
+- no silent reflection or axis swap is permitted.
+
+Validation history:
+
+- RED: 17 failed, 58 passed;
+- focused GREEN: 75 passed;
+- related regression: 138 passed;
+- full regression: 5357 passed, 11 warnings;
+- final Closure Challenge: PASS;
+- target `git diff --check`: clean.
+
+Claim boundary:
+
+This closes the coordinate-system contract boundary only. It does not establish
+that the current HSRD A03 branch has a resolved/admissible global coordinate
+convention, and it does not establish admissible rigid alignment. Those remain
+separate downstream questions, beginning with Item 10.5.
+
+Next locked item after commit/push closure: Item 10.5 — Rigid Alignment.

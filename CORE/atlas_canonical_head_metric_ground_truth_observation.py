@@ -50,6 +50,26 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
     scale_source: str
     scale_uncertainty_mm: float | None
     scale_uncertainty_propagation: str
+
+    source_coordinate_frame: str
+    target_coordinate_frame: str
+    source_handedness: str
+    target_handedness: str
+    source_axis_definitions: tuple[str, str, str]
+    target_axis_definitions: tuple[str, str, str]
+    source_coordinate_origin: str
+    target_coordinate_origin: str
+    source_orientation: str
+    target_orientation: str
+    canonical_pose: str
+    coordinate_transform_provenance: str
+    transform_order: tuple[str, ...]
+    axis_permutation: tuple[int, int, int]
+    reflection_state: str
+    reflection_applied: bool | None
+    canonical_pose_transform: np.ndarray
+    round_trip_invertibility_state: str
+
     source_provenance_reference: str
     license_reference: str
     license_restrictions: str
@@ -234,6 +254,43 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 "UNRESOLVED",
             ),
         )
+        source_handedness = self._normalize_state(
+            self.source_handedness,
+            name="source_handedness",
+            allowed=(
+                "RIGHT_HANDED",
+                "LEFT_HANDED",
+                "UNRESOLVED",
+            ),
+        )
+        target_handedness = self._normalize_state(
+            self.target_handedness,
+            name="target_handedness",
+            allowed=(
+                "RIGHT_HANDED",
+                "LEFT_HANDED",
+                "UNRESOLVED",
+            ),
+        )
+        reflection_state = self._normalize_state(
+            self.reflection_state,
+            name="reflection_state",
+            allowed=(
+                "APPLIED",
+                "NOT_APPLIED",
+                "UNRESOLVED",
+            ),
+        )
+        round_trip_invertibility_state = self._normalize_state(
+            self.round_trip_invertibility_state,
+            name="round_trip_invertibility_state",
+            allowed=(
+                "VERIFIED",
+                "FAILED",
+                "UNRESOLVED",
+            ),
+        )
+
         ground_truth_admissibility_state = self._normalize_state(
             self.ground_truth_admissibility_state,
             name="ground_truth_admissibility_state",
@@ -304,6 +361,47 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
             name="scale_uncertainty_propagation",
             uppercase=False,
         )
+        source_coordinate_frame = self._normalize_required_text(
+            self.source_coordinate_frame,
+            name="source_coordinate_frame",
+            uppercase=False,
+        )
+        target_coordinate_frame = self._normalize_required_text(
+            self.target_coordinate_frame,
+            name="target_coordinate_frame",
+            uppercase=False,
+        )
+        source_coordinate_origin = self._normalize_required_text(
+            self.source_coordinate_origin,
+            name="source_coordinate_origin",
+            uppercase=False,
+        )
+        target_coordinate_origin = self._normalize_required_text(
+            self.target_coordinate_origin,
+            name="target_coordinate_origin",
+            uppercase=False,
+        )
+        source_orientation = self._normalize_required_text(
+            self.source_orientation,
+            name="source_orientation",
+            uppercase=False,
+        )
+        target_orientation = self._normalize_required_text(
+            self.target_orientation,
+            name="target_orientation",
+            uppercase=False,
+        )
+        canonical_pose = self._normalize_required_text(
+            self.canonical_pose,
+            name="canonical_pose",
+            uppercase=False,
+        )
+        coordinate_transform_provenance = self._normalize_required_text(
+            self.coordinate_transform_provenance,
+            name="coordinate_transform_provenance",
+            uppercase=False,
+        )
+
         source_provenance_reference = self._normalize_required_text(
             self.source_provenance_reference,
             name="source_provenance_reference",
@@ -428,6 +526,140 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 "scale_uncertainty_mm is provided."
             )
 
+        def normalize_axis_definitions(
+            value: object,
+            *,
+            name: str,
+        ) -> tuple[str, str, str]:
+            try:
+                items = tuple(value)
+            except TypeError as exc:
+                raise TypeError(
+                    f"{name} must contain exactly three axis definitions."
+                ) from exc
+
+            if len(items) != 3:
+                raise ValueError(
+                    f"{name} must contain exactly three axis definitions."
+                )
+
+            normalized = tuple(
+                str(item).strip().upper()
+                for item in items
+            )
+
+            if any(not item for item in normalized):
+                raise ValueError(
+                    f"{name} entries must be non-blank."
+                )
+
+            return normalized
+
+        source_axis_definitions = normalize_axis_definitions(
+            self.source_axis_definitions,
+            name="source_axis_definitions",
+        )
+        target_axis_definitions = normalize_axis_definitions(
+            self.target_axis_definitions,
+            name="target_axis_definitions",
+        )
+
+        try:
+            axis_permutation = tuple(
+                int(value)
+                for value in self.axis_permutation
+            )
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                "axis_permutation must be an exact permutation of (0, 1, 2)."
+            ) from exc
+
+        if (
+            len(axis_permutation) != 3
+            or sorted(axis_permutation) != [0, 1, 2]
+        ):
+            raise ValueError(
+                "axis_permutation must be an exact permutation of (0, 1, 2)."
+            )
+
+        try:
+            transform_order = tuple(
+                str(value).strip().upper()
+                for value in self.transform_order
+            )
+        except TypeError as exc:
+            raise TypeError(
+                "transform_order must be an ordered sequence."
+            ) from exc
+
+        required_transform_order = (
+            "AXIS_PERMUTATION",
+            "REFLECTION",
+            "CANONICAL_POSE",
+        )
+
+        if transform_order != required_transform_order:
+            raise ValueError(
+                "transform_order must explicitly be "
+                "('AXIS_PERMUTATION', 'REFLECTION', 'CANONICAL_POSE')."
+            )
+
+        reflection_applied = self.reflection_applied
+
+        if (
+            reflection_applied is not None
+            and not isinstance(reflection_applied, bool)
+        ):
+            raise TypeError(
+                "reflection_applied must be boolean or None."
+            )
+
+        if reflection_state == "APPLIED":
+            if reflection_applied is not True:
+                raise ValueError(
+                    "reflection_state APPLIED requires "
+                    "reflection_applied=True."
+                )
+        elif reflection_state == "NOT_APPLIED":
+            if reflection_applied is not False:
+                raise ValueError(
+                    "reflection_state NOT_APPLIED requires "
+                    "reflection_applied=False."
+                )
+        else:
+            if reflection_applied is not None:
+                raise ValueError(
+                    "UNRESOLVED reflection_state requires "
+                    "reflection_applied=None."
+                )
+
+        canonical_pose_transform = np.asarray(
+            self.canonical_pose_transform,
+            dtype=np.float64,
+        )
+
+        if canonical_pose_transform.shape != (4, 4):
+            raise ValueError(
+                "canonical_pose_transform must have shape (4, 4)."
+            )
+
+        if not np.all(np.isfinite(canonical_pose_transform)):
+            raise ValueError(
+                "canonical_pose_transform must contain only finite values."
+            )
+
+        if round_trip_invertibility_state == "VERIFIED":
+            try:
+                np.linalg.inv(canonical_pose_transform)
+            except np.linalg.LinAlgError as exc:
+                raise ValueError(
+                    "VERIFIED round_trip_invertibility_state requires "
+                    "an invertible canonical_pose_transform."
+                ) from exc
+
+        canonical_pose_transform = canonical_pose_transform.copy()
+        canonical_pose_transform.setflags(write=False)
+
         compatible_strength_by_surface_origin = {
             "RAW_SENSOR_DERIVED_SURFACE": "RAW_SENSOR",
             "REGISTERED_SENSOR_DERIVED_SURFACE": "REGISTERED_SENSOR",
@@ -511,6 +743,24 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 "scale_uncertainty_propagation",
                 scale_uncertainty_propagation,
             ),
+            ("source_coordinate_frame", source_coordinate_frame),
+            ("target_coordinate_frame", target_coordinate_frame),
+            ("source_handedness", source_handedness),
+            ("target_handedness", target_handedness),
+            ("source_coordinate_origin", source_coordinate_origin),
+            ("target_coordinate_origin", target_coordinate_origin),
+            ("source_orientation", source_orientation),
+            ("target_orientation", target_orientation),
+            ("canonical_pose", canonical_pose),
+            (
+                "coordinate_transform_provenance",
+                coordinate_transform_provenance,
+            ),
+            ("reflection_state", reflection_state),
+            (
+                "round_trip_invertibility_state",
+                round_trip_invertibility_state,
+            ),
             (
                 "source_provenance_reference",
                 source_provenance_reference,
@@ -527,6 +777,37 @@ class AtlasCanonicalHeadMetricGroundTruthObservation:
                 field_name,
                 value,
             )
+
+        object.__setattr__(
+            self,
+            "source_axis_definitions",
+            source_axis_definitions,
+        )
+        object.__setattr__(
+            self,
+            "target_axis_definitions",
+            target_axis_definitions,
+        )
+        object.__setattr__(
+            self,
+            "transform_order",
+            transform_order,
+        )
+        object.__setattr__(
+            self,
+            "axis_permutation",
+            axis_permutation,
+        )
+        object.__setattr__(
+            self,
+            "reflection_applied",
+            reflection_applied,
+        )
+        object.__setattr__(
+            self,
+            "canonical_pose_transform",
+            canonical_pose_transform,
+        )
 
         object.__setattr__(
             self,
