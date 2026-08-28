@@ -17917,3 +17917,65 @@ Next exact subitem:
 **11.4 — Relief Depth Transfer**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_4_RELIEF_DEPTH_TRANSFER_FINAL_CLOSURE_2026_08_28
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.4 — Relief Depth Transfer
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.4 establishes the canonical-head-specific semantic audit contract for
+recording how metric canonical head depth is transferred into a physical relief
+representation.
+
+New contract:
+
+- `CORE/atlas_canonical_head_relief_depth_transfer.py`
+- `Test/test_canonical_head_relief_depth_transfer.py`
+
+Locked transfer semantics:
+
+- canonical metric depth and physical relief depth are recorded separately in millimetres;
+- observed transfer derives `depth_transfer_ratio = relief_depth_mm / canonical_depth_mm`;
+- zero relief depth resolves to `FLATTENED`;
+- `0 < ratio < 1` resolves to `COMPRESSED`;
+- exact `ratio == 1` resolves to `PRESERVED`;
+- `ratio > 1` resolves to `EXAGGERATED`;
+- no arbitrary preservation tolerance is invented;
+- `compression_fraction` is derived only for non-exaggerated transfer;
+- clipping is recorded independently as an audit flag;
+- local identity-bearing shape loss is recorded as an observation only;
+- `UNRESOLVED` requires both metric depth values to remain absent;
+- unresolved evidence cannot be populated with fabricated mm values;
+- provenance is mandatory.
+
+Architectural boundary:
+
+- generic relief band composition remains owned by `AtlasReliefDepthComposer`;
+- generic percentile/gamma compression remains owned by `AtlasReliefDepthCompressor`;
+- architectural relief composition remains owned by the architectural relief subsystem;
+- physical adapter isolation remains responsible for traceability of identity-sensitive transforms;
+- Item 11.4 owns only canonical-head-to-relief depth-transfer audit evidence;
+- Item 11.4 does not generate likeness scores, identity-preservation scores,
+  production decisions, or Phase 9 authorization;
+- LoD identity preservation remains Item 11.5;
+- printed dimensional fidelity remains Item 11.8.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.4: `34 passed`;
+- Closure Challenge V1: `30/30 PASS`;
+- related regression: `376 passed`;
+- full regression: `5770 passed, 11 warnings in 134.88s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.4.
+
+Item 11.4 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.5 — LoD Identity Preservation**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
