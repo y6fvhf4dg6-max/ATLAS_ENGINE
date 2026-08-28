@@ -17651,3 +17651,102 @@ Next main checklist item:
 `11 — Physical Representation Gate`
 
 Marker: `PHASE8_ITEM10_15_METRIC_GROUND_TRUTH_FINAL_CLOSURE_2026_08_28`
+
+## Phase 8 Item 11.1 — Canonical-to-Physical Adapter Isolation — FINAL CLOSURE
+
+Status: `CLOSED / BOUNDED_PASS`
+
+Item 11.1 now has an explicit semantic owner for isolating canonical identity
+geometry from downstream physical-representation conversion:
+
+- `CORE/atlas_canonical_head_physical_adapter_isolation.py`
+- `Test/test_canonical_head_physical_adapter_isolation.py`
+
+The contract was derived from both the ATLAS repository audit and external
+research into reconstruction / manufacturing separation patterns. The central
+boundary is that canonical reconstruction state and physical-production state
+remain distinct.
+
+Locked source-isolation behavior:
+
+- canonical source identity is explicit;
+- source topology signature is explicit;
+- source geometry signatures before and after adapter processing are explicit;
+- source provenance is mandatory;
+- derived physical representation identity is explicit and must be distinct
+  from the source identity;
+- physical unit is explicit and currently locked to `mm`;
+- physical output topology signature is explicit;
+- canonical-source geometry mutation is detected by before/after geometry
+  signature mismatch;
+- physical output topology may legitimately differ from canonical topology
+  without being confused with mutation of the canonical source;
+- the contract does not mutate or replace the canonical identity source.
+
+Locked representation families:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+Locked ordered transform-ledger operations:
+
+- `scale`;
+- `orientation`;
+- `translation`;
+- `clipping`;
+- `relief_depth_mapping`;
+- `relief_depth_compression`;
+- `lod_decimation`;
+- `shell_thickness`;
+- `smoothing`;
+- `repair`;
+- `feature_exaggeration`;
+- `topology_change`.
+
+Locked transform classifications:
+
+- `identity_neutral`;
+- `identity_sensitive`;
+- `topology_changing`.
+
+Semantic enforcement:
+
+- `topology_change` and `lod_decimation` must be classified as
+  `topology_changing`;
+- clipping, relief-depth mapping/compression, smoothing and feature
+  exaggeration cannot be declared `identity_neutral`;
+- every declared transform requires at least one explicit parameter;
+- duplicate transform-parameter keys are rejected;
+- transform order is preserved;
+- transform and isolation records are immutable snapshots.
+
+Epistemic boundary:
+
+- Item 11.1 does not produce a likeness score;
+- it does not produce an identity-preservation support score;
+- it does not issue production GO/HOLD/REJECT;
+- it does not authorize Phase 9;
+- it owns only canonical-source isolation and transformation traceability.
+
+Validation history:
+
+- initial RED: expected missing-module collection failure;
+- focused GREEN V1: `44 passed`;
+- adversarial Closure Challenge V1: `10 PASS / 10 FAIL`;
+- corrective RED: `10 failed, 44 passed`;
+- focused GREEN V2: `54 passed`;
+- Closure Challenge V2: `20 / 20 PASS`;
+- related regression: `146 passed`;
+- full regression: `5603 passed, 11 warnings in 135.96s`.
+
+The 11 warnings are the pre-existing NumPy `numpy.core.numeric` deprecation
+warnings in the real FLAME correspondence test path and are not introduced by
+Item 11.1.
+
+Next checklist item:
+
+`11.2 — Scale Classes`
+
+PHASE8_ITEM11_1_CANONICAL_TO_PHYSICAL_ADAPTER_ISOLATION_FINAL_CLOSURE_2026_08_28
