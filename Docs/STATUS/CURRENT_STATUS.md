@@ -17334,3 +17334,68 @@ has quantified dataset evidence, and it does not convert repeatability
 into accuracy, trueness, or metric anatomical truth.
 
 Marker: `PHASE8_ITEM10_11_REPEAT_CAPTURE_REPEATABILITY_FINAL_CLOSURE_2026_08_28`
+<!-- PHASE8_ITEM10_12_TRUENESS_VS_PRECISION_FINAL_CLOSURE_2026_08_28 -->
+
+### Phase 8 / Item 10.12 — Trueness vs Precision — CLOSED
+
+Status: `BOUNDED_PASS`
+
+Implemented contract:
+
+- `CORE/atlas_canonical_head_metric_trueness_precision.py`
+- `Test/test_canonical_head_metric_trueness_precision.py`
+
+Locked measurement concepts:
+
+- `TRUENESS`: closeness to reference truth;
+- `PRECISION`: consistency among repeated measurements.
+
+Evidence semantics:
+
+- trueness and precision remain separate executable concepts;
+- `ACCURACY` and `REPEATABILITY` are not accepted as aliases for either concept;
+- quantified trueness requires finite, non-negative `value_mm`, explicit provenance,
+  and explicit `REFERENCE_TRUTH_COMPARISON` evidence basis;
+- quantified precision requires finite, non-negative `value_mm`, explicit provenance,
+  and explicit `REPEATED_MEASUREMENT_CONSISTENCY` evidence basis;
+- the contract does not infer a quantified evidence basis when the caller omits it;
+- a trueness observation cannot carry a repeated-measurement basis;
+- a precision observation cannot carry a reference-truth basis;
+- `UNRESOLVED` observations cannot carry fabricated numeric values;
+- duplicate concepts are rejected;
+- constructor-bypassed observations are revalidated during evaluation;
+- partial concept coverage is explicitly reported as `INCOMPLETE`;
+- `COMPLETE` coverage requires both trueness and precision concepts to be represented;
+- no accuracy or repeatability result field is exposed by this contract.
+
+Validation:
+
+- initial RED: `11 failed` as expected;
+- initial focused: `11 passed`;
+- initial related regression: `203 passed`;
+- initial full regression: `5455 passed, 11 warnings`;
+- Closure Challenge V1: `FAIL` — concept names were separated, but quantified
+  evidence basis was not yet enforced;
+- corrective RED V1: `3 failed, 11 passed` as expected;
+- corrective focused V1: `14 passed`;
+- corrective related regression V1: `206 passed`;
+- corrective full regression V1: `5458 passed, 11 warnings`;
+- Closure Challenge V2: `FAIL` — omitted evidence basis was still inferred from
+  the concept rather than being explicitly supplied for quantified evidence;
+- corrective RED V2: `2 failed, 14 passed` as expected;
+- final focused: `16 passed`;
+- final related regression: `208 passed`;
+- final full regression: `5460 passed, 11 warnings`;
+- Closure Challenge V3: `PASS`.
+
+Boundary:
+
+This closes the Item 10.12 trueness-versus-precision semantic contract.
+It does not define a combined accuracy formula, does not convert repeatability
+into accuracy or trueness, and does not claim quantified trueness or precision
+where supporting dataset evidence is absent.
+
+Next locked item after commit/push closure:
+Item 10.13 — Ground-Truth Leakage.
+
+Marker: `PHASE8_ITEM10_12_TRUENESS_VS_PRECISION_FINAL_CLOSURE_2026_08_28`
