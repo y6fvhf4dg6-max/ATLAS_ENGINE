@@ -19086,3 +19086,99 @@ sampling or correspondence evidence remains unresolved.
 
 Next locked item after commit/push closure:
 Item 10.8 — Global Metric Error.
+
+## PHASE8_ITEM10_8_GLOBAL_METRIC_ERROR_FINAL_CLOSURE_2026_08_28
+
+Phase 8 Main Checklist Item 10.8 — Global Metric Error reached final
+technical closure after RED-first implementation, multiple adversarial Closure
+Challenges, corrective evidence-binding work, locked-scope coverage completion,
+and focused/related/full regression validation.
+
+Locked global metric result coverage now records:
+
+- primary metric-distance aggregate;
+- source-to-target aggregate;
+- target-to-source aggregate;
+- symmetric bidirectional aggregate where legitimately established;
+- valid correspondence count;
+- evaluation coverage denominator;
+- missing-surface fraction;
+- optional normal-orientation/angular discrepancy;
+- concrete ground-truth observation identity and source identity;
+- ground-truth admissibility state;
+- alignment admissibility;
+- alignment/evaluation overlap risk;
+- correspondence evidence class and direction;
+- bidirectional evaluation state;
+- regional blocker state;
+- derived global metric result state.
+
+Critical invariants:
+
+- a bare caller-supplied `ACCEPTABLE` token cannot establish admissible metric
+  evidence;
+- the evaluator requires a concrete
+  `AtlasCanonicalHeadMetricGroundTruthObservation` and revalidates it through
+  the existing Item 10.1 constructor / `__post_init__` invariant chain;
+- constructor-bypassed / incomplete ground-truth instances are rejected;
+- admissible global metric evaluation requires `ACCEPTABLE` GT evidence,
+  `ADMISSIBLE` alignment and resolved correspondence;
+- `valid_correspondence_count` must be greater than zero and must equal the
+  primary aggregate `sample_count`;
+- `evaluation_coverage_denominator` must be positive and cannot be smaller
+  than the valid correspondence count;
+- `missing_surface_fraction` must match the explicit
+  count/coverage-denominator relationship;
+- `BIDIRECTIONAL` correspondence requires `VERIFIED` bidirectional evaluation;
+- verified bidirectional evaluation requires both directional aggregates and
+  a symmetric aggregate;
+- a symmetric aggregate cannot be reported for a non-bidirectional evaluation;
+- alignment/evaluation overlap remains visible and does not silently disappear;
+- a global admissible result does not clear a recorded regional blocker.
+
+Claim boundary:
+
+Item 10.8 establishes the global metric-error contract and admissibility
+firewall. It does not establish anatomical homology from geometric nearest
+points, does not clear unresolved regional quality, does not by itself establish
+population/generalization coverage, and does not authorize official Phase 9.
+Subject-specific millimetre claims remain dependent on admissible metric GT,
+scale/coordinate/alignment provenance and legitimate correspondence semantics.
+
+Validation history:
+
+- initial RED: 7 failed, 8 passed;
+- initial focused GREEN: 15 passed;
+- initial related regression: 165 passed;
+- initial full regression: 5393 passed, 11 warnings;
+- Closure Challenge: FAIL because a bare `ACCEPTABLE` token could establish
+  an admissible global metric result;
+- corrective GT evidence-binding RED: 2 failed, 16 passed;
+- corrective focused GREEN: 18 passed;
+- corrective related regression: 168 passed;
+- corrective full regression: 5396 passed, 11 warnings;
+- Closure Challenge V2: FAIL because a constructor-bypassed incomplete GT
+  instance could still establish admissibility;
+- forged-instance corrective RED: 1 failed, 18 passed;
+- corrective V2 focused GREEN: 19 passed;
+- corrective V2 related regression: 169 passed;
+- corrective V2 full regression: 5397 passed, 11 warnings;
+- Closure Challenge V3: PASS;
+- locked-scope coverage audit: FAIL because directional/coverage/symmetric
+  evidence fields were not yet represented;
+- locked-scope corrective RED V3: 4 failed, 19 passed;
+- corrective V3 focused GREEN: 23 passed;
+- corrective V3 related regression: 173 passed;
+- corrective V3 full regression: 5401 passed, 11 warnings;
+- Final Closure Challenge: FAIL because zero-valid-correspondence and
+  aggregate/count contradiction states could still be accepted;
+- corrective RED V4: 2 failed, 23 passed;
+- corrective V4.1 focused GREEN: 25 passed;
+- corrective V4.1 related regression: 175 passed;
+- corrective V4.1 full regression: 5403 passed, 11 warnings;
+- Final Closure Challenge V2: PASS;
+- focused recheck: 25 passed;
+- target `git diff --check`: clean.
+
+Next locked item after commit/push closure:
+Item 10.9 — Region-Wise Metric Error.
