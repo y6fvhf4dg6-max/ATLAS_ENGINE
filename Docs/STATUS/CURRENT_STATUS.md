@@ -17276,3 +17276,61 @@ Validation history:
 
 Next locked item after commit/push closure:
 Item 10.11 — Repeat Capture / Repeatability.
+
+
+<!-- PHASE8_ITEM10_11_REPEAT_CAPTURE_REPEATABILITY_FINAL_CLOSURE_2026_08_28 -->
+
+### Phase 8 / Item 10.11 — Repeat Capture / Repeatability — CLOSED
+
+Status: `BOUNDED_PASS`
+
+Implemented contract:
+
+- `CORE/atlas_canonical_head_metric_repeatability.py`
+- `Test/test_canonical_head_metric_repeatability.py`
+
+Locked repeatability dimensions:
+
+- repeated sensor acquisition;
+- repeated preprocessing;
+- repeated reconstruction;
+- repeated registration / evaluation;
+- intra-run repeatability;
+- inter-run repeatability;
+- inter-capture repeatability;
+- inter-operator repeatability where relevant.
+
+Evidence semantics:
+
+- `QUANTIFIED` requires finite, non-negative `repeatability_mm` and explicit provenance;
+- `UNRESOLVED` cannot carry a numeric repeatability value;
+- `NOT_AVAILABLE` cannot carry a numeric repeatability value;
+- repeatability dimensions remain semantically distinct;
+- duplicate dimensions are rejected;
+- constructor-bypassed observations are revalidated during evaluation;
+- partial dimension coverage is explicitly reported as `INCOMPLETE`;
+- `COMPLETE` coverage requires all locked repeatability dimensions to be represented;
+- repeatability is not exposed or relabelled as accuracy or trueness;
+- no repeatability number is fabricated where dataset evidence is absent.
+
+Validation:
+
+- initial RED: `10 failed` as expected;
+- initial focused: `10 passed`;
+- initial related regression: `190 passed`;
+- initial full regression: `5442 passed, 11 warnings`;
+- Closure Challenge V1: `FAIL` — missing explicit partial-coverage guard;
+- corrective RED: `2 failed, 10 passed` as expected;
+- corrective focused: `12 passed`;
+- Closure Challenge V2: `PASS`;
+- post-correction related regression: `192 passed`;
+- post-correction full regression: `5444 passed, 11 warnings`.
+
+Boundary:
+
+This closes the Item 10.11 measurement-repeatability contract and its
+coverage semantics. It does not claim that every repeatability dimension
+has quantified dataset evidence, and it does not convert repeatability
+into accuracy, trueness, or metric anatomical truth.
+
+Marker: `PHASE8_ITEM10_11_REPEAT_CAPTURE_REPEATABILITY_FINAL_CLOSURE_2026_08_28`
