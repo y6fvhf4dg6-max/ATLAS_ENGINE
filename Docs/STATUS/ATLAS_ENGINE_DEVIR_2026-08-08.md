@@ -20124,3 +20124,93 @@ Next exact subitem:
 **11.6 — Topology / Manufacturability**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_6_TOPOLOGY_MANUFACTURABILITY_FINAL_CLOSURE_2026_08_28
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.6 — Topology / Manufacturability
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.6 establishes a canonical-head-specific physical topology and
+manufacturability evidence contract.
+
+New contract:
+
+- `CORE/atlas_canonical_head_topology_manufacturability.py`
+- `Test/test_canonical_head_topology_manufacturability.py`
+
+The contract records explicit observed evidence for:
+
+- open edges;
+- non-manifold edges;
+- self-intersections;
+- degenerate geometry;
+- minimum observed physical thickness;
+- minimum required physical thickness;
+- unsupported structures;
+- unintended disconnected components.
+
+Derived criterion states:
+
+- `closed_manifold_state`
+- `self_intersection_state`
+- `degenerate_geometry_state`
+- `thickness_state`
+- `unsupported_structure_state`
+- `disconnected_geometry_state`
+
+Aggregate state:
+
+- `SATISFIED`
+- `VIOLATED`
+- `UNRESOLVED`
+
+Locked semantics:
+
+- count fields require strict nonnegative integers;
+- boolean, float and string count substitutions are rejected;
+- observed and required thickness values must be finite and strictly positive;
+- thickness equality satisfies the requirement;
+- any positive defect count violates its applicable criterion;
+- any single violated criterion makes aggregate manufacturability `VIOLATED`;
+- `UNRESOLVED` requires all quantitative observations to remain absent;
+- unresolved evidence cannot contain fabricated numeric measurements;
+- provenance is mandatory;
+- supported representation kinds remain:
+  `relief`, `bust`, `figurine_head`, `story_kit_component`.
+
+Architectural boundary:
+
+- generic open-edge/non-manifold inspection remains owned by `AtlasMeshValidator`;
+- generic repair remains owned by `AtlasMeshRepair`;
+- generic minimum-thickness analysis remains owned by `AtlasMinimumThicknessAnalyzer`;
+- generic physical feature adaptation remains owned by `AtlasPhysicalFeatureResolver`;
+- relief-specific quality reporting remains owned by `AtlasReliefQualityReport`;
+- canonical source topology compatibility remains owned by
+  `AtlasCanonicalHeadTopologyCompatibilityGate`;
+- physical transform traceability remains owned by
+  `AtlasCanonicalHeadPhysicalAdapterIsolation`;
+- Item 11.6 owns only canonical-head physical topology/manufacturability evidence;
+- slicer validity is explicitly NOT established here and remains Item 11.7;
+- Item 11.6 does not issue production GO/HOLD/REJECT;
+- Item 11.6 does not establish identity preservation;
+- Item 11.6 does not authorize Phase 9.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.6: `60 passed`;
+- Closure Challenge V1: `88/88 PASS`;
+- related regression: `223 passed`;
+- full regression: `5878 passed, 11 warnings in 134.98s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.6.
+
+Item 11.6 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.7 — Slicer Gate**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
