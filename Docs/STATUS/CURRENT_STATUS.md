@@ -17842,3 +17842,78 @@ Next checklist item:
 `11.3 — Minimum Feature Survival`
 
 PHASE8_ITEM11_2_SCALE_CLASSES_FINAL_CLOSURE_2026_08_28
+
+## PHASE8_ITEM11_3_MINIMUM_FEATURE_SURVIVAL_FINAL_CLOSURE_2026_08_28
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.3 — Minimum Feature Survival
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.3 establishes the provider-independent semantic contract for recording
+whether identity-bearing canonical facial features survive conversion into a
+specific physical representation at an applicable minimum physical dimension.
+
+New contract:
+
+- `CORE/atlas_canonical_head_physical_feature_survival.py`
+- `Test/test_canonical_head_physical_feature_survival.py`
+
+Locked representation kinds:
+
+- `relief`
+- `bust`
+- `figurine_head`
+- `story_kit_component`
+
+Locked minimum-survival feature set:
+
+- `nose_edge_profile`
+- `nose_base`
+- `upper_lip_boundary`
+- `lower_lip_boundary`
+- `left_eyelid_orbital_boundary`
+- `right_eyelid_orbital_boundary`
+- `jaw_edge`
+- `chin`
+- `left_ear_structure`
+- `right_ear_structure`
+
+Locked measurement semantics:
+
+- actual physical feature measurement is recorded in millimetres;
+- applicable minimum required physical dimension is recorded separately;
+- `OBSERVED` requires a finite positive numeric physical measurement;
+- `UNRESOLVED` and `NOT_APPLICABLE` require `measurement_mm=None`;
+- unknown or non-applicable measurements cannot be populated with fabricated mm values;
+- observed features at or above the applicable minimum resolve to `SURVIVES`;
+- observed features below the applicable minimum resolve to `BELOW_MINIMUM`;
+- unresolved and non-applicable states remain explicit rather than being converted into pass/fail claims;
+- measurement provenance is mandatory.
+
+Architectural boundary:
+
+- semantic region mapping remains owned by the existing canonical-head mapping contracts;
+- canonical facial-region quality remains owned by the existing Item 9 evidence contracts;
+- generic manufacturability actions remain owned by `AtlasPhysicalFeatureResolver`;
+- Item 11.3 owns only canonical facial-feature physical-survival evidence;
+- Item 11.3 does not generate likeness score, identity-support score,
+  GO/HOLD/REJECT, production status, or Phase 9 authorization.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.3: `36 passed`;
+- Closure Challenge V1: `40/40 PASS`;
+- related regression: `363 passed`;
+- full regression: `5736 passed, 11 warnings in 135.43s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.3.
+
+Item 11.3 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.4 — Relief Depth Transfer**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
