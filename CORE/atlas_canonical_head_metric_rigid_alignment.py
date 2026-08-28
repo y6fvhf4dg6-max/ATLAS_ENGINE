@@ -371,3 +371,254 @@ class AtlasCanonicalHeadMetricRigidAlignment:
             )
 
         return points.copy()
+
+
+@dataclass(
+    frozen=True,
+    slots=True,
+)
+class AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAuditResult:
+    alignment_features: tuple[str, ...]
+    evaluation_features: tuple[str, ...]
+    feature_overlap: tuple[str, ...]
+    alignment_regions: tuple[str, ...]
+    evaluation_regions: tuple[str, ...]
+    region_overlap: tuple[str, ...]
+    alignment_bias_leakage_risk: str
+
+    def __post_init__(self) -> None:
+        for field_name in (
+            "alignment_features",
+            "evaluation_features",
+            "feature_overlap",
+            "alignment_regions",
+            "evaluation_regions",
+            "region_overlap",
+        ):
+            value = getattr(self, field_name)
+
+            if not isinstance(value, tuple):
+                raise TypeError(
+                    f"{field_name} must be a tuple."
+                )
+
+            normalized = tuple(
+                self._normalize_identifier(
+                    item,
+                    name=field_name,
+                )
+                for item in value
+            )
+
+            if len(normalized) != len(set(normalized)):
+                raise ValueError(
+                    f"{field_name} must not contain duplicates."
+                )
+
+            object.__setattr__(
+                self,
+                field_name,
+                normalized,
+            )
+
+        allowed_risk_states = (
+            "OVERLAP_PRESENT",
+            "NO_OVERLAP_IDENTIFIED",
+        )
+
+        risk = self._normalize_state(
+            self.alignment_bias_leakage_risk,
+            name="alignment_bias_leakage_risk",
+        )
+
+        if risk not in allowed_risk_states:
+            raise ValueError(
+                "alignment_bias_leakage_risk must be one of "
+                f"{allowed_risk_states}."
+            )
+
+        expected_feature_overlap = tuple(
+            feature
+            for feature in self.evaluation_features
+            if feature in set(self.alignment_features)
+        )
+        expected_region_overlap = tuple(
+            region
+            for region in self.evaluation_regions
+            if region in set(self.alignment_regions)
+        )
+
+        if self.feature_overlap != expected_feature_overlap:
+            raise ValueError(
+                "feature_overlap must exactly match the intersection "
+                "of alignment_features and evaluation_features."
+            )
+
+        if self.region_overlap != expected_region_overlap:
+            raise ValueError(
+                "region_overlap must exactly match the intersection "
+                "of alignment_regions and evaluation_regions."
+            )
+
+        expected_risk = (
+            "OVERLAP_PRESENT"
+            if self.feature_overlap or self.region_overlap
+            else "NO_OVERLAP_IDENTIFIED"
+        )
+
+        if risk != expected_risk:
+            raise ValueError(
+                "alignment_bias_leakage_risk must be derived from "
+                "feature and region overlap."
+            )
+
+        object.__setattr__(
+            self,
+            "alignment_bias_leakage_risk",
+            risk,
+        )
+
+    @staticmethod
+    def _normalize_identifier(
+        value: object,
+        *,
+        name: str,
+    ) -> str:
+        if not isinstance(value, str):
+            raise TypeError(
+                f"{name} entries must be strings."
+            )
+
+        normalized = "_".join(
+            value.strip().lower().split()
+        )
+
+        if not normalized:
+            raise ValueError(
+                f"{name} entries must not be blank."
+            )
+
+        return normalized
+
+    @staticmethod
+    def _normalize_state(
+        value: object,
+        *,
+        name: str,
+    ) -> str:
+        if not isinstance(value, str):
+            raise TypeError(
+                f"{name} must be a string."
+            )
+
+        normalized = "_".join(
+            value.strip().upper().split()
+        )
+
+        if not normalized:
+            raise ValueError(
+                f"{name} must not be blank."
+            )
+
+        return normalized
+
+
+class AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit:
+    @classmethod
+    def evaluate(
+        cls,
+        *,
+        alignment_features: object,
+        evaluation_features: object,
+        alignment_regions: object,
+        evaluation_regions: object,
+    ) -> AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAuditResult:
+        alignment_features = cls._normalize_identifier_collection(
+            alignment_features,
+            name="alignment_features",
+        )
+        evaluation_features = cls._normalize_identifier_collection(
+            evaluation_features,
+            name="evaluation_features",
+        )
+        alignment_regions = cls._normalize_identifier_collection(
+            alignment_regions,
+            name="alignment_regions",
+        )
+        evaluation_regions = cls._normalize_identifier_collection(
+            evaluation_regions,
+            name="evaluation_regions",
+        )
+
+        alignment_feature_set = set(
+            alignment_features
+        )
+        alignment_region_set = set(
+            alignment_regions
+        )
+
+        feature_overlap = tuple(
+            feature
+            for feature in evaluation_features
+            if feature in alignment_feature_set
+        )
+        region_overlap = tuple(
+            region
+            for region in evaluation_regions
+            if region in alignment_region_set
+        )
+
+        risk = (
+            "OVERLAP_PRESENT"
+            if feature_overlap or region_overlap
+            else "NO_OVERLAP_IDENTIFIED"
+        )
+
+        return AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAuditResult(
+            alignment_features=alignment_features,
+            evaluation_features=evaluation_features,
+            feature_overlap=feature_overlap,
+            alignment_regions=alignment_regions,
+            evaluation_regions=evaluation_regions,
+            region_overlap=region_overlap,
+            alignment_bias_leakage_risk=risk,
+        )
+
+    @staticmethod
+    def _normalize_identifier_collection(
+        value: object,
+        *,
+        name: str,
+    ) -> tuple[str, ...]:
+        if isinstance(value, (str, bytes)):
+            raise TypeError(
+                f"{name} must be an iterable of identifiers."
+            )
+
+        try:
+            items = tuple(value)
+        except TypeError as exc:
+            raise TypeError(
+                f"{name} must be an iterable of identifiers."
+            ) from exc
+
+        normalized = tuple(
+            AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAuditResult
+            ._normalize_identifier(
+                item,
+                name=name,
+            )
+            for item in items
+        )
+
+        if not normalized:
+            raise ValueError(
+                f"{name} must not be empty."
+            )
+
+        if len(normalized) != len(set(normalized)):
+            raise ValueError(
+                f"{name} must not contain duplicates."
+            )
+
+        return normalized

@@ -18951,3 +18951,62 @@ transform. Rigid and similarity alignment remain explicitly separate.
 
 Next locked item after commit/push closure:
 Item 10.6 — Alignment Landmark Independence.
+
+## PHASE8_ITEM10_6_ALIGNMENT_LANDMARK_INDEPENDENCE_FINAL_CLOSURE_2026_08_28
+
+Phase 8 Main Checklist Item 10.6 — Alignment Landmark Independence reached
+final technical closure after RED-first implementation, full regression
+validation, a failed first Closure Challenge, corrective RED, and Final Closure
+Challenge V2.
+
+Locked audit coverage records:
+
+- alignment features;
+- evaluation features;
+- feature overlap;
+- alignment regions;
+- evaluation regions;
+- region overlap;
+- evaluation-induced alignment-bias / leakage risk.
+
+Critical invariants:
+
+- feature overlap is derived from the recorded alignment/evaluation feature sets;
+- region overlap is derived from the recorded alignment/evaluation region sets;
+- any feature or region overlap yields
+  `alignment_bias_leakage_risk=OVERLAP_PRESENT`;
+- only non-empty, recorded and disjoint support sets may yield
+  `NO_OVERLAP_IDENTIFIED`;
+- empty alignment/evaluation feature or region evidence is rejected;
+- duplicate, blank and invalid identifier collections are rejected;
+- leakage-risk state is derived by the audit and is not caller-controlled.
+
+Claim boundary:
+
+`NO_OVERLAP_IDENTIFIED` means only that no overlap was found in the explicitly
+recorded feature and region support sets. It does not by itself prove complete
+statistical independence, correspondence validity, metric accuracy, or absence
+of every possible registration bias.
+
+Item 10.6 remains separate from:
+
+- Item 10.7 surface-correspondence semantics;
+- Item 10.9 regional metric-error aggregation.
+
+Validation history:
+
+- initial RED: 6 failed, 16 passed;
+- initial focused GREEN: 22 passed;
+- initial related regression: 146 passed;
+- initial full regression: 5375 passed, 11 warnings;
+- first Closure Challenge: FAIL because empty support evidence could produce
+  `NO_OVERLAP_IDENTIFIED`;
+- corrective RED: 4 failed, 22 passed;
+- corrective focused GREEN: 26 passed;
+- corrective related regression: 150 passed;
+- corrective full regression: 5379 passed, 11 warnings;
+- Final Closure Challenge V2: PASS;
+- target `git diff --check`: clean.
+
+Next locked item after commit/push closure:
+Item 10.7 — Surface Correspondence.

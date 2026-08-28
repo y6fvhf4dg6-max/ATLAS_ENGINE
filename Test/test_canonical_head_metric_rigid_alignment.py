@@ -330,3 +330,179 @@ def test_admissible_alignment_accepts_verified_coordinate_system():
 
     assert result.coordinate_system_state == "VERIFIED"
     assert result.alignment_admissibility == "ADMISSIBLE"
+
+# === PHASE 8 ITEM 10.6 ALIGNMENT LANDMARK INDEPENDENCE RED ===
+
+
+def test_alignment_landmark_independence_audit_records_exact_feature_and_region_sets():
+    from CORE.atlas_canonical_head_metric_rigid_alignment import (
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit,
+    )
+
+    result = AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit.evaluate(
+        alignment_features=("nose_tip", "left_eye_outer", "right_eye_outer"),
+        evaluation_features=("nose_tip", "chin"),
+        alignment_regions=("nose", "orbital"),
+        evaluation_regions=("nose", "jaw_chin"),
+    )
+
+    assert result.alignment_features == (
+        "nose_tip",
+        "left_eye_outer",
+        "right_eye_outer",
+    )
+    assert result.evaluation_features == (
+        "nose_tip",
+        "chin",
+    )
+    assert result.alignment_regions == (
+        "nose",
+        "orbital",
+    )
+    assert result.evaluation_regions == (
+        "nose",
+        "jaw_chin",
+    )
+
+
+def test_alignment_landmark_independence_audit_computes_feature_and_region_overlap():
+    from CORE.atlas_canonical_head_metric_rigid_alignment import (
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit,
+    )
+
+    result = AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit.evaluate(
+        alignment_features=("nose_tip", "left_eye_outer", "right_eye_outer"),
+        evaluation_features=("chin", "nose_tip"),
+        alignment_regions=("orbital", "nose"),
+        evaluation_regions=("jaw_chin", "nose"),
+    )
+
+    assert result.feature_overlap == ("nose_tip",)
+    assert result.region_overlap == ("nose",)
+
+
+def test_feature_overlap_is_reported_as_alignment_bias_leakage_risk():
+    from CORE.atlas_canonical_head_metric_rigid_alignment import (
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit,
+    )
+
+    result = AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit.evaluate(
+        alignment_features=("nose_tip", "left_eye_outer"),
+        evaluation_features=("nose_tip", "chin"),
+        alignment_regions=("orbital",),
+        evaluation_regions=("jaw_chin",),
+    )
+
+    assert result.feature_overlap == ("nose_tip",)
+    assert result.region_overlap == ()
+    assert result.alignment_bias_leakage_risk == "OVERLAP_PRESENT"
+
+
+def test_region_overlap_is_reported_as_alignment_bias_leakage_risk():
+    from CORE.atlas_canonical_head_metric_rigid_alignment import (
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit,
+    )
+
+    result = AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit.evaluate(
+        alignment_features=("left_eye_outer",),
+        evaluation_features=("chin",),
+        alignment_regions=("orbital", "nose"),
+        evaluation_regions=("nose", "jaw_chin"),
+    )
+
+    assert result.feature_overlap == ()
+    assert result.region_overlap == ("nose",)
+    assert result.alignment_bias_leakage_risk == "OVERLAP_PRESENT"
+
+
+def test_disjoint_alignment_and_evaluation_support_has_no_identified_overlap_risk():
+    from CORE.atlas_canonical_head_metric_rigid_alignment import (
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit,
+    )
+
+    result = AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit.evaluate(
+        alignment_features=("left_eye_outer", "right_eye_outer"),
+        evaluation_features=("chin", "mouth_center"),
+        alignment_regions=("orbital",),
+        evaluation_regions=("jaw_chin", "perioral"),
+    )
+
+    assert result.feature_overlap == ()
+    assert result.region_overlap == ()
+    assert (
+        result.alignment_bias_leakage_risk
+        == "NO_OVERLAP_IDENTIFIED"
+    )
+
+
+def test_overlap_risk_is_derived_and_not_caller_supplied():
+    from CORE.atlas_canonical_head_metric_rigid_alignment import (
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit,
+    )
+
+    with pytest.raises(TypeError):
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit.evaluate(
+            alignment_features=("nose_tip",),
+            evaluation_features=("nose_tip",),
+            alignment_regions=("nose",),
+            evaluation_regions=("nose",),
+            alignment_bias_leakage_risk="NO_OVERLAP_IDENTIFIED",
+        )
+
+# === PHASE 8 ITEM 10.6 EMPTY-EVIDENCE CORRECTIVE RED ===
+
+
+@pytest.mark.parametrize(
+    (
+        "alignment_features",
+        "evaluation_features",
+        "alignment_regions",
+        "evaluation_regions",
+    ),
+    (
+        (
+            (),
+            ("chin",),
+            ("orbital",),
+            ("jaw_chin",),
+        ),
+        (
+            ("left_eye_outer",),
+            (),
+            ("orbital",),
+            ("jaw_chin",),
+        ),
+        (
+            ("left_eye_outer",),
+            ("chin",),
+            (),
+            ("jaw_chin",),
+        ),
+        (
+            ("left_eye_outer",),
+            ("chin",),
+            ("orbital",),
+            (),
+        ),
+    ),
+)
+def test_alignment_landmark_independence_rejects_missing_support_evidence(
+    alignment_features,
+    evaluation_features,
+    alignment_regions,
+    evaluation_regions,
+):
+    from CORE.atlas_canonical_head_metric_rigid_alignment import (
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="must not be empty|evidence|support",
+    ):
+        AtlasCanonicalHeadMetricAlignmentLandmarkIndependenceAudit.evaluate(
+            alignment_features=alignment_features,
+            evaluation_features=evaluation_features,
+            alignment_regions=alignment_regions,
+            evaluation_regions=evaluation_regions,
+        )
