@@ -15816,3 +15816,107 @@ Next exact subitem:
 **11.7 — Slicer Gate**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_7_SLICER_GATE_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.7 — Slicer Gate
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.7 establishes a canonical-head-specific slicer evidence gate.
+
+New contract:
+
+- `CORE/atlas_canonical_head_slicer_gate.py`
+- `Test/test_canonical_head_slicer_gate.py`
+
+The contract records explicit slicer evidence for:
+
+- physical representation identity and representation kind;
+- slicer name and version;
+- printer model;
+- nozzle diameter;
+- layer height;
+- slice-attempt state;
+- observed slice completion;
+- slicer error count;
+- slicer-reported mesh repair count;
+- support enabled/disabled;
+- artifact provenance.
+
+Supported physical representation kinds remain:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+Slice-attempt states are:
+
+- `ATTEMPTED`;
+- `NOT_ATTEMPTED`;
+- `UNRESOLVED`.
+
+Derived slicer gate states are:
+
+- `PASSED`;
+- `FAILED`;
+- `UNRESOLVED`.
+
+`PASSED` requires explicit observed slicer evidence:
+
+1. `slice_attempt_state == ATTEMPTED`;
+2. `slice_completed == True`;
+3. `slicer_error_count == 0`.
+
+A valid digital mesh, topology/manufacturability result, or structurally valid
+Bambu `.3mf` MUST NOT independently produce `PASSED`.
+
+`FAILED` is derived when an actual slice was attempted but:
+
+- slicing did not complete; or
+- one or more slicer errors were observed.
+
+`NOT_ATTEMPTED` and `UNRESOLVED` remain `UNRESOLVED`; they cannot carry
+invented slice-result fields.
+
+`mesh_repair_count` is retained as slicer evidence but is not used as a
+substitute for observed slice completion. Item 11.6 remains the owner of the
+canonical topology/manufacturability decision.
+
+The contract intentionally does not claim:
+
+- digital-mesh validity;
+- topology validity;
+- physical print success;
+- printed dimensional fidelity;
+- physical regional identity preservation;
+- production `GO/HOLD/REJECT`;
+- Phase 9 authorization;
+- identity-preservation scoring.
+
+Existing general Bambu `.3mf` metadata validation remains owned by:
+
+- `CORE/atlas_bambu_3mf_production_validator.py`
+
+That validator does not invoke Bambu Studio and its
+`is_structurally_valid=True` result is not equivalent to slicer validity.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.7 V2: `58 passed`;
+- Closure Challenge V1: `69/69 PASS`;
+- related regression: `432 passed`;
+- full regression: `5936 passed, 11 warnings in 135.69s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.7.
+
+Item 11.7 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.8 — Printed Dimensional Fidelity**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
