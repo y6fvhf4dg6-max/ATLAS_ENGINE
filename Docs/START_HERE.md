@@ -15231,3 +15231,99 @@ Next locked Item 10 subitem after commit/push closure:
 `10.15 — Item 10 Closure`
 
 Marker: `PHASE8_ITEM10_14_DATASET_COVERAGE_FINAL_CLOSURE_2026_08_28`
+
+## Phase 8 Item 10.15 — Item 10 Closure — FINAL CLOSURE
+
+Status: `CLOSED / BOUNDED_PASS`
+
+Executable claim-specific closure contract:
+
+- `CORE/atlas_canonical_head_metric_claim_closure.py`
+- `Test/test_canonical_head_metric_claim_closure.py`
+
+Item 10.15 evaluates each intended metric claim independently across the
+authority-locked prerequisite dimensions:
+
+- ground-truth admissibility;
+- unit certainty;
+- scale / traceability;
+- coordinate-system certainty;
+- alignment admissibility;
+- correspondence admissibility;
+- uncertainty;
+- coverage;
+- leakage.
+
+Permitted final evidence states are:
+
+- `SUPPORTED`;
+- `PARTIAL`;
+- `MISSING`;
+- `BLOCKED`.
+
+Claim-state precedence is conservative:
+
+- explicit blockers dominate all other states;
+- missing evidence is not promoted by partial or supported evidence elsewhere;
+- partial evidence remains partial;
+- only all-supported prerequisites can yield `SUPPORTED`.
+
+Authority hard blockers are explicitly enforced:
+
+- unqualified / unresolved ground truth;
+- unresolved unit certainty;
+- inadmissible / unresolved alignment;
+- unverified / unresolved correspondence.
+
+For these hard prerequisites, `PARTIAL`, `MISSING`, or `BLOCKED` evidence
+produces a final `BLOCKED` metric claim.
+
+Scale / traceability, coordinate-system certainty, uncertainty, coverage and
+leakage remain independently visible. Their partial or missing states are not
+silently promoted to supported evidence, while an explicit `BLOCKED` state in
+any prerequisite still blocks the claim.
+
+Global and regional claims remain distinct. A global metric result cannot
+compensate for partial, missing or blocked evidence of a material regional
+claim.
+
+Closure Challenge history:
+
+- V1: `FAIL` — eight semantic gaps were detected because `PARTIAL` or `MISSING`
+  states in ground-truth admissibility, unit certainty, alignment admissibility
+  and correspondence admissibility were not yet promoted to explicit claim
+  blockers;
+- corrective RED V1: `8 failed, 32 passed`;
+- hard-blocker semantics corrected;
+- focused GREEN V2: `40 passed`;
+- Closure Challenge V2: `20/20 PASS`.
+
+Final validation:
+
+- focused: `40 passed`;
+- related complete Item 10 metric regression: `309 passed`;
+- full regression: `5549 passed, 11 warnings in 135.67s`.
+
+Boundary:
+
+This closure classifies metric evidence. It does not create a global support
+score, does not establish Phase 8 GO, does not authorize Phase 9, and does not
+promote observation-space or canonical-model evidence into metric anatomical
+truth.
+
+### Main Checklist Item 10 — Metric Ground-Truth Layer — CLOSED
+
+All Item 10 subitems `10.1` through `10.15` are now technically closed under
+their recorded bounded contracts.
+
+This means the Metric Ground-Truth Layer architecture and its claim boundaries
+are defined and regression-protected. It does NOT mean that every present or
+future dataset supports millimetre anatomical claims. Dataset-specific missing,
+partial, unresolved or blocked evidence remains explicit and must be evaluated
+per intended claim.
+
+Next main checklist item:
+
+`11 — Physical Representation Gate`
+
+Marker: `PHASE8_ITEM10_15_METRIC_GROUND_TRUTH_FINAL_CLOSURE_2026_08_28`
