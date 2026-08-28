@@ -114,3 +114,219 @@ def test_rejects_nonfinite_points():
             source_points=source,
             target_points=np.zeros((3, 3)),
         )
+
+# === PHASE 8 ITEM 10.5 RIGID ALIGNMENT CONTRACT ===
+
+
+def _well_conditioned_points():
+    return np.asarray(
+        [
+            [0.0, 0.0, 0.0],
+            [10.0, 0.0, 0.0],
+            [0.0, 20.0, 0.0],
+            [0.0, 0.0, 30.0],
+        ],
+        dtype=np.float64,
+    )
+
+
+def test_result_explicitly_identifies_scale_fixed_rigid_alignment():
+    source = _well_conditioned_points()
+    target = source + np.asarray([2.0, -3.0, 4.0])
+
+    result = AtlasCanonicalHeadMetricRigidAlignment.solve(
+        source_points=source,
+        target_points=target,
+    )
+
+    assert result.alignment_mode == "RIGID_SCALE_FIXED"
+    assert result.scale_factor == pytest.approx(1.0)
+
+
+def test_mathematically_computable_transform_is_not_automatically_admissible():
+    source = _well_conditioned_points()
+    target = source + np.asarray([2.0, -3.0, 4.0])
+
+    result = AtlasCanonicalHeadMetricRigidAlignment.solve(
+        source_points=source,
+        target_points=target,
+    )
+
+    assert result.alignment_admissibility == "UNRESOLVED"
+
+
+def test_records_solver_derived_alignment_audit_states():
+    source = _well_conditioned_points()
+
+    result = AtlasCanonicalHeadMetricRigidAlignment.solve(
+        source_points=source,
+        target_points=source,
+    )
+
+    assert result.anchor_sufficiency == "SUFFICIENT"
+    assert result.initialization == "DETERMINISTIC_CLOSED_FORM"
+    assert result.reflection_state == "NOT_APPLIED"
+    assert result.icp_refinement_state == "NOT_APPLIED"
+    assert (
+        result.multiple_initialization_sensitivity
+        == "NOT_APPLICABLE_CLOSED_FORM"
+    )
+
+
+def test_records_unresolved_sensitivity_and_stability_until_independently_audited():
+    source = _well_conditioned_points()
+
+    result = AtlasCanonicalHeadMetricRigidAlignment.solve(
+        source_points=source,
+        target_points=source,
+    )
+
+    assert result.anchor_subset_sensitivity == "UNRESOLVED"
+    assert result.solver_stability == "UNRESOLVED"
+    assert result.transform_stability == "UNRESOLVED"
+    assert result.icp_free_agreement == "NOT_APPLICABLE_NO_ICP"
+
+
+def test_rejects_collinear_anchor_geometry_as_insufficient_for_3d_rigid_alignment():
+    source = np.asarray(
+        [
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [2.0, 0.0, 0.0],
+            [3.0, 0.0, 0.0],
+        ],
+        dtype=np.float64,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="anchor|rank|collinear|sufficient",
+    ):
+        AtlasCanonicalHeadMetricRigidAlignment.solve(
+            source_points=source,
+            target_points=source,
+        )
+
+
+def test_rigid_solver_never_returns_an_improper_rotation():
+    source = _well_conditioned_points()
+    reflected = source.copy()
+    reflected[:, 0] *= -1.0
+
+    result = AtlasCanonicalHeadMetricRigidAlignment.solve(
+        source_points=source,
+        target_points=reflected,
+    )
+
+    assert np.linalg.det(result.rotation) == pytest.approx(
+        1.0,
+        abs=1e-12,
+    )
+    assert result.reflection_state == "NOT_APPLIED"
+
+
+def test_alignment_audit_states_can_be_supplied_without_changing_rigid_scale():
+    source = _well_conditioned_points()
+
+    result = AtlasCanonicalHeadMetricRigidAlignment.solve(
+        source_points=source,
+        target_points=source,
+        alignment_admissibility="ADMISSIBLE",
+        coordinate_system_state="VERIFIED",
+        anchor_subset_sensitivity="VERIFIED_STABLE",
+        solver_stability="VERIFIED_STABLE",
+        transform_stability="VERIFIED_STABLE",
+    )
+
+    assert result.alignment_admissibility == "ADMISSIBLE"
+    assert result.anchor_subset_sensitivity == "VERIFIED_STABLE"
+    assert result.solver_stability == "VERIFIED_STABLE"
+    assert result.transform_stability == "VERIFIED_STABLE"
+    assert result.scale_factor == pytest.approx(1.0)
+
+
+def test_rejects_unknown_alignment_admissibility_state():
+    source = _well_conditioned_points()
+
+    with pytest.raises(
+        ValueError,
+        match="alignment_admissibility",
+    ):
+        AtlasCanonicalHeadMetricRigidAlignment.solve(
+            source_points=source,
+            target_points=source,
+            alignment_admissibility="MAYBE",
+        )
+
+# === PHASE 8 ITEM 10.5 ADMISSIBILITY CROSS-FIELD RED ===
+
+
+def test_admissible_alignment_rejects_unresolved_stability_states():
+    source = _well_conditioned_points()
+
+    with pytest.raises(
+        ValueError,
+        match="ADMISSIBLE|stability|VERIFIED_STABLE",
+    ):
+        AtlasCanonicalHeadMetricRigidAlignment.solve(
+            source_points=source,
+            target_points=source,
+            alignment_admissibility="ADMISSIBLE",
+            anchor_subset_sensitivity="UNRESOLVED",
+            solver_stability="UNRESOLVED",
+            transform_stability="UNRESOLVED",
+        )
+
+
+def test_admissible_alignment_rejects_unstable_stability_states():
+    source = _well_conditioned_points()
+
+    with pytest.raises(
+        ValueError,
+        match="ADMISSIBLE|stability|VERIFIED_STABLE",
+    ):
+        AtlasCanonicalHeadMetricRigidAlignment.solve(
+            source_points=source,
+            target_points=source,
+            alignment_admissibility="ADMISSIBLE",
+            anchor_subset_sensitivity="UNSTABLE",
+            solver_stability="UNSTABLE",
+            transform_stability="UNSTABLE",
+        )
+
+# === PHASE 8 ITEM 10.5 COORDINATE ADMISSIBILITY RED ===
+
+
+def test_admissible_alignment_rejects_unresolved_coordinate_system():
+    source = _well_conditioned_points()
+
+    with pytest.raises(
+        ValueError,
+        match="ADMISSIBLE|coordinate|VERIFIED",
+    ):
+        AtlasCanonicalHeadMetricRigidAlignment.solve(
+            source_points=source,
+            target_points=source,
+            alignment_admissibility="ADMISSIBLE",
+            coordinate_system_state="UNRESOLVED",
+            anchor_subset_sensitivity="VERIFIED_STABLE",
+            solver_stability="VERIFIED_STABLE",
+            transform_stability="VERIFIED_STABLE",
+        )
+
+
+def test_admissible_alignment_accepts_verified_coordinate_system():
+    source = _well_conditioned_points()
+
+    result = AtlasCanonicalHeadMetricRigidAlignment.solve(
+        source_points=source,
+        target_points=source,
+        alignment_admissibility="ADMISSIBLE",
+        coordinate_system_state="VERIFIED",
+        anchor_subset_sensitivity="VERIFIED_STABLE",
+        solver_stability="VERIFIED_STABLE",
+        transform_stability="VERIFIED_STABLE",
+    )
+
+    assert result.coordinate_system_state == "VERIFIED"
+    assert result.alignment_admissibility == "ADMISSIBLE"

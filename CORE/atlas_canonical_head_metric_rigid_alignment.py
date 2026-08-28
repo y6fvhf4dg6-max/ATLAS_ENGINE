@@ -14,6 +14,18 @@ class AtlasCanonicalHeadMetricRigidAlignmentResult:
     rotation: np.ndarray
     translation: np.ndarray
     scale_factor: float
+    alignment_mode: str
+    alignment_admissibility: str
+    coordinate_system_state: str
+    anchor_sufficiency: str
+    initialization: str
+    reflection_state: str
+    icp_refinement_state: str
+    multiple_initialization_sensitivity: str
+    anchor_subset_sensitivity: str
+    solver_stability: str
+    transform_stability: str
+    icp_free_agreement: str
 
     def __post_init__(self) -> None:
         aligned = np.asarray(
@@ -100,6 +112,112 @@ class AtlasCanonicalHeadMetricRigidAlignmentResult:
             scale_factor,
         )
 
+        allowed_states = {
+            "alignment_mode": (
+                "RIGID_SCALE_FIXED",
+            ),
+            "alignment_admissibility": (
+                "ADMISSIBLE",
+                "INADMISSIBLE",
+                "UNRESOLVED",
+            ),
+            "coordinate_system_state": (
+                "VERIFIED",
+                "UNRESOLVED",
+            ),
+            "anchor_sufficiency": (
+                "SUFFICIENT",
+                "INSUFFICIENT",
+                "UNRESOLVED",
+            ),
+            "initialization": (
+                "DETERMINISTIC_CLOSED_FORM",
+                "EXPLICIT_INITIALIZATION",
+                "UNRESOLVED",
+            ),
+            "reflection_state": (
+                "NOT_APPLIED",
+                "APPLIED",
+                "UNRESOLVED",
+            ),
+            "icp_refinement_state": (
+                "NOT_APPLIED",
+                "APPLIED",
+                "UNRESOLVED",
+            ),
+            "multiple_initialization_sensitivity": (
+                "NOT_APPLICABLE_CLOSED_FORM",
+                "VERIFIED_STABLE",
+                "UNSTABLE",
+                "UNRESOLVED",
+            ),
+            "anchor_subset_sensitivity": (
+                "VERIFIED_STABLE",
+                "UNSTABLE",
+                "UNRESOLVED",
+            ),
+            "solver_stability": (
+                "VERIFIED_STABLE",
+                "UNSTABLE",
+                "UNRESOLVED",
+            ),
+            "transform_stability": (
+                "VERIFIED_STABLE",
+                "UNSTABLE",
+                "UNRESOLVED",
+            ),
+            "icp_free_agreement": (
+                "NOT_APPLICABLE_NO_ICP",
+                "AGREES",
+                "DISAGREES",
+                "UNRESOLVED",
+            ),
+        }
+
+        for field_name, allowed in allowed_states.items():
+            value = getattr(self, field_name)
+            if not isinstance(value, str):
+                raise TypeError(
+                    f"{field_name} must be a string."
+                )
+
+            normalized = value.strip().upper()
+            if normalized not in allowed:
+                raise ValueError(
+                    f"{field_name} must be one of {allowed}."
+                )
+
+            object.__setattr__(
+                self,
+                field_name,
+                normalized,
+            )
+
+        if self.alignment_admissibility == "ADMISSIBLE":
+            if self.coordinate_system_state != "VERIFIED":
+                raise ValueError(
+                    "ADMISSIBLE alignment requires VERIFIED "
+                    "coordinate_system_state."
+                )
+
+            required_stable_fields = (
+                "anchor_subset_sensitivity",
+                "solver_stability",
+                "transform_stability",
+            )
+
+            unstable_or_unresolved = tuple(
+                field_name
+                for field_name in required_stable_fields
+                if getattr(self, field_name) != "VERIFIED_STABLE"
+            )
+
+            if unstable_or_unresolved:
+                raise ValueError(
+                    "ADMISSIBLE alignment requires VERIFIED_STABLE "
+                    "anchor-subset, solver, and transform stability."
+                )
+
 
 class AtlasCanonicalHeadMetricRigidAlignment:
     @classmethod
@@ -108,6 +226,11 @@ class AtlasCanonicalHeadMetricRigidAlignment:
         *,
         source_points: object,
         target_points: object,
+        alignment_admissibility: str = "UNRESOLVED",
+        coordinate_system_state: str = "UNRESOLVED",
+        anchor_subset_sensitivity: str = "UNRESOLVED",
+        solver_stability: str = "UNRESOLVED",
+        transform_stability: str = "UNRESOLVED",
     ) -> AtlasCanonicalHeadMetricRigidAlignmentResult:
         source = cls._normalize_points(
             source_points,
@@ -135,6 +258,28 @@ class AtlasCanonicalHeadMetricRigidAlignment:
         target_centroid = target.mean(
             axis=0
         )
+
+        source_centered_for_rank = (
+            source
+            - source_centroid
+        )
+        target_centered_for_rank = (
+            target
+            - target_centroid
+        )
+
+        source_rank = np.linalg.matrix_rank(
+            source_centered_for_rank
+        )
+        target_rank = np.linalg.matrix_rank(
+            target_centered_for_rank
+        )
+
+        if source_rank < 2 or target_rank < 2:
+            raise ValueError(
+                "anchor geometry is insufficient for 3D rigid alignment; "
+                "at least three non-collinear correspondences are required."
+            )
 
         source_centered = (
             source
@@ -182,6 +327,20 @@ class AtlasCanonicalHeadMetricRigidAlignment:
             rotation=rotation,
             translation=translation,
             scale_factor=1.0,
+            alignment_mode="RIGID_SCALE_FIXED",
+            alignment_admissibility=alignment_admissibility,
+            coordinate_system_state=coordinate_system_state,
+            anchor_sufficiency="SUFFICIENT",
+            initialization="DETERMINISTIC_CLOSED_FORM",
+            reflection_state="NOT_APPLIED",
+            icp_refinement_state="NOT_APPLIED",
+            multiple_initialization_sensitivity=(
+                "NOT_APPLICABLE_CLOSED_FORM"
+            ),
+            anchor_subset_sensitivity=anchor_subset_sensitivity,
+            solver_stability=solver_stability,
+            transform_stability=transform_stability,
+            icp_free_agreement="NOT_APPLICABLE_NO_ICP",
         )
 
     @staticmethod

@@ -14479,3 +14479,77 @@ convention, and it does not establish admissible rigid alignment. Those remain
 separate downstream questions, beginning with Item 10.5.
 
 Next locked item after commit/push closure: Item 10.5 — Rigid Alignment.
+
+## PHASE8_ITEM10_5_RIGID_ALIGNMENT_FINAL_CLOSURE_2026_08_28
+
+Phase 8 Main Checklist Item 10.5 — Rigid Alignment reached final technical
+closure after RED-first implementation, two corrective RED cycles, full
+regression revalidation, and Final Closure Challenge V2.
+
+Locked contract coverage now keeps explicit and separate:
+
+- translation;
+- rotation;
+- rigid scale factor;
+- alignment mode;
+- alignment admissibility;
+- coordinate-system verification state;
+- anchor sufficiency;
+- initialization state;
+- reflection state;
+- ICP refinement state;
+- multiple-initialization sensitivity;
+- anchor-subset sensitivity;
+- solver stability;
+- transform stability;
+- ICP-versus-ICP-free agreement state.
+
+Critical invariants and firewalls:
+
+- rigid alignment requires `scale_factor == 1.0`;
+- alignment mode is explicitly `RIGID_SCALE_FIXED`;
+- mathematically computable transforms default to
+  `alignment_admissibility=UNRESOLVED`;
+- at least three non-collinear correspondences are required;
+- improper rotations are corrected so the rigid solver does not silently
+  return a reflection;
+- this closed-form solver records reflection and ICP refinement as
+  `NOT_APPLIED`;
+- no-ICP execution records `icp_free_agreement=NOT_APPLICABLE_NO_ICP`;
+- `ADMISSIBLE` requires `coordinate_system_state=VERIFIED`;
+- `ADMISSIBLE` also requires `VERIFIED_STABLE` anchor-subset, solver, and
+  transform stability;
+- unresolved or unstable stability cannot coexist with `ADMISSIBLE`.
+
+Validation history:
+
+- initial RED: 8 failed, 4 passed;
+- first focused GREEN: 12 passed;
+- first related regression: 146 passed;
+- first full regression: 5365 passed, 11 warnings;
+- first Closure Challenge: FAIL because `ADMISSIBLE` accepted unresolved or
+  unstable stability states;
+- stability corrective RED: 2 failed, 12 passed;
+- corrective focused GREEN: 14 passed;
+- corrective related regression: 148 passed;
+- corrective full regression: 5367 passed, 11 warnings;
+- coordinate/admissibility corrective RED: 2 failed, 14 passed;
+- final focused GREEN: 16 passed;
+- final related regression: 150 passed;
+- final full regression: 5369 passed, 11 warnings;
+- Final Closure Challenge V2: PASS;
+- target `git diff --check`: clean.
+
+Claim boundary:
+
+`coordinate_system_state=VERIFIED` is an evidence-state input to the rigid
+alignment contract; the rigid solver does not independently establish the
+underlying coordinate convention. Therefore this closure does not convert the
+HSRD-100 A03 diagnostic branch into admissible metric ground truth. Its existing
+`INADMISSIBLE_ALIGNMENT` disposition remains unchanged.
+
+A mathematically computable transform is not automatically an admissible metric
+transform. Rigid and similarity alignment remain explicitly separate.
+
+Next locked item after commit/push closure:
+Item 10.6 — Alignment Landmark Independence.
