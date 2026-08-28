@@ -17750,3 +17750,95 @@ Next checklist item:
 `11.2 — Scale Classes`
 
 PHASE8_ITEM11_1_CANONICAL_TO_PHYSICAL_ADAPTER_ISOLATION_FINAL_CLOSURE_2026_08_28
+
+## Phase 8 Item 11.2 — Scale Classes — FINAL CLOSURE
+
+Status: `CLOSED / BOUNDED_PASS`
+
+Item 11.2 now has an explicit canonical-head physical scale record:
+
+- `CORE/atlas_canonical_head_physical_scale_class.py`
+- `Test/test_canonical_head_physical_scale_class.py`
+
+Authority requirement:
+
+- record actual physical head/output dimensions for each representation class.
+
+Supported representation classes:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+Recorded actual physical dimensions:
+
+- `head_width_mm`;
+- `head_height_mm`;
+- `head_depth_mm`;
+- `output_width_mm`;
+- `output_height_mm`;
+- `output_depth_mm`.
+
+The contract explicitly separates actual measured dimensions from historical
+target-dimension semantics. It does not expose `target_*` dimension fields.
+
+Physical unit is locked to:
+
+- `mm`.
+
+Every record requires explicit measurement provenance.
+
+Each physical dimension has an explicit epistemic state:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_APPLICABLE`.
+
+State/value consistency is locked:
+
+- `OBSERVED` requires a finite positive numeric measurement;
+- `UNRESOLVED` requires the corresponding dimension value to be `None`;
+- `NOT_APPLICABLE` requires the corresponding dimension value to be `None`;
+- contradictory numeric-value/non-observed-state pairs are rejected;
+- unknown states are rejected.
+
+This prevents unknown or non-applicable dimensions from being represented by
+fabricated positive millimetre values.
+
+No unsupported named scale bands were invented. In particular, Item 11.2 does
+not introduce arbitrary `small`, `medium`, `large`, `size_band`, or
+`scale_class_name` thresholds because no authority-backed thresholds currently
+exist.
+
+Epistemic boundary:
+
+- no production GO/HOLD/REJECT decision;
+- no likeness score;
+- no identity-preservation support score;
+- no production status;
+- no Phase 9 authorization.
+
+Validation history:
+
+- initial RED: expected missing-module collection failure;
+- focused GREEN V1: `63 passed`;
+- Closure Challenge V1: `12 PASS / 4 FAIL`;
+- corrective RED #1: `22 failed, 63 passed`;
+- focused GREEN V2: `85 passed`;
+- Closure Challenge V2: `22 PASS / 12 FAIL`;
+- corrective RED #2: `12 failed, 85 passed`;
+- focused GREEN V3: `97 passed`;
+- Closure Challenge V3: `57 / 57 PASS`;
+- related regression: `219 passed`;
+- full regression: `5700 passed, 11 warnings in 136.16s`.
+
+The 11 warnings are the pre-existing NumPy `numpy.core.numeric` deprecation
+warnings in the real FLAME correspondence test path and are not introduced by
+Item 11.2.
+
+Next checklist item:
+
+`11.3 — Minimum Feature Survival`
+
+PHASE8_ITEM11_2_SCALE_CLASSES_FINAL_CLOSURE_2026_08_28
