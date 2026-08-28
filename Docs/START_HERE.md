@@ -15162,3 +15162,72 @@ Next locked Item 10 subitem after commit/push closure:
 `10.14 — Dataset Coverage`
 
 Marker: `PHASE8_ITEM10_13_GROUND_TRUTH_LEAKAGE_FINAL_CLOSURE_2026_08_28`
+
+## Phase 8 Item 10.14 — Dataset Coverage — FINAL CLOSURE
+
+Status: `CLOSED / BOUNDED_PASS`
+
+Item 10.14 now has an explicit dataset-level metric ground-truth coverage
+contract:
+
+- `CORE/atlas_canonical_head_metric_dataset_coverage.py`
+- `Test/test_canonical_head_metric_dataset_coverage.py`
+
+The contract records dataset-level evidence separately from single-observation
+ground-truth metadata, metric-result surface coverage, and candidate benchmark
+evidence-channel coverage.
+
+Recorded coverage dimensions include:
+
+- unique subject inventory and derived subject count;
+- unique view inventory and derived view count;
+- expression coverage;
+- capture-condition coverage;
+- same-subject confirmation state;
+- same-session versus cross-session relation;
+- scan expression and image expression;
+- expression compatibility;
+- scan posture and image/head pose;
+- posture/gravity compatibility;
+- camera-calibration availability;
+- raw-scan availability;
+- source-image / multiview availability;
+- valid facial-surface coverage state;
+- missing surface regions;
+- missing ground-truth states;
+- failure count;
+- exclusion count;
+- explicit provenance reference.
+
+Critical boundaries:
+
+- demographic or phenotypic attributes are not inferred from images and are not
+  part of this contract;
+- subject and view counts are derived from explicit unique identifiers rather
+  than caller-supplied totals;
+- unresolved dataset evidence remains explicitly unresolved;
+- dataset coverage does not itself establish metric admissibility, a candidate
+  decision, a support score, or Phase 9 authorization;
+- existing single-observation, global/regional metric coverage and benchmark
+  evidence owners remain separate and are not conflated with this dataset-level
+  inventory.
+
+Validation:
+
+- initial RED: `22 failed` because the dataset-coverage owner did not yet exist;
+- focused GREEN: `22 passed`;
+- Closure Challenge V1: `19/19 PASS`;
+- related metric/canonical-head regression: `269 passed`;
+- full regression: `5509 passed, 11 warnings in 135.46s`;
+- targeted `git diff --check`: clean before validation.
+
+This closes the Item 10.14 dataset-coverage semantic contract. It does not
+claim that current or future datasets possess complete coverage. Coverage
+remains dataset-specific, provenance-bound and explicitly unresolved or
+missing where supporting evidence is absent.
+
+Next locked Item 10 subitem after commit/push closure:
+
+`10.15 — Item 10 Closure`
+
+Marker: `PHASE8_ITEM10_14_DATASET_COVERAGE_FINAL_CLOSURE_2026_08_28`
