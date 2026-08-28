@@ -19265,3 +19265,88 @@ Validation history:
 
 Next locked item after commit/push closure:
 Item 10.10 — Measurement Uncertainty.
+
+## PHASE8_ITEM10_10_MEASUREMENT_UNCERTAINTY_FINAL_CLOSURE_2026_08_28
+
+Phase 8 Main Checklist Item 10.10 — Measurement Uncertainty reached final
+technical closure.
+
+Implementation ownership:
+
+- new cross-cutting contract:
+  `CORE/atlas_canonical_head_metric_uncertainty.py`;
+- focused tests:
+  `Test/test_canonical_head_metric_uncertainty.py`;
+- existing Item 10.1 ground-truth observation uncertainty-bearing fields remain
+  in place and are not migrated or reinterpreted by this contract.
+
+Locked uncertainty-source families:
+
+- `GT_ACQUISITION_SCANNER`;
+- `CALIBRATION`;
+- `SEGMENTATION`;
+- `LANDMARK_LOCALIZATION`;
+- `ALIGNMENT`;
+- `CORRESPONDENCE`;
+- `SAMPLING`;
+- `EXPRESSION_POSTURE_MISMATCH`;
+- `PREDICTION_RECONSTRUCTION`;
+- `REPEAT_CAPTURE`.
+
+Evidence semantics:
+
+- each uncertainty component is explicitly `QUANTIFIED` or `UNRESOLVED`;
+- quantified uncertainty requires a finite non-negative millimetre value and
+  non-empty provenance;
+- unresolved uncertainty cannot silently carry numeric zero or any other
+  fabricated numeric value;
+- uncertainty components are revalidated at evaluation time, preventing
+  constructor-bypassed / forged component instances from establishing metric
+  claims;
+- prediction/reconstruction uncertainty remains separate from ground-truth
+  uncertainty and cannot establish a GT uncertainty floor.
+
+GT uncertainty-floor boundary:
+
+- an `ESTABLISHED` GT uncertainty floor requires quantified GT-side evidence;
+- in this first bounded contract, the floor must match an explicitly quantified
+  GT-side evidence value;
+- no RSS, summation, maximum, covariance, statistical independence or other
+  combined-uncertainty propagation model is silently assumed;
+- caller-supplied arbitrary or invented combined floor values are rejected;
+- when observed reconstruction-to-GT difference is at or below an established
+  GT uncertainty floor, precise anatomical-error magnitude is explicitly
+  `NOT_RESOLVED_BELOW_OR_AT_GT_FLOOR`;
+- an observed difference above the floor remains only
+  `ABOVE_GT_FLOOR_OBSERVED_DIFFERENCE` and is not promoted by this contract to
+  anatomical truth, accuracy proof, or physical ground truth.
+
+Claim boundary:
+
+Item 10.10 establishes a bounded measurement-uncertainty evidence and
+interpretation contract. It does not create a combined uncertainty propagation
+formula, does not complete Item 10.11 repeat-capture / repeatability analysis,
+does not convert reconstruction error into GT uncertainty, does not fabricate
+missing uncertainty values, does not establish subject-specific millimetre
+anatomical truth without admissible metric ground truth, and does not authorize
+official Phase 9.
+
+Validation history:
+
+- initial RED: 10 failed;
+- initial focused GREEN: 10 passed;
+- initial related regression: 174 passed;
+- initial full regression: 5430 passed, 11 warnings;
+- initial Closure Challenge: FAIL with two semantic gaps:
+  arbitrary caller-supplied GT uncertainty floor could survive once any
+  quantified GT-side component existed, and constructor-bypassed forged
+  uncertainty components could survive evaluation;
+- corrective RED: 2 failed, 10 passed;
+- corrective focused GREEN: 12 passed;
+- corrective related regression: 176 passed;
+- corrective full regression: 5432 passed, 11 warnings;
+- Closure Challenge V2: PASS;
+- target `git diff --check`: clean.
+
+Next locked item after commit/push closure:
+Item 10.11 — Repeat Capture / Repeatability.
