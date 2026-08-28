@@ -185,3 +185,165 @@ def test_contract_does_not_claim_provider_or_geometry_application():
             correspondence,
             forbidden_attribute,
         )
+
+# === PHASE 8 ITEM 10.7 SURFACE CORRESPONDENCE AUDIT RED ===
+
+
+def test_surface_correspondence_audit_records_exact_evidence_and_direction_states():
+    from CORE.atlas_canonical_head_surface_correspondence import (
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit,
+    )
+
+    result = AtlasCanonicalHeadSurfaceCorrespondenceAudit.evaluate(
+        correspondence_evidence_class=(
+            "VERIFIED_SEMANTIC_BARYCENTRIC_CORRESPONDENCE"
+        ),
+        correspondence_direction="SOURCE_TO_TARGET",
+        bidirectional_evaluation_state="NOT_PERFORMED",
+        topology_independent_evaluation_state="NOT_ESTABLISHED",
+        closest_point_assumption="NOT_USED",
+        barycentric_projection_state="VERIFIED",
+        source_sampling_density="KNOWN",
+        target_sampling_density="KNOWN",
+        resampling_method="NONE",
+        area_weighting="NOT_APPLIED",
+        density_normalization_assumption="NOT_APPLIED",
+    )
+
+    assert result.correspondence_evidence_class == (
+        "VERIFIED_SEMANTIC_BARYCENTRIC_CORRESPONDENCE"
+    )
+    assert result.correspondence_direction == "SOURCE_TO_TARGET"
+    assert result.bidirectional_evaluation_state == "NOT_PERFORMED"
+    assert result.topology_independent_evaluation_state == "NOT_ESTABLISHED"
+
+
+def test_geometric_closest_point_correspondence_cannot_claim_anatomical_homology():
+    from CORE.atlas_canonical_head_surface_correspondence import (
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="anatomical|homology|closest",
+    ):
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit.evaluate(
+            correspondence_evidence_class=(
+                "GEOMETRIC_CLOSEST_POINT_CORRESPONDENCE"
+            ),
+            correspondence_direction="SOURCE_TO_TARGET",
+            bidirectional_evaluation_state="NOT_PERFORMED",
+            topology_independent_evaluation_state="VERIFIED",
+            closest_point_assumption="USED",
+            barycentric_projection_state="NOT_USED",
+            source_sampling_density="KNOWN",
+            target_sampling_density="KNOWN",
+            resampling_method="NONE",
+            area_weighting="NOT_APPLIED",
+            density_normalization_assumption="NOT_APPLIED",
+            anatomical_homology_state="CLAIMED",
+        )
+
+
+def test_geometric_closest_point_correspondence_records_no_anatomical_homology():
+    from CORE.atlas_canonical_head_surface_correspondence import (
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit,
+    )
+
+    result = AtlasCanonicalHeadSurfaceCorrespondenceAudit.evaluate(
+        correspondence_evidence_class=(
+            "GEOMETRIC_CLOSEST_POINT_CORRESPONDENCE"
+        ),
+        correspondence_direction="SOURCE_TO_TARGET",
+        bidirectional_evaluation_state="NOT_PERFORMED",
+        topology_independent_evaluation_state="VERIFIED",
+        closest_point_assumption="USED",
+        barycentric_projection_state="NOT_USED",
+        source_sampling_density="KNOWN",
+        target_sampling_density="KNOWN",
+        resampling_method="NONE",
+        area_weighting="NOT_APPLIED",
+        density_normalization_assumption="NOT_APPLIED",
+        anatomical_homology_state="NOT_CLAIMED",
+    )
+
+    assert result.anatomical_homology_state == "NOT_CLAIMED"
+
+
+def test_barycentric_projection_does_not_auto_promote_to_dense_anatomical_correspondence():
+    from CORE.atlas_canonical_head_surface_correspondence import (
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="dense|anatomical|barycentric",
+    ):
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit.evaluate(
+            correspondence_evidence_class="DENSE_ANATOMICAL_CORRESPONDENCE",
+            correspondence_direction="SOURCE_TO_TARGET",
+            bidirectional_evaluation_state="NOT_PERFORMED",
+            topology_independent_evaluation_state="NOT_ESTABLISHED",
+            closest_point_assumption="NOT_USED",
+            barycentric_projection_state="VERIFIED",
+            source_sampling_density="KNOWN",
+            target_sampling_density="KNOWN",
+            resampling_method="NONE",
+            area_weighting="NOT_APPLIED",
+            density_normalization_assumption="NOT_APPLIED",
+            anatomical_homology_state="NOT_CLAIMED",
+        )
+
+
+def test_bidirectional_state_requires_explicit_bidirectional_direction():
+    from CORE.atlas_canonical_head_surface_correspondence import (
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="bidirectional|direction",
+    ):
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit.evaluate(
+            correspondence_evidence_class=(
+                "GEOMETRIC_CLOSEST_POINT_CORRESPONDENCE"
+            ),
+            correspondence_direction="SOURCE_TO_TARGET",
+            bidirectional_evaluation_state="VERIFIED",
+            topology_independent_evaluation_state="VERIFIED",
+            closest_point_assumption="USED",
+            barycentric_projection_state="NOT_USED",
+            source_sampling_density="KNOWN",
+            target_sampling_density="KNOWN",
+            resampling_method="NONE",
+            area_weighting="NOT_APPLIED",
+            density_normalization_assumption="NOT_APPLIED",
+            anatomical_homology_state="NOT_CLAIMED",
+        )
+
+
+def test_unknown_sampling_and_weighting_assumptions_remain_explicitly_unresolved():
+    from CORE.atlas_canonical_head_surface_correspondence import (
+        AtlasCanonicalHeadSurfaceCorrespondenceAudit,
+    )
+
+    result = AtlasCanonicalHeadSurfaceCorrespondenceAudit.evaluate(
+        correspondence_evidence_class="UNRESOLVED_CORRESPONDENCE",
+        correspondence_direction="UNRESOLVED",
+        bidirectional_evaluation_state="UNRESOLVED",
+        topology_independent_evaluation_state="UNRESOLVED",
+        closest_point_assumption="UNRESOLVED",
+        barycentric_projection_state="UNRESOLVED",
+        source_sampling_density="UNRESOLVED",
+        target_sampling_density="UNRESOLVED",
+        resampling_method="UNRESOLVED",
+        area_weighting="UNRESOLVED",
+        density_normalization_assumption="UNRESOLVED",
+        anatomical_homology_state="UNRESOLVED",
+    )
+
+    assert result.source_sampling_density == "UNRESOLVED"
+    assert result.target_sampling_density == "UNRESOLVED"
+    assert result.resampling_method == "UNRESOLVED"
+    assert result.area_weighting == "UNRESOLVED"
+    assert result.density_normalization_assumption == "UNRESOLVED"

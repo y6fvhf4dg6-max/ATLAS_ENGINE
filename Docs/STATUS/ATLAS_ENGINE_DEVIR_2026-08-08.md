@@ -19010,3 +19010,79 @@ Validation history:
 
 Next locked item after commit/push closure:
 Item 10.7 — Surface Correspondence.
+
+## PHASE8_ITEM10_7_SURFACE_CORRESPONDENCE_FINAL_CLOSURE_2026_08_28
+
+Phase 8 Main Checklist Item 10.7 — Surface Correspondence reached final
+technical closure after RED-first implementation, focused/related/full
+validation, and an adversarial Closure Challenge.
+
+Locked correspondence audit coverage records:
+
+- correspondence evidence class;
+- correspondence direction;
+- bidirectional evaluation state;
+- topology-independent evaluation state;
+- closest-point assumption;
+- barycentric projection state;
+- source sampling density;
+- target sampling density;
+- resampling method;
+- area weighting;
+- density-normalization assumption;
+- anatomical-homology claim state.
+
+Exact correspondence evidence classes:
+
+- `DENSE_ANATOMICAL_CORRESPONDENCE`;
+- `VERIFIED_SEMANTIC_BARYCENTRIC_CORRESPONDENCE`;
+- `SPARSE_LANDMARK_CORRESPONDENCE`;
+- `GEOMETRIC_CLOSEST_POINT_CORRESPONDENCE`;
+- `UNRESOLVED_CORRESPONDENCE`.
+
+Critical invariants:
+
+- geometric closest-point correspondence cannot claim anatomical homology;
+- geometric closest-point correspondence requires explicit closest-point usage;
+- verified bidirectional evaluation requires explicit bidirectional direction;
+- bidirectional direction requires verified bidirectional evaluation;
+- verified semantic barycentric correspondence requires verified barycentric
+  projection;
+- barycentric projection alone cannot promote correspondence to dense
+  anatomical correspondence;
+- dense anatomical correspondence requires explicit anatomical-homology
+  evidence;
+- unresolved correspondence cannot silently promote unresolved evidence to
+  verified correspondence;
+- sampling density, resampling, area weighting and density normalization remain
+  explicit rather than assumed;
+- the existing sparse barycentric surface-mapping contract remains bounded and
+  does not itself claim metric accuracy, anatomical ground truth, dense
+  anatomical correspondence, or Phase 9 authorization.
+
+Ownership boundary:
+
+Item 10.7 owns correspondence semantics and provenance only. It does not own
+global metric-error values, regional metric-error values, metric-accuracy
+claims, Phase decisions, or Phase 9 authorization. Item 10.8 and Item 10.9
+remain separate downstream metric-result responsibilities.
+
+Validation history:
+
+- RED: 6 failed, 10 passed;
+- focused GREEN: 16 passed;
+- related regression: 80 passed, 9 warnings;
+- full regression: 5385 passed, 11 warnings;
+- Closure Challenge: PASS;
+- focused recheck: 16 passed;
+- target `git diff --check`: clean.
+
+Claim boundary:
+
+Nearest-point geometry is geometric correspondence, not anatomical homology.
+Barycentric surface projection is a surface-location mechanism and does not by
+itself establish dense anatomical correspondence. Explicitly unresolved
+sampling or correspondence evidence remains unresolved.
+
+Next locked item after commit/push closure:
+Item 10.8 — Global Metric Error.
