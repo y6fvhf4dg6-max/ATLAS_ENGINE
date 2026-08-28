@@ -17399,3 +17399,90 @@ Next locked item after commit/push closure:
 Item 10.13 — Ground-Truth Leakage.
 
 Marker: `PHASE8_ITEM10_12_TRUENESS_VS_PRECISION_FINAL_CLOSURE_2026_08_28`
+
+
+## Phase 8 Item 10.13 — Ground-Truth Leakage — FINAL CLOSURE — 2026-08-28
+
+Status: `CLOSED / BOUNDED_PASS`
+
+Executable contract:
+
+- `CORE/atlas_canonical_head_metric_ground_truth_leakage.py`
+- `Test/test_canonical_head_metric_ground_truth_leakage.py`
+
+Locked leakage dimensions:
+
+- `GROUND_TRUTH_USAGE`
+- `SUBJECT_TRAINING_OVERLAP`
+- `VALIDATION_OVERLAP`
+- `REGISTRATION_LEAKAGE`
+- `CORRESPONDENCE_LEAKAGE`
+- `EVALUATION_REGION_LEAKAGE`
+- `POST_HOC_REGION_SELECTION`
+- `REPEATED_BENCHMARK_ADAPTATION`
+
+Evidence states:
+
+- `NO_LEAKAGE_IDENTIFIED`
+- `LEAKAGE_PRESENT`
+- `UNRESOLVED`
+- `NOT_APPLICABLE`
+
+Ground-truth usage is explicitly classified across:
+
+- evaluation-only use;
+- fitting use;
+- tuning use;
+- model-selection use.
+
+Locked invariants:
+
+- evaluation-only GT cannot simultaneously be classified as fitting, tuning or
+  model-selection use;
+- a known GT-usage object must identify at least one explicit usage state;
+- a clean or leakage-present `GROUND_TRUTH_USAGE` claim requires an explicit,
+  revalidated GT-usage object;
+- fitting, tuning or model-selection dependency maps to
+  `LEAKAGE_PRESENT`;
+- confirmed evaluation-only use maps to `NO_LEAKAGE_IDENTIFIED`;
+- unknown GT usage may remain `UNRESOLVED` without inventing a usage state;
+- `NOT_APPLICABLE` may remain explicit where GT use genuinely does not apply;
+- once GT usage is known, `UNRESOLVED` or `NOT_APPLICABLE` cannot silently
+  override the known usage state;
+- duplicate leakage dimensions are rejected;
+- constructor-bypassed observations and GT-usage objects are revalidated;
+- partial dimension coverage remains `INCOMPLETE`;
+- complete dimension representation reports `COMPLETE` without converting
+  unresolved evidence into clean evidence.
+
+Closure Challenge history:
+
+- V1: `FAIL` — structured GT usage was not bound to the
+  `GROUND_TRUTH_USAGE` leakage observation.
+- V2: `FAIL` — unresolved GT usage could not be represented without inventing
+  a known usage object.
+- V3: `FAIL` — known usage could still be hidden behind `UNRESOLVED` or
+  `NOT_APPLICABLE`.
+- V4: `FAIL` — an all-false known usage object could incorrectly drive a
+  clean claim.
+- V5: `PASS` — clean/leakage claims, unresolved usage, known-use
+  contradictions and constructor-bypass cases behaved according to contract.
+
+Final validation:
+
+- focused: `27 passed`
+- related canonical-head metric regression: `235 passed`
+- full regression: `5487 passed, 11 warnings in 136.31s`
+
+Boundary:
+
+This closes the Item 10.13 ground-truth-leakage semantic contract. It does not
+claim that every current or future dataset is leakage-free. Leakage status
+remains evidence-specific, provenance-bound and explicitly unresolved where
+supporting audit evidence is absent.
+
+Next locked Item 10 subitem after commit/push closure:
+
+`10.14 — Dataset Coverage`
+
+Marker: `PHASE8_ITEM10_13_GROUND_TRUTH_LEAKAGE_FINAL_CLOSURE_2026_08_28`
