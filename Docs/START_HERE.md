@@ -15655,3 +15655,74 @@ Next exact subitem:
 **11.5 — LoD Identity Preservation**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_5_LOD_IDENTITY_PRESERVATION_FINAL_CLOSURE_2026_08_28
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.5 — LoD Identity Preservation
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.5 establishes the canonical-head-specific semantic evidence contract for
+recording identity-bearing regional preservation across a real LoD reduction.
+
+New contract:
+
+- `CORE/atlas_canonical_head_lod_identity_preservation.py`
+- `Test/test_canonical_head_lod_identity_preservation.py`
+
+Locked identity-preservation regions:
+
+- `silhouette`
+- `profile`
+- `nose`
+- `jaw_chin`
+- `orbital_cheek`
+- `mouth`
+
+Locked LoD semantics:
+
+- source and target LoD levels are explicit;
+- a valid LoD reduction requires `target_lod_level < source_lod_level`;
+- LoD levels are strict integers in the `0..4` range;
+- pre-LoD and post-LoD regional measurements are recorded separately;
+- observed preservation derives `preservation_ratio = post / pre`;
+- zero post-LoD measurement resolves to `LOST`;
+- `0 < ratio < 1` resolves to `DEGRADED`;
+- exact `ratio == 1` resolves to `PRESERVED`;
+- `ratio > 1` resolves to `EXAGGERATED`;
+- no arbitrary preservation tolerance is invented;
+- `loss_fraction` is derived only for non-exaggerated observations;
+- `UNRESOLVED` requires both measurements to remain absent;
+- unresolved evidence cannot be populated with fabricated numeric values;
+- provenance is mandatory.
+
+Architectural boundary:
+
+- generic LoD level definition remains owned by `AtlasLoDLevelCatalog`;
+- generic LoD resolution remains owned by `AtlasLoDResolver`;
+- generic mesh filtering remains owned by `AtlasLoDMeshFilter`;
+- physical adapter isolation remains responsible for traceability of `lod_decimation`;
+- Item 11.5 owns only canonical-head regional identity-preservation evidence
+  across LoD reduction;
+- Item 11.5 does not establish printability;
+- Item 11.5 does not generate production GO/HOLD/REJECT or Phase 9 authorization;
+- topology/manufacturability remains Item 11.6.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.5: `48 passed`;
+- Closure Challenge V1: `53/53 PASS`;
+- related regression: `346 passed`;
+- full regression: `5818 passed, 11 warnings in 135.75s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.5.
+
+Item 11.5 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.6 — Topology / Manufacturability**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
