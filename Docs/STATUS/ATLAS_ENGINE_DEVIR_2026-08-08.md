@@ -19182,3 +19182,86 @@ Validation history:
 
 Next locked item after commit/push closure:
 Item 10.9 — Region-Wise Metric Error.
+
+## PHASE8_ITEM10_9_REGION_WISE_METRIC_ERROR_FINAL_CLOSURE_2026_08_28
+
+Phase 8 Main Checklist Item 10.9 — Region-Wise Metric Error reached final
+technical closure after RED-first implementation, adversarial Closure Challenge,
+corrective admissibility gating, and focused/related/full regression validation.
+
+Locked implementation ownership:
+
+- no new file was introduced;
+- numeric region aggregation remains owned by
+  `AtlasCanonicalHeadMetricRegionDistanceAggregate`;
+- regional metric admissibility/result semantics are implemented in the existing
+  `CORE/atlas_canonical_head_metric_region_distance_aggregate.py`;
+- Item 9.12 `AtlasCanonicalHeadRegionalSurfaceErrorEvidence` remains a bounded
+  capability/blocker evidence contract and is not promoted into the Item 10.9
+  metric-result owner.
+
+Per-region result coverage now records:
+
+- semantic region;
+- numeric metric-distance aggregate;
+- region-definition origin;
+- ground-truth region mapping;
+- prediction region mapping;
+- correspondence evidence class;
+- valid sample count;
+- coverage ratio;
+- region-alignment overlap;
+- expression compatibility;
+- posture compatibility;
+- regional metric admissibility.
+
+Critical invariants:
+
+- `valid_sample_count` must be greater than zero and equal the numeric
+  aggregate `sample_count`;
+- `coverage_ratio` must be finite and remain within `[0, 1]`;
+- an `ADMISSIBLE` regional metric result requires a verified
+  region-definition origin;
+- an `ADMISSIBLE` result requires `VERIFIED` ground-truth region mapping;
+- an `ADMISSIBLE` result requires `VERIFIED` prediction region mapping;
+- unresolved correspondence cannot establish an `ADMISSIBLE` regional metric
+  result;
+- expression compatibility must be `COMPATIBLE` for an `ADMISSIBLE` result;
+- posture compatibility must be `COMPATIBLE` for an `ADMISSIBLE` result;
+- an `ADMISSIBLE` result requires coverage greater than zero;
+- Item 8 H2 barycentric-anchor-supported footprints remain bounded mappings
+  and cannot be promoted to dense anatomical metric correspondence or to an
+  admissible regional metric result;
+- region-alignment overlap remains explicitly visible and, consistent with the
+  Item 10.6 boundary, is not silently converted into automatic invalidation at
+  this layer.
+
+Claim boundary:
+
+Item 10.9 establishes the region-wise metric aggregation/admissibility contract.
+It does not establish subject-specific regional millimetre truth without
+admissible metric ground truth, legitimate region mapping, admissible alignment
+and correspondence evidence. It does not promote anchor-supported Item 8 H2
+nose footprints to dense anatomical ground truth, does not fabricate metric
+thresholds, and does not authorize official Phase 9.
+
+Validation history:
+
+- initial RED: 5 failed, 5 passed;
+- initial focused GREEN: 10 passed;
+- initial related regression: 176 passed;
+- initial full regression: 5408 passed, 11 warnings;
+- Closure Challenge: FAIL with 12 semantic gaps because caller-supplied
+  `ADMISSIBLE` could survive unresolved/anchor-only mappings, unresolved
+  correspondence, expression/posture incompatibility, zero coverage and the
+  Item 8 H2 anchor-supported boundary;
+- corrective RED: 12 failed, 10 passed;
+- corrective focused GREEN: 22 passed;
+- corrective related regression: 188 passed;
+- corrective full regression: 5420 passed, 11 warnings;
+- Closure Challenge V2: PASS;
+- final focused recheck: 22 passed;
+- target `git diff --check`: clean.
+
+Next locked item after commit/push closure:
+Item 10.10 — Measurement Uncertainty.
