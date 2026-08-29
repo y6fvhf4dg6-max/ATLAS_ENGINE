@@ -16660,3 +16660,99 @@ Next exact subitem:
 **11.15 — Item 11 Closure**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_15_PHYSICAL_REPRESENTATION_GATE_HOLD_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.15 — Item 11 Closure
+**Decision:** `HOLD / BLOCKED`
+**Item 11 status:** `NOT OFFICIALLY CLOSED`
+
+Authority:
+
+Determine whether the selected canonical identity is sufficiently preserved
+through the required physical-representation paths.
+
+Closure audit:
+
+- Item 11.1 through Item 11.14 contract closure records are structurally
+  complete across all three continuity documents;
+- format-aware audit checked `42/42` closure records successfully;
+- all fourteen subitems retain the Phase 9 non-authorization boundary;
+- the current safe repository checkpoint remained synchronized with
+  `origin/main` during the closure audit.
+
+Blocking-gap audit:
+
+No persisted runtime empirical canonical-head physical-evidence instance was
+found for the evidence channels required to support an Item 11 preservation
+conclusion.
+
+In particular, the audit did not establish persisted real-world canonical-head
+instances for:
+
+- printed dimensional fidelity;
+- physical regional preservation;
+- controlled human visual inspection;
+- orientation sensitivity;
+- layer/nozzle sensitivity;
+- material sensitivity.
+
+The corresponding CORE modules establish contracts and validation semantics.
+Their existence and unit-test fixtures do not by themselves prove that a
+selected canonical identity survives the real physical-production path.
+
+Negative Closure Challenge result:
+
+- no accidental Item 11 `OFFICIALLY CLOSED` claim was found in the three
+  continuity documents;
+- no persisted runtime empirical physical-evidence instances were found;
+- `ITEM11_15_CLOSURE_CHALLENGE=PASS`;
+- `ITEM11_DECISION=HOLD_BLOCKED`;
+- blocker:
+  `EMPIRICAL_CANONICAL_HEAD_PHYSICAL_VALIDATION_MISSING`.
+
+Epistemic conclusion:
+
+Item 11 MUST NOT be promoted to `OFFICIALLY CLOSED` from contract completeness,
+unit-test success, slicer semantics, or digital evidence alone.
+
+The remaining blocker is empirical rather than architectural:
+
+**A selected canonical-head output must be physically produced and evaluated
+through the applicable Item 11 evidence contracts before Item 11 closure can be
+claimed.**
+
+The required empirical evidence should, where applicable, establish:
+
+- real printed dimensions against intended digital dimensions;
+- regional identity preservation on the physical output;
+- controlled subjective inspection under recorded view, distance,
+  illumination, and comparison conditions;
+- sensitivity evidence for orientation, layer/nozzle, and material when those
+  variables are part of the required physical-representation path;
+- failure attribution where observed degradation permits attribution.
+
+No new production `GO`, likeness score, identity-preservation support score, or
+Phase 9 authorization is created by this HOLD record.
+
+Validation supporting this decision:
+
+- latest Item 11.14 focused validation: `35 passed`;
+- latest Item 11.14 Closure Challenge: `33/33 PASS`;
+- latest Item 11.14 related regression: `297 passed`;
+- latest full repository regression: `6268 passed, 11 warnings in 135.40s`;
+- Item 11.15 format-aware completeness audit: `42/42` records complete;
+- Item 11.15 negative Closure Challenge: `PASS`.
+
+No additional full regression was required for the Item 11.15 decision audit
+because no executable code was changed after the latest `6268 passed` full
+regression.
+
+Next exact task:
+
+**Execute and persist empirical canonical-head physical validation sufficient
+to revisit Item 11.15.**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
