@@ -16010,3 +16010,91 @@ Next exact subitem:
 **11.9 — Physical Regional Preservation**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_9_PHYSICAL_REGIONAL_PRESERVATION_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.9 — Physical Regional Preservation
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.9 establishes a canonical-head-specific physical regional
+preservation evidence contract.
+
+New contract:
+
+- `CORE/atlas_canonical_head_physical_regional_preservation.py`
+- `Test/test_canonical_head_physical_regional_preservation.py`
+
+The contract re-evaluates Item 9 identity-bearing facial regions after
+physical conversion where those regions are practically observable.
+
+Supported physical representation kinds remain:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+Supported regions are:
+
+- `nose`;
+- `jaw_chin`;
+- `orbital`;
+- `cheek_midface`;
+- `mouth_perioral`;
+- `forehead_cranial`;
+- `silhouette`;
+- `profile`.
+
+Observation states are:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_OBSERVABLE`.
+
+For `OBSERVED` evidence, physical regional preservation states are:
+
+- `PRESERVED`;
+- `DEGRADED`;
+- `LOST`.
+
+`OBSERVED` evidence requires both an explicit digital reference and an
+explicit physical reference together with non-blank observation provenance.
+
+`UNRESOLVED` and `NOT_OBSERVABLE` evidence must not fabricate digital or
+physical references. Their preservation state must match their observation
+state exactly.
+
+Existing Item 9 regional quality owners remain the authoritative owners of
+their original digital/model/metric evidence. Their existing
+`physical_output` evaluation-space capability does not by itself establish
+that a region survived physical conversion.
+
+The Item 11.9 contract intentionally does not claim:
+
+- an aggregate identity-preservation score;
+- printed dimensional fidelity;
+- slicer validity;
+- topology/manufacturability validity;
+- physical print success;
+- production `GO/HOLD/REJECT`;
+- Phase 9 authorization.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.9: `43 passed`;
+- Closure Challenge V1: `36/36 PASS`;
+- related regression: `271 passed`;
+- full regression: `6030 passed, 11 warnings in 135.48s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.9.
+
+Item 11.9 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.10 — Orientation Sensitivity**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
