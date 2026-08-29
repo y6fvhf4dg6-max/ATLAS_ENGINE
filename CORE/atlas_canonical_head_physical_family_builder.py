@@ -11,7 +11,8 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
     already physical-coordinate canonical-head triangle mesh.
 
     Scope:
-    - relief: controlled depth compression;
+    - relief: controlled depth compression with an integral
+      planar backing surface;
     - bust: full head plus pedestal support;
     - figurine_head: full head plus attachment interface;
     - story_kit_component: full head plus kit mount.
@@ -95,10 +96,12 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
             )
 
         if kind == "relief":
-            compressed = cls._compress_depth(
-                triangles=triangles,
-                bounds=bounds,
-                ratio=cls.RELIEF_DEPTH_RATIO,
+            compressed = (
+                cls._compress_depth_with_planar_backing(
+                    triangles=triangles,
+                    bounds=bounds,
+                    ratio=cls.RELIEF_DEPTH_RATIO,
+                )
             )
 
             physical_depth = (
@@ -110,7 +113,7 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                 kind=kind,
                 geometry_kind="relief",
                 triangles=compressed,
-                support_geometry_kind="none",
+                support_geometry_kind="planar_backing",
                 canonical_depth_mm=canonical_depth,
                 physical_depth_mm=physical_depth,
             )
@@ -389,6 +392,85 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                 for point in triangle
             )
             for triangle in triangles
+        )
+
+    @staticmethod
+    def _compress_depth_with_planar_backing(
+        *,
+        triangles: Sequence,
+        bounds: Mapping[str, float],
+        ratio: float,
+    ) -> tuple:
+        """
+        Compress canonical-head depth while converting the
+        rear half of the existing closed topology into one
+        integral planar backing surface.
+
+        No secondary solid or boolean union is introduced.
+        The front half retains relative depth variation.
+        """
+
+        if not (
+            math.isfinite(ratio)
+            and 0.0 < ratio <= 1.0
+        ):
+            raise ValueError(
+                "relief depth ratio must be finite and "
+                "within (0, 1]"
+            )
+
+        min_z = float(
+            bounds["min_z"]
+        )
+        max_z = float(
+            bounds["max_z"]
+        )
+
+        center_z = (
+            min_z + max_z
+        ) / 2.0
+
+        compressed_min_z = (
+            center_z
+            + (
+                min_z - center_z
+            )
+            * ratio
+        )
+
+        def transform(point):
+            x, y, z = point
+
+            if z <= center_z:
+                transformed_z = compressed_min_z
+            else:
+                transformed_z = (
+                    center_z
+                    + (
+                        z - center_z
+                    )
+                    * ratio
+                )
+
+            return (
+                float(x),
+                float(y),
+                float(transformed_z),
+            )
+
+        transformed = tuple(
+            tuple(
+                transform(point)
+                for point in triangle
+            )
+            for triangle in triangles
+        )
+
+        return (
+            AtlasCanonicalHeadPhysicalFamilyBuilder
+            ._normalize_closed_mesh_orientation(
+                transformed
+            )
         )
 
     @classmethod

@@ -293,7 +293,7 @@ def test_repo_local_real_flame_produces_four_single_volume_family_geometries():
     expected = {
         "relief": {
             "geometry_kind": "relief",
-            "support_kind": "none",
+            "support_kind": "planar_backing",
             "triangle_count": 7862,
         },
         "bust": {
@@ -365,6 +365,58 @@ def test_repo_local_real_flame_produces_four_single_volume_family_geometries():
             == "UNRESOLVED"
         )
 
+        if representation_kind == "relief":
+            vertices = np.asarray(
+                mesh.vertices,
+                dtype=np.float64,
+            )
+            faces = np.asarray(
+                mesh.faces,
+                dtype=np.int64,
+            )
+
+            z_min = float(
+                vertices[:, 2].min()
+            )
+
+            face_z = vertices[
+                faces,
+                2,
+            ]
+
+            planar_back_faces = np.all(
+                np.isclose(
+                    face_z,
+                    z_min,
+                    atol=1e-6,
+                    rtol=0.0,
+                ),
+                axis=1,
+            )
+
+            planar_back_area = float(
+                mesh.area_faces[
+                    planar_back_faces
+                ].sum()
+            )
+
+            xy_bounding_area = float(
+                mesh.extents[0]
+                * mesh.extents[1]
+            )
+
+            assert int(
+                planar_back_faces.sum()
+            ) > 0
+
+            assert planar_back_area > 0.0
+
+            assert (
+                planar_back_area
+                / xy_bounding_area
+                >= 0.50
+            )
+
     relief = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
         physical_head_mesh=physical_head_mesh,
         representation_kind="relief",
@@ -378,4 +430,146 @@ def test_repo_local_real_flame_produces_four_single_volume_family_geometries():
     assert (
         relief["physical_depth_mm"]
         < relief["canonical_depth_mm"]
+    )
+
+
+def test_relief_has_integral_planar_backing_surface():
+    import numpy as np
+    import trimesh
+
+    source = _closed_tetrahedron_physical_mesh()
+
+    def shear_point(point):
+        x, y, z = point
+        return (
+            x,
+            y,
+            z + 0.10 * x + 0.05 * y,
+        )
+
+    sheared_triangles = tuple(
+        tuple(
+            shear_point(point)
+            for point in triangle
+        )
+        for triangle in source["triangles"]
+    )
+
+    source_attachment = source[
+        "support_attachment_boundary"
+    ]
+
+    sheared_ring = tuple(
+        shear_point(point)
+        for point in source_attachment[
+            "physical_points"
+        ]
+    )
+
+    sheared_centroid = tuple(
+        sum(point[axis] for point in sheared_ring)
+        / len(sheared_ring)
+        for axis in range(3)
+    )
+
+    sheared_source = {
+        **source,
+        "triangles": sheared_triangles,
+        "support_attachment_boundary": {
+            **source_attachment,
+            "physical_points": sheared_ring,
+            "centroid": sheared_centroid,
+        },
+    }
+
+    result = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=sheared_source,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    triangles = np.asarray(
+        result["family_geometry"]["triangles"],
+        dtype=np.float64,
+    )
+
+    mesh = trimesh.Trimesh(
+        vertices=triangles.reshape(-1, 3),
+        faces=np.arange(
+            triangles.shape[0] * 3,
+            dtype=np.int64,
+        ).reshape(-1, 3),
+        process=True,
+        validate=False,
+    )
+
+    assert len(
+        mesh.split(
+            only_watertight=False
+        )
+    ) == 1
+    assert mesh.is_watertight
+    assert mesh.is_winding_consistent
+    assert mesh.is_volume
+    assert float(mesh.volume) > 0.0
+
+    vertices = np.asarray(
+        mesh.vertices,
+        dtype=np.float64,
+    )
+    faces = np.asarray(
+        mesh.faces,
+        dtype=np.int64,
+    )
+
+    z_min = float(
+        vertices[:, 2].min()
+    )
+
+    face_z = vertices[
+        faces,
+        2,
+    ]
+
+    planar_back_faces = np.all(
+        np.isclose(
+            face_z,
+            z_min,
+            atol=1e-6,
+            rtol=0.0,
+        ),
+        axis=1,
+    )
+
+    planar_back_area = float(
+        mesh.area_faces[
+            planar_back_faces
+        ].sum()
+    )
+
+    xy_bounding_area = float(
+        mesh.extents[0]
+        * mesh.extents[1]
+    )
+
+    assert int(
+        planar_back_faces.sum()
+    ) > 0
+
+    assert planar_back_area > 0.0
+
+    assert (
+        planar_back_area
+        / xy_bounding_area
+        >= 0.50
+    )
+
+    assert (
+        result["support_geometry_kind"]
+        == "planar_backing"
+    )
+
+    assert (
+        result["manufacturability_status"]
+        == "UNRESOLVED"
     )
