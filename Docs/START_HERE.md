@@ -16200,3 +16200,115 @@ Next exact subitem:
 **11.11 — Layer / Nozzle Sensitivity**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_11_LAYER_NOZZLE_SENSITIVITY_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.11 — Layer / Nozzle Sensitivity
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.11 establishes a canonical-head-specific manufacturing-profile
+sensitivity evidence contract for nozzle diameter and layer height changes.
+
+New contract:
+
+- `CORE/atlas_canonical_head_layer_nozzle_sensitivity.py`
+- `Test/test_canonical_head_layer_nozzle_sensitivity.py`
+
+Authority:
+
+Evaluate relevant manufacturing-profile changes where required.
+
+The audit found that existing layer/nozzle-adjacent owners do not satisfy this
+requirement by themselves:
+
+- `AtlasCanonicalHeadSlicerGateObservation` records nozzle diameter and layer
+  height but owns slicer execution outcome rather than identity-bearing physical
+  geometry sensitivity;
+- `AtlasNozzleDetailAnalyzer` evaluates generic detail size relative to nozzle
+  diameter rather than canonical-head physical identity-bearing geometry;
+- `AtlasLoDResolutionInput` uses nozzle diameter and layer height as LoD
+  resolution inputs rather than as comparative physical evidence;
+- `AtlasPhysicalFeatureResolver` uses nozzle/layer limits for generic feature
+  resolution and also includes material semantics, which remain outside Item
+  11.11 and belong to Item 11.12.
+
+Supported physical representation kinds are:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+The contract records an explicit reference manufacturing profile and an
+evaluated manufacturing profile using:
+
+- reference nozzle diameter;
+- reference layer height;
+- evaluated nozzle diameter;
+- evaluated layer height.
+
+All profile dimensions must be finite and positive.
+
+Observation states are:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_OBSERVABLE`.
+
+For `OBSERVED` evidence, sensitivity states are:
+
+- `NO_MATERIAL_CHANGE`;
+- `MATERIAL_CHANGE`.
+
+`NO_MATERIAL_CHANGE` requires no affected identity-bearing regions.
+
+`MATERIAL_CHANGE` requires at least one explicitly affected identity-bearing
+region.
+
+Supported identity-bearing regions are:
+
+- `nose`;
+- `jaw_chin`;
+- `orbital`;
+- `cheek_midface`;
+- `mouth_perioral`;
+- `forehead_cranial`;
+- `silhouette`;
+- `profile`.
+
+Affected regions are normalized and deduplicated while preserving first-seen
+order.
+
+For `UNRESOLVED` and `NOT_OBSERVABLE`, the sensitivity state must match the
+observation state exactly and no affected regions may be asserted.
+
+The Item 11.11 contract intentionally does not claim:
+
+- material or material-profile sensitivity;
+- slicer validity;
+- support requirement;
+- topology/manufacturability validity;
+- aggregate identity-preservation score;
+- physical print success;
+- production `GO/HOLD/REJECT`;
+- Phase 9 authorization.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.11: `67 passed`;
+- Closure Challenge V1: `47/47 PASS`;
+- related regression: `371 passed`;
+- full regression: `6141 passed, 11 warnings in 134.46s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.11.
+
+Item 11.11 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.12 — Material Sensitivity**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
