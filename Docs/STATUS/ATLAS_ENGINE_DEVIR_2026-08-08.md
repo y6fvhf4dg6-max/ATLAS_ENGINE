@@ -20496,3 +20496,105 @@ Next exact subitem:
 **11.10 — Orientation Sensitivity**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_10_ORIENTATION_SENSITIVITY_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.10 — Orientation Sensitivity
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.10 establishes a canonical-head-specific production-orientation
+sensitivity evidence contract.
+
+New contract:
+
+- `CORE/atlas_canonical_head_orientation_sensitivity.py`
+- `Test/test_canonical_head_orientation_sensitivity.py`
+
+Authority:
+
+Determine whether production orientation materially changes identity-bearing
+geometry.
+
+The audit found that existing orientation-adjacent owners do not satisfy this
+requirement:
+
+- `AtlasOverhangSupportAnalyzer` owns overhang/support requirement analysis,
+  not identity-bearing geometry preservation across production orientations;
+- `AtlasCanonicalHeadPhysicalAdapterIsolation` records `orientation` as an
+  `identity_neutral` physical transform operation, but does not establish
+  whether manufacturing orientation materially changes the resulting physical
+  identity-bearing geometry.
+
+Supported physical representation kinds are:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+The contract compares a production orientation against an explicit reference
+orientation and records an observation state with evidence provenance.
+
+Observation states are:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_OBSERVABLE`.
+
+For `OBSERVED` evidence, sensitivity states are:
+
+- `NO_MATERIAL_CHANGE`;
+- `MATERIAL_CHANGE`.
+
+`NO_MATERIAL_CHANGE` requires no affected identity-bearing regions.
+
+`MATERIAL_CHANGE` requires at least one explicitly affected identity-bearing
+region.
+
+Supported identity-bearing regions are:
+
+- `nose`;
+- `jaw_chin`;
+- `orbital`;
+- `cheek_midface`;
+- `mouth_perioral`;
+- `forehead_cranial`;
+- `silhouette`;
+- `profile`.
+
+Affected regions are normalized and deduplicated while preserving first-seen
+order.
+
+For `UNRESOLVED` and `NOT_OBSERVABLE`, the sensitivity state must match the
+observation state exactly and no affected regions may be asserted.
+
+The Item 11.10 contract intentionally does not claim:
+
+- overhang or support requirement;
+- aggregate identity-preservation score;
+- printed dimensional fidelity;
+- slicer validity;
+- topology/manufacturability validity;
+- physical print success;
+- production `GO/HOLD/REJECT`;
+- Phase 9 authorization.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.10: `44 passed`;
+- Closure Challenge V1: `30/30 PASS`;
+- related regression: `547 passed`;
+- full regression: `6074 passed, 11 warnings in 135.96s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.10.
+
+Item 11.10 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.11 — Layer / Nozzle Sensitivity**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
