@@ -20826,3 +20826,117 @@ Next exact subitem:
 **11.13 — Human Visual Inspection Protocol**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_13_HUMAN_VISUAL_INSPECTION_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.13 — Human Visual Inspection Protocol
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.13 establishes a canonical-head-specific human visual inspection
+protocol contract for subjective physical evidence.
+
+New contract:
+
+- `CORE/atlas_canonical_head_human_visual_inspection.py`
+- `Test/test_canonical_head_human_visual_inspection.py`
+
+Authority:
+
+Where subjective visual inspection is used, control as much as practical:
+
+- front;
+- 3/4;
+- profile;
+- viewing distance;
+- illumination;
+- camera/view comparison conditions.
+
+Subjective inspection MUST remain identified as subjective evidence.
+
+The audit found that existing adjacent owners do not satisfy this requirement
+by themselves:
+
+- `AtlasCanonicalHeadCustomerVisibleLikenessRiskEvidence` owns bounded
+  customer-visible likeness-risk semantics but does not define controlled human
+  visual-inspection conditions;
+- `AtlasCanonicalHeadPhysicalRegionalPreservation` records physical regional
+  preservation evidence but does not enforce controlled front, three-quarter,
+  profile, viewing-distance, illumination, or camera/view comparison
+  conditions;
+- `AtlasCanonicalHeadCameraObservation` owns perspective-camera intrinsic
+  observations and is not a human-inspection protocol;
+- `AtlasLoDResolutionInput` includes viewing distance as a LoD input rather
+  than as a subjective visual-inspection evidence condition.
+
+Supported physical representation kinds are:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+Controlled view conditions are:
+
+- `front`;
+- `three_quarter`;
+- `profile`.
+
+At least one controlled view condition is required. View conditions are
+normalized and deduplicated while preserving first-seen order.
+
+The contract records:
+
+- representation identity;
+- inspection identity;
+- controlled view conditions;
+- positive finite viewing distance in millimetres;
+- illumination condition;
+- camera/view comparison condition;
+- inspection state;
+- evidence provenance;
+- evidence kind.
+
+Inspection states are:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_PERFORMED`.
+
+The evidence kind is restricted to:
+
+- `SUBJECTIVE`.
+
+This preserves the roadmap requirement that human visual inspection remain
+explicitly identified as subjective evidence.
+
+The Item 11.13 contract intentionally does not claim:
+
+- likeness score;
+- customer-visible score;
+- commercial acceptance or rejection;
+- regional preservation outcome;
+- affected identity-bearing regions;
+- metric score or threshold;
+- pass/fail decision;
+- production `GO/HOLD/REJECT`;
+- Phase 9 authorization.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.13: `44 passed`;
+- Closure Challenge V1: `38/38 PASS`;
+- related regression: `303 passed`;
+- full regression: `6233 passed, 11 warnings in 135.39s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.13.
+
+Item 11.13 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.14 — Digital-vs-Physical Failure Classification**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
