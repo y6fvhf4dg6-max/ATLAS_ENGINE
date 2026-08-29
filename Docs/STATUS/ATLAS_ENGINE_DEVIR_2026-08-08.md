@@ -20318,3 +20318,93 @@ Next exact subitem:
 **11.8 — Printed Dimensional Fidelity**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_8_PRINTED_DIMENSIONAL_FIDELITY_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.8 — Printed Dimensional Fidelity
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.8 establishes a canonical-head-specific printed dimensional
+fidelity evidence contract.
+
+New contract:
+
+- `CORE/atlas_canonical_head_printed_dimensional_fidelity.py`
+- `Test/test_canonical_head_printed_dimensional_fidelity.py`
+
+The contract compares, where measurable:
+
+- intended digital dimension in millimetres;
+- measured printed dimension in millimetres;
+- absolute dimensional error;
+- relative dimensional error;
+- explicit dimensional tolerance;
+- measurement state;
+- measurement provenance.
+
+Supported physical representation kinds remain:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+Measurement states are:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_MEASURABLE`.
+
+Derived fidelity states are:
+
+- `WITHIN_TOLERANCE`;
+- `OUTSIDE_TOLERANCE`;
+- `UNRESOLVED`;
+- `NOT_MEASURABLE`.
+
+For `OBSERVED` evidence:
+
+- intended digital dimension must be finite and positive;
+- measured printed dimension must be finite and positive;
+- tolerance must be finite and positive;
+- absolute error is derived from the printed-vs-digital difference;
+- relative error is normalized by the intended digital dimension;
+- error equal to the tolerance remains `WITHIN_TOLERANCE`.
+
+`UNRESOLVED` and `NOT_MEASURABLE` must not fabricate printed
+measurements or derived dimensional-error values.
+
+The contract intentionally does not claim:
+
+- regional facial identity preservation;
+- overall identity-preservation scoring;
+- slicer validity;
+- topology/manufacturability validity;
+- physical print success;
+- production `GO/HOLD/REJECT`;
+- Phase 9 authorization.
+
+Existing digital geometry-versus-plan checks remain separate. In particular,
+`AtlasArchitecturalReliefQualityReport` compares digital mesh dimensions
+against a digital physical plan and is not evidence of printed dimensional
+fidelity.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.8: `51 passed`;
+- Closure Challenge V1: `42/42 PASS`;
+- related regression: `421 passed`;
+- full regression: `5987 passed, 11 warnings in 135.47s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.8.
+
+Item 11.8 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.9 — Physical Regional Preservation**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
