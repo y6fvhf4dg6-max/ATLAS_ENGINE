@@ -418,3 +418,142 @@ def test_boundary_closure_preserves_reversed_source_winding_consistency():
     assert mesh.is_watertight
     assert mesh.is_winding_consistent
     assert mesh.is_volume
+
+
+def test_boundary_closure_exposes_explicit_physical_attachment_boundary():
+    source = _open_tetrahedron()
+
+    result = AtlasCanonicalHeadPhysicalMeshAdapter.build(
+        canonical_mesh=source,
+        representation_kind="bust",
+        target_head_height_mm=40.0,
+        close_boundaries=True,
+    )
+
+    records = result["physical_boundary_loops"]
+
+    assert len(records) == 1
+
+    record = records[0]
+
+    assert record["boundary_index"] == 0
+    assert len(record["vertex_indices"]) == 3
+    assert len(record["physical_points"]) == 3
+    assert len(record["centroid"]) == 3
+
+    attachment = result["support_attachment_boundary"]
+
+    assert attachment is not None
+    assert (
+        result["physical_mesh"][
+            "support_attachment_boundary"
+        ]
+        == attachment
+    )
+    assert (
+        attachment["boundary_index"]
+        == record["boundary_index"]
+    )
+    assert (
+        attachment["physical_points"]
+        == record["physical_points"]
+    )
+    assert (
+        result["support_attachment_boundary_policy"]
+        == "lowest_mean_y_boundary"
+    )
+
+
+def test_repo_local_real_flame_exposes_bottom_boundary_without_provider_semantic_label():
+    root = Path(__file__).resolve().parents[1]
+
+    flame_path = (
+        root
+        / "Data"
+        / "MODELS"
+        / "FLAME"
+        / "flame2023_Open.pkl"
+    )
+
+    with flame_path.open("rb") as stream:
+        flame = pickle.load(
+            stream,
+            encoding="latin1",
+        )
+
+    source_vertices = tuple(
+        tuple(float(value) for value in vertex)
+        for vertex in np.asarray(
+            flame["v_template"],
+            dtype=np.float64,
+        )
+    )
+
+    source_faces = tuple(
+        tuple(int(index) for index in face)
+        for face in np.asarray(
+            flame["f"],
+            dtype=np.int64,
+        )
+    )
+
+    result = AtlasCanonicalHeadPhysicalMeshAdapter.build(
+        canonical_mesh={
+            "vertices": source_vertices,
+            "faces": source_faces,
+            "provenance": (
+                "repo-local:Data/MODELS/FLAME/"
+                "flame2023_Open.pkl:v_template"
+            ),
+        },
+        representation_kind="bust",
+        target_head_height_mm=40.0,
+        close_boundaries=True,
+        main_head_only=True,
+    )
+
+    records = result["physical_boundary_loops"]
+
+    assert len(records) == 2
+
+    attachment = result[
+        "support_attachment_boundary"
+    ]
+
+    assert attachment is not None
+    assert len(
+        attachment["physical_points"]
+    ) == 30
+
+    attachment_mean_y = sum(
+        point[1]
+        for point in attachment["physical_points"]
+    ) / len(
+        attachment["physical_points"]
+    )
+
+    other = next(
+        record
+        for record in records
+        if (
+            record["boundary_index"]
+            != attachment["boundary_index"]
+        )
+    )
+
+    other_mean_y = sum(
+        point[1]
+        for point in other["physical_points"]
+    ) / len(
+        other["physical_points"]
+    )
+
+    assert attachment_mean_y < other_mean_y
+    assert (
+        result["support_attachment_boundary_policy"]
+        == "lowest_mean_y_boundary"
+    )
+
+    # Explicitly geometry-derived only:
+    # no provider semantic such as "neck" or "mouth".
+    assert "semantic_region" not in attachment

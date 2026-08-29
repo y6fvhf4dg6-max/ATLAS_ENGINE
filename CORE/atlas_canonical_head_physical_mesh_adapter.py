@@ -10,8 +10,10 @@ class AtlasCanonicalHeadPhysicalMeshAdapter:
     Converts one canonical-head triangle topology into
     representation-scoped physical-coordinate triangles.
 
-    Boundary closure / family-specific carrier geometry is
-    intentionally not claimed by this initial contract.
+    Optional boundary closure is topology-changing and
+    limited to deterministic centroid-fan closure of simple,
+    consistently oriented boundary loops. Family-specific carrier
+    geometry and manufacturability are not claimed here.
     """
 
     SUPPORTED_REPRESENTATION_KINDS = (
@@ -117,6 +119,49 @@ class AtlasCanonicalHeadPhysicalMeshAdapter:
             selected_faces
         )
 
+        physical_boundary_loops = tuple(
+            {
+                "boundary_index": boundary_index,
+                "vertex_indices": tuple(loop),
+                "physical_points": tuple(
+                    physical_vertices[index]
+                    for index in loop
+                ),
+                "centroid": (
+                    sum(
+                        physical_vertices[index][0]
+                        for index in loop
+                    )
+                    / len(loop),
+                    sum(
+                        physical_vertices[index][1]
+                        for index in loop
+                    )
+                    / len(loop),
+                    sum(
+                        physical_vertices[index][2]
+                        for index in loop
+                    )
+                    / len(loop),
+                ),
+            }
+            for boundary_index, loop in enumerate(
+                boundary_loops
+            )
+        )
+
+        support_attachment_boundary = (
+            min(
+                physical_boundary_loops,
+                key=lambda record: (
+                    record["centroid"][1],
+                    record["boundary_index"],
+                ),
+            )
+            if physical_boundary_loops
+            else None
+        )
+
         closure_triangles = ()
 
         if close_boundaries:
@@ -158,6 +203,12 @@ class AtlasCanonicalHeadPhysicalMeshAdapter:
                 "triangles": ready_triangles,
                 "type": "canonical_head_physical_mesh",
                 "representation_kind": resolved_kind,
+                "support_attachment_boundary": (
+                    support_attachment_boundary
+                ),
+                "support_attachment_boundary_policy": (
+                    "lowest_mean_y_boundary"
+                ),
             },
             "source_provenance": source_provenance,
             "adapter_provenance": cls.ADAPTER_PROVENANCE,
@@ -180,6 +231,15 @@ class AtlasCanonicalHeadPhysicalMeshAdapter:
             ),
             "source_open_boundary_count": len(
                 boundary_loops
+            ),
+            "physical_boundary_loops": (
+                physical_boundary_loops
+            ),
+            "support_attachment_boundary": (
+                support_attachment_boundary
+            ),
+            "support_attachment_boundary_policy": (
+                "lowest_mean_y_boundary"
             ),
             "closed_boundary_count": (
                 len(boundary_loops)
