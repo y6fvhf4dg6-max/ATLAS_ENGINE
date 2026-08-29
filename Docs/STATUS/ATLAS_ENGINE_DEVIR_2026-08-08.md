@@ -20710,3 +20710,119 @@ Next exact subitem:
 **11.12 — Material Sensitivity**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_12_MATERIAL_SENSITIVITY_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.12 — Material Sensitivity
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.12 establishes a canonical-head-specific material-sensitivity evidence
+contract for physical identity-bearing features.
+
+New contract:
+
+- `CORE/atlas_canonical_head_material_sensitivity.py`
+- `Test/test_canonical_head_material_sensitivity.py`
+
+Authority:
+
+Evaluate material/profile effects where they materially affect physical
+identity-bearing features.
+
+The audit found that existing material-adjacent owners do not satisfy this
+requirement by themselves:
+
+- `AtlasPhysicalFeatureProfile` records material as generic physical-profile
+  metadata but does not compare material changes against canonical-head
+  identity-bearing physical regions;
+- `AtlasProductPreviewMaterialProfile` owns RGB/presentation palette semantics,
+  not physical material behavior;
+- `AtlasSemanticMaterialHierarchy` maps semantic roles to presentation/material
+  slots and physical color count, not material-driven identity-bearing geometry
+  sensitivity;
+- `AtlasReliefSemanticMaterialMap` maps semantic relief regions to material IDs,
+  not comparative physical identity evidence;
+- `AtlasArchitecturalReliefPhysicalProfile` owns relief dimensions and sampling
+  resolution and does not own material sensitivity.
+
+Supported physical representation kinds are:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+The contract compares explicit reference and evaluated material identities and
+material-profile identifiers:
+
+- reference material;
+- evaluated material;
+- reference material profile ID;
+- evaluated material profile ID.
+
+Material and material-profile identifiers are normalized canonical identifiers.
+
+Observation states are:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_OBSERVABLE`.
+
+For `OBSERVED` evidence, sensitivity states are:
+
+- `NO_MATERIAL_CHANGE`;
+- `MATERIAL_CHANGE`.
+
+`NO_MATERIAL_CHANGE` requires no affected identity-bearing regions.
+
+`MATERIAL_CHANGE` requires at least one explicitly affected identity-bearing
+region.
+
+Supported identity-bearing regions are:
+
+- `nose`;
+- `jaw_chin`;
+- `orbital`;
+- `cheek_midface`;
+- `mouth_perioral`;
+- `forehead_cranial`;
+- `silhouette`;
+- `profile`.
+
+Affected regions are normalized and deduplicated while preserving first-seen
+order.
+
+For `UNRESOLVED` and `NOT_OBSERVABLE`, the sensitivity state must match the
+observation state exactly and no affected regions may be asserted.
+
+The Item 11.12 contract intentionally does not claim:
+
+- nozzle diameter or layer-height sensitivity;
+- RGB or preview-palette semantics;
+- slicer validity;
+- support requirement;
+- topology/manufacturability validity;
+- aggregate identity-preservation score;
+- physical print success;
+- production `GO/HOLD/REJECT`;
+- Phase 9 authorization.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.12: `48 passed`;
+- Closure Challenge V1: `36/36 PASS`;
+- related regression: `304 passed`;
+- full regression: `6189 passed, 11 warnings in 134.59s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.12.
+
+Item 11.12 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.13 — Human Visual Inspection Protocol**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
