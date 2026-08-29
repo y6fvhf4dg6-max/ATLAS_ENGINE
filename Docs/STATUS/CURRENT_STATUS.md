@@ -18866,3 +18866,121 @@ Next exact subitem:
 **11.14 — Digital-vs-Physical Failure Classification**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_14_DIGITAL_PHYSICAL_FAILURE_CLASSIFICATION_FINAL_CLOSURE_2026_08_29
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.14 — Digital-vs-Physical Failure Classification
+**Status:** `OFFICIALLY CLOSED`
+
+Item 11.14 establishes a canonical-head-specific bounded failure-attribution
+contract for distinguishing digital and physical pipeline failure origins where
+evidence permits attribution.
+
+New contract:
+
+- `CORE/atlas_canonical_head_digital_physical_failure_classification.py`
+- `Test/test_canonical_head_digital_physical_failure_classification.py`
+
+Authority:
+
+Failures must be attributed where evidence permits to:
+
+- reconstruction;
+- canonical-to-physical adapter;
+- LoD;
+- slicer;
+- printer;
+- material;
+- post-processing.
+
+The audit found that existing adjacent owners do not satisfy this requirement
+by themselves:
+
+- `AtlasCanonicalHeadPhysicalRepresentationGate` emits bounded physical
+  representation failure reasons but does not classify them into the roadmap
+  root-cause attribution classes;
+- `AtlasCanonicalHeadBenchmarkCandidateGate` emits benchmark quality and policy
+  failure reasons rather than digital-vs-physical pipeline attribution;
+- `AtlasCanonicalHeadIdentityConfidenceGate` emits identity-evidence
+  insufficiency reasons rather than physical pipeline root causes;
+- `AtlasCanonicalHeadLandmarkSurfaceAgreementEvidence` separates 2D,
+  canonical-model, and metric-3D evidence spaces but does not classify printer,
+  slicer, material, LoD, adapter, or post-processing causes;
+- `AtlasCanonicalHeadCrossRegionCompensationEvidence` owns bounded compensation
+  semantics and does not own physical failure attribution;
+- `AtlasCanonicalHeadEvaluationSpaceClaimBoundary` blocks unsupported claim
+  promotion and does not identify production-pipeline failure origin.
+
+Supported physical representation kinds are:
+
+- `relief`;
+- `bust`;
+- `figurine_head`;
+- `story_kit_component`.
+
+Observed failure-attribution classes are:
+
+- `reconstruction`;
+- `canonical_to_physical_adapter`;
+- `lod`;
+- `slicer`;
+- `printer`;
+- `material`;
+- `post_processing`.
+
+Observation states are:
+
+- `OBSERVED`;
+- `UNRESOLVED`;
+- `NOT_OBSERVABLE`.
+
+For `OBSERVED` evidence, the failure attribution must be one of the seven
+explicit roadmap attribution classes.
+
+For `UNRESOLVED` evidence, the failure attribution is restricted to
+`unresolved`.
+
+For `NOT_OBSERVABLE` evidence, the failure attribution is restricted to
+`not_observable`.
+
+This prevents the contract from inventing a specific root cause when evidence
+does not permit attribution.
+
+The contract records:
+
+- representation identity;
+- representation kind;
+- failure identity;
+- observation state;
+- failure attribution;
+- evidence provenance;
+- attribution basis.
+
+The Item 11.14 contract intentionally does not claim:
+
+- failure severity or severity score;
+- production `GO/HOLD/REJECT`;
+- likeness score;
+- metric accuracy or metric score;
+- repair recommendation or repair action;
+- Phase 9 authorization.
+
+Validation:
+
+- initial RED: expected missing-module failure (`RED_EXIT=2`);
+- focused Item 11.14: `35 passed`;
+- Closure Challenge V1: `33/33 PASS`;
+- related regression: `297 passed`;
+- full regression: `6268 passed, 11 warnings in 135.40s`;
+- warnings are the existing NumPy `numpy.core.numeric` deprecation warnings
+  in the real FLAME correspondence tests and are not introduced by Item 11.14.
+
+Item 11.14 is therefore `OFFICIALLY CLOSED`.
+
+Next exact subitem:
+
+**11.15 — Item 11 Closure**
+
+Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
