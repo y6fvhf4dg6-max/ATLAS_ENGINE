@@ -21154,3 +21154,373 @@ Next exact task:
 to revisit Item 11.15.**
 
 Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+
+# PHASE8_ITEM11_15_PHYSICAL_IDENTITY_RECOVERY_PLAN_2026_08_30
+
+**Phase:** 8 — Canonical Face/Head Decision Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Active subitem:** 11.15 — Item 11 Closure / Physical Identity Recovery
+**Status:** `ACTIVE / HOLD-BLOCKED`
+**Phase 9:** `NOT AUTHORIZED / NOT STARTED`
+
+## Why the previous Item 11.15 next-step is superseded
+
+The original Item 11.15 HOLD correctly established that empirical physical
+validation was missing.
+
+Subsequent real-candidate digital physical-representation work established an
+additional upstream blocker before physical printing should be used as closure
+evidence.
+
+The selected canonical candidate does not yet preserve sufficient
+identity-bearing facial structure through the current frontal
+canonical-to-relief representation path.
+
+Therefore the previous statement that the remaining blocker is exclusively
+empirical is no longer the complete current state.
+
+The historical HOLD record remains valid as historical evidence and MUST NOT be
+rewritten or deleted.
+
+The current blocker set is now:
+
+1. `DIGITAL_PHYSICAL_IDENTITY_TRANSFER_NOT_YET_ACCEPTABLE`
+2. `EMPIRICAL_CANONICAL_HEAD_PHYSICAL_VALIDATION_MISSING`
+
+The first blocker must be addressed before spending physical-validation effort
+on a candidate that is already visibly inadequate in the digital
+manufacturing representation.
+
+## Verified observations motivating recovery
+
+Real selected-candidate inspection established:
+
+- the first physical-relief representation did not preserve convincing source
+  likeness;
+- frontal physical calibration materially improved head-width transfer;
+- excessive upper/mid lateral width remains a real canonical/physical
+  silhouette issue;
+- local facial identity-bearing structures require stronger preservation,
+  especially nose, mouth/lips and other fine facial structure;
+- relief-depth transfer can compress local source structure;
+- global/over-broad ordering repair can flatten local structure;
+- Gaussian semantic masks have non-zero tails and therefore `support > 0`
+  cannot by itself be treated as global semantic ownership;
+- fixed-point local ordering can propagate relief-ceiling saturation through
+  chains of neighbouring samples;
+- a blanket rule that prevents saturated samples from acting as ordering
+  drivers breaks a legitimate existing local-ordering invariant;
+- immutable-original-driver ordering limits propagation but still leaves many
+  local reversals and is therefore diagnostic evidence, not an accepted final
+  policy;
+- repeated local policy tuning without a stronger representation principle is
+  now considered architectural patinaj and MUST NOT continue as arbitrary
+  threshold tuning.
+
+No numeric likeness PASS threshold is created by these observations.
+
+## Research-derived engineering direction
+
+The recovery path must move from heuristic relief-value correction toward a
+representation pipeline based on explicit geometry, correspondence, semantic
+locality and physically constrained projection.
+
+Applicable technical families to evaluate include:
+
+- multi-view / 3D morphable-model identity reconstruction;
+- dense or surface correspondence;
+- explicit canonical 3D geometry before relief conversion;
+- visibility-aware projection;
+- depth-buffer / ray / surface-based frontal projection;
+- semantic facial-region ownership;
+- multi-scale geometry/detail separation;
+- edge- and feature-preserving local detail transfer;
+- bounded physical-depth allocation;
+- print-resolution-aware feature survival;
+- objective digital validation before physical fabrication.
+
+Research evidence is guidance for architecture selection. It MUST NOT be
+converted into invented ATLAS thresholds or unsupported claims.
+
+---
+
+# MAIN CHECKLIST — LOCKED ORDER
+
+1. Canonical Identity Representation — `CLOSED`
+2. Canonical Correspondence Semantics — `CLOSED`
+3. Hybrid Bounded-Detail Bridge — `CLOSED`
+4. Six-View Quantitative Evidence — `CLOSED`
+5. FLAME / PRNet Evidence Closure — `CLOSED`
+6. Silhouette / Profile Closure — `CLOSED`
+7. Identity Preservation — `CLOSED`
+8. Pose / Expression Separation — `CLOSED`
+9. Facial Region Geometry Quality — `CLOSED`
+10. Metric Ground-Truth Layer — `CLOSED`
+11. Physical Representation Gate — `ACTIVE / HOLD-BLOCKED`
+12. Runtime / Reproducibility — `PENDING`
+13. Commercial / Legal / Privacy — `PENDING`
+14. Three-Class Architecture Comparison — `PENDING`
+15. Phase 8 Final Decision / Phase 9 Gate — `PENDING`
+
+No later main-checklist item is authorized by this recovery plan.
+
+---
+
+# ITEM 11 CHECKLIST
+
+11.1 Canonical-to-Physical Adapter Isolation — `CLOSED`
+11.2 Scale Classes — `CLOSED`
+11.3 Minimum Feature Survival — `CLOSED`
+11.4 Relief Depth Transfer — `CLOSED`
+11.5 LoD Identity Preservation — `CLOSED`
+11.6 Topology / Manufacturability — `CLOSED`
+11.7 Slicer Gate — `CLOSED`
+11.8 Printed Dimensional Fidelity — `CLOSED-CONTRACT / EMPIRICAL EVIDENCE PENDING`
+11.9 Physical Regional Preservation — `CLOSED-CONTRACT / EMPIRICAL EVIDENCE PENDING`
+11.10 Orientation Sensitivity — `CLOSED-CONTRACT / EMPIRICAL EVIDENCE PENDING`
+11.11 Layer / Nozzle Sensitivity — `CLOSED-CONTRACT / EMPIRICAL EVIDENCE PENDING`
+11.12 Material Sensitivity — `CLOSED-CONTRACT / EMPIRICAL EVIDENCE PENDING`
+11.13 Human Visual Inspection Protocol — `CLOSED`
+11.14 Digital-vs-Physical Failure Classification — `CLOSED`
+11.15 Item 11 Closure — `ACTIVE / HOLD-BLOCKED`
+
+---
+
+# ACTIVE WORKING CHECKLIST — ITEM 11.15 PHYSICAL IDENTITY RECOVERY
+
+## R0 — Freeze and preserve current evidence
+
+- [ ] R0.1 Preserve the current pushed checkpoint.
+- [ ] R0.2 Preserve the four current exact-scope dirty Item-11.15 files.
+- [ ] R0.3 Record rejected/diagnostic experiments without promoting them to
+      production policy.
+- [ ] R0.4 Do not touch protected unrelated dirty work.
+
+## R1 — Representation failure decomposition
+
+Determine where source identity is lost:
+
+`source observations`
+→ `canonical 3D identity`
+→ `physical calibration`
+→ `frontal projection/rasterization`
+→ `relief-depth allocation`
+→ `ordering/composition`
+→ `mesh`
+→ `slicer`
+→ `print`.
+
+Required outcome:
+
+- quantify loss at each observable transition;
+- separate reconstruction error from physical-representation error;
+- identify the earliest stage at which unacceptable visible identity loss is
+  introduced;
+- no repair before causal attribution.
+
+## R2 — Canonical geometry sufficiency audit
+
+Audit whether the selected canonical geometry itself contains sufficient
+identity-bearing shape before relief conversion.
+
+Regions include, where legitimately supported:
+
+- global silhouette / cranial contour;
+- jaw and chin;
+- orbital/eyelid structure;
+- nose bridge;
+- nose body;
+- nose base / alar structure;
+- philtrum;
+- upper and lower lips;
+- cheek / nasolabial structure;
+- forehead and age/life-line detail where source evidence supports it.
+
+If the canonical source is insufficient, relief-policy tuning MUST NOT be used
+to fabricate missing 3D identity.
+
+## R3 — Projection architecture decision
+
+Compare bounded alternatives for canonical-3D → physical-relief conversion.
+
+At minimum evaluate:
+
+A. current raster/depth-transfer baseline;
+B. visibility-aware surface/depth projection;
+C. explicit local surface displacement / normal-aware projection where
+   justified.
+
+Decision criteria must include:
+
+- identity-bearing structure retention;
+- silhouette/profile consistency;
+- local depth-order preservation;
+- clipping/saturation behaviour;
+- deterministic manufacturability;
+- no invented geometry unsupported by source/canonical evidence.
+
+Select one architecture before further production tuning.
+
+## R4 — Semantic locality and ownership
+
+Replace accidental Gaussian-tail connectivity with explicit locality semantics
+where required.
+
+Audit:
+
+- region core;
+- transition/feather zone;
+- neighbouring-region overlap;
+- ownership;
+- permitted cross-region interaction.
+
+Do not introduce arbitrary support thresholds solely to make a test pass.
+
+## R5 — Multi-scale facial geometry preservation
+
+Separate:
+
+- macro head form;
+- meso facial anatomy;
+- micro identity/detail.
+
+Prevent macro compression or ordering from erasing meso/micro identity.
+
+Required facial structures include the identity-bearing features needed for the
+selected candidate, especially:
+
+- nose;
+- lips/mouth;
+- orbital boundaries;
+- jaw/chin;
+- relevant facial folds/lines supported by source evidence.
+
+## R6 — Physical-depth allocation
+
+Design bounded depth allocation from available physical Z budget.
+
+Requirements:
+
+- explicit budget;
+- region-aware but evidence-based allocation;
+- no uncontrolled ceiling propagation;
+- no global flattening;
+- preserve meaningful local source ordering where physically possible;
+- clipping/saturation reported explicitly.
+
+## R7 — Digital validation gate
+
+Before printing, generate only real pipeline geometry/STL evidence.
+
+Synthetic or image-generated previews are not validation evidence.
+
+Required digital checks include:
+
+- actual candidate geometry;
+- actual STL;
+- deterministic render(s) of that STL/mesh;
+- front / three-quarter / profile where applicable;
+- regional preservation comparison;
+- clipping/saturation diagnostics;
+- topology/manufacturability checks.
+
+A candidate that visibly fails digitally MUST NOT be promoted merely to obtain
+physical evidence.
+
+## R8 — Controlled physical validation
+
+Only after the digital candidate is acceptable enough to justify fabrication:
+
+- slice actual candidate;
+- record print profile;
+- print;
+- measure dimensional fidelity;
+- inspect controlled views;
+- record orientation/layer/nozzle/material conditions as applicable;
+- classify observed failures using Item 11.14.
+
+## R9 — Item 11.15 closure decision
+
+Item 11 can close only when evidence supports the required physical
+representation preservation claim.
+
+Possible outcomes remain:
+
+- `GO / CLOSE`
+- `HOLD`
+- `REJECT / REDESIGN`
+
+No GO is implied by this recovery plan.
+
+---
+
+# EXACT CURRENT ENGINEERING STATE
+
+Safe pushed checkpoint at plan creation:
+
+`HEAD == origin/main == 791b98b5b5e02d5f4af22be9a4141db6677cacee`
+
+Current exact-scope dirty Item-11.15 files:
+
+- `CORE/atlas_canonical_head_region_aware_relief_depth_policy.py`
+- `Test/test_canonical_head_region_aware_relief_depth_policy.py`
+- `CORE/atlas_canonical_head_local_facial_feature_z_correction.py`
+- `Test/test_canonical_head_local_facial_feature_z_correction.py`
+
+The two local-facial-Z files are untracked.
+
+These four files MUST be preserved until explicitly resolved.
+
+Current region-aware policy focused state:
+
+- `41 passed`;
+- `1 expected RED`:
+  `test_v2_local_ordering_does_not_propagate_existing_relief_ceiling_saturation`.
+
+The RED is evidence of an unresolved production-policy problem and MUST NOT be
+silenced by weakening the test without causal justification.
+
+Rejected fix:
+
+- blanket prevention of saturated ordering drivers.
+
+Reason for rejection:
+
+- it broke an existing legitimate local source-order invariant.
+
+Counterfactual diagnostics:
+
+- immutable-original-driver ordering reduced saturation propagation;
+- it did not eliminate the large remaining local-reversal population;
+- therefore it is not accepted as the final architecture.
+
+No staging or commit of the current dirty Item-11.15 implementation is
+authorized merely by this plan persistence.
+
+---
+
+# EXACT NEXT PROJECT
+
+The next project is:
+
+**ITEM 11.15 — PHYSICAL IDENTITY RECOVERY / REPRESENTATION RECONSTRUCTION**
+
+It is not Phase 9.
+
+The first active task is:
+
+**R0 — Freeze and preserve current evidence.**
+
+After R0 closure, execute:
+
+**R1 — Representation failure decomposition.**
+
+Do not resume threshold tuning of the current ordering policy before R1
+identifies the earliest causal loss stage.
+
+---
+
+# EXACT FIRST INSTRUCTION FOR THE NEXT CHATGPT ENGINE
+
+> Continue ATLAS_ENGINE at Phase 8 Main Checklist Item 11.15 — Physical Identity Recovery. Read the latest appended `PHASE8_ITEM11_15_PHYSICAL_IDENTITY_RECOVERY_PLAN_2026_08_30` record in `Docs/START_HERE.md`, `Docs/STATUS/CURRENT_STATUS.md`, and `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md`. Verify Git state first. Preserve the four exact-scope dirty Item-11.15 files and all protected unrelated dirty work. Do not resume heuristic threshold tuning. Begin only at R0 — Freeze and preserve current evidence, then R1 — Representation failure decomposition. Use exactly one terminal command per step with tee + `/usr/bin/pbcopy`. Phase 9 is NOT AUTHORIZED / NOT STARTED.
