@@ -645,7 +645,83 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
 
         active_vertex_coverage &= coverage
 
-        if region_masks is None:
+        if indexed_projection:
+            from CORE.atlas_relief_normal_structure_detail_decomposer import (
+                AtlasReliefNormalStructureDetailDecomposer,
+            )
+            from CORE.atlas_relief_normal_gradient_limiter import (
+                AtlasReliefNormalGradientLimiter,
+            )
+            from CORE.atlas_relief_normal_height_integrator import (
+                AtlasReliefNormalHeightIntegrator,
+            )
+
+            normal_map = np.asarray(
+                raster["normal_map"],
+                dtype=np.float64,
+            )
+
+            structure_normals, detail_normals = (
+                AtlasReliefNormalStructureDetailDecomposer.decompose(
+                    normal_map,
+                    mask=active_vertex_coverage,
+                )
+            )
+
+            limited_detail_normals = (
+                AtlasReliefNormalGradientLimiter.limit(
+                    detail_normals,
+                    mask=active_vertex_coverage,
+                )
+            )
+
+            reconstructed_normals = (
+                AtlasReliefNormalStructureDetailDecomposer.recombine(
+                    structure_normals,
+                    limited_detail_normals,
+                )
+            )
+
+            normalized = (
+                AtlasReliefNormalHeightIntegrator.integrate(
+                    reconstructed_normals,
+                    mask=active_vertex_coverage,
+                    sample_spacing_mm=sample_pitch_mm,
+                    normalize_output=True,
+                )
+            )
+
+            relief_depth_mm = (
+                normalized
+                * relief_height_mm
+            )
+
+            relief_depth_metadata = {
+                "relief_depth_transfer_kind": (
+                    "visible_normal_gradient_reconstruction"
+                ),
+                "relief_semantic_support": (
+                    "constraint_only"
+                    if region_masks is not None
+                    else "not_used"
+                ),
+                "relief_depth_policy_provenance": (
+                    "not_geometry_owner"
+                    if region_masks is not None
+                    else "not_used"
+                ),
+                "relief_geometry_owner": (
+                    "visible_normal_gradient_reconstruction"
+                ),
+                "relief_reconstruction_sample_pitch_mm": (
+                    float(sample_pitch_mm)
+                ),
+                "relief_reconstruction_height_mm": (
+                    float(relief_height_mm)
+                ),
+            }
+
+        elif region_masks is None:
             normalized = np.zeros_like(
                 visible_depth,
                 dtype=np.float64,

@@ -588,3 +588,93 @@ def test_invalid_minimum_nz_is_rejected(
             normals,
             minimum_nz=minimum_nz,
         )
+
+
+def test_recombine_restores_structure_plus_detail_gradients() -> None:
+    rows = 36
+    columns = 44
+
+    y, x = np.mgrid[
+        -1.0:1.0:complex(rows),
+        -1.0:1.0:complex(columns),
+    ]
+
+    height = (
+        0.35 * np.exp(-2.0 * (x * x + y * y))
+        + 0.018 * np.sin(15.0 * x)
+        + 0.013 * np.cos(13.0 * y)
+    )
+
+    normals = _normals_from_height(height)
+
+    structure, detail = (
+        AtlasReliefNormalStructureDetailDecomposer.decompose(
+            normals,
+            structure_radius=4,
+        )
+    )
+
+    combined = (
+        AtlasReliefNormalStructureDetailDecomposer.recombine(
+            structure,
+            detail,
+        )
+    )
+
+    input_gx, input_gy = _gradient_from_normals(normals)
+    combined_gx, combined_gy = _gradient_from_normals(combined)
+
+    assert combined.shape == normals.shape
+    assert combined.dtype == np.float64
+    assert np.allclose(
+        np.linalg.norm(combined, axis=2),
+        1.0,
+        atol=1e-10,
+    )
+    assert np.allclose(combined_gx, input_gx, atol=1e-8)
+    assert np.allclose(combined_gy, input_gy, atol=1e-8)
+
+
+def test_recombine_restores_structure_plus_detail_gradients() -> None:
+    rows = 36
+    columns = 44
+
+    y, x = np.mgrid[
+        -1.0:1.0:complex(rows),
+        -1.0:1.0:complex(columns),
+    ]
+
+    height = (
+        0.35 * np.exp(-2.0 * (x * x + y * y))
+        + 0.018 * np.sin(15.0 * x)
+        + 0.013 * np.cos(13.0 * y)
+    )
+
+    normals = _normals_from_height(height)
+
+    structure, detail = (
+        AtlasReliefNormalStructureDetailDecomposer.decompose(
+            normals,
+            structure_radius=4,
+        )
+    )
+
+    combined = (
+        AtlasReliefNormalStructureDetailDecomposer.recombine(
+            structure,
+            detail,
+        )
+    )
+
+    input_gx, input_gy = _gradient_from_normals(normals)
+    combined_gx, combined_gy = _gradient_from_normals(combined)
+
+    assert combined.shape == normals.shape
+    assert combined.dtype == np.float64
+    assert np.allclose(
+        np.linalg.norm(combined, axis=2),
+        1.0,
+        atol=1e-10,
+    )
+    assert np.allclose(combined_gx, input_gx, atol=1e-8)
+    assert np.allclose(combined_gy, input_gy, atol=1e-8)

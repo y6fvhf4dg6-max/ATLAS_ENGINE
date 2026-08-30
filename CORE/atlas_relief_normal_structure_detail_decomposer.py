@@ -164,6 +164,50 @@ class AtlasReliefNormalStructureDetailDecomposer:
         )
 
     @staticmethod
+    def recombine(
+        structure_normals: np.ndarray,
+        detail_normals: np.ndarray,
+        *,
+        minimum_nz: float = 0.05,
+    ) -> np.ndarray:
+        structure = np.asarray(structure_normals, dtype=np.float64)
+        detail = np.asarray(detail_normals, dtype=np.float64)
+
+        AtlasReliefNormalStructureDetailDecomposer._validate_normals(structure)
+        AtlasReliefNormalStructureDetailDecomposer._validate_normals(detail)
+
+        if structure.shape != detail.shape:
+            raise ValueError(
+                "structure_normals and detail_normals must have matching shapes"
+            )
+
+        minimum_normal_z = float(minimum_nz)
+        if not np.isfinite(minimum_normal_z) or minimum_normal_z <= 0.0:
+            raise ValueError(
+                "minimum_nz must be finite and greater than zero"
+            )
+
+        structure_nz = np.maximum(structure[..., 2], minimum_normal_z)
+        detail_nz = np.maximum(detail[..., 2], minimum_normal_z)
+
+        gradient_x = (
+            -structure[..., 0] / structure_nz
+            -detail[..., 0] / detail_nz
+        )
+        gradient_y = (
+            -structure[..., 1] / structure_nz
+            -detail[..., 1] / detail_nz
+        )
+
+        return np.asarray(
+            AtlasReliefNormalStructureDetailDecomposer._gradients_to_normals(
+                gradient_x,
+                gradient_y,
+            ),
+            dtype=np.float64,
+        )
+
+    @staticmethod
     def _validate_normals(
         normals: np.ndarray,
     ) -> None:

@@ -888,3 +888,101 @@ def test_relief_consumes_indexed_projection_surface():
         result["relief_projection_correspondence"]
         == "indexed_visible_surface"
     )
+
+
+def test_indexed_relief_reports_normal_gradient_reconstruction():
+    mesh = _closed_tetrahedron_physical_mesh()
+
+    projection_triangles = mesh["triangles"]
+    vertices = tuple(
+        point
+        for triangle in projection_triangles
+        for point in triangle
+    )
+    faces = tuple(
+        (index, index + 1, index + 2)
+        for index in range(0, len(vertices), 3)
+    )
+
+    mesh = dict(mesh)
+    mesh["frontal_projection_triangles"] = projection_triangles
+    mesh["frontal_projection_vertices"] = vertices
+    mesh["frontal_projection_faces"] = faces
+
+    result = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    assert (
+        result["relief_geometry_owner"]
+        == "visible_normal_gradient_reconstruction"
+    )
+    assert (
+        result["relief_reconstruction_sample_pitch_mm"]
+        == pytest.approx(0.25)
+    )
+    assert (
+        result["relief_reconstruction_height_mm"]
+        == pytest.approx(2.0)
+    )
+
+
+def test_indexed_normal_reconstruction_changes_relief_geometry():
+    import numpy as np
+
+    mesh = _closed_tetrahedron_physical_mesh()
+    projection_triangles = mesh["triangles"]
+
+    baseline_mesh = dict(mesh)
+    baseline_mesh["frontal_projection_triangles"] = (
+        projection_triangles
+    )
+
+    indexed_mesh = dict(baseline_mesh)
+    indexed_mesh["frontal_projection_vertices"] = tuple(
+        point
+        for triangle in projection_triangles
+        for point in triangle
+    )
+    indexed_mesh["frontal_projection_faces"] = tuple(
+        (index, index + 1, index + 2)
+        for index in range(
+            0,
+            len(indexed_mesh["frontal_projection_vertices"]),
+            3,
+        )
+    )
+
+    baseline = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=baseline_mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+    reconstructed = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=indexed_mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    baseline_triangles = np.asarray(
+        baseline["family_geometry"]["triangles"],
+        dtype=np.float64,
+    )
+    reconstructed_triangles = np.asarray(
+        reconstructed["family_geometry"]["triangles"],
+        dtype=np.float64,
+    )
+
+    assert baseline_triangles.shape == reconstructed_triangles.shape
+    assert not np.allclose(
+        baseline_triangles[..., 2],
+        reconstructed_triangles[..., 2],
+        atol=1e-10,
+    )
+    assert (
+        reconstructed["relief_geometry_owner"]
+        == "visible_normal_gradient_reconstruction"
+    )
+    assert reconstructed["physical_depth_mm"] == pytest.approx(2.0)
