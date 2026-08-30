@@ -84,3 +84,46 @@ Do not return to arbitrary threshold tuning.
 ## Exact first instruction
 
 > Continue ATLAS_ENGINE at Phase 8 Main Checklist Item 11.15 — Physical Identity Recovery. Verify Git state and the latest 2026-08-30 recovery-plan record first. Preserve the four exact-scope dirty Item-11.15 files and protected unrelated work. Begin only at R0, then R1. Do not resume heuristic threshold tuning. Phase 9 is not authorized.
+
+## R1.9 — Earliest-loss causal decision — 2026-08-30
+
+Status: `CLOSED — CAUSAL STAGE IDENTIFIED`
+
+Real-candidate stage decomposition established:
+
+- robust global 2.0 mm base transfer preserves source-depth ordering with very
+  high correlation and is not the earliest demonstrated major distortion;
+- the earliest demonstrated serious identity-bearing distortion occurs in the
+  `region-aware local semantic Z allocation` stage;
+- nose-base source/base correlation was `1.000000`, then source/local fell to
+  `0.757943`;
+- philtrum source/base correlation was `1.000000`, then source/local fell to
+  `-0.684747`;
+- fixed-point local nose ordering is a separate downstream distortion mechanism,
+  not the earliest cause;
+- ordering modified 971 active raster samples and increased relief-ceiling
+  saturation from 92 to 138 samples, including 46 ordering-induced ceiling
+  samples;
+- ordering partially repaired nose-base and philtrum ordering while degrading
+  upper-lip and lower-lip source correlation and propagating saturation.
+
+Causal decision:
+
+`EARLIEST_DEMONSTRATED_IDENTITY_DISTORTION_STAGE =
+REGION_AWARE_LOCAL_SEMANTIC_Z_ALLOCATION`
+
+Downstream finding:
+
+`FIXED_POINT_ORDERING =
+SECONDARY_CROSS_REGION_PROPAGATION_AND_CEILING_SATURATION_MECHANISM`
+
+Epistemic boundary:
+
+This does not establish that a 2.0 mm physical relief budget is ultimately
+sufficient, does not establish physical likeness, and does not authorize
+physical-validation closure or Phase 9. It establishes only the earliest
+demonstrated serious distortion within the measured current real-candidate
+representation pipeline.
+
+R1 repair remains intentionally unstarted. The next recovery stage is
+`R2 — Canonical geometry sufficiency audit`.
