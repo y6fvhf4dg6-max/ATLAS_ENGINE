@@ -181,6 +181,19 @@ class AtlasCanonicalHeadPhysicalMeshAdapter:
             )
         )
 
+        frontal_projection_triangles = (
+            tuple(
+                (
+                    physical_vertices[a],
+                    physical_vertices[b],
+                    physical_vertices[c],
+                )
+                for a, b, c in faces
+            )
+            if resolved_kind == "relief"
+            else ()
+        )
+
         source_provenance = str(
             canonical_mesh.get(
                 "provenance",
@@ -208,6 +221,14 @@ class AtlasCanonicalHeadPhysicalMeshAdapter:
                 ),
                 "support_attachment_boundary_policy": (
                     "lowest_mean_y_boundary"
+                ),
+                "frontal_projection_triangles": (
+                    frontal_projection_triangles
+                ),
+                "frontal_projection_source_policy": (
+                    "full_source_without_boundary_closure"
+                    if resolved_kind == "relief"
+                    else "not_applicable"
                 ),
             },
             "source_provenance": source_provenance,

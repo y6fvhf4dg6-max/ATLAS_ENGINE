@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import math
+
+import numpy as np
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -32,7 +34,9 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
         "atlas_canonical_head_physical_family_builder:v1"
     )
 
-    RELIEF_DEPTH_RATIO = 0.30
+    RELIEF_HEIGHT_MM = 2.00
+    RELIEF_BASE_THICKNESS_MM = 0.80
+    RELIEF_SAMPLE_PITCH_MM = 0.25
 
     BUST_SUPPORT_WIDTH_RATIO = 0.56
     BUST_SUPPORT_DEPTH_RATIO = 0.52
@@ -96,26 +100,43 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
             )
 
         if kind == "relief":
-            compressed = (
-                cls._compress_depth_with_planar_backing(
-                    triangles=triangles,
-                    bounds=bounds,
-                    ratio=cls.RELIEF_DEPTH_RATIO,
+            projection_source = (
+                physical_head_mesh.get(
+                    "frontal_projection_triangles"
                 )
             )
 
-            physical_depth = (
-                canonical_depth
-                * cls.RELIEF_DEPTH_RATIO
+            if not projection_source:
+                projection_triangles = triangles
+            else:
+                projection_triangles = cls._triangles(
+                    {
+                        "triangles": projection_source,
+                    }
+                )
+
+            relief_geometry = (
+                cls._frontal_visible_surface_relief(
+                    triangles=projection_triangles,
+                    bounds=bounds,
+                    relief_height_mm=(
+                        cls.RELIEF_HEIGHT_MM
+                    ),
+                    sample_pitch_mm=(
+                        cls.RELIEF_SAMPLE_PITCH_MM
+                    ),
+                )
             )
 
             return cls._result(
                 kind=kind,
                 geometry_kind="relief",
-                triangles=compressed,
+                triangles=relief_geometry,
                 support_geometry_kind="planar_backing",
                 canonical_depth_mm=canonical_depth,
-                physical_depth_mm=physical_depth,
+                physical_depth_mm=(
+                    cls.RELIEF_HEIGHT_MM
+                ),
             )
 
         attachment_boundary = (
@@ -364,6 +385,350 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
             "min_z": min(zs),
             "max_z": max(zs),
         }
+
+    @classmethod
+    def _frontal_visible_surface_relief(
+        cls,
+        *,
+        triangles: Sequence,
+        bounds: Mapping[str, float],
+        relief_height_mm: float,
+        sample_pitch_mm: float,
+    ) -> tuple:
+        """
+        Convert the frontal visible surface of the canonical
+        head into a silhouette-bounded closed 2.5D relief.
+
+        FLAME physical coordinates:
+        - X: frontal horizontal
+        - Y: frontal vertical
+        - Z: frontal depth
+
+        At each frontal sample only the greatest Z value is
+        retained. Geometry hidden behind that visible surface
+        therefore cannot influence the relief.
+        """
+
+        from CORE.atlas_projected_semantic_mesh_depth_rasterizer import (
+            AtlasProjectedSemanticMeshDepthRasterizer,
+        )
+
+        width = (
+            float(bounds["max_x"])
+            - float(bounds["min_x"])
+        )
+        height = (
+            float(bounds["max_y"])
+            - float(bounds["min_y"])
+        )
+
+        if width <= 0.0 or height <= 0.0:
+            raise ValueError(
+                "relief frontal extent must be positive"
+            )
+
+        row_count = max(
+            3,
+            int(math.ceil(
+                height / sample_pitch_mm
+            )) + 1,
+        )
+        column_count = max(
+            3,
+            int(math.ceil(
+                width / sample_pitch_mm
+            )) + 1,
+        )
+
+        min_x = float(bounds["min_x"])
+        min_y = float(bounds["min_y"])
+
+        local_triangles = tuple(
+            tuple(
+                (
+                    float(point[0]) - min_x,
+                    float(point[1]) - min_y,
+                    float(point[2]),
+                )
+                for point in triangle
+            )
+            for triangle in triangles
+        )
+
+        raster = (
+            AtlasProjectedSemanticMeshDepthRasterizer
+            .rasterize(
+                mesh={
+                    "triangles": local_triangles,
+                },
+                width_mm=width,
+                depth_mm=height,
+                rows=row_count,
+                columns=column_count,
+            )
+        )
+
+        coverage = np.asarray(
+            raster["coverage_map"],
+            dtype=np.bool_,
+        )
+        visible_depth = np.asarray(
+            raster["depth_map"],
+            dtype=np.float64,
+        )
+
+        if not np.any(coverage):
+            raise ValueError(
+                "frontal visible surface has no coverage"
+            )
+
+        normalized = np.zeros_like(
+            visible_depth,
+            dtype=np.float64,
+        )
+
+        covered_depth = visible_depth[
+            coverage
+        ]
+
+        minimum_visible = float(
+            covered_depth.min()
+        )
+        maximum_visible = float(
+            covered_depth.max()
+        )
+        visible_range = (
+            maximum_visible
+            - minimum_visible
+        )
+
+        if visible_range > 1e-12:
+            normalized[coverage] = (
+                covered_depth
+                - minimum_visible
+            ) / visible_range
+
+        x_coordinates = np.linspace(
+            min_x,
+            float(bounds["max_x"]),
+            column_count,
+            dtype=np.float64,
+        )
+        y_coordinates = np.linspace(
+            min_y,
+            float(bounds["max_y"]),
+            row_count,
+            dtype=np.float64,
+        )
+
+        bottom_z = 0.0
+        relief_base_z = (
+            bottom_z
+            + cls.RELIEF_BASE_THICKNESS_MM
+        )
+        triangles_out = []
+
+        active_cells = np.zeros(
+            (
+                row_count - 1,
+                column_count - 1,
+            ),
+            dtype=np.bool_,
+        )
+
+        for row in range(row_count - 1):
+            for column in range(
+                column_count - 1
+            ):
+                active_cells[
+                    row,
+                    column,
+                ] = bool(
+                    coverage[row, column]
+                    and coverage[
+                        row,
+                        column + 1,
+                    ]
+                    and coverage[
+                        row + 1,
+                        column,
+                    ]
+                    and coverage[
+                        row + 1,
+                        column + 1,
+                    ]
+                )
+
+        def top(row, column):
+            return (
+                float(x_coordinates[column]),
+                float(y_coordinates[row]),
+                float(
+                    relief_base_z
+                    + normalized[
+                        row,
+                        column,
+                    ]
+                    * relief_height_mm
+                ),
+            )
+
+        def bottom(row, column):
+            return (
+                float(x_coordinates[column]),
+                float(y_coordinates[row]),
+                float(bottom_z),
+            )
+
+        def add_wall(
+            bottom_a,
+            bottom_b,
+            top_b,
+            top_a,
+        ):
+            triangles_out.append(
+                (
+                    bottom_a,
+                    bottom_b,
+                    top_b,
+                )
+            )
+            triangles_out.append(
+                (
+                    bottom_a,
+                    top_b,
+                    top_a,
+                )
+            )
+
+        for row in range(row_count - 1):
+            for column in range(
+                column_count - 1
+            ):
+                if not active_cells[
+                    row,
+                    column,
+                ]:
+                    continue
+
+                t00 = top(row, column)
+                t10 = top(
+                    row,
+                    column + 1,
+                )
+                t01 = top(
+                    row + 1,
+                    column,
+                )
+                t11 = top(
+                    row + 1,
+                    column + 1,
+                )
+
+                b00 = bottom(row, column)
+                b10 = bottom(
+                    row,
+                    column + 1,
+                )
+                b01 = bottom(
+                    row + 1,
+                    column,
+                )
+                b11 = bottom(
+                    row + 1,
+                    column + 1,
+                )
+
+                triangles_out.extend(
+                    (
+                        (
+                            t00,
+                            t10,
+                            t11,
+                        ),
+                        (
+                            t00,
+                            t11,
+                            t01,
+                        ),
+                        (
+                            b00,
+                            b11,
+                            b10,
+                        ),
+                        (
+                            b00,
+                            b01,
+                            b11,
+                        ),
+                    )
+                )
+
+                if (
+                    row == 0
+                    or not active_cells[
+                        row - 1,
+                        column,
+                    ]
+                ):
+                    add_wall(
+                        b00,
+                        b10,
+                        t10,
+                        t00,
+                    )
+
+                if (
+                    column
+                    == column_count - 2
+                    or not active_cells[
+                        row,
+                        column + 1,
+                    ]
+                ):
+                    add_wall(
+                        b10,
+                        b11,
+                        t11,
+                        t10,
+                    )
+
+                if (
+                    row == row_count - 2
+                    or not active_cells[
+                        row + 1,
+                        column,
+                    ]
+                ):
+                    add_wall(
+                        b11,
+                        b01,
+                        t01,
+                        t11,
+                    )
+
+                if (
+                    column == 0
+                    or not active_cells[
+                        row,
+                        column - 1,
+                    ]
+                ):
+                    add_wall(
+                        b01,
+                        b00,
+                        t00,
+                        t01,
+                    )
+
+        if not triangles_out:
+            raise ValueError(
+                "frontal coverage produced no relief cells"
+            )
+
+        return tuple(
+            triangles_out
+        )
 
     @staticmethod
     def _compress_depth(

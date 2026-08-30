@@ -557,3 +557,77 @@ def test_repo_local_real_flame_exposes_bottom_boundary_without_provider_semantic
     # Explicitly geometry-derived only:
     # no provider semantic such as "neck" or "mouth".
     assert "semantic_region" not in attachment
+
+
+def test_relief_main_head_mesh_retains_full_source_frontal_projection_triangles():
+    """
+    Relief may retain a main-head physical body while exposing
+    the complete physical source surface for frontal visible-
+    surface projection.
+
+    The projection payload must contain all source components
+    and must not include topology-closing triangles.
+    """
+
+    canonical_mesh = {
+        "vertices": (
+            # Main component.
+            (-2.0, 0.0, 0.0),
+            (2.0, 0.0, 0.0),
+            (0.0, 4.0, 1.0),
+            (0.0, 1.0, -1.0),
+
+            # Separate frontal component.
+            (-0.5, 1.5, 1.5),
+            (0.5, 1.5, 1.5),
+            (0.0, 2.0, 1.5),
+        ),
+        "faces": (
+            (0, 1, 2),
+            (0, 3, 1),
+            (0, 2, 3),
+            (1, 3, 2),
+
+            (4, 5, 6),
+        ),
+        "provenance": "synthetic relief component fixture",
+    }
+
+    result = AtlasCanonicalHeadPhysicalMeshAdapter.build(
+        canonical_mesh=canonical_mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+        close_boundaries=True,
+        main_head_only=True,
+    )
+
+    physical_mesh = result["physical_mesh"]
+
+    # Primary physical body preserves existing main-head-only
+    # semantics.
+    assert (
+        result["selected_source_component_face_count"]
+        == 4
+    )
+    assert result["discarded_source_face_count"] == 1
+
+    # Relief projection must nevertheless retain every original
+    # source face in physical coordinates.
+    projection = physical_mesh[
+        "frontal_projection_triangles"
+    ]
+
+    assert len(projection) == 5
+
+    # Closure is not part of the frontal projection source.
+    assert (
+        len(projection)
+        == len(canonical_mesh["faces"])
+    )
+
+    assert (
+        physical_mesh[
+            "frontal_projection_source_policy"
+        ]
+        == "full_source_without_boundary_closure"
+    )

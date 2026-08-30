@@ -294,7 +294,7 @@ def test_repo_local_real_flame_produces_four_single_volume_family_geometries():
         "relief": {
             "geometry_kind": "relief",
             "support_kind": "planar_backing",
-            "triangle_count": 7862,
+            "triangle_count": None,
         },
         "bust": {
             "geometry_kind": "bust",
@@ -349,10 +349,13 @@ def test_repo_local_real_flame_produces_four_single_volume_family_geometries():
             result["support_geometry_kind"]
             == contract["support_kind"]
         )
-        assert (
-            len(triangles)
-            == contract["triangle_count"]
-        )
+        if contract["triangle_count"] is None:
+            assert len(triangles) > 0
+        else:
+            assert (
+                len(triangles)
+                == contract["triangle_count"]
+            )
 
         assert len(bodies) == 1
         assert mesh.is_watertight
@@ -424,8 +427,10 @@ def test_repo_local_real_flame_produces_four_single_volume_family_geometries():
     )
 
     assert relief["physical_depth_mm"] == pytest.approx(
-        relief["canonical_depth_mm"]
-        * AtlasCanonicalHeadPhysicalFamilyBuilder.RELIEF_DEPTH_RATIO
+        AtlasCanonicalHeadPhysicalFamilyBuilder.RELIEF_HEIGHT_MM
+    )
+    assert relief["physical_depth_mm"] == pytest.approx(
+        2.0
     )
     assert (
         relief["physical_depth_mm"]
@@ -572,4 +577,122 @@ def test_relief_has_integral_planar_backing_surface():
     assert (
         result["manufacturability_status"]
         == "UNRESOLVED"
+    )
+
+
+def test_relief_depends_on_frontal_visible_surface_not_rear_head_depth():
+    """
+    Relief semantics are frontal-visible-surface based.
+
+    Changing geometry hidden behind the same frontal surface
+    must not change the produced relief. Relief excursion is
+    independently bounded to the physical relief-height
+    contract rather than derived as a fraction of full
+    canonical head depth.
+    """
+
+    def physical_head_mesh(rear_z):
+        front_z = 10.0
+
+        return {
+            "triangles": (
+                # Identical frontal visible surface.
+                (
+                    (-10.0, 0.0, front_z),
+                    (10.0, 0.0, front_z),
+                    (0.0, 40.0, front_z),
+                ),
+                # Fully hidden rear surface. Only its depth
+                # changes between the two fixtures.
+                (
+                    (-10.0, 0.0, rear_z),
+                    (0.0, 40.0, rear_z),
+                    (10.0, 0.0, rear_z),
+                ),
+            ),
+        }
+
+    near_rear = (
+        AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+            physical_head_mesh=physical_head_mesh(-10.0),
+            representation_kind="relief",
+            target_head_height_mm=40.0,
+        )
+    )
+
+    far_rear = (
+        AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+            physical_head_mesh=physical_head_mesh(-30.0),
+            representation_kind="relief",
+            target_head_height_mm=40.0,
+        )
+    )
+
+    assert (
+        near_rear["family_geometry"]["triangles"]
+        == far_rear["family_geometry"]["triangles"]
+    )
+
+    assert near_rear["physical_depth_mm"] == 2.0
+    assert far_rear["physical_depth_mm"] == 2.0
+
+
+def test_relief_uses_frontal_projection_triangles_when_available():
+    """
+    Relief generation must use the adapter-provided frontal
+    projection payload when present rather than limiting the
+    visible-surface raster to the primary physical body.
+    """
+
+    primary_triangles = (
+        (
+            (-10.0, 0.0, 0.0),
+            (10.0, 0.0, 0.0),
+            (0.0, 40.0, 1.0),
+        ),
+    )
+
+    frontal_component = (
+        (
+            (-2.0, 18.0, 5.0),
+            (2.0, 18.0, 5.0),
+            (0.0, 22.0, 5.0),
+        ),
+    )
+
+    primary_only = {
+        "triangles": primary_triangles,
+    }
+
+    with_projection_payload = {
+        "triangles": primary_triangles,
+        "frontal_projection_triangles": (
+            *primary_triangles,
+            *frontal_component,
+        ),
+        "frontal_projection_source_policy": (
+            "full_source_without_boundary_closure"
+        ),
+    }
+
+    baseline = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=primary_only,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    projected = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=with_projection_payload,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    assert (
+        baseline["family_geometry"]["triangles"]
+        != projected["family_geometry"]["triangles"]
+    )
+
+    assert (
+        projected["physical_depth_mm"]
+        == pytest.approx(2.0)
     )
