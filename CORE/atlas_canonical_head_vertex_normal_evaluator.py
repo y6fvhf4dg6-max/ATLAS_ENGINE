@@ -22,12 +22,72 @@ class AtlasCanonicalHeadVertexNormalEvaluator:
                 "AtlasCanonicalHeadGeometry."
             )
 
-        vertices = geometry.vertices
-        faces = geometry.topology.faces
+        return cls._evaluate_indexed(
+            vertices=geometry.vertices,
+            faces=geometry.topology.faces,
+        )
 
+    @classmethod
+    def evaluate_indexed_surface(
+        cls,
+        *,
+        vertices,
+        faces,
+    ) -> np.ndarray:
+        vertices = np.asarray(
+            vertices,
+            dtype=np.float64,
+        )
+        faces = tuple(
+            tuple(face)
+            for face in faces
+        )
+
+        if (
+            vertices.ndim != 2
+            or vertices.shape[1] != 3
+            or not np.isfinite(vertices).all()
+        ):
+            raise ValueError(
+                "vertices must have shape "
+                "(vertex_count, 3) and be finite."
+            )
+
+        if not faces:
+            raise ValueError(
+                "faces must not be empty."
+            )
+
+        for face in faces:
+            if len(face) != 3:
+                raise ValueError(
+                    "faces must contain triangles."
+                )
+            if any(
+                isinstance(index, bool)
+                or not isinstance(index, (int, np.integer))
+                or index < 0
+                or index >= len(vertices)
+                for index in face
+            ):
+                raise ValueError(
+                    "faces reference invalid vertices."
+                )
+
+        return cls._evaluate_indexed(
+            vertices=vertices,
+            faces=faces,
+        )
+
+    @staticmethod
+    def _evaluate_indexed(
+        *,
+        vertices,
+        faces,
+    ) -> np.ndarray:
         accumulated = np.zeros(
             (
-                geometry.vertex_count,
+                len(vertices),
                 3,
             ),
             dtype=np.float64,

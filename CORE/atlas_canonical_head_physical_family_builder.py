@@ -161,6 +161,12 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                 relief_depth_metadata,
             ) = cls._frontal_visible_surface_relief(
                 triangles=projection_triangles,
+                projection_vertices=physical_head_mesh.get(
+                    "frontal_projection_vertices"
+                ),
+                projection_faces=physical_head_mesh.get(
+                    "frontal_projection_faces"
+                ),
                 bounds=bounds,
                 relief_height_mm=(
                     cls.RELIEF_HEIGHT_MM
@@ -446,6 +452,8 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
         cls,
         *,
         triangles: Sequence,
+        projection_vertices: Sequence | None = None,
+        projection_faces: Sequence | None = None,
         bounds: Mapping[str, float],
         relief_height_mm: float,
         sample_pitch_mm: float,
@@ -512,12 +520,57 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
             for triangle in triangles
         )
 
+        has_vertices = bool(projection_vertices)
+        has_faces = bool(projection_faces)
+
+        if has_vertices != has_faces:
+            raise ValueError(
+                "indexed relief projection requires both "
+                "projection_vertices and projection_faces"
+            )
+
+        indexed_projection = has_vertices and has_faces
+        raster_mesh = {
+            "triangles": local_triangles,
+        }
+
+        if indexed_projection:
+            from CORE.atlas_canonical_head_vertex_normal_evaluator import (
+                AtlasCanonicalHeadVertexNormalEvaluator,
+            )
+
+            local_vertices = tuple(
+                (
+                    float(point[0]) - min_x,
+                    float(point[1]) - min_y,
+                    float(point[2]),
+                )
+                for point in projection_vertices
+            )
+            indexed_faces = tuple(
+                tuple(face)
+                for face in projection_faces
+            )
+
+            vertex_normals = (
+                AtlasCanonicalHeadVertexNormalEvaluator
+                .evaluate_indexed_surface(
+                    vertices=local_vertices,
+                    faces=indexed_faces,
+                )
+            )
+
+            raster_mesh.update(
+                {
+                    "vertex_normals": vertex_normals,
+                    "face_vertex_indices": indexed_faces,
+                }
+            )
+
         raster = (
             AtlasProjectedSemanticMeshDepthRasterizer
             .rasterize(
-                mesh={
-                    "triangles": local_triangles,
-                },
+                mesh=raster_mesh,
                 width_mm=width,
                 depth_mm=height,
                 rows=row_count,
@@ -678,6 +731,14 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                     policy_result.metadata
                 ),
             }
+
+        relief_depth_metadata[
+            "relief_projection_correspondence"
+        ] = (
+            "indexed_visible_surface"
+            if indexed_projection
+            else "triangle_only"
+        )
 
         x_coordinates = np.linspace(
             min_x,

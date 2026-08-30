@@ -856,3 +856,35 @@ def test_relief_without_region_masks_preserves_existing_depth_path():
         result["relief_semantic_support"]
         == "not_used"
     )
+
+def test_relief_consumes_indexed_projection_surface():
+    mesh = _closed_tetrahedron_physical_mesh()
+
+    projection_triangles = mesh["triangles"]
+    vertices = tuple(
+        point
+        for triangle in projection_triangles
+        for point in triangle
+    )
+    faces = tuple(
+        (index, index + 1, index + 2)
+        for index in range(0, len(vertices), 3)
+    )
+
+    mesh = dict(mesh)
+    mesh["frontal_projection_triangles"] = (
+        projection_triangles
+    )
+    mesh["frontal_projection_vertices"] = vertices
+    mesh["frontal_projection_faces"] = faces
+
+    result = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    assert (
+        result["relief_projection_correspondence"]
+        == "indexed_visible_surface"
+    )

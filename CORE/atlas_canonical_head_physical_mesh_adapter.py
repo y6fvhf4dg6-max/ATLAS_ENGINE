@@ -225,6 +225,16 @@ class AtlasCanonicalHeadPhysicalMeshAdapter:
                 "frontal_projection_triangles": (
                     frontal_projection_triangles
                 ),
+                "frontal_projection_vertices": (
+                    physical_vertices
+                    if resolved_kind == "relief"
+                    else ()
+                ),
+                "frontal_projection_faces": (
+                    faces
+                    if resolved_kind == "relief"
+                    else ()
+                ),
                 "frontal_projection_source_policy": (
                     "full_source_without_boundary_closure"
                     if resolved_kind == "relief"

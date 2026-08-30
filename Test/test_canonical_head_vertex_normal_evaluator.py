@@ -217,3 +217,32 @@ def test_evaluator_does_not_claim_provider_camera_pose_or_identity_quality():
         evaluator,
         "phase_9_authorized",
     )
+
+def test_evaluates_indexed_surface_without_canonical_wrapper():
+    vertices = (
+        (0.0, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0),
+    )
+    faces = ((0, 1, 2),)
+
+    normals = (
+        AtlasCanonicalHeadVertexNormalEvaluator
+        .evaluate_indexed_surface(
+            vertices=vertices,
+            faces=faces,
+        )
+    )
+
+    assert normals.shape == (3, 3)
+    np.testing.assert_allclose(
+        normals,
+        np.array(
+            [
+                [0.0, 0.0, 1.0],
+                [0.0, 0.0, 1.0],
+                [0.0, 0.0, 1.0],
+            ]
+        ),
+    )
+    assert normals.flags.writeable is False

@@ -631,3 +631,48 @@ def test_relief_main_head_mesh_retains_full_source_frontal_projection_triangles(
         ]
         == "full_source_without_boundary_closure"
     )
+
+def test_relief_projection_payload_preserves_indexed_full_source_surface():
+    canonical_mesh = {
+        "vertices": (
+            (-2.0, 0.0, 0.0),
+            (2.0, 0.0, 0.0),
+            (0.0, 4.0, 1.0),
+            (0.0, 1.0, -1.0),
+            (-0.5, 1.5, 1.5),
+            (0.5, 1.5, 1.5),
+            (0.0, 2.0, 1.5),
+        ),
+        "faces": (
+            (0, 1, 2),
+            (0, 3, 1),
+            (0, 2, 3),
+            (1, 3, 2),
+            (4, 5, 6),
+        ),
+        "provenance": "indexed_projection_bridge_test",
+    }
+
+    result = AtlasCanonicalHeadPhysicalMeshAdapter.build(
+        canonical_mesh=canonical_mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+        close_boundaries=True,
+        main_head_only=True,
+    )
+
+    physical_mesh = result["physical_mesh"]
+
+    assert (
+        physical_mesh["frontal_projection_vertices"]
+        == result["physical_vertices"]
+    )
+    assert (
+        physical_mesh["frontal_projection_faces"]
+        == canonical_mesh["faces"]
+    )
+    assert len(
+        physical_mesh["frontal_projection_faces"]
+    ) == len(
+        physical_mesh["frontal_projection_triangles"]
+    )
