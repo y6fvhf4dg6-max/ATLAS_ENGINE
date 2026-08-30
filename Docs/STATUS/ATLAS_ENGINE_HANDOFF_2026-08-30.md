@@ -177,3 +177,21 @@ R1 repair remains intentionally unstarted. The next recovery stage is
 - Implementation authorized by R4 decision alone: `NO`.
 - Next recovery stage: `R5 — Multi-scale Facial Geometry`.
 - Phase 9: `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_15_RECOVERY_R5_MULTISCALE_FACIAL_GEOMETRY_2026_08_30
+
+- Status: `CLOSED — MULTI-SCALE OWNERSHIP DECISION`.
+- Identity owner: `CANONICAL_GEOMETRY`.
+- Multi-scale signal owner: `CANONICAL_VISIBLE_SURFACE_NORMAL_GRADIENT`.
+- External residual detail role: `BOUNDED_REFINEMENT_NOT_SECOND_IDENTITY_MODEL`.
+- Semantic masks do not own facial frequency content.
+- Scale parameterization: `PHYSICAL_MM_FIRST_RASTER_SAMPLES_DERIVED`.
+- Raster radii must be derived from physical scale and sample pitch.
+- Current `structure_radius=5` is only a baseline at `0.25 mm/sample`; it is not a universal physical constant.
+- At the current pitch, radius 5 corresponds to `1.25 mm` radius and an `11 x 11` / `2.75 mm` kernel footprint.
+- Broad structure bypasses high-frequency detail limiting by default.
+- Fine/detail geometry may use bounded gradient limiting.
+- Exact production facial frequency-band thresholds in mm are `NOT YET SELECTED`.
+- Implementation authorized by R5 decision alone: `NO`.
+- Next recovery stage: `R6 — Physical-depth Allocation`.
+- Phase 9: `NOT AUTHORIZED / NOT STARTED`.
