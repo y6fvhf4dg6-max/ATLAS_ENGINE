@@ -329,3 +329,30 @@ def test_zero_confidence_produces_flat_height_map() -> None:
         0.0,
         abs=1e-10,
     )
+
+
+def test_sample_spacing_scales_unnormalized_physical_height() -> None:
+    normals = np.zeros((12, 20, 3), dtype=np.float64)
+    normals[..., 0] = -0.25
+    normals[..., 2] = 1.0
+    normals = _normalize_normals(normals)
+
+    unit_spacing = AtlasReliefNormalHeightIntegrator.integrate(
+        normals,
+        normalize_output=False,
+    )
+    physical_spacing = AtlasReliefNormalHeightIntegrator.integrate(
+        normals,
+        sample_spacing_mm=0.25,
+        normalize_output=False,
+    )
+
+    unit_range = float(np.ptp(unit_spacing))
+    physical_range = float(np.ptp(physical_spacing))
+
+    assert unit_range > 0.0
+    assert physical_range == pytest.approx(
+        unit_range * 0.25,
+        rel=1e-10,
+        abs=1e-10,
+    )

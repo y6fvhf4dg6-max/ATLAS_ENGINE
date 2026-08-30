@@ -33,6 +33,7 @@ class AtlasReliefNormalHeightIntegrator:
         mask: np.ndarray | None = None,
         confidence_map: np.ndarray | None = None,
         minimum_nz: float = 0.05,
+        sample_spacing_mm: float = 1.0,
         normalize_output: bool = True,
     ) -> np.ndarray:
         normal_array = np.asarray(
@@ -62,6 +63,16 @@ class AtlasReliefNormalHeightIntegrator:
         ):
             raise ValueError(
                 "minimum_nz must be finite "
+                "and greater than zero"
+            )
+
+        sample_spacing = float(sample_spacing_mm)
+        if (
+            not np.isfinite(sample_spacing)
+            or sample_spacing <= 0.0
+        ):
+            raise ValueError(
+                "sample_spacing_mm must be finite "
                 "and greater than zero"
             )
 
@@ -104,6 +115,7 @@ class AtlasReliefNormalHeightIntegrator:
                     gradient_x,
                     gradient_y,
                     valid_mask=valid_mask,
+                    sample_spacing=sample_spacing,
                 )
             )
         else:
@@ -126,6 +138,7 @@ class AtlasReliefNormalHeightIntegrator:
                 ._integrate_confidence_weighted_gradients(
                     weighted_gradient_x,
                     weighted_gradient_y,
+                    sample_spacing=sample_spacing,
                 )
             )
 
@@ -248,6 +261,7 @@ class AtlasReliefNormalHeightIntegrator:
         gradient_y: np.ndarray,
         *,
         valid_mask: np.ndarray,
+        sample_spacing: float,
     ) -> np.ndarray:
         mean_gradient_x = float(
             np.mean(
@@ -274,6 +288,7 @@ class AtlasReliefNormalHeightIntegrator:
             ._integrate_zero_mean_gradients(
                 residual_gradient_x,
                 residual_gradient_y,
+                sample_spacing=sample_spacing,
             )
         )
 
@@ -289,8 +304,10 @@ class AtlasReliefNormalHeightIntegrator:
         plane_height = (
             mean_gradient_x
             * column_coordinates
+            * sample_spacing
             + mean_gradient_y
             * row_coordinates
+            * sample_spacing
         )
 
         return (
@@ -302,6 +319,8 @@ class AtlasReliefNormalHeightIntegrator:
     def _integrate_confidence_weighted_gradients(
         gradient_x: np.ndarray,
         gradient_y: np.ndarray,
+        *,
+        sample_spacing: float,
     ) -> np.ndarray:
         """Integrate locally weighted gradients without global plane leakage.
 
@@ -328,7 +347,7 @@ class AtlasReliefNormalHeightIntegrator:
             )
 
             height_from_x[:, 1:] = np.cumsum(
-                horizontal_steps,
+                horizontal_steps * sample_spacing,
                 axis=1,
             )
 
@@ -344,7 +363,7 @@ class AtlasReliefNormalHeightIntegrator:
             )
 
             height_from_y[1:, :] = np.cumsum(
-                vertical_steps,
+                vertical_steps * sample_spacing,
                 axis=0,
             )
 
@@ -419,6 +438,8 @@ class AtlasReliefNormalHeightIntegrator:
     def _integrate_zero_mean_gradients(
         gradient_x: np.ndarray,
         gradient_y: np.ndarray,
+        *,
+        sample_spacing: float,
     ) -> np.ndarray:
         rows, columns = gradient_x.shape
 
@@ -432,6 +453,9 @@ class AtlasReliefNormalHeightIntegrator:
             * np.pi
             * np.fft.fftfreq(rows)
         )
+
+        frequency_x = frequency_x / sample_spacing
+        frequency_y = frequency_y / sample_spacing
 
         omega_x, omega_y = np.meshgrid(
             frequency_x,
