@@ -696,3 +696,163 @@ def test_relief_uses_frontal_projection_triangles_when_available():
         projected["physical_depth_mm"]
         == pytest.approx(2.0)
     )
+
+
+def _region_aware_relief_fixture():
+    import numpy as np
+
+    # 20 x 40 mm frontal surface. With the locked 0.25 mm
+    # sample pitch this resolves to 161 x 81 raster samples.
+    v00 = (-10.0, 0.0, 0.0)
+    v10 = (10.0, 0.0, 1.0)
+    v01 = (-10.0, 40.0, 2.0)
+    v11 = (10.0, 40.0, 3.0)
+
+    mesh = {
+        "triangles": (
+            (v00, v10, v11),
+            (v00, v11, v01),
+        ),
+    }
+
+    shape = (161, 81)
+
+    zero = np.zeros(
+        shape,
+        dtype=np.float64,
+    )
+    one = np.ones(
+        shape,
+        dtype=np.float64,
+    )
+
+    regions = {
+        "eye_glasses": zero.copy(),
+        "nose_bridge": zero.copy(),
+        "nose_body": zero.copy(),
+        "nose_base": zero.copy(),
+        "philtrum": zero.copy(),
+        "upper_lip": zero.copy(),
+        "lower_lip": zero.copy(),
+        "left_cheek": zero.copy(),
+        "right_cheek": zero.copy(),
+        "chin": zero.copy(),
+        "face_interior": one,
+        "face_boundary_falloff": zero.copy(),
+    }
+
+    regions["nose_body"][55:90, 34:47] = 1.0
+    regions["nose_base"][88:101, 35:46] = 1.0
+    regions["upper_lip"][101:116, 32:49] = 1.0
+    regions["lower_lip"][114:128, 31:50] = 1.0
+    regions["philtrum"][94:106, 36:45] = 1.0
+    regions["chin"][127:148, 29:52] = 1.0
+
+    return mesh, regions
+
+
+def test_relief_accepts_explicit_raster_region_masks_for_region_aware_depth():
+    mesh, regions = _region_aware_relief_fixture()
+
+    result = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+        relief_region_masks=regions,
+        minimum_printable_separation_mm=0.20,
+    )
+
+    assert (
+        result["relief_depth_transfer_kind"]
+        == "region_aware_bounded_local_depth_allocation"
+    )
+    assert (
+        result["relief_semantic_support"]
+        == "raster_region_masks"
+    )
+    assert (
+        result["relief_depth_policy_provenance"]
+        == "atlas_canonical_head_region_aware_relief_depth_policy:v1"
+    )
+
+
+def test_region_aware_relief_changes_depth_surface_when_masks_are_supplied():
+    mesh, regions = _region_aware_relief_fixture()
+
+    baseline = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    adjusted = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+        relief_region_masks=regions,
+        minimum_printable_separation_mm=0.20,
+    )
+
+    assert (
+        adjusted["family_geometry"]["triangles"]
+        != baseline["family_geometry"]["triangles"]
+    )
+
+
+def test_region_aware_relief_rejects_masks_not_matching_builder_raster_shape():
+    import numpy as np
+
+    mesh, regions = _region_aware_relief_fixture()
+
+    bad_regions = dict(regions)
+    bad_regions["nose_body"] = np.zeros(
+        (160, 81),
+        dtype=np.float64,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="region|shape|raster",
+    ):
+        AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+            physical_head_mesh=mesh,
+            representation_kind="relief",
+            target_head_height_mm=40.0,
+            relief_region_masks=bad_regions,
+            minimum_printable_separation_mm=0.20,
+        )
+
+
+def test_non_relief_families_reject_region_aware_relief_inputs():
+    _, regions = _region_aware_relief_fixture()
+
+    with pytest.raises(
+        ValueError,
+        match="relief",
+    ):
+        AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+            physical_head_mesh=_closed_tetrahedron_physical_mesh(),
+            representation_kind="bust",
+            target_head_height_mm=40.0,
+            relief_region_masks=regions,
+            minimum_printable_separation_mm=0.20,
+        )
+
+
+def test_relief_without_region_masks_preserves_existing_depth_path():
+    mesh, _ = _region_aware_relief_fixture()
+
+    result = AtlasCanonicalHeadPhysicalFamilyBuilder.build(
+        physical_head_mesh=mesh,
+        representation_kind="relief",
+        target_head_height_mm=40.0,
+    )
+
+    assert (
+        result["relief_depth_transfer_kind"]
+        == "covered_global_linear"
+    )
+    assert (
+        result["relief_semantic_support"]
+        == "not_used"
+    )

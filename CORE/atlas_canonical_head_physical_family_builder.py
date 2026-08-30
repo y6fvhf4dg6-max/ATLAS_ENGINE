@@ -57,6 +57,8 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
         physical_head_mesh: Mapping[str, Any],
         representation_kind: str,
         target_head_height_mm: float,
+        relief_region_masks: Mapping[str, Any] | None = None,
+        minimum_printable_separation_mm: float | None = None,
     ) -> dict[str, Any]:
         triangles = cls._triangles(
             physical_head_mesh
@@ -69,6 +71,45 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
         target_height = cls._positive_finite(
             target_head_height_mm,
             name="target_head_height_mm",
+        )
+
+        has_relief_regions = (
+            relief_region_masks is not None
+        )
+        has_minimum_separation = (
+            minimum_printable_separation_mm is not None
+        )
+
+        if (
+            kind != "relief"
+            and (
+                has_relief_regions
+                or has_minimum_separation
+            )
+        ):
+            raise ValueError(
+                "relief_region_masks and "
+                "minimum_printable_separation_mm "
+                "are valid only for relief"
+            )
+
+        if (
+            has_relief_regions
+            != has_minimum_separation
+        ):
+            raise ValueError(
+                "relief_region_masks and "
+                "minimum_printable_separation_mm "
+                "must be supplied together"
+            )
+
+        minimum_separation = (
+            cls._positive_finite(
+                minimum_printable_separation_mm,
+                name="minimum_printable_separation_mm",
+            )
+            if has_minimum_separation
+            else None
         )
 
         bounds = cls._bounds(triangles)
@@ -115,17 +156,22 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                     }
                 )
 
-            relief_geometry = (
-                cls._frontal_visible_surface_relief(
-                    triangles=projection_triangles,
-                    bounds=bounds,
-                    relief_height_mm=(
-                        cls.RELIEF_HEIGHT_MM
-                    ),
-                    sample_pitch_mm=(
-                        cls.RELIEF_SAMPLE_PITCH_MM
-                    ),
-                )
+            (
+                relief_geometry,
+                relief_depth_metadata,
+            ) = cls._frontal_visible_surface_relief(
+                triangles=projection_triangles,
+                bounds=bounds,
+                relief_height_mm=(
+                    cls.RELIEF_HEIGHT_MM
+                ),
+                sample_pitch_mm=(
+                    cls.RELIEF_SAMPLE_PITCH_MM
+                ),
+                region_masks=relief_region_masks,
+                minimum_printable_separation_mm=(
+                    minimum_separation
+                ),
             )
 
             return cls._result(
@@ -137,6 +183,7 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                 physical_depth_mm=(
                     cls.RELIEF_HEIGHT_MM
                 ),
+                extra_metadata=relief_depth_metadata,
             )
 
         attachment_boundary = (
@@ -219,8 +266,9 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
         support_geometry_kind: str,
         canonical_depth_mm: float,
         physical_depth_mm: float,
+        extra_metadata: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
-        return {
+        result = {
             "representation_kind": kind,
             "physical_unit": "mm",
             "family_geometry_kind": geometry_kind,
@@ -245,6 +293,13 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
             ),
             "manufacturability_status": "UNRESOLVED",
         }
+
+        if extra_metadata:
+            result.update(
+                extra_metadata
+            )
+
+        return result
 
     @staticmethod
     def _triangles(
@@ -394,6 +449,8 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
         bounds: Mapping[str, float],
         relief_height_mm: float,
         sample_pitch_mm: float,
+        region_masks: Mapping[str, Any] | None = None,
+        minimum_printable_separation_mm: float | None = None,
     ) -> tuple:
         """
         Convert the frontal visible surface of the canonical
@@ -482,52 +539,6 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                 "frontal visible surface has no coverage"
             )
 
-        normalized = np.zeros_like(
-            visible_depth,
-            dtype=np.float64,
-        )
-
-        covered_depth = visible_depth[
-            coverage
-        ]
-
-        minimum_visible = float(
-            covered_depth.min()
-        )
-        maximum_visible = float(
-            covered_depth.max()
-        )
-        visible_range = (
-            maximum_visible
-            - minimum_visible
-        )
-
-        if visible_range > 1e-12:
-            normalized[coverage] = (
-                covered_depth
-                - minimum_visible
-            ) / visible_range
-
-        x_coordinates = np.linspace(
-            min_x,
-            float(bounds["max_x"]),
-            column_count,
-            dtype=np.float64,
-        )
-        y_coordinates = np.linspace(
-            min_y,
-            float(bounds["max_y"]),
-            row_count,
-            dtype=np.float64,
-        )
-
-        bottom_z = 0.0
-        relief_base_z = (
-            bottom_z
-            + cls.RELIEF_BASE_THICKNESS_MM
-        )
-        triangles_out = []
-
         active_cells = np.zeros(
             (
                 row_count - 1,
@@ -559,17 +570,145 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                     ]
                 )
 
+        active_vertex_coverage = np.zeros_like(
+            coverage,
+            dtype=np.bool_,
+        )
+
+        active_rows, active_columns = np.nonzero(
+            active_cells
+        )
+
+        for row_offset, column_offset in (
+            (0, 0),
+            (0, 1),
+            (1, 0),
+            (1, 1),
+        ):
+            active_vertex_coverage[
+                active_rows + row_offset,
+                active_columns + column_offset,
+            ] = True
+
+        active_vertex_coverage &= coverage
+
+        if region_masks is None:
+            normalized = np.zeros_like(
+                visible_depth,
+                dtype=np.float64,
+            )
+
+            covered_depth = visible_depth[
+                coverage
+            ]
+
+            minimum_visible = float(
+                covered_depth.min()
+            )
+            maximum_visible = float(
+                covered_depth.max()
+            )
+            visible_range = (
+                maximum_visible
+                - minimum_visible
+            )
+
+            if visible_range > 1e-12:
+                normalized[coverage] = (
+                    covered_depth
+                    - minimum_visible
+                ) / visible_range
+
+            relief_depth_mm = (
+                normalized
+                * relief_height_mm
+            )
+
+            relief_depth_metadata = {
+                "relief_depth_transfer_kind": (
+                    "covered_global_linear"
+                ),
+                "relief_semantic_support": (
+                    "not_used"
+                ),
+                "relief_depth_policy_provenance": (
+                    "not_used"
+                ),
+            }
+        else:
+            from CORE.atlas_canonical_head_region_aware_relief_depth_policy import (
+                AtlasCanonicalHeadRegionAwareReliefDepthPolicy,
+            )
+
+            policy_result = (
+                AtlasCanonicalHeadRegionAwareReliefDepthPolicy
+                .transfer(
+                    source_depth_map=visible_depth,
+                    coverage_map=active_vertex_coverage,
+                    region_masks=region_masks,
+                    relief_height_mm=relief_height_mm,
+                    minimum_printable_separation_mm=(
+                        minimum_printable_separation_mm
+                    ),
+                )
+            )
+
+            relief_depth_mm = np.asarray(
+                policy_result.depth_map_mm,
+                dtype=np.float64,
+            )
+
+            relief_depth_metadata = {
+                "relief_depth_transfer_kind": (
+                    policy_result.metadata[
+                        "transfer_kind"
+                    ]
+                ),
+                "relief_semantic_support": (
+                    policy_result.metadata[
+                        "semantic_support"
+                    ]
+                ),
+                "relief_depth_policy_provenance": (
+                    policy_result.metadata[
+                        "policy_provenance"
+                    ]
+                ),
+                "relief_depth_policy_metadata": dict(
+                    policy_result.metadata
+                ),
+            }
+
+        x_coordinates = np.linspace(
+            min_x,
+            float(bounds["max_x"]),
+            column_count,
+            dtype=np.float64,
+        )
+        y_coordinates = np.linspace(
+            min_y,
+            float(bounds["max_y"]),
+            row_count,
+            dtype=np.float64,
+        )
+
+        bottom_z = 0.0
+        relief_base_z = (
+            bottom_z
+            + cls.RELIEF_BASE_THICKNESS_MM
+        )
+        triangles_out = []
+
         def top(row, column):
             return (
                 float(x_coordinates[column]),
                 float(y_coordinates[row]),
                 float(
                     relief_base_z
-                    + normalized[
+                    + relief_depth_mm[
                         row,
                         column,
                     ]
-                    * relief_height_mm
                 ),
             )
 
@@ -726,8 +865,11 @@ class AtlasCanonicalHeadPhysicalFamilyBuilder:
                 "frontal coverage produced no relief cells"
             )
 
-        return tuple(
-            triangles_out
+        return (
+            tuple(
+                triangles_out
+            ),
+            relief_depth_metadata,
         )
 
     @staticmethod
