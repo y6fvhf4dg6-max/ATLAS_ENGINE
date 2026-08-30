@@ -17237,3 +17237,23 @@ R1 repair remains intentionally unstarted. The next recovery stage is
 - Implementation authorized by R5 decision alone: `NO`.
 - Next recovery stage: `R6 — Physical-depth Allocation`.
 - Phase 9: `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_15_RECOVERY_R6_PHYSICAL_DEPTH_ALLOCATION_2026_08_30
+
+- Status: `CLOSED — PHYSICAL-DEPTH ARCHITECTURE DECISION`.
+- Primary depth signal: `CANONICAL_VISIBLE_SURFACE_NORMAL_GRADIENT`.
+- Integration space: `PHYSICAL_GRID_SPACING_AWARE`.
+- Raster sample pitch must participate in gradient-to-height reconstruction.
+- Normalized `0..1` integrator output is not physical millimeter height.
+- Anchor role: `CANONICAL_GEOMETRIC_LOW_FREQUENCY_ONLY`.
+- Semantic-mutated depth is prohibited as the reconstruction anchor.
+- Semantic masks may provide weighting, constraints and audit only.
+- Semantic masks may not allocate direct signed anatomical Z.
+- Final physical surface remains bounded by the global `2.00 mm` relief envelope.
+- External residual detail remains bounded refinement and is not an identity owner.
+- Exact structure/detail physical-mm allocation is `UNRESOLVED_PENDING_EVIDENCE`.
+- Existing region-aware semantic-Z policy is not the target R6 allocator.
+- Existing normal integrators are useful primitives but are not yet a production physical-mm allocator.
+- Implementation authorized by this decision alone: `NO`.
+- Next recovery stage after R6 closure: `R7 — Digital Validation / bounded implementation evidence`.
+- Phase 9: `NOT AUTHORIZED / NOT STARTED`.
