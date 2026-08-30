@@ -19493,3 +19493,19 @@ representation pipeline.
 
 R1 repair remains intentionally unstarted. The next recovery stage is
 `R2 — Canonical geometry sufficiency audit`.
+
+## PHASE8_ITEM11_15_RECOVERY_R2_CANONICAL_GEOMETRY_SUFFICIENCY_2026_08_30
+
+- Status: `CLOSED — CAUSAL SUFFICIENCY DECISION`
+- Decision: `CANONICAL_NOT_EXONERATED_BUT_NOT_PRIMARY_CAUSE`
+- Exact personal canonical mesh evidence: 5023 vertices.
+- Canonical identity change is measurable: bbox-normalized RMS `0.010425098`, P95 `0.020443063`, max `0.035519139`.
+- No canonical absolute-likeness acceptance threshold was applied.
+- Metric 3D ground truth was not proven by this evidence.
+- Therefore absolute canonical likeness sufficiency remains unproven.
+- Canonical geometry is not proven to be the primary cause of the current physical-representation failure.
+- R1 remains causal authority for the earliest measured severe loss: `REGION_AWARE_LOCAL_SEMANTIC_Z_ALLOCATION`.
+- Secondary damage mechanism remains: `ORDERING_PROPAGATION_AND_CEILING_SATURATION`.
+- No repair was performed during R2.
+- Next: `R3 — Projection Architecture Decision`.
+- Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
