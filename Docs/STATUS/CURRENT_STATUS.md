@@ -19526,3 +19526,20 @@ R1 repair remains intentionally unstarted. The next recovery stage is
 - Implementation authorized by R3 decision alone: `NO`.
 - Next recovery stage: `R4 — Semantic Locality / Ownership`.
 - Phase 9: `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_15_RECOVERY_R4_SEMANTIC_LOCALITY_OWNERSHIP_2026_08_30
+
+- Status: `CLOSED — SEMANTIC ROLE DECISION`.
+- Semantic role: `CONSTRAINT_WEIGHT_AUDIT_NOT_DIRECT_GEOMETRY_GENERATOR`.
+- Geometry owner: `CANONICAL_VISIBLE_SURFACE_NORMAL_GRADIENT_SIGNAL`.
+- Region masks remain available for weighting, explicit local constraints, and regional audit.
+- Region masks may not generate direct signed anatomical Z.
+- Fixed anatomical Z offsets: `NOT RETAINED`.
+- Nose-base residual Z generator: `NOT RETAINED`.
+- Ordering propagation as geometry generator: `NOT RETAINED`.
+- Ordering may return only as an audit or explicit constraint if later independently justified.
+- Global physical depth bounds: `RETAINED`.
+- Source canonical geometry remains the primary geometric signal.
+- Implementation authorized by R4 decision alone: `NO`.
+- Next recovery stage: `R5 — Multi-scale Facial Geometry`.
+- Phase 9: `NOT AUTHORIZED / NOT STARTED`.
