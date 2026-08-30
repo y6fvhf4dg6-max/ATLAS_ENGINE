@@ -105,6 +105,65 @@ class AtlasProjectedSemanticMeshDepthRasterizer:
             mesh
         )
 
+        raw_vertex_normals = mesh.get("vertex_normals")
+        raw_face_vertex_indices = mesh.get("face_vertex_indices")
+
+        vertex_normals = None
+        face_vertex_indices = None
+
+        if (
+            raw_vertex_normals is not None
+            or raw_face_vertex_indices is not None
+        ):
+            if (
+                raw_vertex_normals is None
+                or raw_face_vertex_indices is None
+            ):
+                raise ValueError(
+                    "vertex_normals and face_vertex_indices "
+                    "must be provided together"
+                )
+
+            vertex_normals = np.asarray(
+                raw_vertex_normals,
+                dtype=np.float64,
+            )
+            face_vertex_indices = np.asarray(
+                raw_face_vertex_indices,
+                dtype=np.int64,
+            )
+
+            if (
+                vertex_normals.ndim != 2
+                or vertex_normals.shape[1] != 3
+                or not np.isfinite(vertex_normals).all()
+            ):
+                raise ValueError(
+                    "vertex_normals must have shape "
+                    "(vertex_count, 3) and be finite"
+                )
+
+            if face_vertex_indices.shape != (
+                len(triangles),
+                3,
+            ):
+                raise ValueError(
+                    "face_vertex_indices must have shape "
+                    "(triangle_count, 3)"
+                )
+
+            if (
+                np.any(face_vertex_indices < 0)
+                or np.any(
+                    face_vertex_indices
+                    >= len(vertex_normals)
+                )
+            ):
+                raise ValueError(
+                    "face_vertex_indices reference "
+                    "invalid vertex normals"
+                )
+
         depth_map = np.zeros(
             (
                 row_count,
@@ -119,6 +178,33 @@ class AtlasProjectedSemanticMeshDepthRasterizer:
                 column_count,
             ),
             dtype=bool,
+        )
+
+        face_index_map = np.full(
+            (
+                row_count,
+                column_count,
+            ),
+            -1,
+            dtype=np.int64,
+        )
+
+        barycentric_map = np.zeros(
+            (
+                row_count,
+                column_count,
+                3,
+            ),
+            dtype=np.float64,
+        )
+
+        normal_map = np.zeros(
+            (
+                row_count,
+                column_count,
+                3,
+            ),
+            dtype=np.float64,
         )
 
         pixel_x = np.linspace(
@@ -137,7 +223,7 @@ class AtlasProjectedSemanticMeshDepthRasterizer:
 
         epsilon = 1e-12
 
-        for triangle in triangles:
+        for face_index, triangle in enumerate(triangles):
             if (
                 not isinstance(
                     triangle,
@@ -374,6 +460,45 @@ class AtlasProjectedSemanticMeshDepthRasterizer:
                             row,
                             column,
                         ] = depth
+                        face_index_map[
+                            row,
+                            column,
+                        ] = face_index
+                        barycentric_map[
+                            row,
+                            column,
+                        ] = (
+                            w0,
+                            w1,
+                            w2,
+                        )
+
+                        if vertex_normals is not None:
+                            indices = face_vertex_indices[
+                                face_index
+                            ]
+                            interpolated_normal = (
+                                w0 * vertex_normals[indices[0]]
+                                + w1 * vertex_normals[indices[1]]
+                                + w2 * vertex_normals[indices[2]]
+                            )
+                            normal_length = float(
+                                np.linalg.norm(
+                                    interpolated_normal
+                                )
+                            )
+                            if normal_length <= 1e-12:
+                                raise ValueError(
+                                    "interpolated visible normal "
+                                    "must be non-degenerate"
+                                )
+                            normal_map[
+                                row,
+                                column,
+                            ] = (
+                                interpolated_normal
+                                / normal_length
+                            )
 
                     coverage_map[
                         row,
@@ -399,6 +524,15 @@ class AtlasProjectedSemanticMeshDepthRasterizer:
             ),
             "coverage_map": (
                 coverage_map
+            ),
+            "face_index_map": (
+                face_index_map
+            ),
+            "barycentric_map": (
+                barycentric_map
+            ),
+            "normal_map": (
+                normal_map
             ),
             "coordinate_space": (
                 "local_uv_depth"

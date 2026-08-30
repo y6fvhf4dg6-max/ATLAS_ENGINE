@@ -259,3 +259,173 @@ def test_inward_overlapping_world_triangles_keep_most_recessed_signed_depth():
         result["depth_map"][covered],
         -0.60,
     )
+
+
+def test_visible_winner_preserves_face_index_and_barycentric_weights():
+    mesh = {
+        "triangles": [
+            (
+                (0.0, 0.0, 0.15),
+                (4.0, 0.0, 0.15),
+                (0.0, 4.0, 0.15),
+            ),
+            (
+                (0.0, 0.0, 0.35),
+                (4.0, 0.0, 0.35),
+                (0.0, 4.0, 0.35),
+            ),
+        ],
+    }
+
+    result = AtlasProjectedSemanticMeshDepthRasterizer.rasterize(
+        mesh=mesh,
+        width_mm=4.0,
+        depth_mm=4.0,
+        rows=5,
+        columns=5,
+    )
+
+    covered = result["coverage_map"]
+    face_index_map = result["face_index_map"]
+    barycentric_map = result["barycentric_map"]
+
+    assert face_index_map.shape == (5, 5)
+    assert barycentric_map.shape == (5, 5, 3)
+
+    assert np.all(face_index_map[covered] == 1)
+    np.testing.assert_allclose(
+        np.sum(barycentric_map[covered], axis=1),
+        1.0,
+        atol=1e-12,
+    )
+    assert np.all(
+        barycentric_map[covered] >= -1e-12
+    )
+
+
+def test_visible_surface_interpolates_indexed_vertex_normals():
+    mesh = {
+        "triangles": [
+            (
+                (0.0, 0.0, 0.20),
+                (4.0, 0.0, 0.20),
+                (0.0, 4.0, 0.20),
+            ),
+        ],
+        "vertex_normals": [
+            (0.0, 0.0, 1.0),
+            (0.0, 0.0, 1.0),
+            (0.0, 0.0, 1.0),
+        ],
+        "face_vertex_indices": [
+            (0, 1, 2),
+        ],
+    }
+
+    result = AtlasProjectedSemanticMeshDepthRasterizer.rasterize(
+        mesh=mesh,
+        width_mm=4.0,
+        depth_mm=4.0,
+        rows=5,
+        columns=5,
+    )
+
+    covered = result["coverage_map"]
+    normal_map = result["normal_map"]
+
+    assert normal_map.shape == (5, 5, 3)
+
+    np.testing.assert_allclose(
+        normal_map[covered],
+        np.tile(
+            np.array([0.0, 0.0, 1.0]),
+            (np.count_nonzero(covered), 1),
+        ),
+        atol=1e-12,
+    )
+    np.testing.assert_allclose(
+        np.linalg.norm(normal_map[covered], axis=1),
+        1.0,
+        atol=1e-12,
+    )
+
+
+def test_visible_normal_follows_same_overlap_winner_as_depth():
+    mesh = {
+        "triangles": [
+            ((0., 0., .15), (4., 0., .15), (0., 4., .15)),
+            ((0., 0., .35), (4., 0., .35), (0., 4., .35)),
+        ],
+        "vertex_normals": [
+            (0., 0., 1.), (0., 0., 1.), (0., 0., 1.),
+            (0., 1., 1.), (0., 1., 1.), (0., 1., 1.),
+        ],
+        "face_vertex_indices": [
+            (0, 1, 2),
+            (3, 4, 5),
+        ],
+    }
+
+    result = AtlasProjectedSemanticMeshDepthRasterizer.rasterize(
+        mesh=mesh,
+        width_mm=4.0,
+        depth_mm=4.0,
+        rows=5,
+        columns=5,
+    )
+
+    covered = result["coverage_map"]
+    expected = np.array([0., 1., 1.])
+    expected /= np.linalg.norm(expected)
+
+    np.testing.assert_allclose(
+        result["normal_map"][covered],
+        np.tile(expected, (np.count_nonzero(covered), 1)),
+        atol=1e-12,
+    )
+    assert np.all(result["face_index_map"][covered] == 1)
+
+
+def test_visible_normal_barycentrically_interpolates_and_normalizes():
+    mesh = {
+        "triangles": [
+            ((0., 0., .2), (4., 0., .2), (0., 4., .2)),
+        ],
+        "vertex_normals": [
+            (1., 0., 1.),
+            (0., 1., 1.),
+            (0., 0., 1.),
+        ],
+        "face_vertex_indices": [(0, 1, 2)],
+    }
+
+    result = AtlasProjectedSemanticMeshDepthRasterizer.rasterize(
+        mesh=mesh,
+        width_mm=4.0,
+        depth_mm=4.0,
+        rows=5,
+        columns=5,
+    )
+
+    covered = result["coverage_map"]
+
+    np.testing.assert_allclose(
+        np.linalg.norm(result["normal_map"][covered], axis=1),
+        1.0,
+        atol=1e-12,
+    )
+
+    row, column = np.argwhere(covered)[0]
+    weights = result["barycentric_map"][row, column]
+    raw = (
+        weights[0] * np.array([1., 0., 1.])
+        + weights[1] * np.array([0., 1., 1.])
+        + weights[2] * np.array([0., 0., 1.])
+    )
+    expected = raw / np.linalg.norm(raw)
+
+    np.testing.assert_allclose(
+        result["normal_map"][row, column],
+        expected,
+        atol=1e-12,
+    )
