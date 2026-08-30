@@ -21583,3 +21583,20 @@ R1 repair remains intentionally unstarted. The next recovery stage is
 - No repair was performed during R2.
 - Next: `R3 — Projection Architecture Decision`.
 - Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## PHASE8_ITEM11_15_RECOVERY_R3_PROJECTION_ARCHITECTURE_2026_08_30
+
+- Status: `CLOSED — ARCHITECTURE DECISION`
+- Selected architecture: `C_VISIBILITY_AWARE_NORMAL_GRADIENT_DOMAIN`
+- Required new boundary: `VISIBLE_CANONICAL_SURFACE_TO_RASTER_NORMAL_CORRESPONDENCE`
+- Canonical correspondence: preserve through visible-surface rasterization.
+- Primary geometric signal: canonical surface normals / derived gradients.
+- Semantic masks: `CONSTRAINT_WEIGHT_AUDIT_NOT_DIRECT_Z_GENERATOR`.
+- Depth reconstruction: `BOUNDED_NORMAL_GRADIENT_INTEGRATION`.
+- Current scalar-depth path: `CONTROL_BASELINE_ONLY`.
+- R1 primary failure remains: `REGION_AWARE_LOCAL_SEMANTIC_Z_ALLOCATION`.
+- R1 secondary damage remains: `ORDERING_PROPAGATION_AND_CEILING_SATURATION`.
+- R2 decision remains: `CANONICAL_NOT_EXONERATED_BUT_NOT_PRIMARY_CAUSE`.
+- Implementation authorized by R3 decision alone: `NO`.
+- Next recovery stage: `R4 — Semantic Locality / Ownership`.
+- Phase 9: `NOT AUTHORIZED / NOT STARTED`.
