@@ -17257,3 +17257,3545 @@ R1 repair remains intentionally unstarted. The next recovery stage is
 - Implementation authorized by this decision alone: `NO`.
 - Next recovery stage after R6 closure: `R7 — Digital Validation / bounded implementation evidence`.
 - Phase 9: `NOT AUTHORIZED / NOT STARTED`.
+
+
+# PHASE8_ITEM11_15_R7_8_CANONICAL_PERSONAL_IDENTITY_RECOVERY_CHECKLIST_2026_08_31
+
+**Phase:** 8 — Canonical Identity Gate
+**Main checklist:** Item 11 — Physical Representation Gate
+**Subitem:** 11.15 — Item 11 Closure / Physical Identity Recovery
+**Active work:** R7.8 — Canonical Personal Identity Recovery
+**Status:** `ACTIVE / HOLD-BLOCKED`
+**Phase 9:** `NOT AUTHORIZED / NOT STARTED`
+
+## Current authority / supersession
+
+This record refines the existing Item 11.15 / R7 recovery plan without deleting
+or rewriting its historical records.
+
+Current exact hierarchy:
+
+`Phase 8 → Main Checklist Item 11 → 11.15 → R7.8`
+
+Main Checklist Item 8 — Pose / Expression Separation remains `CLOSED`.
+
+The active problem is therefore NOT Main Checklist Item 8. It is Item 11.15 /
+R7.8 under the Physical Representation Gate.
+
+## Canonical identity acceptance criterion
+
+The primary identity gate is:
+
+**The canonical head reconstructed from the source photographs must visibly
+represent the correct person at direct neutral-mesh level.**
+
+Downstream relief, semantic depth, shading, physical exaggeration or other
+representation layers MUST NOT be used to fabricate or rescue identity that is
+absent from the neutral canonical mesh.
+
+Additional required properties:
+
+- identity remains consistent across available views;
+- identity remains separated from pose;
+- identity remains separated from expression;
+- camera re-solving must not conceal gross 3D shape error;
+- identity must survive physical-representation conversion before Item 11 may
+  close.
+
+Metric improvement alone is not likeness success.
+
+## Persistent R7.8 evidence state
+
+Persistent evidence root:
+
+`/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/`
+
+Persisted artifacts:
+
+- `ATLAS_R78_candidate_neutral_direct.png`
+- `ATLAS_R78_FRONT_DYNAMIC_JAW_OVERLAY.png`
+- `ATLAS_R78_FRONT_FACE_OVAL_OVERLAY.png`
+- `ATLAS_R78_FRONT_JAW_REFIT.npz`
+- `ATLAS_R78_FRONT_STATIC105_OVERLAY.png`
+- `ATLAS_R78_ZERO_BASELINE_CANDIDATE.png`
+
+Persistence verification:
+
+- `SHA256SUMS.txt` regenerated without self-reference;
+- artifact verification: `6/6 OK`.
+
+Any older statement that
+`/tmp/ATLAS_R78_FRONT_JAW_REFIT.npz` is not yet persistent is superseded by
+this record.
+
+## Current failure model
+
+Direct neutral-mesh evidence establishes that likeness failure is present before
+relief conversion.
+
+Verified current observations include:
+
+- candidate neutral mesh does not sufficiently resemble the source person;
+- head remains too long/narrow and lower-face geometry too triangular;
+- ear flare is visibly incorrect;
+- orbital, nose, mouth and chin proportions remain materially wrong;
+- sparse `static105` reprojection can remain low while 3D identity is visibly
+  inadequate;
+- weak-perspective camera re-solving can absorb part of incorrect 3D shape;
+- `static105` does not constrain the full face oval, lower jaw or cranial top;
+- therefore low sparse-landmark error MUST NOT be promoted to neutral identity
+  correctness.
+
+Current primary working hypothesis:
+
+`GLOBAL_OUTER_SHAPE_UNDER_CONSTRAINT`
+
+Current secondary mechanisms:
+
+- `SHAPE_CAMERA_DEGENERACY`
+- `SIDE_PROFILE_BIAS`
+
+Possible but not yet established:
+
+`FLAME_IDENTITY_SPACE_CAPACITY_LIMIT`
+
+No relief-layer tuning is authorized as a substitute for canonical identity
+recovery.
+
+---
+
+# R7.8 EXECUTION CHECKLIST — LOCKED ORDER
+
+## A — Existing-state closure
+
+- [ ] A1 — Execute R7.8.53:
+      `CANDIDATE VS FRONT-JAW REFIT NEUTRAL`.
+- [ ] A2 — Compare candidate and front-jaw refit under the same neutral
+      renderer, pose and scale.
+- [ ] A3 — Classify visual result only as:
+      `IMPROVED`, `NO_MATERIAL_CHANGE`, or `WORSE`.
+- [ ] A4 — Identify which FLAME identity coefficients hit bounds in the
+      controlled front-jaw refit.
+- [ ] A5 — Determine whether jaw residual improvement represents real identity
+      improvement or only objective-space improvement.
+- [ ] A6 — Perform a negative Closure Challenge on the current sparse-fit
+      diagnosis before leaving Section A.
+
+## B — Outer-head constraint recovery
+
+- [ ] B1 — Establish a reliable frontal face-oval observation channel.
+- [ ] B2 — Establish jaw/chin outer-contour constraints independently from
+      `static105`.
+- [ ] B3 — Establish forehead / cranial width-height-envelope constraints where
+      source evidence legitimately supports them.
+- [ ] B4 — Evaluate ear lateral position / flare constraints.
+- [ ] B5 — Integrate right/left profile silhouette evidence into the global
+      head-shape objective.
+- [ ] B6 — Verify contour correspondences are anatomically meaningful and are
+      not arbitrary nearest-boundary matches.
+- [ ] B7 — Execute a controlled outer-shape-focused refit.
+- [ ] B8 — Render neutral before/after comparison using identical visualization
+      conditions.
+
+## C — Camera / shape degeneracy
+
+- [ ] C1 — Quantify how much camera scale/translation changes absorb identity
+      shape changes.
+- [ ] C2 — Execute fixed-camera and/or explicitly bounded-camera
+      counterfactuals.
+- [ ] C3 — Verify that any shape improvement survives without unrestricted
+      camera re-solving.
+- [ ] C4 — If camera compensation still conceals gross shape error, revise the
+      fitting objective before further likeness claims.
+
+## D — Combined identity objective
+
+- [ ] D1 — Preserve `static105` unchanged as its bounded benchmark/evaluation
+      channel.
+- [ ] D2 — Keep outer-contour evidence as an independent constraint family.
+- [ ] D3 — Evaluate staged fitting:
+      global outer shape → internal anatomy → combined refinement.
+- [ ] D4 — Re-evaluate side silhouette weighting only from measured evidence.
+- [ ] D5 — Audit identity regularization and coefficient-bound behavior.
+- [ ] D6 — Test one shared identity across front/right/left evidence.
+- [ ] D7 — Re-run held-out evaluation after the combined objective is
+      established.
+
+## E — First real likeness gate
+
+- [ ] E1 — Produce the new canonical candidate neutral mesh.
+- [ ] E2 — Render direct neutral front view.
+- [ ] E3 — Render direct neutral three-quarter view.
+- [ ] E4 — Render direct neutral profile view.
+- [ ] E5 — Compare against the previous candidate with the same renderer, pose
+      and scale.
+- [ ] E6 — Perform explicit visual inspection of:
+      head envelope, jaw/chin, ears, nose, orbital region, mouth and overall
+      likeness.
+- [ ] E7 — Record one result:
+      `LIKELINESS_MATERIALLY_IMPROVED`,
+      `LIKELINESS_STILL_FAIL`,
+      or `REGRESSION`.
+
+User visual assessment remains authoritative for visible likeness quality.
+
+## F — FLAME capacity decision
+
+Execute only if Section E remains inadequate.
+
+- [ ] F1 — Analyze bound-hit identity coefficients and their geometric
+      sensitivities.
+- [ ] F2 — Test whether stronger legitimate outer-shape constraints can still
+      move the required geometry inside the FLAME identity space.
+- [ ] F3 — Separate optimization/objective insufficiency from representation
+      capacity insufficiency.
+- [ ] F4 — Classify the hypothesis only as:
+      `FLAME_CAPACITY_LIMIT_NOT_ESTABLISHED`,
+      `SUPPORTED_NOT_CLOSED`,
+      or `ESTABLISHED_FOR_CURRENT_CASE`.
+- [ ] F5 — Do not increase identity bounds blindly.
+
+## G — Modern dense recovery branch
+
+Execute only if the existing parametric objective remains insufficient.
+
+- [ ] G1 — Evaluate dense normal evidence.
+- [ ] G2 — Evaluate UV / surface-correspondence evidence.
+- [ ] G3 — Evaluate visibility-aware dense geometric residuals.
+- [ ] G4 — Evaluate true multi-view surface-feature fusion.
+- [ ] G5 — Evaluate Pixel3DMM-class dense fitting principles for ATLAS
+      applicability.
+- [ ] G6 — Evaluate hybrid FLAME + residual-geometry representation.
+- [ ] G7 — If justified, benchmark NPHM-class or other richer neural head
+      representations.
+- [ ] G8 — Audit commercial license, runtime, Apple Silicon and production
+      feasibility before any architecture adoption.
+
+## H — Canonical Identity Acceptance Gate
+
+Relief / physical representation work MUST NOT resume until the canonical
+identity gate is acceptable.
+
+Required evidence:
+
+- [ ] H1 — Neutral mesh visibly represents the correct person.
+- [ ] H2 — Front / three-quarter / profile identity is mutually consistent.
+- [ ] H3 — Jaw/chin is materially acceptable.
+- [ ] H4 — Ear geometry has no gross identity-breaking error.
+- [ ] H5 — Cranial/head envelope is materially acceptable.
+- [ ] H6 — Nose, orbital and mouth identity-bearing structure is preserved.
+- [ ] H7 — Camera is not concealing gross shape error.
+- [ ] H8 — Pose/expression remain separated from identity.
+- [ ] H9 — Held-out evidence does not contradict the visible improvement.
+- [ ] H10 — User visual assessment is `ACCEPTABLE`.
+
+If H fails, downstream identity fabrication is prohibited.
+
+---
+
+## Working discipline
+
+- Evidence first.
+- Test first.
+- One terminal step at a time.
+- No scope drift.
+- No hidden assumptions.
+- No invented scores.
+- No silent architecture changes.
+- No success declaration without acceptance evidence.
+- No downstream patching of an upstream identity failure.
+- Every meaningful change requires explicit user approval.
+- Every meaningful approved change must be persisted in the continuity records.
+- Protected dirty work must not be touched or staged.
+- No `git add .`, broad reset, clean, stash, force-push, or destructive shortcut.
+- Validated critical `/tmp` evidence must be moved to persistent evidence with
+  manifest/hash verification.
+- Major closures require a negative Closure Challenge.
+- Phase 9 remains `NOT AUTHORIZED / NOT STARTED`.
+
+## Exact continuation point
+
+`R7.8 / A1 = R7.8.53 — CANDIDATE VS FRONT-JAW REFIT NEUTRAL`
+
+No later checklist step is authorized before A1 evidence is reviewed.
+
+Marker:
+`PHASE8_ITEM11_15_R7_8_CANONICAL_PERSONAL_IDENTITY_RECOVERY_CHECKLIST_2026_08_31`
+
+
+# PHASE8_ITEM11_15_R7_8_SECTION_A_CLOSURE_2026_08_31
+
+**Hierarchy:** `Phase 8 → Main Checklist Item 11 → 11.15 → R7.8`
+**Section:** A — Existing-state closure
+**Status:** `CLOSED`
+**Closure Challenge:** `PASS`
+**Next exact step:** `B1 — FRONT FACE-OVAL OBSERVATION CHANNEL`
+
+## Completed steps
+
+- [x] A1 — R7.8.53 candidate vs front-jaw-refit neutral comparison executed.
+- [x] A2 — Same neutral renderer/pose comparison reviewed.
+- [x] A3 — Visual classification: `NO_MATERIAL_CHANGE`.
+- [x] A4 — Identity coefficient bound-hit audit completed.
+- [x] A5 — Jaw residual improvement classified as
+      `OBJECTIVE_SPACE_IMPROVEMENT_ONLY`.
+- [x] A6 — Negative Closure Challenge completed: `PASS`.
+
+## A1 / A2 / A3 result
+
+The controlled front-jaw refit produced only small global bounding-box changes:
+
+- candidate XY bbox:
+  `0.18846872628557593 × 0.3343423773787356`
+- refit XY bbox:
+  `0.1886052446587591 × 0.33330180565812406`
+- candidate Z bbox:
+  `0.20247514936980976`
+- refit Z bbox:
+  `0.20291272997968302`
+
+Direct visual comparison against the real frontal source image found no material
+identity improvement.
+
+Observed identity failures remain materially present:
+
+- head/cranium remains too long and narrow;
+- lower face remains too triangular;
+- jaw/chin remains insufficiently person-specific;
+- ear flare remains incorrect;
+- orbital/nose/mouth proportions remain materially mismatched;
+- overall likeness remains unacceptable.
+
+Authoritative visual classification:
+
+`NO_MATERIAL_CHANGE`
+
+## A4 bound-hit correction
+
+The front-jaw refit ended with seven identity coefficients at the ±3 bound:
+
+`[2, 7, 8, 10, 11, 13, 77]`
+
+However, six were already saturated in the incoming candidate:
+
+`[2, 7, 8, 10, 11, 13]`
+
+Only coefficient `77` newly reached a bound during the controlled refit:
+
+`IDX 77: -2.786182176704 → -2.999999999844`
+
+Therefore the earlier interpretation that the front-jaw refit itself drove all
+seven coefficients to the bounds is superseded.
+
+Correct interpretation:
+
+**The incoming candidate already had six saturated identity dimensions; the
+front-jaw refit added one new saturation event.**
+
+## A5 objective-space versus identity-space result
+
+The refit moved the identity vector materially:
+
+- identity delta L2:
+  `4.350135008521516`
+- maximum absolute coefficient change:
+  `1.320575364433013`
+- coefficients with `|delta| >= 0.5`:
+  `21`
+
+The front-jaw objective improved numerically, including the previously recorded
+~20.5% point-RMS reduction, but direct neutral likeness showed
+`NO_MATERIAL_CHANGE`.
+
+Therefore:
+
+`OBJECTIVE_SPACE_IMPROVEMENT_ONLY`
+
+The jaw residual reduction is NOT accepted as evidence of neutral identity
+recovery.
+
+## A6 negative Closure Challenge
+
+Results:
+
+1. The refit did not merely fail to move identity parameters — `NO`.
+2. All seven bound hits did not originate from the refit — `NO`.
+3. Numerical jaw improvement alone cannot establish likeness improvement — `NO`.
+4. FLAME capacity limitation is not yet established because outer-head
+   constraints remain materially incomplete.
+5. Relief is not the current primary repair target because direct neutral mesh
+   already fails likeness.
+
+Closure Challenge result:
+
+`PASS`
+
+Section A technical result:
+
+`SPARSE_FIT_DIAGNOSIS_SUPPORTED`
+
+## Claim boundary
+
+Section A does NOT establish that FLAME is incapable of representing the
+subject.
+
+Current evidence supports:
+
+- sparse/internal landmark fit is insufficient for neutral identity recovery;
+- outer-head geometry remains materially under-constrained;
+- camera/shape degeneracy remains a secondary concern;
+- relief tuning must remain blocked until canonical neutral identity improves.
+
+## Next exact authorized checklist position
+
+`Phase 8 → Item 11 → 11.15 → R7.8 → B1`
+
+`B1 — Establish a reliable frontal face-oval observation channel.`
+
+No later Section B step is authorized before B1 evidence is reviewed.
+
+Marker:
+`PHASE8_ITEM11_15_R7_8_SECTION_A_CLOSURE_2026_08_31`
+
+
+# PHASE8_ITEM11_15_R7_8_MODERN_IDENTITY_RECOVERY_EXECUTION_PLAN_2026_08_31
+
+**Hierarchy:** `Phase 8 → Main Checklist Item 11 → 11.15 → R7.8`
+**Status:** `ACTIVE / HOLD-BLOCKED`
+**Purpose:** Refine the already-approved R7.8 checklist with a modern,
+academically informed but ATLAS-original execution plan.
+**Phase 9:** `NOT AUTHORIZED / NOT STARTED`
+
+This record does NOT replace the locked R7.8 A–H structure.
+It refines Sections B–G into executable substeps.
+
+Academic/open-source systems including MICA, DECA, Pixel3DMM-class methods,
+MonoNPHM-class methods, VHAP-class tracking and metrical photometric fitting
+are used only as methodological references.
+
+No third-party implementation is to be copied wholesale into ATLAS.
+Any production implementation must remain ATLAS-owned, testable, auditable,
+commercially reviewable and compatible with the Apple Silicon target.
+
+---
+
+# R7.8 MODERN IDENTITY RECOVERY — EXECUTION PLAN
+
+## A — Existing-state closure
+
+Status: `CLOSED`
+
+- [x] A1 — Candidate vs front-jaw-refit neutral comparison executed.
+- [x] A2 — Same-condition visual comparison reviewed.
+- [x] A3 — Result classified `NO_MATERIAL_CHANGE`.
+- [x] A4 — Identity bound-hit coefficient audit completed.
+- [x] A5 — Jaw improvement classified
+      `OBJECTIVE_SPACE_IMPROVEMENT_ONLY`.
+- [x] A6 — Negative Closure Challenge `PASS`.
+
+Section A result:
+
+`SPARSE_FIT_DIAGNOSIS_SUPPORTED`
+
+---
+
+## B — Outer-head observation and constraint recovery
+
+### B1 — Frontal face-oval observation channel
+
+- [x] B1.0 — Verify real frontal source landmark asset.
+- [x] B1.0a — Verify 478-point MediaPipe source contract.
+- [x] B1.0b — Verify authoritative 36-point MediaPipe face-oval sequence.
+- [x] B1.0c — Verify `[W-1,H-1]` pixel conversion contract.
+- [x] B1.1 — Partition the 36-point observed face oval into:
+      lower jaw/chin, lateral face/temple, upper facial oval.
+- [x] B1.2 — Record explicit semantic membership for every selected point.
+- [x] B1.3 — Verify the upper MediaPipe face oval is NOT promoted to full
+      cranial/head-top ground truth.
+- [x] B1.4 — Audit available FLAME visible facial-contour evidence.
+- [x] B1.5 — Isolate anatomically eligible projected FLAME facial contour from
+      ears, neck and unrelated visible-surface boundary.
+- [x] B1.6 — Establish raw observation-vs-model contour measurements without
+      optimization.
+- [x] B1.7 — Produce controlled diagnostic overlay.
+- [x] B1.8 — Negative correspondence audit:
+      reject arbitrary nearest-full-boundary matching.
+- [x] B1.9 — B1 Closure Challenge.
+- [x] B1.10 — Persist accepted B1 evidence.
+
+B1 acceptance requires a reliable frontal face-oval observation channel.
+It does NOT require likeness improvement yet.
+
+### B2 — Jaw / chin outer contour
+
+- [ ] B2.1 — Reuse the verified 21-point lower-jaw observation set.
+- [ ] B2.2 — Keep jaw evidence independent from `static105`.
+- [ ] B2.3 — Establish frontal jaw/chin model contour eligibility.
+- [ ] B2.4 — Measure raw jaw/chin contour residuals.
+- [ ] B2.5 — Verify chin position, jaw width and lower-face contour direction.
+- [ ] B2.6 — Controlled jaw/chin-only optimization experiment.
+- [ ] B2.7 — Neutral before/after render.
+- [ ] B2.8 — Closure Challenge.
+
+### B3 — Forehead / cranial envelope
+
+MediaPipe face oval MUST NOT be used as cranial ground truth.
+
+- [ ] B3.1 — Identify legitimate source evidence for forehead/head envelope.
+- [ ] B3.2 — Separate hair boundary from anatomical head-envelope evidence.
+- [ ] B3.3 — Establish head width / height observations where defensible.
+- [ ] B3.4 — Establish frontal cranial-envelope model measurements.
+- [ ] B3.5 — Produce raw source-vs-model cranial diagnostics.
+- [ ] B3.6 — Controlled cranial-envelope optimization only if evidence supports
+      it.
+- [ ] B3.7 — Neutral before/after render.
+- [ ] B3.8 — Closure Challenge.
+
+### B4 — Ear lateral position / flare
+
+- [ ] B4.1 — Identify source-supported left/right ear observations.
+- [ ] B4.2 — Separate ear evidence from face-oval evidence.
+- [ ] B4.3 — Measure ear lateral displacement / flare.
+- [ ] B4.4 — Test whether FLAME identity coefficients can correct the observed
+      error.
+- [ ] B4.5 — Neutral before/after visual audit.
+- [ ] B4.6 — Closure Challenge.
+
+### B5 — Multi-view profile / outer-head silhouette
+
+- [ ] B5.1 — Preserve historical 17-point dynamic profile evidence.
+- [ ] B5.2 — Preserve verified visibility masks.
+- [ ] B5.3 — Add global side-head silhouette evidence where legitimate.
+- [ ] B5.4 — Keep local jaw/profile and global head silhouette as separate raw
+      evidence channels.
+- [ ] B5.5 — Compare front/right/left outer-shape consistency.
+- [ ] B5.6 — Controlled multi-view outer-shape refit.
+- [ ] B5.7 — Neutral front / three-quarter / profile comparison.
+- [ ] B5.8 — Closure Challenge.
+
+---
+
+## C — Camera / shape degeneracy control
+
+### C1 — Camera compensation measurement
+
+- [ ] C1.1 — Record current per-view scale / translation / root pose.
+- [ ] C1.2 — Measure camera changes against identity-shape changes.
+- [ ] C1.3 — Identify camera movements that reduce reprojection without
+      improving neutral shape.
+
+### C2 — Counterfactual camera tests
+
+- [ ] C2.1 — Fixed-camera identity refit.
+- [ ] C2.2 — Narrow-bounded-camera identity refit.
+- [ ] C2.3 — Existing freely re-solved camera reference run.
+- [ ] C2.4 — Compare residual, neutral shape and visual likeness.
+
+### C3 — Camera / shape decision
+
+- [ ] C3.1 — Determine whether shape improvement survives restricted camera.
+- [ ] C3.2 — Reject any candidate whose apparent improvement is primarily
+      camera compensation.
+- [ ] C3.3 — Closure Challenge.
+
+---
+
+## D — Combined staged identity objective
+
+`static105` remains unchanged and retains its bounded benchmark role.
+
+### D1 — Stage architecture
+
+- [ ] D1.1 — Stage 0: validate source observations.
+- [ ] D1.2 — Stage 1: initialize camera / pose.
+- [ ] D1.3 — Stage 2: optimize global outer-face/head shape.
+- [ ] D1.4 — Stage 3: refine internal facial anatomy.
+- [ ] D1.5 — Stage 4: joint multi-view identity refinement.
+- [ ] D1.6 — Record all objective families independently.
+
+### D2 — Objective separation
+
+- [ ] D2.1 — Internal landmark residual remains separate.
+- [ ] D2.2 — Face-oval residual remains separate.
+- [ ] D2.3 — Jaw/chin residual remains separate.
+- [ ] D2.4 — Cranial-envelope residual remains separate.
+- [ ] D2.5 — Ear residual remains separate.
+- [ ] D2.6 — Side silhouette residual remains separate.
+- [ ] D2.7 — No invented scalar support score.
+
+### D3 — Combined candidate
+
+- [ ] D3.1 — Fit one shared identity across available views.
+- [ ] D3.2 — Audit identity regularization.
+- [ ] D3.3 — Audit coefficient saturation.
+- [ ] D3.4 — Produce neutral direct-mesh candidate.
+- [ ] D3.5 — Re-run held-out evaluation.
+- [ ] D3.6 — Closure Challenge.
+
+---
+
+## E — First real likeness gate
+
+- [ ] E1 — Produce new neutral canonical candidate.
+- [ ] E2 — Render direct neutral front.
+- [ ] E3 — Render direct neutral three-quarter.
+- [ ] E4 — Render direct neutral profile.
+- [ ] E5 — Compare against previous candidate under identical visualization.
+- [ ] E6 — Explicitly inspect:
+      head envelope,
+      jaw/chin,
+      ears,
+      nose,
+      orbital region,
+      mouth,
+      overall identity likeness.
+- [ ] E7 — Record exactly one:
+      `LIKELINESS_MATERIALLY_IMPROVED`,
+      `LIKELINESS_STILL_FAIL`,
+      `REGRESSION`.
+
+User visual assessment remains authoritative for visible likeness quality.
+
+If E passes materially, proceed toward H after required consistency/held-out
+checks.
+
+If E remains inadequate, continue to F.
+
+---
+
+## F — FLAME representation-capacity decision
+
+This section MUST NOT be entered merely because a previous candidate looked bad.
+
+- [ ] F1 — Identify saturated identity coefficients.
+- [ ] F2 — Measure geometric sensitivity of saturated/high-change coefficients.
+- [ ] F3 — Test whether legitimate outer-head constraints can move the required
+      geometry within current FLAME identity space.
+- [ ] F4 — Separate optimizer/objective insufficiency from representation
+      insufficiency.
+- [ ] F5 — Do NOT widen identity bounds blindly.
+- [ ] F6 — Classify only as:
+      `FLAME_CAPACITY_LIMIT_NOT_ESTABLISHED`,
+      `SUPPORTED_NOT_CLOSED`,
+      or
+      `ESTABLISHED_FOR_CURRENT_CASE`.
+- [ ] F7 — Closure Challenge.
+
+Only if F establishes a meaningful representation limitation may G become the
+active recovery branch.
+
+---
+
+## G — Modern dense / richer recovery branch
+
+All external systems remain methodological references unless separately
+approved and licensed.
+
+### G1 — Dense normal evidence
+
+- [ ] G1.1 — Evaluate an ATLAS-owned dense normal observation contract.
+- [ ] G1.2 — Preserve camera/frame semantics explicitly.
+- [ ] G1.3 — Use visibility-aware valid-pixel support.
+- [ ] G1.4 — Compare dense normal evidence with current sparse fit.
+
+### G2 — UV / surface correspondence
+
+- [ ] G2.1 — Evaluate dense surface-correspondence representation.
+- [ ] G2.2 — Keep correspondence confidence explicit.
+- [ ] G2.3 — Reject unsupported dense anatomical claims.
+
+### G3 — Visibility-aware dense geometry
+
+- [ ] G3.1 — Reuse/audit depth-aware rasterization where valid.
+- [ ] G3.2 — Construct visibility-aware dense residuals.
+- [ ] G3.3 — Keep dense evidence separate from sparse landmark evidence.
+
+### G4 — Multi-view surface evidence fusion
+
+- [ ] G4.1 — Aggregate evidence in canonical surface space where possible.
+- [ ] G4.2 — Prevent view-specific detail from overwriting shared identity.
+- [ ] G4.3 — Measure cross-view consistency.
+
+### G5 — Hybrid representation candidate
+
+- [ ] G5.1 — Evaluate FLAME as stable canonical scaffold.
+- [ ] G5.2 — Evaluate bounded subject-specific residual geometry.
+- [ ] G5.3 — Preserve topology/correspondence suitability for ATLAS downstream.
+- [ ] G5.4 — Neutral direct-mesh evaluation.
+
+### G6 — Richer representation benchmark
+
+Only if justified:
+
+- [ ] G6.1 — Evaluate NPHM-class or equivalent richer identity representation
+      as a benchmark/reference architecture.
+- [ ] G6.2 — Evaluate extractable printable geometry.
+- [ ] G6.3 — Evaluate stable canonical correspondence.
+- [ ] G6.4 — Evaluate Apple Silicon feasibility.
+- [ ] G6.5 — Evaluate runtime / memory.
+- [ ] G6.6 — Evaluate exact code, model-weight and dataset license chain.
+- [ ] G6.7 — No production adoption without explicit user approval.
+
+### G7 — Dense-branch Closure Challenge
+
+- [ ] G7.1 — Verify any improvement exists at direct neutral-mesh level.
+- [ ] G7.2 — Verify improvement is not renderer/appearance-only.
+- [ ] G7.3 — Verify physical-production compatibility remains plausible.
+- [ ] G7.4 — Persist evidence and decision.
+
+---
+
+## H — Canonical Identity Acceptance Gate
+
+Relief / physical representation work remains blocked until this gate passes.
+
+- [ ] H1 — Neutral mesh visibly represents the correct person.
+- [ ] H2 — Front / three-quarter / profile identity is mutually consistent.
+- [ ] H3 — Jaw/chin is materially acceptable.
+- [ ] H4 — Ear geometry has no gross identity-breaking error.
+- [ ] H5 — Cranial/head envelope is materially acceptable.
+- [ ] H6 — Nose, orbital and mouth identity-bearing structure is preserved.
+- [ ] H7 — Camera is not concealing gross shape error.
+- [ ] H8 — Pose/expression remain separated from identity.
+- [ ] H9 — Held-out evidence does not contradict visual improvement.
+- [ ] H10 — User visual assessment is `ACCEPTABLE`.
+- [ ] H11 — Negative Closure Challenge `PASS`.
+- [ ] H12 — Accepted evidence persisted with provenance and hashes.
+
+Only after H passes may Item 11 return to physical-survival validation.
+
+---
+
+# EXECUTION DISCIPLINE
+
+1. Follow this checklist in order.
+2. No skipping ahead because a later method appears promising.
+3. One terminal step at a time.
+4. Wait for user output after every terminal command.
+5. Read-only audit before mutation.
+6. Every meaningful mutation requires explicit user approval.
+7. No third-party source-code copying as an implementation shortcut.
+8. Academic/open-source work may inform algorithms, contracts and test design.
+9. Licensing of code, weights and datasets remains independently auditable.
+10. No `git add .`.
+11. Protected dirty work remains untouched.
+12. No relief tuning while canonical neutral identity remains unacceptable.
+13. No Phase 9 authorization is implied.
+
+## Exact current position
+
+Completed:
+
+`A1–A6`
+
+Current:
+
+`B1`
+
+Exact next executable action:
+
+`B1.1 — Partition the verified 36-point frontal MediaPipe face oval into lower-jaw/chin, lateral-face/temple and upper-facial-oval semantic subsets.`
+
+Marker:
+`PHASE8_ITEM11_15_R7_8_MODERN_IDENTITY_RECOVERY_EXECUTION_PLAN_2026_08_31`
+
+
+## R7.8 / B1 — Frontal Face-Oval Observation Closure
+
+Marker: `PHASE8_ITEM11_15_R7_8_B1_FRONTAL_FACE_OVAL_OBSERVATION_CLOSURE_2026_08_31`
+
+Status: **B1 CLOSED**
+
+Execution result:
+
+- B1.1 — 36-point MediaPipe frontal face-oval observation partition verified.
+- B1.2 — Explicit semantic membership recorded:
+  `LOWER_JAW_CHIN`, `LATERAL_FACE_TEMPLE`, `UPPER_FACIAL_OVAL`.
+- B1.3 — Upper MediaPipe face oval is explicitly **NOT** promoted to
+  cranial/head-top ground truth.
+- B1.4 — FLAME rasterizer is a usable projection foundation; projected
+  triangle visibility alone is insufficient for anatomical contour recovery.
+- B1.5 — No complete verified frontal FLAME face-oval mapping was established.
+  Provider `face` mask and full raster boundary are rejected as anatomical
+  face-oval correspondence. Historical 79-yaw-bin / 17-point dynamic contour
+  is verified only for transferred lower-jaw/profile evidence in
+  `turn_right` and `turn_left`; no front contract exists.
+- B1.6 — Raw point-to-model-envelope proximity measured strictly as diagnostic
+  geometry, **not anatomical correspondence** and not an optimizer objective.
+  Regional mean distances:
+  - UPPER: 123.965722 px
+  - LATERAL: 46.551190 px
+  - RIGHT_JAW: 88.297700 px
+  - CHIN_CENTER: 142.215446 px
+  - LEFT_JAW: 36.476322 px
+  Central-chin mismatch is strongly supported. Right/left asymmetry is
+  observed; cause is not yet established.
+- B1.7 — Controlled V2 overlay reproduced the B1.6 values exactly using the
+  direct raster external boundary. PNG color-threshold contour recovery was
+  rejected as an invalid earlier diagnostic route.
+- B1.8 — Arbitrary nearest-full-boundary matching is **ELIMINATED** as a
+  correspondence method. Nearest-point use is diagnostic proximity only.
+- B1.9 — Closure Challenge PASS.
+- B1.10 — Accepted B1 evidence persisted with SHA256 manifest under:
+  `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b1_frontal_face_oval_observation`
+
+B1 closure classification:
+
+- `B1_OBSERVATION_CHANNEL=ESTABLISHED`
+- `COMPLETE_FRONTAL_MODEL_FACE_OVAL_CORRESPONDENCE=NOT_ESTABLISHED`
+- `ARBITRARY_BOUNDARY_CORRESPONDENCE=ELIMINATED`
+- `JAW_CHIN_DEFERRED_TO_B2=YES`
+- `CRANIUM_DEFERRED_TO_B3=YES`
+- `LIKELINESS_CLAIM=NO`
+- `PHASE9_AUTHORIZED=NO`
+
+Exact next execution point:
+
+`Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B2.1`
+
+Final marker: `PHASE8_ITEM11_15_R7_8_B1_FRONTAL_FACE_OVAL_OBSERVATION_CLOSURE_2026_08_31`
+
+## PHASE8_ITEM11_15_R7_8_B2_JAW_CHIN_OUTER_CONTOUR_CLOSURE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B2
+- B2 status: CLOSED
+- Closure Challenge: PASS
+- valid frontal jaw source: FLAME dynamic17 with corrected normalized camera projection
+- baseline ordered jaw RMS: 45.6545755307769 px
+- controlled fixed-camera jaw RMS: 10.840921399178077 px
+- jaw improvement: 76.25446897021321%
+- static105 collateral: 7.417029843852709 -> 30.94261297477176 px
+- standalone jaw-only identity refit: REJECTED
+- likeness proven: NO
+- combined objective still required: YES
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b2_jaw_chin_outer_contour`
+- exact next: R7.8 / B3 — Forehead / cranium width-height envelope
+
+## PHASE8_ITEM11_15_R7_8_B3_FOREHEAD_CRANIUM_OUTER_HEAD_ENVELOPE_CLOSURE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B3
+- B3 status: CLOSED
+- corrected Closure Challenge: PASS
+- permitted claim: bounded hair-inclusive multiview outer-head envelope
+- right temporal/lower-head outer bound: ESTABLISHED
+- turn_left posterior/upper-head envelope: ESTABLISHED
+- turn_right posterior envelope: ESTABLISHED AS CROSS-CHECK
+- left frontal temporal bound: UNRESOLVED
+- exact skull height: UNRESOLVED
+- hair silhouette equals anatomical cranium: NO
+- cranial metric ground truth: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b3_forehead_cranium_outer_head_envelope`
+- exact next: R7.8 / B4 — Ears
+
+## PHASE8_ITEM11_15_R7_8_B4_1_TO_B4_4_EAR_INTERIM_EVIDENCE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4
+- B4 overall: ACTIVE
+- persisted scope: B4.1 through B4.4
+- B4.1 production ear geometry mapping: UNRESOLVED
+- B4.2 FLAME left/right ear masks: ESTABLISHED as model-semantic regions, 588 unique valid indices each
+- subject-specific ear GT from FLAME mask: NO
+- B4.3 turn_right visibility: PARTIALLY_USABLE / PREFERRED
+- B4.3 turn_left visibility: PARTIALLY_USABLE / CROSS-CHECK
+- complete anatomical ear outer contour GT: NO
+- B4.4 MediaPipe lateral landmarks: EAR-PROXIMITY ONLY
+- anatomical ear correspondence from MediaPipe: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.5 — subject-specific ear outer-bound observation
+
+## PHASE8_ITEM11_15_R7_8_B4_5_1_TURN_RIGHT_EAR_QUALIFICATION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.5.1
+- status: CLOSED + PERSISTED
+- source: TURN_RIGHT
+- partial subject-specific ear outer bound: USABLE
+- superior/posterior helix: OCCLUDED_BY_HAIR
+- lobule boundary: PARTIALLY_CONFOUNDED_BY_JEWELRY
+- complete anatomical pinna contour GT: NO
+- ear anatomical correspondence: NO
+- ear metric ground truth: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.5.2
+
+
+<!-- R7_8_B4_5_2_TURN_LEFT_EAR_QUALIFICATION_PERSISTED_2026-08-31 -->
+- R7.8 / B4.5.2 persisted.
+- turn_left ear close-up qualified as cross-check only.
+- partial outer bound usable; superior/posterior helix occluded by hair.
+- lobule boundary partially confounded by jewelry.
+- complete pinna contour GT: NO.
+
+## PHASE8_ITEM11_15_R7_8_B4_6_1_REJECTED_GROSS_EAR_BOUND_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.6.1
+- status: REJECTED + PERSISTED
+- reason: attempted ROI was not ear-localized
+- invalidated ROI: `(500, 420, 665, 760)`
+- invalidated width: 165 px
+- invalidated height: 340 px
+- invalidated center: `(582.5, 590.0)`
+- gross ear size measurement: INVALID
+- ear position measurement: INVALID
+- numeric result reuse allowed: NO
+- complete pinna contour GT: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.6.2 — corrected ear-local ROI
+
+## PHASE8_ITEM11_15_R7_8_B4_6_2_TURN_RIGHT_EAR_LOCAL_ROI_QUALIFICATION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.6.2
+- status: CLOSED + PERSISTED
+- source: TURN_RIGHT
+- corrected ear-local ROI: `(405, 505, 555, 745)`
+- ear localization ROI: ACCEPTABLE
+- visible ear position observation: USABLE
+- visible gross ear size: BOUNDED_ONLY
+- anatomical ear size GT: NO
+- complete pinna contour GT: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.6.3 — TURN_RIGHT bounded position/size measurement
+
+## PHASE8_ITEM11_15_R7_8_B4_6_3_TURN_RIGHT_BOUNDED_EAR_METRICS_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.6.3
+- status: CLOSED + PERSISTED
+- source: TURN_RIGHT
+- qualified ROI: `(405, 505, 555, 745)`
+- observation center px: `(480.0, 625.0)`
+- observation window px: `150 x 240`
+- normalized center: `(0.3127035831, 0.5430060817)`
+- normalized extent: `(0.0977198697, 0.2085143354)`
+- role: bounded visible ear window only
+- anatomical ear width/height GT: NO
+- complete pinna contour GT: NO
+- metric 3D ear GT: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.6.4 — TURN_LEFT bounded observation
+
+## PHASE8_ITEM11_15_R7_8_B4_6_4_TURN_LEFT_EAR_LOCAL_ROI_QUALIFICATION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.6.4
+- status: CLOSED + PERSISTED
+- source: TURN_LEFT
+- candidate ROI: `(1020, 450, 1170, 760)`
+- localization role: ACCEPTABLE_AS_CROSSCHECK
+- visible ear position observation: USABLE_AS_CROSSCHECK
+- visible gross ear size: BOUNDED_ONLY
+- anatomical ear size GT: NO
+- complete pinna contour GT: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.6.5 — TURN_LEFT bounded metrics
+
+## PHASE8_ITEM11_15_R7_8_B4_6_5_TURN_LEFT_BOUNDED_EAR_METRICS_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.6.5
+- status: CLOSED + PERSISTED
+- source: TURN_LEFT
+- qualified ROI: `(1020, 450, 1170, 760)`
+- observation center px: `(1095.0, 605.0)`
+- observation window px: `150 x 310`
+- normalized center: `(0.7133550489, 0.5256298871)`
+- normalized extent: `(0.0977198697, 0.2693310165)`
+- role: bounded visible ear window cross-check only
+- TURN_RIGHT vs TURN_LEFT window sizes are not anatomical ear-size comparison
+- bilateral anatomical ear-size asymmetry: NOT_ESTABLISHED
+- anatomical ear width/height GT: NO
+- complete pinna contour GT: NO
+- metric 3D ear GT: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.7
+
+## PHASE8_ITEM11_15_R7_8_B4_7_1_CANDIDATE_DATA_AVAILABILITY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.7.1
+- status: CLOSED + PERSISTED
+- candidate identity parameters: AVAILABLE
+- front/right/left root poses: AVAILABLE
+- per-view solved camera in candidate NPZ: NO
+- projected ear vertices in candidate NPZ: NO
+- ear-region indices in candidate NPZ: NO
+- direct ear projection reproducible from NPZ alone: NO
+- camera/projection chain must be independently recovered and verified before B4.8
+- guessed/substituted camera values permitted: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.7.2 — camera/model projection dependency recovery
+
+## PHASE8_ITEM11_15_R7_8_B4_7_2_CAMERA_PROJECTION_DEPENDENCY_RECOVERY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.7.2
+- status: CLOSED + PERSISTED
+- static105 camera re-solve chain: VERIFIED
+- model projection space: NORMALIZED_IMAGE_SPACE
+- target comparison space: NORMALIZED_IMAGE_SPACE
+- pixel conversion contract: PER_AXIS `[W-1, H-1]`
+- isotropic pixel-camera adapter for this audit: NOT_AUTHORIZED
+- candidate NPZ camera values: NOT_PRESENT
+- B4.8 camera requirement: re-solve from static105, no guessed/substituted values
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8 — ear observation vs candidate comparison
+
+## PHASE8_ITEM11_15_R7_8_B4_8_1_FLAME_MODEL_EAR_MASK_PROVENANCE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.1
+- status: CLOSED + PERSISTED
+- FLAME runner model: `Data/MODELS/FLAME/flame2023_Open.pkl`
+- loader: `AtlasPortraitFlameCanonicalModelLoader.load`
+- identity parameters: 300
+- expression parameters: 100
+- model version: FLAME 2023 Open
+- audited FLAME asset: `/Users/Kubi/ATLAS_FLAME_SPIKE/models/flame2023_open/flame2023_Open.pkl`
+- audited ear-mask asset: `/Users/Kubi/ATLAS_FLAME_SPIKE/models/vertex_masks/FLAME_masks.pkl`
+- mask unpickle encoding: `latin1`
+- source assets read-only: YES
+- model asset provenance: VERIFIED
+- ear-mask asset provenance: VERIFIED
+- subject-specific ear GT from mask: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.2 — resolve side-view cameras
+
+## PHASE8_ITEM11_15_R7_8_B4_8_2_SIDE_VIEW_CAMERA_RESOLVE_CONTRACT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.2
+- status: CLOSED + PERSISTED
+- identity: LOCKED_CANDIDATE_IDENTITY
+- pose: SELECTED_FINAL_ROOT_POSE
+- camera: STATIC105_RESOLVED_AT_FINAL_POSE
+- camera re-solved for every pose candidate: YES
+- best pose selected by minimum SSE: YES
+- final camera recomputed at selected pose: YES
+- camera guessing: NO
+- camera substitution: NO
+- ear accuracy proven: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3 — project candidate ear regions
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_1_VIEW_GEOMETRY_GENERATION_CONTRACT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.1
+- status: CLOSED + PERSISTED
+- identity: LOCKED_CANDIDATE_IDENTITY
+- expression: NEUTRAL / ZERO
+- pose: SELECTED_ROOT_POSE
+- geometry: full FLAME blendshape + joints + pose corrective + kinematics + LBS
+- final geometry space: image-coordinate normalized
+- simplified/approximate mesh: NO
+- ear projection performed: NO
+- ear accuracy proven: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.2 — load ear-mask indices
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_2_FLAME_EAR_MASK_INDEX_VERIFICATION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.2
+- status: CLOSED + PERSISTED
+- mask asset: `/Users/Kubi/ATLAS_FLAME_SPIKE/models/vertex_masks/FLAME_masks.pkl`
+- mask SHA256: `ccefbe1ac0774ff78c68caf2c627b4abc067a6555ebeb0be5d5b0812366ab492`
+- loading encoding: `latin1`
+- left ear: 588 unique valid indices
+- right ear: 588 unique valid indices
+- negative indices: NO
+- duplicate indices: NO
+- subject-specific ear GT from mask: NO
+- ear projection performed: NO
+- source asset modified: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.3 — project TURN_RIGHT ear
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_3_TURN_RIGHT_HELD_OUT_CASE_MAPPING_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.3
+- status: CLOSED + PERSISTED
+- case: `held_out_turn_right`
+- training views: `front`, `turn_left`
+- held-out view: `turn_right`
+- mapping provenance: VERIFIED
+- wrong-case substitution allowed: NO
+- ear projection performed: NO
+- ear accuracy proven: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.3 — project TURN_RIGHT ear
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_3_CANDIDATE_RESULT_PAYLOAD_CONTRACT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.3
+- status: CLOSED + PERSISTED
+- case: `held_out_turn_right`
+- identity source: `candidate_fit["final_active_identity"] -> compose_identity_parameters(...)`
+- root pose source: `candidate_pose["root_pose_parameters"]`
+- camera source: `candidate_pose["camera"]`
+- field guessing allowed: NO
+- wrong-case substitution allowed: NO
+- ear projection performed: NO
+- ear accuracy proven: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.3 — project TURN_RIGHT ear
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_3_NUMERIC_PERSISTENCE_FIELD_AUDIT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.3
+- status: CLOSED + PERSISTED
+- candidate active identity persisted: YES
+- candidate selected root pose persisted: YES
+- weak-perspective camera persisted: NO
+- full identity refit required for ear projection: NO
+- held-out pose reoptimization required: NO
+- camera re-solve required: YES
+- authorized path: reuse identity + pose, re-evaluate geometry, re-solve static105 camera, project ear mask
+- ear projection performed: NO
+- ear accuracy proven: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.3 — project TURN_RIGHT ear
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_3_EXACT_HELD_OUT_ARTIFACT_PATH_CONTRACT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.3
+- status: CLOSED + PERSISTED
+- evidence root: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26`
+- output dir: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/reproducibility_held_out`
+- protocol label: `REPRODUCIBILITY_HELD_OUT`
+- NPZ path: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/reproducibility_held_out/REPRODUCIBILITY_HELD_OUT.npz`
+- JSON path: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/reproducibility_held_out/REPRODUCIBILITY_HELD_OUT.json`
+- path guessing allowed: NO
+- full identity refit required: NO
+- camera reuse from NPZ: NO
+- camera re-solve required: YES
+- ear projection performed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.3 — project TURN_RIGHT ear
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_3_CAMERA_PROJECTION_CONTRACT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.3
+- status: CLOSED + PERSISTED
+- projection equation: `camera.scale * image_vertices[:, :2] + [camera.translation_x, camera.translation_y]`
+- projection space: normalized image space
+- camera fields: `scale`, `translation_x`, `translation_y`
+- pixel conversion: per-axis `[W-1, H-1]`
+- isotropic pixel camera adapter authorized: NO
+- camera field guessing allowed: NO
+- ear projection performed: NO
+- ear accuracy proven: NO
+- likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.3 — project TURN_RIGHT ear
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_3_TURN_RIGHT_ACTUAL_EAR_PROJECTION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.3
+- status: CLOSED + PERSISTED
+- view: `turn_right`
+- projected visible FLAME ear region: `right_ear`
+- correspondence basis: image-space evidence
+- view-name-only assumption: NO
+- projected right-ear center: `(511.763, 678.717)` px
+- projected right-ear extent: `115.936 x 129.002` px
+- bounded observation center: `(480, 625)` px
+- bounded observation extent: `150 x 240` px
+- ear localization/projection feasibility: SUPPORTED
+- anatomical ear-size accuracy: NOT ESTABLISHED
+- ear-shape accuracy: NOT ESTABLISHED
+- subject-specific ear likeness: NOT ESTABLISHED
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.3.4 — project TURN_LEFT ear
+
+## PHASE8_ITEM11_15_R7_8_B4_8_3_4_TURN_LEFT_ACTUAL_EAR_PROJECTION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.3.4
+- status: CLOSED + PERSISTED
+- view: `turn_left`
+- projected visible FLAME ear region: `left_ear`
+- correspondence basis: image-space evidence
+- view-name-only assumption: NO
+- projected left-ear center: `(1114.271, 681.208)` px
+- projected left-ear extent: `137.656 x 165.322` px
+- bounded observation center: `(1095, 605)` px
+- bounded observation extent: `150 x 310` px
+- center delta: approximately `(+19.27,+76.21)` px
+- bilateral FLAME ear-region correspondence: SUPPORTED
+- anatomical ear-size accuracy: NOT ESTABLISHED
+- ear-shape accuracy: NOT ESTABLISHED
+- subject-specific ear likeness: NOT ESTABLISHED
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.4 — bilateral projected-ear vs observation comparison
+
+## PHASE8_ITEM11_15_R7_8_B4_8_4_1_BILATERAL_BOUNDED_COMPARISON_METRICS_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.4.1
+- status: CLOSED + PERSISTED
+- metric class: bounded image-space diagnostic
+- TURN_RIGHT projected-ear-inside-observation: 0.872938
+- TURN_LEFT projected-ear-inside-observation: 0.883667
+- TURN_RIGHT IoU: 0.344471
+- TURN_LEFT IoU: 0.409179
+- TURN_RIGHT center distance: 62.405 px
+- TURN_LEFT center distance: 78.607 px
+- bilateral ear localization compatibility: SUPPORTED
+- bilateral FLAME ear-region correspondence: SUPPORTED
+- anatomical ground truth: NO
+- anatomical ear-size accuracy: NOT ESTABLISHED
+- anatomical ear-position accuracy: NOT ESTABLISHED
+- ear-shape accuracy: NOT ESTABLISHED
+- subject-specific ear likeness: NOT ESTABLISHED
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.8.4.2 — interpretation / acceptance boundary
+
+## PHASE8_ITEM11_15_R7_8_B4_8_4_2_INTERPRETATION_ACCEPTANCE_BOUNDARY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.8.4.2
+- status: CLOSED + PERSISTED
+- maximum defensible result: `LOCALIZATION_SUPPORTED_ONLY`
+- bilateral ear-region correspondence: SUPPORTED
+- bilateral ear-localization compatibility: SUPPORTED
+- PASS allowed only for correct coarse image-space locality: YES
+- anatomical ear-position accuracy: NOT ESTABLISHED
+- anatomical ear-size accuracy: NOT ESTABLISHED
+- ear-shape accuracy: NOT ESTABLISHED
+- subject-specific ear likeness: NOT ESTABLISHED
+- anatomical pass/fail threshold: UNRESOLVED
+- threshold invention allowed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.9 — Closure Challenge
+
+## PHASE8_ITEM11_15_R7_8_B4_9_1_EVIDENCE_COMPLETENESS_PASS_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.9.1
+- status: CLOSED + PERSISTED
+- evidence completeness: PASS
+- required artifacts: 13
+- missing artifacts: 0
+- audited evidence represented in manifest: YES
+- B4 closed: NO
+- anatomical ear accuracy proven: NO
+- subject-specific ear likeness proven: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.9.2 — overclaim / contradiction audit
+
+## PHASE8_ITEM11_15_R7_8_B4_9_2_OVERCLAIM_CONTRADICTION_AUDIT_PASS_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4 -> B4.9.2
+- status: CLOSED + PERSISTED
+- overclaim / contradiction audit: PASS
+- txt files audited: 77
+- forbidden positive claims: 0
+- localization-only boundary present: YES
+- anatomical ear-size accuracy remains: NOT ESTABLISHED
+- ear-shape accuracy remains: NOT ESTABLISHED
+- subject-specific ear likeness remains: NOT ESTABLISHED
+- B4 closed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B4.9.3 — closure decision
+
+## PHASE8_ITEM11_15_R7_8_B4_EARS_CLOSURE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B4
+- status: CLOSED + PERSISTED
+- closure class: `CLOSED_WITH_BOUNDED_LOCALIZATION_EVIDENCE`
+- TURN_RIGHT visible FLAME ear region: `right_ear`
+- TURN_LEFT visible FLAME ear region: `left_ear`
+- bilateral ear-region correspondence: SUPPORTED
+- bilateral ear-localization compatibility: SUPPORTED
+- evidence completeness challenge: PASS
+- overclaim / contradiction challenge: PASS
+- anatomical ear-position accuracy: NOT ESTABLISHED
+- anatomical ear-size accuracy: NOT ESTABLISHED
+- ear-shape accuracy: NOT ESTABLISHED
+- subject-specific ear likeness: NOT ESTABLISHED
+- anatomical ear ground truth: NO
+- downstream use: bounded localization / correspondence only
+- Phase 8 Item 11.15: ACTIVE / HOLD-BLOCKED
+- R7.8: ACTIVE
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b4_ears_interim`
+- next: R7.8 / B5 — Side silhouettes global objective
+
+## PHASE8_ITEM11_15_R7_8_B5_1_EXISTING_SILHOUETTE_OBJECTIVE_COMPOSITION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.1
+- status: PARTIAL + PERSISTED
+- silhouette residual weight: `0.0991588853725`
+- silhouette multiplier: `sqrt(weight)`
+- static105 present for every training view: YES
+- silhouette replaces static105: NO
+- silhouette role: bounded auxiliary objective
+- camera source for silhouette: static105-resolved camera for same view
+- objective composition: static105 + optional silhouette across views + optional identity regularization
+- exact silhouette-enabled view set: NOT YET VERIFIED
+- B5.1 closed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.1 — verify `SILHOUETTE_TRANSFERRED_S` view set
+
+## PHASE8_ITEM11_15_R7_8_B5_1_FINAL_EXISTING_SILHOUETTE_OBJECTIVE_INVENTORY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.1
+- status: CLOSED + PERSISTED
+- silhouette residual weight: `0.0991588853725`
+- static105: all training views
+- silhouette: side views only
+- exact silhouette-enabled views: `turn_right`, `turn_left`
+- front silhouette objective enabled: NO
+- same-view static105-resolved camera used: YES
+- silhouette replaces static105: NO
+- silhouette role: bounded auxiliary objective
+- dedicated side-view visibility masks: YES
+- B5.1 closed: YES
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.2 — bilateral/global objective contract
+
+## PHASE8_ITEM11_15_R7_8_B5_2_1_TRAINING_PAIR_VS_SILHOUETTE_COVERAGE_AUDIT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.2.1
+- status: CLOSED + PERSISTED
+- held_out_front bilateral side silhouettes simultaneous: YES
+- held_out_turn_right bilateral side silhouettes simultaneous: NO
+- held_out_turn_left bilateral side silhouettes simultaneous: NO
+- global bilateral objective present in all cases: NO
+- held-out benchmark equivalent to global bilateral objective: NO
+- architectural consequence: B5 needs an explicit bilateral/global side-silhouette objective contract
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.2.2 — global bilateral objective requirement
+
+## PHASE8_ITEM11_15_R7_8_B5_2_2_ADAPTIVE_GLOBAL_OBJECTIVE_REQUIREMENT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.2.2
+- status: CLOSED + PERSISTED
+- existing fitter accepts exactly two unique views: YES
+- general multi-view/global fitter currently present: NO
+- global multi-view identity objective: REQUIRED BUT NOT PRESENT
+- use all available qualified views: YES
+- three images mandatory: NO
+- missing view blocks pipeline: NO
+- missing view reduces evidence scope: YES
+- bilateral silhouette simultaneous when both side views available: REQUIRED
+- missing side view may be treated as observed evidence: NO
+- shared identity across available qualified views: YES
+- per-view camera remains independently static105-resolved: YES
+- held-out benchmark modification required: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.2.3 — front/side contribution and missing-view contract
+
+## PHASE8_ITEM11_15_R7_8_B5_2_3_FRONT_SIDE_CONTRIBUTION_MISSING_VIEW_CONTRACT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.2.3
+- status: CLOSED + PERSISTED
+- use all available qualified views: YES
+- three images mandatory: NO
+- missing view blocks pipeline: NO
+- missing view reduces evidence scope: YES
+- missing view status: UNRESOLVED
+- static105 contributors: every qualified view
+- front silhouette: disabled under current verified contract
+- side silhouette: only when matching qualified side view exists
+- bilateral silhouette: both used when both side views exist
+- shared identity across available qualified views: YES
+- per-view camera solve: static105
+- mirrored/synthetic missing-view evidence allowed: NO
+- B5.2.3 closed: YES
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.3 — weighting / normalization audit
+
+## PHASE8_ITEM11_15_R7_8_B5_3_1_RESIDUAL_DIMENSION_AUDIT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.3.1
+- status: CLOSED + PERSISTED
+- static105 scalar residuals per view: 210
+- turn_right silhouette scalar residuals: 26
+- turn_left silhouette scalar residuals: 24
+- turn_right silhouette/static scalar-count ratio: 0.123810
+- turn_left silhouette/static scalar-count ratio: 0.114286
+- silhouette residual weight: 0.0991588853725
+- silhouette multiplier: 0.3148950386597096
+- weighting interpretation complete: NO
+- weight change authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.3.2 — effective weighting per view
+
+## PHASE8_ITEM11_15_R7_8_B5_3_2_EFFECTIVE_OBJECTIVE_CONTRIBUTION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.3.2
+- status: CLOSED + PERSISTED
+- metric class: empirical objective SSE contribution
+- turn_right silhouette/static SSE: 0.459155
+- turn_right silhouette share of data SSE: 0.314672
+- turn_left silhouette/static SSE: 0.483996
+- turn_left silhouette share of data SSE: 0.326144
+- bilateral silhouette/static SSE: 0.473458
+- bilateral silhouette share of data SSE: 0.321324
+- silhouette objective influence: MATERIAL
+- weight optimality: NOT ESTABLISHED
+- weight change authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.3.3 — 1/2/3-view normalization behavior
+
+## PHASE8_ITEM11_15_R7_8_B5_3_3_VIEW_COUNT_NORMALIZATION_BEHAVIOR_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.3.3
+- status: CLOSED + PERSISTED
+- current normalization scheme: raw concatenated residuals, no per-view normalization
+- right-only silhouette share: 0.314672
+- left-only silhouette share: 0.326144
+- right+left silhouette share: 0.321324
+- front+right silhouette share: 0.076626
+- front+left silhouette share: 0.100337
+- front+right+left silhouette share: 0.139399
+- objective weighting view-composition dependent: YES
+- raw concatenation view-count/composition invariant: NO
+- weight optimality: NOT ESTABLISHED
+- per-view normalization required: NOT YET ESTABLISHED
+- weight change authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.3.4 — weighting contract decision
+
+## PHASE8_ITEM11_15_R7_8_B5_3_4_NORMALIZATION_POLICY_DECISION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.3.4
+- status: CLOSED + PERSISTED
+- policy A: current raw concatenation
+- policy B: per-view residual-family mean SSE
+- policy C: global per-source mean SSE
+- current raw objective view-composition dependent: YES
+- policies B/C strongly amplify silhouette contribution: YES
+- normalization policy selected: NO
+- fixed global normalization justified by current evidence: NO
+- current raw objective retains baseline role: YES
+- alternative normalization allowed only as controlled experiment: YES
+- production normalization policy: UNRESOLVED
+- weight optimality: NOT ESTABLISHED
+- weight change authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.4 — controlled integration boundary
+
+## PHASE8_ITEM11_15_R7_8_B5_4_1_EXISTING_INTEGRATION_SEAM_AUDIT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.4.1
+- status: CLOSED + PERSISTED
+- general multi-view evaluation seam: `evaluate_training_identity`
+- exact two-view restriction location: `fit_two_view_identity`
+- held-out baseline path uses `fit_two_view_identity`: YES
+- held-out candidate path uses `fit_two_view_identity`: YES
+- adaptive/global fitter implemented: NO
+- existing benchmark modification authorized: NO
+- controlled integration requirement: reuse generic evaluation primitive while preserving held-out two-view benchmark semantics
+- silent benchmark-semantics change allowed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.4.2 — adaptive multi-view fitter boundary
+
+## PHASE8_ITEM11_15_R7_8_B5_4_2_ADAPTIVE_MULTI_VIEW_FITTER_BOUNDARY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.4.2
+- status: CLOSED + PERSISTED
+- common evaluation primitive: `evaluate_training_identity`
+- existing `fit_two_view_identity`: preserve unchanged
+- held-out call-site semantics change allowed: NO
+- separate adaptive entry point required: YES
+- conceptual adaptive entry point: `fit_available_views_identity`
+- adaptive fitter implemented: NO
+- adaptive views: one or more qualified available views
+- duplicate views allowed: NO
+- three images mandatory: NO
+- shared identity across supplied qualified views: YES
+- per-view camera solve: existing static105 path
+- side silhouette: matching qualified side views only
+- missing-view synthetic/mirrored observed evidence: NO
+- raw concatenation retains baseline role: YES
+- experimental normalization must remain explicit/separate: YES
+- production normalization policy: UNRESOLVED
+- existing two-view fitter mutation authorized: NO
+- new fitter implementation authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.4.3 — baseline/experimental policy isolation
+
+## PHASE8_ITEM11_15_R7_8_B5_4_3_BASELINE_EXPERIMENTAL_POLICY_ISOLATION_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.4.3
+- status: CLOSED + PERSISTED
+- silhouette baseline weight location: `evaluate_dynamic_silhouette`
+- objective baseline assembly location: `evaluate_training_identity`
+- baseline objective assembly: raw residual concatenation
+- baseline semantics immutable: YES
+- existing `fit_two_view_identity` unchanged: REQUIRED
+- held-out benchmark call sites unchanged: REQUIRED
+- experimental normalization must use separate explicit policy-aware assembly: YES
+- implicit global normalization flag allowed: NO
+- baseline and experimental metrics separately reportable: REQUIRED
+- baseline/experimental policy isolation: ESTABLISHED
+- production normalization policy: UNRESOLVED
+- experimental policy implemented: NO
+- new adaptive fitter implemented: NO
+- silent benchmark-semantics change allowed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5.4.4 — B5 closure challenge
+
+## PHASE8_ITEM11_15_R7_8_B5_4_4_CLOSURE_CHALLENGE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5 -> B5.4.4
+- status: CLOSED + PERSISTED
+- completeness audit: PASS
+- required evidence files: 9/9
+- continuity marker failures: 0
+- baseline invariant audit: PASS
+- overclaim contradiction audit: PASS
+- B5 closure challenge: PASS
+- B5 closure authorized by audit: YES
+- B5 final closure persisted by this step: NO
+- production normalization policy: UNRESOLVED
+- weight optimality: NOT ESTABLISHED
+- B6 started: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B5 final closure record
+
+## PHASE8_ITEM11_15_R7_8_B5_FINAL_CLOSURE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B5
+- status: CLOSED + PERSISTED
+- closure class: CLOSED_WITH_ARCHITECTURE_AND_WEIGHTING_BOUNDARIES
+- use all available qualified views: YES
+- three images mandatory: NO
+- missing-view synthetic/mirrored observed evidence: NO
+- bilateral silhouette when both sides available: REQUIRED
+- silhouette objective influence: MATERIAL
+- objective weighting view-composition dependent: YES
+- weight optimality: NOT ESTABLISHED
+- production normalization policy: UNRESOLVED
+- general multi-view evaluation seam: `evaluate_training_identity`
+- existing two-view benchmark path preserved: YES
+- separate adaptive entry point required: YES
+- adaptive fitter implemented: NO
+- closure challenge: PASS
+- B6 started: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b5_side_silhouette_interim`
+- next: R7.8 / B6 — anatomical correspondence verification
+
+## PHASE8_ITEM11_15_R7_8_B6_1_ANATOMICAL_CORRESPONDENCE_SOURCE_INVENTORY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.1
+- status: CLOSED + PERSISTED
+- audit class: correspondence source inventory
+- static105 embedding present: YES
+- dynamic embedding present: YES
+- lower-jaw MediaPipe semantic ID set present: YES
+- outer-eye MediaPipe semantic ID set present: YES
+- side visibility masks present: YES
+- transferred side targets present: YES
+- anatomical correspondence verified by this step: NO
+- static105 anatomical coverage verified: NO
+- dynamic silhouette anatomical correspondence verified: NO
+- cross-view correspondence consistency verified: NO
+- source naming/semantic labels accepted as proof: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.2 — static105 anatomical coverage audit
+
+## PHASE8_ITEM11_15_R7_8_B6_2_1_STATIC105_PROVENANCE_EXACT_ID_INVENTORY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.2.1
+- status: CLOSED + PERSISTED
+- static105 count: 105
+- unique MediaPipe IDs: 105
+- unique FLAME faces: 105
+- barycentric shape: 105x3
+- outer-eye IDs 263/33 represented: YES
+- LOWER_JAW_IDS overlap with static105: 0
+- anatomical correspondence verified: NO
+- static105 anatomical correspondence: NOT YET VERIFIED
+- R7.8 progress estimate: ~67 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.2.2 — facial-region coverage classification
+
+## PHASE8_ITEM11_15_R7_8_B6_2_2_STATIC105_EXPLICIT_FACIAL_REGION_COVERAGE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.2.2
+- status: CLOSED + PERSISTED
+- semantic-definition lexical hits: 69
+- explicit outer-eye set present: YES
+- explicit lower-jaw set present: YES
+- outer-eye IDs 263/33 represented in static105: YES
+- lower-jaw overlap with static105: 0
+- complete static105 anatomical-region classification established: NO
+- static105 explicit full-region classification: UNRESOLVED
+- anatomical coverage inferred from names: NO
+- static105 anatomical correspondence: NOT YET VERIFIED
+- R7.8 progress estimate: ~68 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.2.3 — excluded/missing outer-head anatomy
+
+## PHASE8_ITEM11_15_R7_8_B6_2_3_EXCLUDED_MISSING_OUTER_HEAD_ANATOMY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.2.3
+- status: CLOSED + PERSISTED
+- lower-jaw static105 overlap: 0
+- static105 directly constrains 36-point outer face oval: NO
+- static105 cranium GT: NOT ESTABLISHED
+- static105 ear anatomical GT: NOT ESTABLISHED
+- static105 complete outer-head coverage: NOT ESTABLISHED
+- static105 complete silhouette coverage: NOT ESTABLISHED
+- new anatomical mapping created: NO
+- anatomical correspondence verified by this step: NO
+- R7.8 progress estimate: ~69 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.3 — dynamic silhouette anatomical correspondence audit
+
+## PHASE8_ITEM11_15_R7_8_B6_3_DYNAMIC_SILHOUETTE_CORRESPONDENCE_AUDIT_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.3
+- status: CLOSED + PERSISTED
+- dynamic embedding: 79 yaw bins x 17 contour points
+- image jaw source: 21 MediaPipe contour points
+- transferred-S: view-specific
+- visibility masks: view-specific
+- correspondence class: VIEW_DEPENDENT_GEOMETRIC_CONTOUR_CORRESPONDENCE
+- fixed MediaPipe -> fixed FLAME anatomical mapping: NO
+- dynamic silhouette anatomical equivalence: NOT VERIFIED
+- cross-view correspondence consistency: NOT YET VERIFIED
+- R7.8 progress estimate: ~70 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.4 — cross-view correspondence consistency
+
+## PHASE8_ITEM11_15_R7_8_B6_4_1_DYNAMIC_CROSS_VIEW_CORRESPONDENCE_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.4.1
+- status: CLOSED + PERSISTED
+- total dynamic slots: 17
+- same FLAME face slots right vs left: 0
+- exact same face+barycentric slots: 0
+- both-visible slots: 8
+- visibility Jaccard: 0.470588
+- transferred-S equal slots: 0
+- same slot implies same FLAME surface location: NO
+- fixed slotwise anatomical correspondence across right/left: NO
+- anatomical cross-view equivalence: NOT VERIFIED
+- R7.8 progress estimate: ~71 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.4.2 — transferred-S / visibility consistency
+
+## PHASE8_ITEM11_15_R7_8_B6_4_2_TRANSFERRED_S_VISIBILITY_CONSISTENCY_2026_08_31
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.4.2
+- status: CLOSED + PERSISTED
+- transferred-S order preserved both views: YES
+- visible transferred-S order preserved both views: YES
+- right visible contour bins: 5/5
+- left visible contour bins: 4/5
+- coverage-bin Jaccard: 0.8
+- both-visible slots: 8
+- right-only visible slots: 5
+- left-only visible slots: 4
+- slotwise parameterization identical: NO
+- visibility masks identical: NO
+- cross-view contour-order consistency: SUPPORTED
+- cross-view broad contour coverage: SUPPORTED WITH VIEW-SPECIFIC DIFFERENCES
+- cross-view slotwise correspondence: NOT SUPPORTED
+- anatomical equivalence: NOT VERIFIED
+- R7.8 progress estimate: ~72 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.4.3 — cross-view correspondence classification
+
+## PHASE8_ITEM11_15_R7_8_B6_4_3_CROSS_VIEW_CORRESPONDENCE_CLASSIFICATION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.4.3
+- status: CLOSED + PERSISTED
+- cross-view correspondence class: ORDERED_VIEW_DEPENDENT_GEOMETRIC_CONTOUR_CORRESPONDENCE
+- cross-view anatomical correspondence: NOT VERIFIED
+- cross-view fixed slotwise correspondence: NO
+- cross-view geometric order consistency: SUPPORTED
+- broad contour coverage: SUPPORTED WITH VIEW-SPECIFIC DIFFERENCES
+- same-slot anatomical equivalence accepted: NO
+- new anatomical mapping created: NO
+- R7.8 progress estimate: ~72 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6.5 — correspondence closure challenge
+
+## PHASE8_ITEM11_15_R7_8_B6_5_CORRESPONDENCE_CLOSURE_CHALLENGE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6 -> B6.5
+- status: CLOSED + PERSISTED
+- completeness audit: PASS
+- required evidence files: 9/9
+- boundary token audit: PASS
+- overclaim audit: PASS
+- internal consistency audit: PASS
+- B6 closure challenge: PASS
+- B6 closure authorized by audit: YES
+- B6 final closure persisted by this step: NO
+- static105 full-region classification: UNRESOLVED
+- dynamic silhouette anatomical equivalence: NOT VERIFIED
+- cross-view slotwise correspondence: NOT SUPPORTED
+- cross-view anatomical correspondence: NOT VERIFIED
+- R7.8 progress estimate: ~73 percent
+- progress estimate is formal metric: NO
+- B7 started: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B6 final closure record
+
+## PHASE8_ITEM11_15_R7_8_B6_FINAL_CLOSURE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B6
+- status: CLOSED + PERSISTED
+- closure class: CLOSED_WITH_BOUNDED_GEOMETRIC_CORRESPONDENCE_ONLY
+- static105 full-region classification: UNRESOLVED
+- lower-jaw static105 overlap: 0
+- static105 full face oval direct constraint: NO
+- dynamic silhouette correspondence: VIEW_DEPENDENT_GEOMETRIC_CONTOUR_CORRESPONDENCE
+- dynamic silhouette anatomical equivalence: NOT VERIFIED
+- cross-view correspondence: ORDERED_VIEW_DEPENDENT_GEOMETRIC_CONTOUR_CORRESPONDENCE
+- cross-view geometric order consistency: SUPPORTED
+- cross-view slotwise correspondence: NOT SUPPORTED
+- cross-view anatomical correspondence: NOT VERIFIED
+- B6 closure challenge: PASS
+- B7 started: NO
+- R7.8 progress estimate: ~74 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b6_anatomical_correspondence_interim`
+- next: R7.8 / B7 — controlled refit
+
+## PHASE8_ITEM11_15_R7_8_B7_1_CONTROLLED_REFIT_INPUT_STATE_INVENTORY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.1
+- status: CLOSED + PERSISTED
+- primary persisted refit state source: REPRODUCIBILITY_CANDIDATE_2P5
+- baseline initial identity: `baseline_shared_identity_parameters`
+- candidate initial identity: `shared_identity_parameters`
+- identity delta source: `identity_delta`
+- root-pose source: persisted per-view root poses from candidate NPZ
+- held-out case identities accepted as one global baseline: NO
+- camera policy: re-solve independently per view from static105
+- static105 policy: every qualified view
+- side silhouette policy: matching qualified side views only
+- front silhouette: disabled
+- expression: neutral
+- weight change authorized: NO
+- production normalization policy: UNRESOLVED
+- anatomical equivalence required for B7: NO
+- bounded geometric correspondence allowed: YES
+- refit executed: NO
+- R7.8 progress estimate: ~75 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: R7.8 / B7.2 — controlled objective definition
+
+## PHASE8_ITEM11_15_R7_8_B7_2_1_300D_TO_90D_OPTIMIZER_STATE_CONTRACT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.2.1
+- status: CLOSED + PERSISTED
+- model identity dimension: 300
+- active optimizer dimension: 90
+- baseline/candidate tail after index 90: zero
+- persisted 90D delta matches first-90 full delta: YES
+- first-90 composition reconstructs baseline full identity: YES
+- first-90 composition reconstructs candidate full identity: YES
+- mapping: VERIFIED_FIRST_90_ACTIVE_ZERO_TAIL
+- B7 90D baseline initial state verified: YES
+- B7 90D candidate initial state verified: YES
+- refit executed: NO
+- objective policy changed: NO
+- R7.8 progress estimate: ~76 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: R7.8 / B7.2.2 — baseline/candidate objective parity
+
+## PHASE8_ITEM11_15_R7_8_B7_2_2_BASELINE_CANDIDATE_OBJECTIVE_PARITY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.2.2
+- status: CLOSED + PERSISTED
+- train views: front + turn_right + turn_left
+- static-only objective dimension: 630 / 630 — VERIFIED parity
+- combined objective dimension: 680 / 680 — VERIFIED parity
+- static-only baseline SSE: 0.0083117415109872
+- static-only candidate SSE: 0.0084559677206708
+- static-only candidate relative change: 1.735210 percent
+- combined baseline SSE: 0.0111539665847744
+- combined candidate SSE: 0.0102005654089437
+- combined candidate relative change: -8.547642 percent
+- combined objective candidate improvement: YES
+- static105-only candidate improvement: NO
+- interpretation: objective-level trade-off only
+- improved likeness established: NO
+- anatomical accuracy improvement established: NO
+- regularization included in this diagnostic: NO
+- refit executed: NO
+- production normalization policy: UNRESOLVED
+- R7.8 progress estimate: ~77 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: R7.8 / B7.2.3 — controlled-refit contract
+
+## PHASE8_ITEM11_15_R7_8_B7_2_3_INTERIM_OPTIMIZER_CONTRACT_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.2.3
+- status: INTERIM FINDING + PERSISTED
+- active identity count: 90
+- solver method: TRF
+- silhouette residual weight: 0.0991588853725
+- regularization included during identity optimization: YES
+- previous symbol `IDENTITY_BOUND`: NOT PRESENT
+- previous symbol `IDENTITY_REGULARIZATION_WEIGHT`: NOT PRESENT
+- observed bound symbol: `IDENTITY_PARAMETER_LIMIT`
+- observed tolerance symbols: `IDENTITY_FTOL`, `IDENTITY_XTOL`, `IDENTITY_GTOL`
+- observed iteration-limit symbol: `IDENTITY_MAX_NFEV`
+- exact bound value: UNRESOLVED
+- exact tolerances: UNRESOLVED
+- exact max_nfev: UNRESOLVED
+- exact regularization form/coefficient: UNRESOLVED
+- final B7.2.3 contract closed: NO
+- refit executed: NO
+- R7.8 progress estimate: ~77 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: B7.2.3 exact constants and regularization audit
+
+## PHASE8_ITEM11_15_R7_8_B7_2_3_EXACT_OPTIMIZER_REGULARIZATION_FORM_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.2.3
+- status: INTERIM FINDING + PERSISTED
+- active identity count: 90
+- identity bounds: [-3.0, +3.0]
+- solver: TRF
+- ftol: 1e-10
+- xtol: 1e-10
+- gtol: 1e-10
+- max_nfev: 60
+- silhouette residual weight: 0.0991588853725
+- regularization symbol: `REGULARIZATION_WEIGHT`
+- regularization residual form: `sqrt(REGULARIZATION_WEIGHT) * active_identity`
+- regularization residual dimension: 90
+- exact REGULARIZATION_WEIGHT value: UNRESOLVED
+- final B7.2.3 contract closed: NO
+- refit executed: NO
+- R7.8 progress estimate: ~78 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: resolve exact `REGULARIZATION_WEIGHT`
+
+## PHASE8_ITEM11_15_R7_8_B7_2_3_EXACT_REGULARIZATION_WEIGHT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.2.3
+- status: INTERIM FINDING + PERSISTED
+- regularization weight: 1e-05
+- regularization residual multiplier: 0.0031622776601683794
+- regularization form: `sqrt(REGULARIZATION_WEIGHT) * active_identity`
+- regularization residual dimension: 90
+- exact optimizer numeric constants resolved: YES
+- identity bounds: [-3.0, +3.0]
+- solver: TRF
+- tolerances: ftol=xtol=gtol=1e-10
+- max_nfev: 60
+- silhouette residual weight: 0.0991588853725
+- B7.2.3 final contract closed: NO
+- refit executed: NO
+- production normalization policy: UNRESOLVED
+- R7.8 progress estimate: ~79 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: B7.2.3 final controlled-refit contract
+
+## PHASE8_ITEM11_15_R7_8_B7_2_3_FINAL_CONTROLLED_REFIT_CONTRACT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.2.3
+- status: CLOSED + PERSISTED
+- contract class: CONTROLLED_GLOBAL_IDENTITY_REFIT_WITH_BOUNDED_SIDE_CONTOURS
+- identity: shared 90D active state, embedded in 300D with zero tail
+- baseline start: persisted baseline shared identity first 90
+- candidate start: persisted silhouette-aware shared identity first 90
+- views: all available qualified views
+- current views: front + turn_right + turn_left
+- root poses: persisted per-view and fixed during identity refit
+- camera: re-solve per view from static105 for each identity evaluation
+- expression: neutral
+- front observation: static105 only
+- side observation: static105 + matching bounded dynamic silhouette
+- anatomical equivalence assumed: NO
+- objective assembly: current raw concatenation
+- production normalization policy: UNRESOLVED
+- normalization change authorized: NO
+- silhouette residual weight: 0.0991588853725
+- weight change authorized: NO
+- regularization weight: 1e-05
+- regularization: sqrt(1e-05) * active identity
+- identity bounds: [-3.0, +3.0]
+- solver: TRF
+- ftol / xtol / gtol: 1e-10
+- max_nfev: 60
+- B7.3 refit result alone proves likeness: NO
+- B7.3 refit result alone proves anatomical accuracy: NO
+- B7.2 controlled objective definition: CLOSED
+- B7.3 started: NO
+- R7.8 progress estimate: ~80 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: R7.8 / B7.3 — controlled refit execution
+
+## PHASE8_ITEM11_15_R7_8_B7_3_CONTROLLED_THREE_VIEW_REFIT_EXECUTION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.3
+- status: CLOSED + PERSISTED
+- execution: controlled global three-view identity refit
+- baseline start success: YES, nfev=11
+- candidate start success: YES, nfev=3
+- baseline data SSE: 0.011153966584774355 -> 0.010200565408943733
+- candidate data SSE: 0.010200565408943733 -> 0.010200561831418644
+- baseline delta-from-start L2: 4.93594225721593
+- candidate delta-from-start L2: 0.0001618910418394629
+- final identity L2 difference across starts: 0.0001618910418394629
+- final max absolute parameter difference: 5.574532789676123e-05
+- exact numerical equality at 1e-6: NO
+- convergence class: SAME_NUMERICAL_BASIN_PRACTICALLY_CONVERGED
+- bound hits: 6 for both solutions
+- persisted candidate already near locked-objective optimum: SUPPORTED
+- visual likeness established: NO
+- anatomical accuracy established: NO
+- FLAME capacity limitation: NOT ESTABLISHED
+- R7.8 progress estimate: ~82 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: R7.8 / B7.4 — quantitative comparison
+
+## PHASE8_ITEM11_15_R7_8_B7_4_CONTROLLED_REFIT_QUANTITATIVE_COMPARISON_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.4
+- status: CLOSED + PERSISTED
+- quantitative trade-off class: SILHOUETTE_GAIN_WITH_STATIC105_COLLATERAL_DEGRADATION
+- static105 total SSE change: +1.735210 percent
+- weighted side-silhouette SSE change: -38.618595 percent
+- combined data SSE change: -8.547642 percent
+- total objective SSE change: -5.917774 percent
+- right silhouette raw RMS change: -19.331429 percent
+- left silhouette raw RMS change: -23.059059 percent
+- front static RMS change: -1.352995 percent
+- right static RMS change: +1.938881 percent
+- left static RMS change: +2.238751 percent
+- identity bound hits: 3 -> 6
+- final vs persisted candidate L2: 0.0
+- visual likeness assessed: NO
+- likeness improvement established: NO
+- anatomical accuracy improvement established: NO
+- FLAME capacity limitation: NOT ESTABLISHED
+- R7.8 progress estimate: ~84 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: R7.8 / B7.5 — visual neutral-mesh check
+
+## PHASE8_ITEM11_15_R7_8_B7_5_1_EXISTING_NEUTRAL_MESH_RENDER_ROUTE_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5.1
+- status: CLOSED + PERSISTED
+- runner callable candidate count: 1
+- discovered callable: `AtlasPortraitFlamePosedVertexComposer`
+- direct model render/preview/export API count: 0
+- existing complete neutral-mesh render route: NOT VERIFIED
+- posed vertex composer available: YES
+- posed vertex composer source/origin audited: NO
+- new render route created: NO
+- visual render executed: NO
+- visual likeness assessed: NO
+- likeness established: NO
+- R7.8 progress estimate: ~85 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: inspect `AtlasPortraitFlamePosedVertexComposer` source/import origin
+
+## PHASE8_ITEM11_15_R7_8_B7_5_1A_POSED_VERTEX_COMPOSER_SOURCE_ORIGIN_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5.1a
+- status: CLOSED + PERSISTED
+- class: `AtlasPortraitFlamePosedVertexComposer`
+- module: `CORE.atlas_portrait_flame_posed_vertex_composer`
+- source: reproducibility runtime snapshot
+- public API: `compose(model, shaped_vertices, pose_corrective_offsets)`
+- verified operation: shaped vertices + pose corrective offsets
+- identity -> neutral shaped vertices generated by this class: NO
+- mesh topology/export provided by this class: NO
+- render/preview provided by this class: NO
+- complete B7.5 render route: NO
+- downstream vertex-composition seam: YES
+- visual likeness assessed: NO
+- likeness established: NO
+- R7.8 progress estimate: ~86 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: B7.5.1b identity-shape / shaped-vertex producer audit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_1B_IDENTITY_SHAPE_SHAPED_VERTEX_PRODUCER_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5.1b
+- status: CLOSED + PERSISTED
+- runtime source candidates: 16
+- primary identity-to-shaped-vertex producer candidate: `AtlasPortraitFlameBlendshapeEvaluator`
+- candidate basis: identity + expression + blendshape semantics present in runtime source
+- downstream/integration candidates: fitted mesh builder, identity fitter, root-pose fitter
+- direct source-file import failures interpreted as component failure: NO
+- exact blendshape public method verified: NO
+- identity + neutral expression -> shaped vertices verified: NO
+- neutral vertices generated: NO
+- mesh rendered: NO
+- visual likeness assessed: NO
+- R7.8 progress estimate: ~87 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: B7.5.1c exact blendshape producer API audit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_1C_EXACT_BLENDSHAPE_PRODUCER_API_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5.1c
+- status: CLOSED + PERSISTED
+- producer: `AtlasPortraitFlameBlendshapeEvaluator.evaluate(model, parameters)`
+- identity offset source: identity shape directions × identity parameters
+- expression offset source: expression shape directions × expression parameters
+- output: template vertices + identity offset + expression offset
+- runner uses evaluator for `shaped_vertices`: YES
+- identity-to-shaped-vertex producer: VERIFIED
+- zero-expression neutral shaped-vertex path: mathematically supported
+- exact B7 fitting-parameter construction verified: NO
+- neutral vertices generated: NO
+- mesh rendered: NO
+- visual likeness assessed: NO
+- R7.8 progress estimate: ~88 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: B7.5.1d neutral fitting-parameter construction audit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_1D_NEUTRAL_FITTING_PARAMETER_CONTRACT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5.1d
+- status: CLOSED + PERSISTED
+- fitting-parameter fields: identity, expression, pose, metadata
+- separate root/jaw/neck/eye pose fields: NO
+- canonical neutral expression: zero
+- canonical neutral pose: zero
+- neutral shaped-vertex producer: `AtlasPortraitFlameBlendshapeEvaluator.evaluate`
+- neutral identity shaped-vertex path: VERIFIED
+- posed-vertex composer required for canonical neutral identity geometry: NO
+- downstream root-pose parameter object used for neutral likeness geometry: NO
+- canonical neutral baseline/final comparison route: VERIFIED
+- neutral vertices generated: NO
+- mesh rendered: NO
+- visual likeness assessed: NO
+- likeness established: NO
+- R7.8 progress estimate: ~89 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: B7.5.2 baseline vs controlled-final neutral geometry
+
+## PHASE8_ITEM11_15_R7_8_B7_5_2A_CANONICAL_NEUTRAL_GEOMETRY_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5.2a
+- status: CLOSED + PERSISTED
+- baseline neutral geometry: 5023×3, finite
+- controlled-final neutral geometry: 5023×3, finite
+- zero expression: VERIFIED
+- zero pose: VERIFIED
+- active90 tail after index 90: zero for both states
+- RMS neutral displacement: 0.004618469221044006
+- RMS displacement / baseline bbox diagonal: 1.042510 percent
+- p95 displacement / baseline bbox diagonal: 2.044306 percent
+- max displacement / baseline bbox diagonal: 3.551914 percent
+- baseline X extent: 0.20400712665928217
+- controlled-final X extent: 0.18846872628557593
+- baseline Y extent: 0.33237747104608084
+- controlled-final Y extent: 0.3343423773787356
+- baseline Z extent: 0.21016218284492538
+- controlled-final Z extent: 0.20247514936980976
+- geometry ready for matched visualization: YES
+- visual likeness assessed: NO
+- likeness improvement established: NO
+- anatomical accuracy improvement established: NO
+- FLAME capacity limitation: NOT ESTABLISHED
+- R7.8 progress estimate: ~90 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: B7.5.2b matched visual render
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NEW_SUBJECT_FRONTAL_DIAGNOSTIC_USABILITY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- diagnostic class: FRONTAL_SINGLE_VIEW_SOURCE_USABILITY
+- source usable for frontal single-view identity diagnostic: YES
+- tight 640x640 crop visually acceptable: YES
+- forehead/cranium preserved: YES
+- both ears visible: YES
+- jaw/chin readable: YES
+- nose/orbit/mouth readable: YES
+- multiview identity evidence: NO
+- side-silhouette evidence: NO
+- three-view controlled objective allowed: NO
+- cross-view identity preservation evidence: NO
+- main B7 acceptance replaced by this diagnostic: NO
+- new-subject fitting started: NO
+- likeness established: NO
+- R7.8 progress estimate: ~90 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: new-subject frontal single-view identity diagnostic
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NEW_SUBJECT_LANDMARK_RECOVERY_ROUTE_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- diagnostic: new-subject frontal single-view identity diagnostic
+- route-audit status: CLOSED + PERSISTED
+- runner consumes pre-existing MediaPipe landmark JSON: YES
+- expected landmark count: 478
+- runner direct photo-to-landmark extraction: NO
+- runtime contains MediaPipe/landmark-related fitting components: YES
+- direct extraction route verified: NO
+- new-subject landmark extraction route: NOT YET VERIFIED
+- new mapping created: NO
+- landmark extraction executed: NO
+- new-subject fitting executed: NO
+- likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: find historical 478-landmark extraction route used for the original personal multiview photos
+
+## PHASE8_ITEM11_15_R7_8_B7_5_HISTORICAL_478_LANDMARK_EXTRACTION_ROUTE_DISCOVERY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- diagnostic: new-subject frontal single-view identity diagnostic
+- status: CLOSED + PERSISTED
+- high-confidence historical extraction-script candidates: 0
+- historical 478-landmark extraction route: UNRESOLVED
+- route discovery class: NO_HIGH_CONFIDENCE_CANDIDATE
+- absence of discovered script interpreted as proof that no extractor existed: NO
+- new-subject extraction route verified: NO
+- landmark extraction executed: NO
+- new mapping created: NO
+- new-subject fitting executed: NO
+- main B7 acceptance replaced by this diagnostic: NO
+- likeness established: NO
+- R7.8 progress estimate: ~90 percent
+- progress estimate is formal metric: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: inspect provenance/metadata of existing landmark JSON evidence
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NEW_SUBJECT_HISTORICAL_USE_TIMELINE_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- photo previously present in ATLAS evidence: YES
+- pre-existing evidence context: expression_separation_8_8
+- source_neutral.PNG filesystem mtime: 2026-08-27T00:12:23
+- landmarks_neutral.json filesystem mtime: 2026-08-27T00:20:47
+- target hash present in pre-existing evidence: YES
+- first introduction time: UNRESOLVED
+- source_neutral.PNG byte identity with current source: NOT YET VERIFIED
+- exact extraction script verified: NO
+- landmark extraction executed: NO
+- new-subject fitting executed: NO
+- likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: direct SHA256 byte-identity audit of source_neutral.PNG vs current source
+
+## PHASE8_ITEM11_15_R7_8_B7_5_SOURCE_NEUTRAL_BYTE_IDENTITY_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- old source SHA256: b8915ab2f6ed6b7535b3cdb3ca4c53b0bb85f1e9eca153e58db9747d533c309d
+- current source SHA256: b8915ab2f6ed6b7535b3cdb3ca4c53b0bb85f1e9eca153e58db9747d533c309d
+- source_neutral.PNG byte identity with current source: VERIFIED EXACT
+- photo previously used in ATLAS evidence: VERIFIED EXACT
+- old source matches landmark metadata SHA256: YES
+- current source matches landmark metadata SHA256: YES
+- first introduction time: UNRESOLVED
+- exact extraction script verified: NO
+- landmark extraction executed: NO
+- new-subject fitting executed: NO
+- likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: use the verified existing neutral landmark observation for the frontal diagnostic
+
+## PHASE8_ITEM11_15_R7_8_B7_5_FRONTAL_SINGLE_VIEW_IDENTITY_FIT_ROUTE_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- verified observation source: landmarks_neutral.json
+- source byte identity: VERIFIED EXACT
+- identity fitter candidate found: YES
+- identity fitter candidate: AtlasPortraitFlameIdentityFitter.fit
+- existing single-view identity route verified: NO
+- single-view support: NOT YET VERIFIED
+- new mapping created: NO
+- landmark extraction executed: NO
+- new-subject fitting executed: NO
+- likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: inspect exact fit() and fitting-input contract before any execution
+
+## PHASE8_ITEM11_15_R7_8_B7_5_SINGLE_VIEW_IDENTITY_FITTER_EXACT_CONTRACT_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- fitter: AtlasPortraitFlameIdentityFitter.fit
+- single-view identity fitter API support: VERIFIED
+- single landmark-result input: YES
+- view collection required: NO
+- minimum view-count guard present: NO
+- root pose fixed: YES
+- expression neutral/zero: YES
+- non-root pose zero: YES
+- camera re-solved per identity candidate: YES
+- identity parameter limit default: 3.0
+- regularization weight default: 1e-5
+- optimizer: scipy least_squares TRF
+- ftol/xtol/gtol: 1e-12
+- end-to-end single-view route verified: NO
+- dense-input compatibility verified: NO
+- new-subject fitting executed: NO
+- likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: dense-input + static embedding compatibility audit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_DENSE_INPUT_STATIC105_COMPATIBILITY_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- observation landmark count: 478
+- static embedding count: 105
+- static105 compatibility: VERIFIED
+- dense input build success: YES
+- source points finite: YES
+- target points finite: YES
+- landmark weights finite: YES
+- end-to-end single-view route ready for controlled fit: YES
+- identity optimizer executed: NO
+- new mapping created: NO
+- landmark extraction executed: NO
+- new-subject fitting executed: NO
+- likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: controlled frontal single-view identity fit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NEW_SUBJECT_FIXED_ROOT_POSE_PROVENANCE_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- current source byte identity: VERIFIED EXACT
+- current-source fixed root-pose provenance: VERIFIED
+- fixed root pose: [0.02470516700136906, 0.01829744111529926, -0.00047345523113824923]
+- pose source: expression_separation_8_8.neutral_control_root_pose
+- JSON / NPZ cross-artifact match: YES
+- zero root pose assumed: NO
+- identity optimizer executed: NO
+- new-subject fitting executed: NO
+- likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: controlled frontal single-view identity fit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_CONTROLLED_FRONTAL_SINGLE_VIEW_IDENTITY_FIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: EXECUTED + PERSISTED
+- diagnostic class: frontal single-view static105 identity fit
+- optimizer success: YES
+- optimizer status: 3 / xtol
+- function evaluations: 25
+- initial weighted RMSE: 0.007669288420049056
+- final weighted RMSE: 0.0016654831516699127
+- weighted RMSE improvement: 78.28373298211075 percent
+- RMSE improvement interpreted as likeness percentage: NO
+- active identity L2: 5.656064349193596
+- active identity max abs: 2.9999999999999973
+- identity bound hits: 1
+- inactive tail all zero: YES
+- frontal static105 fit numerically successful: YES
+- likeness established: NO
+- head-shape likeness established: NO
+- side silhouette evidence: NO
+- multiview identity evidence: NO
+- neutral mesh visual check executed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: neutral mesh visual comparison against the verified source
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NEUTRAL_MESH_VISUAL_COMPARISON_RESULT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: PARTIAL VISUAL EVIDENCE + PERSISTED
+- actual FLAME geometry generated: YES
+- neutral mesh: 5023 vertices / 9976 triangles
+- generative image used: NO
+- final weighted RMSE: 0.0016654831516699127
+- source-matched projection visually coherent: YES
+- canonical neutral render valid for likeness: NO
+- rejection reason: WRONG VIEW AXIS ORIENTATION
+- fitted geometry rejected: NO
+- likeness established: NO
+- head-shape likeness established: NO
+- corrected frontal neutral render executed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: determine correct neutral-mesh frontal view axis using the same fitted geometry
+
+## PHASE8_ITEM11_15_R7_8_B7_5_CORRECT_NEUTRAL_MESH_FRONTAL_VIEW_AXIS_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- canonical frontal view axis: X-Y
+- profile view axis: Y-Z
+- previous X-Z render invalid for likeness: YES
+- mesh refit executed: NO
+- identity parameters changed: NO
+- geometry changed: NO
+- fitted geometry rejected: NO
+- likeness established: NO
+- head-shape likeness established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: matched frontal likeness comparison using X-Y
+
+## PHASE8_ITEM11_15_R7_8_B7_5_MATCHED_COMPARISON_COORDINATE_FRAME_REJECTION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: REJECTED + PERSISTED
+- matched comparison rejected: YES
+- rejection reason: CAMERA COORDINATE FRAME MISMATCH
+- raw neutral vertices directly projected with fitted camera: INVALID
+- fitter camera coordinate frame parity preserved: NO
+- ear anatomy problem: POSSIBLE BUT NOT YET SEPARABLE FROM PROJECTION ERROR
+- ear anatomy judgment valid: NO
+- likeness judgment: DEFERRED
+- fitted identity rejected: NO
+- new fit required: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: rebuild comparison through exact fitter image-coordinate normalization chain
+
+## PHASE8_ITEM11_15_R7_8_B7_5_SUBJECT_SPECIFIC_FRONTAL_GEOMETRY_REJECTION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: REJECTED + PERSISTED
+- projection parity: VERIFIED
+- current finding scope: SUBJECT SPECIFIC DIAGNOSTIC
+- ear geometry: REJECT
+- ear lateral projection: EXCESSIVE
+- upper cranium outer boundary: REJECT
+- temporal/parietal lateral bulge: EXCESSIVE
+- nostril frontal exposure: REJECT
+- source nostril visibility: MINIMAL OR NONE
+- fitted nostril visibility: EXCESSIVE
+- frontal static105 internal fit numerically successful: YES
+- outer-head likeness sufficient: NO
+- nose 3D morphology likeness sufficient: NO
+- direct frontal likeness gate: FAIL CURRENT FIT
+- potential systemic cause: STATIC105 OUTER-HEAD AND 3D-NOSE UNDERCONSTRAINT
+- general ATLAS fix authorized: NO
+- cross-subject confirmation required: YES
+- FLAME capacity limitation established: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: quantify frontal outer-head, ear, and nose residuals
+
+## PHASE8_ITEM11_15_R7_8_B7_5_RESIDUAL_MEASUREMENT_SOURCE_AUDIT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- face-oval observation measurable: YES
+- face-oval anatomical correspondence residual established: NO
+- static105 full face-oval direct constraint: NO
+- upper-cranium metric residual from current 478: NO
+- cranial metric ground truth: NO
+- ear anatomical residual from current static105: NO
+- static105 ear anatomical ground truth: NOT ESTABLISHED
+- nose 2D residual: REQUIRES EXACT MAPPING AUDIT
+- nostril 3D orientation residual from single frontal 2D: NO
+- current nostril evidence class: VISUAL REJECTION ONLY
+- quantitative residuals computed: NO
+- new mapping created: NO
+- geometry changed: NO
+- systemic architecture failure established: NO
+- general ATLAS fix authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: exact nose MediaPipe-to-FLAME mapping audit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NOSE_MAPPING_AUDIT_PARSER_FALSE_NEGATIVE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CORRECTED FINDING + PERSISTED
+- previous regex-derived no-mapping result valid: NO
+- nose mapping audit parser false negative: YES
+- existing barycentric nose mapping evidence present: YES
+- observed nose_base MediaPipe IDs: 2, 326
+- observed nose_body MediaPipe IDs: 129, 98, 2, 327, 358
+- these IDs visible in static105 inventory: YES
+- authoritative dense nose segmentation: NO
+- exact nose ID/FLAME face/barycentric mapping: REQUIRES STRUCTURED JSON PARSE
+- nose 2D residual computed: NO
+- nostril 3D orientation residual computed: NO
+- new mapping created: NO
+- geometry changed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: structured JSON parse of exact nose mapping
+
+## PHASE8_ITEM11_15_R7_8_B7_5_STRUCTURED_NOSE_MAPPING_VERIFICATION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- exact barycentric nose mapping verified: YES
+- nose_base MediaPipe IDs: 2, 326
+- nose_body MediaPipe IDs: 129, 98, 2, 327, 358
+- nose_bridge MediaPipe IDs: 168, 6, 197, 195
+- total nose anchor records: 11
+- all nose anchor face/barycentric fields valid: YES
+- all listed nose IDs in static105: YES
+- authoritative dense nose segmentation: NO
+- nose 2D residual: READY
+- nostril 3D orientation residual: NOT ESTABLISHED
+- new mapping created: NO
+- geometry changed: NO
+- general ATLAS fix authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: compute verified nose-anchor 2D residuals
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NOSE_OBSERVATION_COORDINATE_CONTRACT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- coordinate representation: NORMALIZED IMAGE COORDINATES
+- landmark count: 478
+- image size: 1536 x 1152
+- pixel conversion: x*(W-1), y*(H-1)
+- nose anchor observations present: YES
+- nose observation coordinate contract: VERIFIED
+- nose 2D residual: READY
+- nostril 3D orientation residual: NOT ESTABLISHED
+- new mapping created: NO
+- geometry changed: NO
+- general ATLAS fix authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: compute verified nose-anchor 2D residuals
+
+## PHASE8_ITEM11_15_R7_8_B7_5_VERIFIED_NOSE_ANCHOR_2D_RESIDUALS_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- exact fitter projection path: VERIFIED
+- unique nose anchor count: 10
+- nose unique-anchor RMS: 3.751012515 px
+- nose_base RMS: 3.400048975 px
+- nose_body RMS: 4.523594479 px
+- nose_bridge RMS: 2.580171218 px
+- maximum anchor residual: 5.440181514 px
+- formal pixel acceptance threshold: NOT ESTABLISHED
+- visual nostril rejection remains: YES
+- 2D anchor error alone sufficient to explain nostril rejection: NO EVIDENCE
+- potential 3D nose morphology underconstraint: SUPPORTED, NOT PROVEN
+- nostril 3D orientation error quantified: NO
+- FLAME capacity failure: NOT ESTABLISHED
+- systemic ATLAS failure: NOT ESTABLISHED
+- general ATLAS fix authorized: NO
+- geometry changed: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: diagnose 3D nose morphology without a new fit
+
+## PHASE8_ITEM11_15_R7_8_B7_5_NOSE_3D_MORPHOLOGY_DIAGNOSTIC_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- comparison: fitted identity vs zero-identity FLAME reference
+- subject anatomical GT comparison: NO
+- nose_base mean normal change: 18.337949486 deg
+- nose_body mean normal change: 22.736562898 deg
+- nose_body maximum normal change: 32.859869824 deg
+- nose_bridge mean normal change: 5.746626070 deg
+- prior unique nose-anchor RMS: 3.751012515 px
+- prior nose_base RMS: 3.400048975 px
+- visual nostril rejection remains: YES
+- fitted-vs-mean 3D nose change: MATERIAL
+- 2D constraints do not fully control 3D nose orientation: SUPPORTED
+- potential 3D nose morphology underconstraint: STRONGLY SUPPORTED
+- exact nostril orientation error against person: NOT QUANTIFIED
+- nostril-plane ground truth: NOT ESTABLISHED
+- FLAME capacity failure: NOT ESTABLISHED
+- systemic ATLAS failure: NOT YET ESTABLISHED
+- cross-subject confirmation required: YES
+- general ATLAS fix authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/new_subject_frontal_diagnostic`
+- next: cross-subject nose morphology confirmation
+
+## PHASE8_ITEM11_15_R7_8_B7_5_PRIOR_SUBJECT_EXACT_IDENTITY_FRONT_POSE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- prior subject identity artifact: VERIFIED
+- artifact: REPRODUCIBILITY_CANDIDATE_2P5.npz / shared_identity_parameters
+- identity dimensions: 300
+- active identity dimensions: 90
+- inactive tail 210 zero: YES
+- identity L2: 12.810096429512145
+- candidate-minus-baseline identity L2: 4.935942257215931
+- prior subject exact front root pose: VERIFIED
+- front pose: [0.10263173664919156, -0.2076937164435544, 0.080359928466506]
+- candidate/baseline front pose exact equal: YES
+- turn-right candidate/baseline pose exact equal: YES
+- turn-left candidate/baseline pose exact equal: YES
+- cross-subject reference: zero-identity FLAME under same subject front pose
+- cross-subject 3D nose diagnostic ready: YES
+- new fit required: NO
+- geometry changed: NO
+- general ATLAS fix authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: matched cross-subject 3D nose comparison
+
+## PHASE8_ITEM11_15_R7_8_B7_5_CROSS_SUBJECT_NOSE_UNDERCONSTRAINT_SIGNAL_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- comparison contract: matched fitted-vs-zero-identity per subject
+- same FLAME model: YES
+- same nose barycentric anchors: YES
+- expression zero: YES
+- subject root pose fixed within each comparison: YES
+- nose_base prior/new mean normal change: 20.573760023 / 18.337949486 deg
+- nose_body prior/new mean normal change: 24.013786756 / 22.736562898 deg
+- nose_bridge prior/new mean normal change: 7.498220352 / 5.746626070 deg
+- nose_base both subjects >=10 deg mean normal change: YES
+- nose_body both subjects >=10 deg mean normal change: YES
+- nose_bridge both subjects >=10 deg mean normal change: NO
+- identical per-anchor failure pattern: NO
+- repeated large identity-driven nose base/body orientation change: YES
+- subject-specific-only classification sufficient: NO
+- cross-subject nose base/body underconstraint signal: SUPPORTED
+- systemic objective failure: NOT PROVEN
+- FLAME capacity failure: NOT ESTABLISHED
+- prior subject matched visual nostril validation: REQUIRED
+- general ATLAS fix authorized: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: prior-subject matched visual nostril validation
+
+## PHASE8_ITEM11_15_R7_8_B7_5_PRIOR_SUBJECT_FRONT_OBSERVATION_CAMERA_RESOLUTION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- prior subject front landmark JSON: VERIFIED
+- front landmark file: 0B54D8DA-6E72-4E5F-9850-DC6250CAE81F.json
+- front landmark count: 478
+- front image size: 1536 x 1152
+- front source SHA256: 53713bd1a5797123ddd5a65b9513a4bafd19277b6767b832c7e9d52eda429d48
+- front source file path: UNRESOLVED
+- turn-right landmark JSON: 4E2C4BF5-6BB5-456A-8B98-C79B46CA0EC3.json
+- turn-left landmark JSON: 7995EE35-F4AA-48DD-85B0-E83985291297.json
+- candidate front static105 camera RMSE stored: 0.0052862870930593005
+- candidate final camera parameters stored: NO EVIDENCE
+- baseline camera reuse without verification: REJECTED
+- candidate front camera recomputation required: YES
+- recomputation scope: camera only; identity/root-pose/static105 fixed
+- identity refit required: NO
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: recompute prior-subject candidate front camera only
+
+## PHASE8_ITEM11_15_R7_8_B7_5_EXACT_CAMERA_INITIALIZER_CONTRACT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- camera model: WEAK PERSPECTIVE / NO ROTATION
+- initializer: WEIGHTED SIMILARITY / CLOSED FORM
+- scale: weighted covariance / source spread
+- translation: target centroid - scale * source centroid
+- weighted camera RMSE contract: VERIFIED
+- nonlinear camera optimization: NO
+- pose fitting: NO
+- identity fitting: NO
+- prior subject candidate camera recomputation: READY
+- identity/root-pose/static105 fixed during recomputation: YES
+- expected parity RMSE: 0.0052862870930593005
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: recompute candidate front camera and verify RMSE parity
+
+## PHASE8_ITEM11_15_R7_8_B7_5_PRIOR_SUBJECT_CANDIDATE_FRONT_CAMERA_EXACT_PARITY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> B7 -> B7.5
+- status: CLOSED + PERSISTED
+- prior-subject candidate front camera reconstruction: VERIFIED EXACT PARITY
+- camera scale: 2.263185834551791
+- camera tx: 0.6019543751676599
+- camera ty: 0.4954688159436652
+- expected static105 camera RMSE: 0.0052862870930593005
+- recomputed static105 camera RMSE: 0.0052862870930593005
+- RMSE absolute delta: 0.0
+- parity at 1e-12: YES
+- identity refit: NO
+- root pose change: NO
+- geometry/model change: NO
+- candidate camera uncertainty: CLOSED
+- prior-subject exact front source file path: UNRESOLVED
+- matched visual nostril validation: NOT YET EXECUTED
+- systemic objective failure: NOT PROVEN
+- FLAME capacity failure: NOT ESTABLISHED
+- Phase 9 authorized: NO
+- persistent evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim`
+- next: resolve exact front source file by verified SHA256, then render corrected matched projection-parity visual
+
+## PHASE8_ITEM11_15_R7_8_IDENTITY_RECOVERY_V2_SPEC_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + PERSISTED
+- new production contract: `CORE/atlas_portrait_identity_recovery_v2_spec.py`
+- focused test: `Test/test_portrait_identity_recovery_v2_spec.py`
+- focused result: 12 passed
+- shared identity across views: REQUIRED
+- separate pose per view: YES
+- separate camera per view: YES
+- neutral expression during identity fit: REQUIRED
+- default camera model: PERSPECTIVE
+- evidence channels: static landmarks, dense landmarks, face oval, silhouette, photometric, surface normals, identity prior
+- optimizer implemented: NO
+- real-subject refit executed: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_IDENTITY_RECOVERY_V2_SPEC_MILESTONE.txt`
+- next: implement Identity Recovery V2 objective composition
+
+## PHASE8_ITEM11_15_R7_8_LICENSE_SAFE_IDENTITY_PRIOR_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + PERSISTED
+- production contract: `CORE/atlas_portrait_identity_prior_provider.py`
+- focused test: `Test/test_portrait_identity_prior_provider.py`
+- focused result: 12 passed
+- vendor-independent identity prior interface: YES
+- third-party code copied: NO
+- third-party model weights included: NO
+- commercial-use clearance metadata: REQUIRED
+- non-cleared prior production use: BLOCKED
+- real identity prior provider implemented: NO
+- objective composition connected: NO
+- optimizer implemented: NO
+- real-subject refit executed: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_LICENSE_SAFE_IDENTITY_PRIOR_INTERFACE_MILESTONE.txt`
+- next: implement Identity Recovery V2 objective composition
+
+## PHASE8_ITEM11_15_R7_8_IDENTITY_RECOVERY_V2_FOUNDATION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production files:
+  - `CORE/atlas_portrait_identity_recovery_v2_spec.py`
+  - `CORE/atlas_portrait_identity_prior_provider.py`
+  - `CORE/atlas_portrait_identity_recovery_v2_objective.py`
+- focused test files:
+  - `Test/test_portrait_identity_recovery_v2_spec.py`
+  - `Test/test_portrait_identity_prior_provider.py`
+  - `Test/test_portrait_identity_recovery_v2_objective.py`
+- validation: 37 passed
+- git diff --check: PASS
+- third-party code copied: NO
+- third-party model weights included: NO
+- commercial-use-uncleared prior: BLOCKED
+- optimizer implemented: NO
+- real-subject refit: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_IDENTITY_RECOVERY_V2_FOUNDATION_CHECKPOINT.txt`
+- next: stage/commit/push only the V2 foundation package
+
+## PHASE8_ITEM11_15_R7_8_ATLAS_NATIVE_IDENTITY_PRIOR_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production file: `CORE/atlas_portrait_native_identity_prior_provider.py`
+- focused test: `Test/test_portrait_native_identity_prior_provider.py`
+- validation: 48 passed
+- ATLAS-owned provider: YES
+- zero-centered identity-space regularizer: YES
+- subject-specific learned prior: NO
+- third-party code: NO
+- third-party pretrained weights: NO
+- commercial-use cleared: YES
+- prevents uncontrolled identity drift: YES
+- creates likeness by itself: NO
+- perspective camera implemented: NO
+- multiview optimizer implemented: NO
+- real-subject refit: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_ATLAS_NATIVE_IDENTITY_PRIOR_MILESTONE.txt`
+- next: implement perspective camera and multiview optimizer
+
+## PHASE8_ITEM11_15_R7_8_PERSPECTIVE_CAMERA_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production file: `CORE/atlas_portrait_perspective_camera.py`
+- focused test: `Test/test_portrait_perspective_camera.py`
+- related validation: 67 passed
+- camera model: PINHOLE PERSPECTIVE
+- weak-perspective used: NO
+- depth-dependent projection: YES
+- intrinsic matrix: explicit
+- ATLAS-owned implementation: YES
+- third-party code: NO
+- camera parameter fitting: NOT YET
+- multiview optimizer: NOT YET
+- real-subject refit: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_PRODUCTION_PERSPECTIVE_CAMERA_MILESTONE.txt`
+- next: implement shared-identity multiview parameterization and optimizer
+
+## PHASE8_ITEM11_15_R7_8_MULTIVIEW_OPTIMIZER_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production file: `CORE/atlas_portrait_identity_recovery_v2_optimizer.py`
+- focused test: `Test/test_portrait_identity_recovery_v2_optimizer.py`
+- related validation: 75 passed
+- optimizer: scipy least_squares / TRF
+- shared identity across views: YES
+- per-view pose: YES
+- per-view translation: YES
+- per-view focal scale: YES
+- native identity prior integrated: YES
+- weak-perspective: NO
+- third-party model/weights: NO
+- synthetic optimizer recovery validated: YES
+- FLAME geometry connected: NO
+- real multiview evidence connected: NO
+- real-subject refit: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_SHARED_IDENTITY_MULTIVIEW_OPTIMIZER_MILESTONE.txt`
+- next: connect optimizer to real FLAME geometry and real multiview evidence
+
+## PHASE8_ITEM11_15_R7_8_NEUTRAL_FLAME_IDENTITY_GEOMETRY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production file: `CORE/atlas_portrait_flame_identity_geometry_evaluator.py`
+- test file: `Test/test_portrait_flame_identity_geometry_evaluator.py`
+- related validation: 87 passed
+- ATLAS-owned evaluator: YES
+- frozen runtime code copied: NO
+- neutral identity shapedirs evaluation: YES
+- expected real FLAME topology: 5023 vertices / 9976 faces
+- expression applied: NO
+- jaw/neck LBS applied: NO
+- root pose/camera remain external optimizer variables
+- FLAME asset commercial clearance: NOT ESTABLISHED
+- commercial-ready claim: NO
+- MediaPipe 105 barycentric binding: NOT YET
+- real multiview fit: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_NEUTRAL_FLAME_IDENTITY_GEOMETRY_MILESTONE.txt`
+- next: bind the verified 105-point MediaPipe-to-FLAME barycentric evidence
+
+## PHASE8_ITEM11_15_R7_8_REAL_105_BARYCENTRIC_BINDING_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production file: `CORE/atlas_portrait_flame_barycentric_landmark_evaluator.py`
+- test file: `Test/test_portrait_flame_barycentric_landmark_evaluator.py`
+- validation: 96 passed, 1 NumPy pickle deprecation warning
+- functional failures: 0
+- real FLAME topology: 5023 vertices / 9976 faces
+- verified MediaPipe-to-FLAME barycentric correspondences: 105
+- unique MediaPipe IDs: 105
+- all 105 real template surface points finite: YES
+- ATLAS-owned evaluator: YES
+- frozen runtime code copied: NO
+- image-space perspective residual connected: NO
+- real multiview fit executed: NO
+- FLAME asset commercial clearance: NOT ESTABLISHED
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_REAL_105_POINT_FLAME_BARYCENTRIC_BINDING.txt`
+- next: connect real JSON observations to perspective image-space residual
+
+## PHASE8_ITEM11_15_R7_8_REAL_MULTIVIEW_PERSPECTIVE_RESIDUAL_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production file: `CORE/atlas_portrait_flame_multiview_landmark_residual.py`
+- test file: `Test/test_portrait_flame_multiview_landmark_residual.py`
+- validation: 103 passed, 2 NumPy pickle deprecation warnings
+- functional failures: 0
+- real MediaPipe JSON: connected
+- pixel contract: W-1 / H-1
+- verified MediaPipe-to-FLAME points: 105
+- FLAME identity -> barycentric 3D -> pose -> pinhole perspective -> image residual: CONNECTED
+- per-view pose/translation/focal: YES
+- shared identity: YES
+- real three-view V2 fit executed: NO
+- direct likeness gate: NO
+- FLAME asset commercial clearance: NOT ESTABLISHED
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_REAL_MULTIVIEW_PERSPECTIVE_LANDMARK_RESIDUAL_MILESTONE.txt`
+- next: run first real three-view Identity Recovery V2 fit
+
+## PHASE8_ITEM11_15_R7_8_FLAME_IMAGE_AXIS_CONTRACT_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: VALIDATED + PERSISTED
+- validation: 105 passed, 2 NumPy pickle deprecation warnings
+- git diff --check: PASS
+- FLAME frontal plane: X-Y
+- FLAME vertical axis: Y-up
+- ATLAS image vertical axis: Y-down
+- Y reflection: exactly once
+- X/Z reflection: NO
+- reflection placement: after root rotation, before camera translation/projection
+- purpose: prevent camera-axis error from being absorbed into identity geometry
+- real three-view V2 fit executed: NO
+- Phase 9 authorized: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_FLAME_IMAGE_CAMERA_AXIS_CONTRACT.txt`
+- next: run first real three-view Identity Recovery V2 fit
+
+## PHASE8_ITEM11_15_R7_8_FIRST_REAL_V2_NEAR_PLANE_BLOCKER_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- first real three-view V2 fit: EXECUTED but NOT COMPLETED
+- real views: front / turn_right / turn_left
+- shared identity dimension: 90
+- correspondence count: 105 per view
+- baseline static SSE: 0.8772770014833973
+- baseline normalized RMS: 0.03731625888212501
+- blocker: optimizer entered invalid camera-depth domain and perspective projection correctly rejected points behind/at near plane
+- FLAME capacity failure: NOT ESTABLISHED
+- likeness result: NOT AVAILABLE
+- corrective action: constrain per-view translation-Z to physically valid positive camera-depth domain; do not suppress projection safety
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_FIRST_REAL_V2_FIT_NEAR_PLANE_BLOCKER.txt`
+- next: fix optimizer camera-depth bounds and rerun the identical real three-view fit
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_POSITIVE_CAMERA_DEPTH_BOUND_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- validation: 40 passed, 1 NumPy pickle deprecation warning
+- git diff --check: PASS
+- translation X/Y bounds: symmetric
+- translation Z lower bound: explicit positive
+- near-plane exception suppression: NO
+- invalid projection clamping: NO
+- purpose: prevent optimizer from entering nonphysical behind-camera depth domain
+- real three-view rerun executed: NO
+- likeness result: NOT AVAILABLE
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_POSITIVE_CAMERA_DEPTH_BOUND_FIX.txt`
+- next: rerun identical real three-view V2 fit
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_INVALID_V2_VIEW_DIRECTION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- visual gate status: REJECTED — TECHNICAL VIEW-DIRECTION ERROR
+- front V2 render exposes posterior cranium instead of frontal facial surface
+- right/left renders likewise do not provide a valid facial-side comparison
+- numerical 99.789% static-SSE reduction is NOT likeness evidence
+- current landmark objective lacks surface-visibility constraint
+- prior B7.5 evidence demonstrates that a valid frontal FLAME projection is possible
+- previous `Z_AXIS_REFLECTION=NO` assertion is reopened
+- FLAME capacity failure: NOT ESTABLISHED
+- identity likeness failure: NOT ESTABLISHED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_V2_VISUAL_GATE_INVALID_VIEW_DIRECTION.txt`
+- next: compare prior valid B7.5 projection convention against current V2 camera transform and correct view direction
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_FLAME_FRONTAL_POSITIVE_Z_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: CONFIRMED + PERSISTED
+- template Z extent: -0.1532322399 .. +0.0750886554
+- all verified 105 facial landmarks lie on positive Z: +0.0177428631 .. +0.0749842991
+- 105-landmark mean Z: +0.0446316920
+- MediaPipe ID 4 Z: +0.0749842991
+- FLAME frontal face side: POSITIVE Z
+- prior Y reflection: CONFIRMED CORRECT
+- required perspective conversion: `(x, y, z) -> (x, -y, -z)`
+- Z reflection required: YES
+- previous V2 numerical fit must be rerun after correction
+- previous 99.789% SSE reduction remains NOT likeness proof
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_CONFIRMED_FLAME_FRONTAL_POSITIVE_Z.txt`
+- next: patch confirmed Z reflection only
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_CONFIRMED_PERSPECTIVE_Z_PATCH_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- validation: 109 passed, 2 NumPy pickle deprecation warnings
+- git diff --check: PASS
+- FLAME -> ATLAS perspective camera: `(x,y,z) -> (x,-y,-z)`
+- FLAME frontal +Z surface now faces camera: YES
+- handedness preserved by Y+Z double reflection: YES
+- face winding change required: NO
+- previous real three-view fit invalidated by incorrect Z direction
+- previous 99.789% SSE reduction is NOT likeness evidence
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_CONFIRMED_PERSPECTIVE_Z_DIRECTION_PATCH.txt`
+- next: rerun real three-view V2 fit with corrected camera direction
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_CORRECTED_V2_DIRECT_LIKENESS_FAIL_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- corrected camera direction: VALID
+- corrected real three-view optimizer fit: SUCCESS
+- numerical static-SSE reduction: 99.864563%
+- direct neutral-mesh likeness gate: FAIL_CURRENT_FIT
+- face remains too long/narrow; cheeks/midface insufficiently wide/full
+- jaw/chin too narrow, pointed and long
+- upper cranium too tall/oval
+- ears too lateral/prominent
+- nose too narrow/long/bony
+- three-quarter cheek/jaw/nose silhouette does not preserve subject identity
+- static105-only objective is rejected as sufficient 3D identity constraint
+- camera failure: NO
+- FLAME capacity failure: NOT ESTABLISHED
+- current failure class: UNDERCONSTRAINED_IDENTITY_OBJECTIVE
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_CORRECTED_V2_DIRECT_LIKENESS_GATE.txt`
+- montage: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_CORRECTED_V2_SOURCE_VS_NEUTRAL_MONTAGE.png`
+- next: integrate existing outer-head, ear and side-silhouette evidence into V2 objective
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_V2_DYNAMIC_SILHOUETTE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- status: IMPLEMENTED + VALIDATED + PERSISTED
+- production: `CORE/atlas_portrait_flame_dynamic_silhouette_residual.py`
+- test: `Test/test_portrait_flame_dynamic_silhouette_residual.py`
+- validation: 98 passed, 4 NumPy pickle deprecation warnings
+- git diff --check: PASS
+- dynamic embedding: 79 yaw bins x 17 points
+- lower-jaw source IDs: 21
+- transferred target points: 17
+- right visible points: 13
+- left visible points: 12
+- front dynamic silhouette contract: NO
+- historical transferred-S and visibility masks reused
+- frozen runtime code copied: NO
+- perspective V2 camera: YES
+- camera axis contract: `(x,-y,-z)`
+- real static105+silhouette refit executed: NO
+- direct likeness established: NO
+- FLAME capacity failure: NOT ESTABLISHED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_V2_DYNAMIC_SILHOUETTE_RESIDUAL_MILESTONE.txt`
+- next: run real static105 + silhouette V2 refit
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_DIRECT_LIKENESS_GATE_2_FAIL_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- camera/render validity: PASS
+- real static105 + dynamic silhouette refit: SUCCESS
+- silhouette SSE improvement: 62.504410%
+- total weighted objective improvement: 28.436386%
+- direct likeness gate #2: FAIL
+- lower-jaw/profile response: PARTIAL IMPROVEMENT
+- face remains too long/narrow
+- midface/cheeks remain insufficiently wide/full
+- jaw/chin remains too narrow and bony
+- upper cranium remains too tall/oval
+- ears remain too lateral/prominent
+- nose remains too narrow/sharp
+- lips/mouth region does not preserve subject identity
+- mouth remains too generic/narrow
+- lip fullness is insufficient
+- philtrum/upper-lip transition is insufficient
+- person-specific identity readable: NO
+- static105 + lower-jaw side silhouette sufficient: NO
+- camera failure: NO
+- FLAME capacity failure: NOT ESTABLISHED
+- current failure class: OBJECTIVE_STILL_UNDERCONSTRAINED
+- missing constraint classes: outer-head/cranium, ears, broader face shape, perioral/lip/mouth identity
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_DIRECT_LIKENESS_GATE_2_STATIC105_PLUS_SILHOUETTE.txt`
+- montage: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_STATIC105_PLUS_SILHOUETTE_SOURCE_VS_NEUTRAL_MONTAGE.png`
+- next: integrate outer-head/cranium, ear, broader-face and perioral constraints
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_DIRECT_LIKENESS_GATE_3_FAIL_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- perioral emphasis V1 numerical response: positive
+- perioral raw SSE improvement: 47.722894%
+- direct likeness gate #3: FAIL
+- mouth remains too narrow
+- lip volume/projection remains insufficient
+- philtrum/upper-lip transition remains insufficient
+- commissure/perioral form remains generic
+- exact 2D lip-anchor reprojection is insufficient for subject-specific 3D perioral likeness
+- further blind lip-weight escalation: rejected
+- midface/cheek width and fullness remain insufficient
+- jaw/chin remains too narrow
+- upper head remains too tall/oval
+- ears remain too prominent
+- current silhouette scope: LOWER_JAW_SIDE_PROFILE_ONLY
+- cranium envelope currently in objective: NO
+- explicit ear constraint currently in objective: NO
+- cranium anatomical GT: UNRESOLVED
+- ear anatomical shape GT: UNRESOLVED
+- camera failure: NO
+- FLAME capacity failure: NOT ESTABLISHED
+- current failure class: OBJECTIVE_STILL_UNDERCONSTRAINED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_DIRECT_LIKENESS_GATE_3_PERIORAL_EMPHASIS_V1.txt`
+- montage: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_PERIORAL_EMPHASIS_V1_SOURCE_VS_NEUTRAL_GATE3.png`
+- next: supported broader-face/midface width constraint
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_SPARSE_2D_OBJECTIVE_BOUNDARY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- documented facial-width-height support: bounded 2D observation only
+- documented bigonial support: bounded 2D surrogate only
+- bizygomatic relation: BLOCKED
+- `AtlasFrontalFaceMeasurer` current runtime owner: NOT FOUND
+- exact current face-width measurement owner: NOT FOUND
+- exact current jaw-width measurement owner: NOT FOUND
+- cheek/midface subject-specific geometry criteria: BLOCKED
+- no new face-width / jaw-width anatomical correspondence may be invented
+- static105: implemented, visually insufficient
+- lower-jaw side silhouette: implemented, visually insufficient
+- verified perioral anchor emphasis: numerically effective, visually insufficient
+- sparse 2D identity-objective expansion using current verified mappings: EXHAUSTED
+- current objective remains underconstrained
+- FLAME capacity failure: NOT ESTABLISHED
+- next required evidence class: dense image-conditioned shape evidence
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_BROADER_FACE_WIDTH_RUNTIME_OWNER_BOUNDARY.txt`
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_FACIAL_CONTOUR_RESIDUAL_IMPLEMENTED_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- facial-contour residual: IMPLEMENTED / TESTED
+- focused validation: 8 passed
+- diff check: PASS
+- correspondence class: VIEW_DEPENDENT_GEOMETRIC_CONTOUR
+- residual: symmetric image-diagonal-normalized nearest-contour distance
+- candidate vertex support must be supplied explicitly
+- candidate support is search support only
+- anatomical cheek mapping invented: NO
+- anatomical cranium mapping invented: NO
+- explicit ear mapping invented: NO
+- hair shell included: NO
+- provider FLAME face mask available: NO
+- direct likeness established: NO
+- FLAME capacity failure: NOT ESTABLISHED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_FACIAL_CONTOUR_RESIDUAL_IMPLEMENTATION_MILESTONE.txt`
+- next: real three-view facial-contour support binding
+- hair shell remains after Gate #4
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_DIRECT_LIKENESS_GATE_4_FAIL_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- facial-contour numerical response: +38.039533%
+- direct likeness gate #4: FAIL
+- face remains too long/narrow
+- cheek/midface fullness remains insufficient
+- cheek-to-jaw transition remains too bony
+- jaw/chin remains too narrow
+- mouth/lip likeness remains insufficient
+- nose remains too narrow/bony
+- upper head remains too tall/oval
+- ears remain too prominent
+- person-specific identity readable: NO
+- significant static-landmark collateral: YES
+- blind facial-contour weight escalation: REJECTED
+- current objective remains underconstrained
+- camera failure: NO
+- FLAME capacity failure: NOT ESTABLISHED
+- hair is not anatomical cranium ground truth
+- cranium anatomical GT: UNRESOLVED
+- ear anatomical shape GT: UNRESOLVED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_DIRECT_LIKENESS_GATE_4_FACIAL_CONTOUR.txt`
+- montage: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_FACIAL_CONTOUR_REFIT_SOURCE_VS_NEUTRAL_GATE4.png`
+- next: bounded hair-shell / outer-head visual envelope
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_HAIR_SHELL_V1_IMPLEMENTED_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- Hair Shell V1: IMPLEMENTED / VALIDATED
+- focused tests: 14 passed
+- diff check: PASS
+- representation role: bounded visual outer-head envelope
+- canonical identity mutation: NO
+- hair as anatomical cranium: NO
+- cranial metric GT: NO
+- default displacement direction: outward only
+- maximum offset: explicit reference-span fraction
+- real B3 envelope binding: PENDING
+- direct likeness established: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_HAIR_SHELL_V1_IMPLEMENTATION_MILESTONE.txt`
+- next: bind verified B3 real envelope to Hair Shell V1
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_HAIR_SHELL_BINDING_PARTIAL_REJECTION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8
+- turn-left posterior/upper-head B3 envelope: VALID for bounded Hair Shell
+- turn-right B3.14 cross-check: REJECTED for Hair Shell
+- rejection reason: visible door/background-boundary contamination
+- historical numerical stability does not override visual boundary failure
+- current geometric support also reaches facial/jaw/lower-head vertices
+- face/jaw/neck vertices are prohibited Hair Shell support
+- Hair Shell offset solve from current binding: NOT AUTHORIZED
+- hair as anatomical cranium: NO
+- anatomical cranium GT: UNRESOLVED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_HAIR_SHELL_BINDING_VISUAL_REJECTION.txt`
+- overlay: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_REAL_GATE4_FLAME_TO_B3_HAIR_ENVELOPE_BINDING_OVERLAY.png`
+- next: rebuild support from valid posterior/upper-head geometry only
+- Phase 9 authorized: NO
+
+# PHASE8_ITEM11_15_R7_8_DENSE_IDENTITY_STRATEGY_SUPERSESSION_2026_09_01
+
+**Hierarchy:** `Phase 8 -> Main Checklist Item 11 -> 11.15 -> R7.8`
+
+**Status:** ACTIVE STRATEGY SUPERSESSION
+
+This record supersedes the current R7.8 execution priority without deleting or
+rewriting historical R7.8 evidence, rejected probes, or the locked A-H structure.
+
+## Why the execution order changes
+
+Gate #2, Gate #3, and Gate #4 established that the current sparse / contour-led
+identity objective is insufficient for direct person-specific neutral-mesh
+likeness.
+
+Observed failure pattern:
+
+- static 105-point reprojection can become numerically strong while neutral
+  identity remains visually wrong;
+- side silhouette improves jaw/profile but does not recover cheek / midface
+  morphology;
+- perioral weighting improves its local residual but does not recover convincing
+  3D mouth/lip morphology;
+- multiview facial-contour fitting improves outer-contour SSE while causing
+  significant collateral degradation in static landmarks and still fails the
+  direct likeness gate;
+- repeated local contour constraints therefore do not supply the missing
+  low-frequency subject-specific 3D facial shape evidence.
+
+The active failure classification remains:
+
+`CURRENT_OBJECTIVE_STILL_UNDERCONSTRAINED=YES`
+
+`CAMERA_FAILURE=NO`
+
+`FLAME_CAPACITY_FAILURE=NOT_ESTABLISHED`
+
+## Reference-architecture conclusion
+
+The current R7.8 execution order is realigned with the architectural principle
+demonstrated by MICA / Metrical Tracker / Pixel3DMM-class systems:
+
+1. establish subject-specific image-conditioned identity / shape evidence;
+2. add dense surface/image evidence rather than relying only on sparse landmarks
+   and contours;
+3. solve shared multiview identity jointly with per-view camera / pose;
+4. run the direct neutral-mesh likeness gate;
+5. only after neutral identity is credible, add hair / visible outer-head
+   appearance geometry;
+6. challenge FLAME representation capacity only if the better-constrained
+   identity solve still fails.
+
+This is an architectural principle only. Third-party research code, pretrained
+weights, or model assets are NOT authorized for ATLAS production unless their
+commercial/model/data licenses are independently cleared.
+
+## Updated active R7.8 execution order
+
+### R7.8-D1 — Dense subject-specific identity evidence — PRIMARY NEXT
+
+Goal:
+
+Recover image-conditioned evidence that constrains low-frequency person-specific
+3D facial morphology, especially:
+
+- cheek / malar volume;
+- midface fullness and projection;
+- nose 3D form;
+- mouth / lip 3D morphology;
+- mandibular / chin morphology;
+- global facial width-depth relationships.
+
+Requirements:
+
+- ATLAS-owned or independently implemented;
+- commercial-safe dependency path;
+- no unsupported anatomical ground-truth claims;
+- no use of DSINE as the owner of low-frequency identity geometry;
+- evidence must contain information beyond the existing static105 / silhouette /
+  face-oval channels.
+
+Current V2 objective slots already anticipate dense landmarks, surface normals,
+photometric evidence, and an identity prior. Real subject-specific producers are
+not yet fully wired.
+
+### R7.8-D2 — Dense image-conditioned surface evidence
+
+Evaluate and integrate the strongest commercially admissible real image evidence
+available to ATLAS, in priority order determined by verified capability:
+
+- dense image-to-surface correspondence / shape evidence;
+- photometric multiview consistency;
+- bounded surface-normal evidence where epistemically valid;
+- subject-specific identity prior if a commercially safe implementation path is
+  established.
+
+DSINE remains restricted to bounded residual-detail / normal evidence and MUST
+NOT be promoted to canonical identity ownership.
+
+### R7.8-D3 — Joint multiview identity solve
+
+Run one shared identity solve using the validated evidence set while preserving:
+
+- one shared identity vector;
+- separate per-view pose;
+- separate per-view perspective camera;
+- neutral expression for the identity gate;
+- existing verified static landmark evidence;
+- valid side silhouette evidence;
+- only facial-contour evidence that passed its correspondence boundary;
+- explicit regularization and bound-hit reporting.
+
+Do not use local loss improvement as likeness proof.
+
+### R7.8-D4 — Direct neutral-mesh likeness gate
+
+Render the actual fitted neutral geometry against the real source views.
+
+Required judgment remains visual and person-specific.
+
+Primary acceptance questions:
+
+- is overall facial width/height credible?
+- is cheek/midface volume credible?
+- is nose volume/form credible?
+- is mouth/lip morphology credible?
+- is jaw/chin morphology credible?
+- do 3/4 views preserve the same identity?
+- is the person recognisable without relying on hair?
+
+PASS is required before Hair Shell becomes an active fitting priority.
+
+### R7.8-D5 — Hair Shell / visible outer-head appearance — PARKED
+
+Current Hair Shell V1 primitive is preserved:
+
+- implementation: retained;
+- canonical identity mutation: NO;
+- role: bounded visual outer-head / hair appearance envelope;
+- anatomical cranium claim: NO.
+
+Current fitting work is PARKED.
+
+The existing B3 / Hair Shell experimental evidence remains historical evidence,
+including rejected contaminated or face-leaking support bindings.
+
+Hair Shell MUST NOT be used to rescue a neutral identity mesh that still fails
+the direct likeness gate.
+
+Resume Hair Shell only after R7.8-D4 produces an acceptable neutral identity.
+
+### R7.8-D6 — FLAME capacity challenge — CONDITIONAL
+
+Only if dense subject-specific identity evidence plus the joint multiview solve
+still cannot represent the person's major morphology:
+
+- perform an explicit FLAME capacity challenge;
+- distinguish optimization/evidence failure from representation-basis failure;
+- consider richer full-head / deformation architecture only after capacity
+  failure is demonstrated.
+
+Until then:
+
+`FLAME_CAPACITY_FAILURE=NOT_ESTABLISHED`
+
+## Immediate next step
+
+`NEXT=R7.8_D1_DENSE_SUBJECT_SPECIFIC_IDENTITY_EVIDENCE`
+
+Do NOT resume Hair Shell fitting first.
+
+Do NOT return to blind static-landmark, perioral, face-oval, silhouette, or
+contour weight escalation.
+
+`HAIR_SHELL_STATUS=PARKED_AFTER_NEUTRAL_IDENTITY_GATE`
+
+`PHASE9_AUTHORIZED=NO`
+
+## PHASE8_ITEM11_15_R7_8_D1_DENSE_IMAGE_SURFACE_IMPLEMENTATION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- status: `IMPLEMENTED_RELATED_GREEN`
+- contract: `AtlasPortraitDenseImageSurfaceEvidence`
+- producer: `AtlasPortraitDenseImageSurfaceEvidenceProducer`
+- evidence class: `IMAGE_CONDITIONED_DENSE_SURFACE_EVIDENCE`
+- focused validation: 21 passed
+- related pytest exit: 0
+- related passed: 113
+- scoped diff check exit: 0
+- anatomical homology claim: NO
+- dense anatomical correspondence claim: NO
+- canonical identity owner: NO
+- canonical identity mutation: NO
+- DSINE low-frequency identity owner: NO
+- Hair Shell: PARKED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_DENSE_IMAGE_SURFACE_IMPLEMENTATION_MILESTONE.txt`
+- related regression log: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_DENSE_IMAGE_SURFACE_RELATED_REGRESSION.txt`
+- next: `EXECUTE_REAL_PERSONAL_IMAGE_DENSE_SURFACE_EVIDENCE`
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_PHOTOMETRIC_VISIBILITY_BOUNDARY_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- real image-conditioned photometric signal: CONFIRMED
+- shared canonical support: 2059 / 5023 vertices
+- current confidence source: cross-view RGB agreement
+- current confidence is true visibility confidence: NO
+- full z-buffer / self-occlusion rejection: NO
+- face/head-only support: NOT ESTABLISHED
+- visible neck/lower-head contamination: YES
+- current evidence safe for optimizer integration: NO
+- superseded next: `INTEGRATE_REAL_MULTIVIEW_PHOTOMETRIC_SIGNAL_INTO_V2_OBJECTIVE`
+- required next: establish true mesh visibility + face/head support, then rerun real D1 evidence
+- Hair Shell: PARKED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_REAL_PHOTOMETRIC_VISIBILITY_BOUNDARY.txt`
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_DEPTH_RASTERIZER_REUSE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- visibility owner: `AtlasProjectedSemanticMeshDepthRasterizer`
+- reuse decision: APPROVED
+- new visibility architecture required: NO
+- raster XY: projected image pixels
+- perspective visibility depth: reciprocal camera depth `1/Z`
+- raw camera Z as raster depth: PROHIBITED
+- reason: existing rasterizer keeps greatest depth; nearest positive-Z surface has greatest reciprocal depth
+- face/head support owner: existing MediaPipe `face_interior` image mask
+- new anatomical FLAME vertex labels: NO
+- visibility filtering must precede photometric optimizer integration
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_DEPTH_RASTERIZER_VISIBILITY_REUSE_DECISION.txt`
+- Hair Shell: PARKED
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_RASTERIZED_VISIBILITY_IMPLEMENTED_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- producer: `AtlasPortraitDenseImageSurfaceEvidenceProducer`
+- method: `rasterized_vertex_visibility_mask`
+- visibility owner: `AtlasProjectedSemanticMeshDepthRasterizer`
+- depth encoding: `1/Z`
+- winning-face vertex visibility: IMPLEMENTED
+- optional image support mask: IMPLEMENTED
+- focused validation: 10 passed
+- D1 regression: 25 passed
+- diff check: clean
+- new visibility architecture: NO
+- next: real three-view rerun with rasterized visibility + existing MediaPipe face-interior support
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_RASTERIZED_VERTEX_VISIBILITY_IMPLEMENTATION_MILESTONE.txt`
+- Hair Shell: PARKED
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_REAL_VISIBILITY_AWARE_EVIDENCE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- real visibility-aware dense evidence: EXECUTED
+- visibility owner: `AtlasProjectedSemanticMeshDepthRasterizer`
+- depth encoding: `1/Z`
+- face support: existing MediaPipe-derived `face_interior`
+- visibility raster linear scale: 0.25
+- raw previous shared support: 2059
+- filtered shared support: 149
+- retained support: 7.237%
+- self-occlusion filtering: YES
+- face-interior filtering: YES
+- optimizer integration this step: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_REAL_VISIBILITY_AWARE_DENSE_SURFACE_EVIDENCE.txt`
+- overlay: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_REAL_VISIBILITY_AWARE_DENSE_SURFACE_SUPPORT.png`
+- Hair Shell: PARKED
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_THREE_VIEW_SHARED_SUPPORT_REJECTED_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- front visible face-interior vertices: 1714
+- turn-right visible face-interior vertices: 838
+- turn-left visible face-interior vertices: 891
+- all-three shared vertices: 149
+- retained from prior raw shared support: 7.2365%
+- rasterized visibility: FUNCTIONAL
+- face-interior filtering: FUNCTIONAL
+- all-three-view intersection as primary dense identity support: REJECTED
+- failure: three-view canonical visibility intersection is too restrictive and collapses evidence toward central face
+- proposed replacement: pairwise front-right + front-left visibility evidence
+- pairwise protocol authorized: NO
+- optimizer integration: HOLD
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_THREE_VIEW_SHARED_SUPPORT_REJECTION.txt`
+- Hair Shell: PARKED
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_PAIRWISE_PHOTOMETRIC_PROTOCOL_AUTHORIZATION_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- three-view shared-support protocol: REJECTED
+- three-view retained support: 149 vertices (`7.236522583778533%`)
+- pairwise protocol authorized: YES
+- primary pairwise paths: `front↔turn_right` and `front↔turn_left`
+- `turn_right↔turn_left` primary path: NO
+- self-occlusion filter: KEEP
+- face-interior filter: KEEP
+- depth encoding: `1 / camera_z`
+- new visibility architecture required: NO
+- superseded next: `VISUAL_AND_NUMERIC_ACCEPTANCE_THEN_PHOTOMETRIC_OBJECTIVE_INTEGRATION`
+- required next: execute real pairwise D1 evidence for `front↔turn_right` and `front↔turn_left`
+- Hair Shell: PARKED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_PAIRWISE_PHOTOMETRIC_PROTOCOL_AUTHORIZATION_2026_09_01.txt`
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_REAL_PAIRWISE_EVIDENCE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- real pairwise evidence: EXECUTED
+- front-right shared support: 773
+- front-left shared support: 797
+- pairwise union: 1421
+- both-pairs intersection: 149
+- pairwise union / FLAME: 28.290%
+- previous all-three support: 149
+- union gain vs all-three: 9.537x
+- front-right photometric RMS: 0.16688134646491354
+- front-left photometric RMS: 0.17680407045692326
+- optimizer integration this step: NO
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_REAL_PAIRWISE_DENSE_PHOTOMETRIC_EVIDENCE.txt`
+- overlay: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_REAL_PAIRWISE_DENSE_SUPPORT.png`
+- Hair Shell: PARKED
+- Phase 9 authorized: NO
+
+## PHASE8_ITEM11_15_R7_8_D1_PAIRWISE_DENSE_IDENTITY_EVIDENCE_CLOSED_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D1
+- D1 final decision: **PASS / CLOSED**
+- accepted protocol: `front↔turn_right` + `front↔turn_left`
+- front-right support: 773 canonical vertices
+- front-left support: 797 canonical vertices
+- pairwise union: 1421 / 5023 (`28.2899%`)
+- previous three-view support: 149
+- coverage gain: `9.5369x`
+- pairwise visual coverage gate: PASS
+- cheek/midface coverage: RECOVERED
+- lateral face coverage: RECOVERED
+- static persisted residual is sufficient as evidence but NOT as an optimizer residual
+- D2 requirement: candidate-sensitive reprojection + visibility + RGB sampling on every optimizer evaluation
+- next: `R7.8_D2_CANDIDATE_SENSITIVE_DENSE_IMAGE_EVIDENCE_INTEGRATION`
+- Hair Shell: PARKED
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D1_PAIRWISE_DENSE_IDENTITY_EVIDENCE_CLOSURE_2026_09_01.txt`
+- Phase 9 authorized: NO
+
+
+## PHASE8_ITEM11_15_R7_8_D2_CANDIDATE_SENSITIVE_DENSE_IMAGE_INTEGRATION_MILESTONE_2026_09_01
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8 -> D2
+- status: IMPLEMENTATION GREEN / CLOSURE CHALLENGE PASS
+- D1 accepted pairwise support remains frozen: front-right + front-left
+- static persisted D1 residual used as optimizer residual: NO
+- candidate reprojection recomputed every evaluation: YES
+- candidate rasterized visibility recomputed every evaluation: YES
+- candidate RGB sampling recomputed every evaluation: YES
+- accepted canonical support cardinality remains fixed: YES
+- baseline confidence remains frozen: YES
+- invisible accepted samples silently zeroed/dropped: NO
+- D2 production integration owner: `AtlasPortraitIdentityRecoveryV2ResidualEvaluator`
+- optimizer owns dense geometry/evidence generation: NO
+- objective channel: `photometric`
+- objective weighting owner remains: `AtlasPortraitIdentityRecoveryV2Objective`
+- focused D2 closure contract tests: 18 passed
+- related regression: 122 passed, 3 pre-existing NumPy deprecation warnings
+- D2 Closure Challenge: PASS
+- epistemic boundary: this establishes a live candidate-sensitive photometric optimizer channel; it does NOT by itself prove identity-recovery quality
+- evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D2_CANDIDATE_SENSITIVE_DENSE_IMAGE_INTEGRATION_MILESTONE_2026_09_01.txt`
+- evidence SHA256: `14b6b4bc81684c3ab0cf2be5a52e18e691b10855da97167d974499e9fad0f941`
+- Hair Shell: PARKED
+- Phase 9 authorized: NO
+- next: full regression and scoped commit validation
