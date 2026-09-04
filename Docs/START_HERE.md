@@ -20799,3 +20799,249 @@ contour weight escalation.
 - Hair Shell: PARKED
 - Phase 9 authorized: NO
 - next: full regression and scoped commit validation
+
+## PHASE8_ITEM11_15_R7_8_D3_SESSION_CHECKPOINT_2026_09_02
+
+- hierarchy: Phase 8 -> Item 11 -> 11.15 -> R7.8-D3
+- status: ACTIVE / BLOCKED
+- raw RGB objective: NOT LIKENESS SAFE
+- approved replacement: face-support affine-normalized pairwise evidence
+- optimizer execution: HOLD
+- exact next: one real raw-vs-normalized baseline evaluation
+- persistent handoff:
+  `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_D3_SESSION_CHECKPOINT_2026_09_02/HANDOFF.md`
+- handoff SHA256: `937de075da04965b8bbcbef49573708b5b7305a6a73df82917bd907705b3bfa1`
+- checkpoint manifest SHA256: `aaae3844b2949bf7b6fee1ee8fab0b21884093ff256b1fd6196486a9893e0b02`
+- Hair Shell: PARKED
+- Phase 9: dependent on Phase 8 GO + LOCK
+
+
+## PHASE8_ITEM11_15_R7_8_D3_AFFINE_NORMALIZATION_REJECTED_2026_09_02
+
+- status: REJECTED / PERSISTED
+- normalized-vs-raw SSE change: +18.62426608%
+- optimizer executed: NO
+- rejected primitive/test removed: YES
+- raw RGB role: DIAGNOSTIC ONLY
+- next: select true image-conditioned 3D shape evidence
+- likeness: FAIL / NOT ESTABLISHED
+
+## PHASE8_ITEM11_15_R7_8_D3_PRNET_FRONTAL_ENVELOPE_MILESTONE_2026_09_02
+
+- Hierarchy: `Phase 8 -> Item 11 -> 11.15 -> R7.8-D3`.
+- User-approved milestone:
+  `CURRENT_BEST_VISIBLE_GEOMETRIC_STAGE_FOR_CURRENT_SUBJECT`.
+- Frontal PRNet diagnostic classification:
+  `FRONTAL_OUTER_FACE_ENVELOPE=MATERIALLY_ALIGNED`.
+- Internal subject-specific identity:
+  `FAIL`.
+- Age/life-line geometry:
+  `MISSING`.
+- Full 3D and cross-view consistency:
+  `NOT_YET_VERIFIED`.
+- Locked order: preserve outer envelope -> recover internal meso geometry ->
+  add source-supported age/life-line microgeometry -> verify shared identity.
+- PRNet remains research-diagnostic evidence only; production adoption is not
+  authorized and pretrained-weight production rights remain unestablished.
+- Overall likeness remains `FAIL / NOT YET ESTABLISHED`.
+- Hair Shell remains `PARKED`.
+- Phase 9 depends on Phase 8 `GO + LOCK`.
+- Next: three-view outer-envelope consistency check.
+
+## PHASE8_ITEM11_15_R7_8_D3_PRNET_THREE_SCALE_IDENTITY_ASSESSMENT_2026_09_02
+
+- User-approved correction to the earlier overbroad internal-identity wording.
+- `MACRO_OUTER_GEOMETRY=ADVANCED`.
+- `MESO_IDENTITY_GEOMETRY=POSITIVE_WITH_LOCAL_GAPS`.
+- `MICRO_AGE_LIFE_LINE_GEOMETRY=MISSING`.
+- `SHARED_SINGLE_3D_IDENTITY=NOT_YET_VERIFIED`.
+- Remaining local gaps include nostril orientation, philtrum depth, selected
+  cheek volume, nasolabial grooves, mouth-corner lines, glabellar lines and
+  source-supported age geometry.
+- PRNet remains research-diagnostic evidence only; production adoption is not
+  authorized and pretrained-weight commercial rights remain unestablished.
+- Next: PRNet cross-view canonical-geometry consistency measurement.
+- Phase 9 depends on Phase 8 `GO + LOCK`.
+
+## PHASE8_ITEM11_15_R7_8_D3_PRNET_CROSS_VIEW_GEOMETRY_EVALUATION_2026_09_02
+
+- Cross-view PRNet geometry:
+  `POSITIVE_EVIDENCE / SUPPORTED_NOT_CLOSED`.
+- Pairwise bbox-normalized RMS:
+  front-right `0.009531982562`;
+  front-left `0.011583373121`;
+  right-left `0.010529450348`.
+- Three-view consensus dispersion:
+  RMS `0.005891526236`; P95 `0.009997637304`;
+  maximum `0.016010978455`.
+- Alignment used rotation, translation and uniform scale only; no reflection,
+  nonrigid deformation or invented acceptance threshold.
+- `MACRO_MESO_GEOMETRY=ATLAS_CURRENT_BEST_EVIDENCE`.
+- `MICRO_AGE_GEOMETRY=MISSING`.
+- PRNet remains research-diagnostic comparator evidence only.
+- Production adoption is not authorized; pretrained-weight commercial rights
+  remain unestablished.
+- Next: define the ATLAS-owned two-layer identity-recovery contract.
+- Phase 9 depends on Phase 8 `GO + LOCK`.
+
+## PHASE8_ITEM11_15_R7_8_D3_ATLAS_OWNED_TWO_LAYER_IDENTITY_RECOVERY_CONTRACT_2026_09_02
+
+- Status: `USER_APPROVED_LOCKED`.
+- Goal: recognizable neutral shared identity.
+- Layer A owner:
+  `ATLAS_SHARED_NEUTRAL_CANONICAL_GEOMETRY`.
+- Layer A owns shared macro/meso identity: envelope, jaw/chin, nose, lips,
+  orbital structure, philtrum and cheek/nasolabial volume.
+- First controlled execution locks expression, pose and camera.
+- Layer B owner:
+  `ATLAS_BOUNDED_MICRO_GEOMETRY_RESIDUAL`.
+- Layer B contains only source-supported age/life-line geometry and cannot
+  repair or alter incorrect macro/meso identity.
+- PRNet remains diagnostic comparator evidence only and may not become a
+  production mesh, fitting target, teacher signal or copied identity surface.
+- MICA remains parked pending written licensing information.
+- User direct visual assessment remains authoritative.
+- Next: read-only current-subject dense normal/depth evidence inventory.
+- Phase 9 depends on Phase 8 `GO + LOCK`.
+
+## PHASE8_ITEM11_15_R7_8_D3_DSINE_PRODUCTION_BLOCK_AND_LAYER_A_DIRECTION_2026_09_02
+
+- DSINE runtime/checkpoint exists, but its verified licence permits only
+  non-commercial internal or academic research.
+- No exact current-subject DSINE binding was found.
+- Historical `dsine_normal_map.npy` is finite but is not qualified as
+  current-subject evidence.
+- `DSINE_PRODUCTION_USE=BLOCKED`.
+- PRNet and DSINE remain diagnostic/research references only.
+- User-authorized Layer-A design direction:
+  `ATLAS_SHARED_CANONICAL_RESIDUAL_GEOMETRY_V1`.
+- Status: `DESIGN_AUTHORIZED_NOT_IMPLEMENTED`.
+- It must use verified source photographs/landmarks/contours, one shared neutral
+  geometry, locked pose/camera/expression and bounded smooth deformation.
+- Macro/meso identity precedes micro age/life-line geometry.
+- Next: define the exact V1 design before implementation.
+- Phase 9 depends on Phase 8 `GO + LOCK`.
+
+## PHASE8_ITEM11_15_R7_8_D3_ATLAS_SHARED_CANONICAL_RESIDUAL_GEOMETRY_V1_DESIGN_LOCKED_2026_09_02
+
+- `ATLAS_SHARED_CANONICAL_RESIDUAL_GEOMETRY_V1`:
+  `USER_APPROVED_LOCKED / NOT IMPLEMENTED`.
+- One shared neutral mesh; fixed topology and vertex cardinality.
+- A1: bounded low-frequency 3D deformation graph for macro envelope.
+- A2: bounded Laplacian-regularized local deformation for meso anatomy.
+- Order: A1 -> A2 while preserving A1 -> bounded combined refinement ->
+  direct neutral renders -> user visual assessment.
+- Expression, validated pose and validated camera remain locked.
+- PRNet, DSINE and raw RGB are prohibited objective inputs.
+- No blind weight sweep, invented threshold, arbitrary symmetry or free
+  deformation of unobserved regions.
+- One bounded prototype only after structural/runtime preflight.
+- Next: read-only reuse audit for existing ATLAS adjacency, Laplacian,
+  deformation and mesh-safety components.
+- Phase 9 depends on Phase 8 `GO + LOCK`.
+
+## R7.8-D3 Shared Canonical Residual Geometry Implementation Milestone — 2026-09-02
+
+- Status: `IMPLEMENTED_STRUCTURALLY_VERIFIED_NOT_INTEGRATED`.
+- New ATLAS-owned primitive:
+  `CORE/atlas_portrait_shared_canonical_residual_geometry.py`.
+- Focused validation: `5 passed`; compile `OK`.
+- Real FLAME probe: 5,023 vertices, 9,976 faces and three connected
+  components.
+- Largest 3,931-vertex component was active; its 62 boundary vertices and
+  all 1,092 vertices in the other components remained fixed.
+- Exact constraints passed with zero control/fixed/inactive error.
+- Triangle safety: zero collapsed faces, zero reversed faces and minimum
+  area ratio `0.998341478995`.
+- No identity fit, optimizer, likeness decision or production adoption was
+  performed.
+- Evidence: `/Users/Kubi/ATLAS_PERSONAL_MULTIVIEW_SPIKE/EVIDENCE/phase8_10_personal_multiview_2026-08-26/r7_8_identity_recovery_2026-08-31/b7_controlled_refit_interim/R7_8_PRNET_CURRENT_SUBJECT_DIAGNOSTIC_2026_09_02/R7_8_D3_SHARED_CANONICAL_RESIDUAL_GEOMETRY_IMPLEMENTATION_MILESTONE_2026_09_02.txt`.
+- Next: focused and related regression validation before the first bounded
+  real-subject residual-observation prototype.
+
+---
+
+<!-- SPC_V1_START_HERE_AUTHORITY_2026_09_04 -->
+
+# SPC V1 — Stylized Personalized Collectible Program
+
+**Current status:** `PIVOT_VALIDATION_ACTIVE`
+
+ATLAS has opened a new commercial validation program for personalized stylized physical collectibles.
+
+The current commercial product development order is:
+
+`1 -> 3 -> 2`
+
+1. `CHIBI / CUTE PERSONALIZED FIGURINE`
+2. `STYLIZED BUST / MINI SCULPTURE`
+3. `BOBBLEHEAD / CHARACTER FIGURINE`
+
+Only `CHIBI` is authorized for initial end-to-end feasibility.
+
+The SPC V1 authority roadmap is split across:
+
+- `Docs/Roadmap/SPC_V1_PART_1_STRATEGY_AND_IDENTITY.md`
+- `Docs/Roadmap/SPC_V1_PART_2_3D_ATLAS_AND_PRODUCT.md`
+- `Docs/Roadmap/SPC_V1_PART_3_BUSINESS_PILOT_AND_GOVERNANCE.md`
+
+## Relationship to the existing ATLAS roadmap
+
+The existing 15-item ATLAS roadmap remains preserved and is not retrospectively rewritten.
+
+Current handling:
+
+- Items 1–10: historical verified status preserved.
+- Item 11 exact-likeness / realistic identity branch:
+  - `RESEARCH_PARKED`
+  - `NON_MVP_BLOCKING`
+- Items 12–15:
+  - `NOT_CANCELLED`
+  - `HOLD_PENDING_SPC_VALIDATION`
+- Phase 9:
+  - `NOT_AUTHORIZED`
+  - `NOT_STARTED`
+
+SPC V1 does not erase or redefine the prior exact-identity evidence.
+
+Its role is to validate whether a different commercial architecture can reach a sellable physical product more reliably.
+
+## Primary SPC architecture candidate
+
+`PHOTO(S)`
+->
+`STYLIZED 2D IDENTITY`
+->
+`HUMAN / CUSTOMER APPROVAL`
+->
+`IDENTITY-CONSISTENT MULTI-VIEW`
+->
+`AI 3D`
+->
+`ATLAS CONTROL`
+->
+`HUMAN EXCEPTION HANDLING`
+->
+`PHYSICAL PRODUCT`
+
+Authority model:
+
+- `AI = GENERATE`
+- `ATLAS = CONTROL`
+- `HUMAN = JUDGE / CORRECT EXCEPTIONS`
+- `PRODUCTION = MANUFACTURE`
+
+## Pivot-lock rule
+
+SPC V1 remains a validation program until both technical and commercial evidence pass the roadmap gates.
+
+Only after `SPC-G7 — PIVOT LOCK` may SPC be promoted to:
+
+`PRIMARY_COMMERCIAL_TRACK`
+
+Until then:
+
+- Exact Identity Track = `RESEARCH_PARKED / NON_MVP_BLOCKING`
+- SPC V1 = `PIVOT_VALIDATION_ACTIVE`
+
+The original 15-item roadmap and its remaining Items 12–15 shall be updated progressively as validated SPC evidence establishes their correct future relationship.
