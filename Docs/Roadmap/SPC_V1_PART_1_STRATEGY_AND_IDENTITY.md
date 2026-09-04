@@ -932,3 +932,137 @@ Resolve identity drift first.
 Next authority document:
 
 `SPC_V1_PART_2_3D_ATLAS_AND_PRODUCT.md`
+
+---
+
+<!-- SPC_C0_COMMERCIAL_LEGAL_ELIGIBILITY_PASS_2026_09_04 -->
+
+# SPC-C0 — Commercial / Legal Eligibility Closure
+
+**Decision date:** `2026-09-04`
+
+**Gate:** `SPC-C0 — Commercial / Legal Eligibility`
+
+**Result:** `PASS`
+
+## Decision
+
+SPC-C0 is closed as PASS because at least one commercially and technically plausible architecture exists for continuing SPC validation.
+
+The preferred initial architecture class is:
+
+`REAL CUSTOMER PHOTO(S)`
+->
+`LOCAL / PRIVATE 2D IDENTITY PROCESSING`
+->
+`APPROVED STYLIZED MASTER 2D`
+->
+`IDENTITY-CONSISTENT MULTI-VIEW`
+->
+`APPROVED EXTERNAL OR LOCAL 3D GENERATION`
+->
+`ATLAS CONTROL`
+
+## 2D direction
+
+The preferred first-line 2D strategy is:
+
+`LOCAL / SELF-HOSTED WHERE PRACTICAL`
+
+Rationale:
+
+- reduce unnecessary external transfer of raw customer photographs;
+- improve privacy-by-design;
+- reduce vendor dependence;
+- reduce per-order API cost where technically feasible;
+- allow ATLAS-controlled identity and style experiments.
+
+A Qwen-class self-hosted image-editing / identity-consistency system is currently a strong initial benchmark candidate.
+
+This is a benchmark preference, not a permanent vendor lock.
+
+Alternative local or commercially eligible systems may be evaluated.
+
+## 3D direction
+
+Initial 3D benchmark candidates include commercially available multi-image / image-to-3D systems such as:
+
+- Rodin-class systems;
+- Tripo-class systems.
+
+These are benchmark candidates only.
+
+Selection must consider:
+
+- identity retention;
+- multi-view handling;
+- geometry quality;
+- output topology;
+- automation suitability;
+- latency;
+- real cost per successful order;
+- commercial license;
+- data processing terms;
+- customer-data handling.
+
+## Customer data restriction
+
+The following rule is active:
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_VENDOR_DPA_OR_WRITTEN_CONFIRMATION`
+
+This means:
+
+- SPC-C0 PASS does NOT authorize unrestricted upload of real customer face photographs to external AI vendors;
+- real customer raw face images shall not be sent to an external 3D service merely because that service passed a technical benchmark;
+- vendor-specific DPA, SCC, contractual language, written confirmation, or equivalent sufficient legal/privacy basis must be verified before such use;
+- synthetic, stylized, consented benchmark data may be used according to the applicable test protocol and legal basis;
+- local/private processing remains preferred for raw identity evidence where practical.
+
+## Important interpretation
+
+`SPC-C0 = PASS`
+
+means:
+
+> A commercially plausible technology and legal architecture exists and the SPC program may proceed to product-definition validation.
+
+It does NOT mean:
+
+> Every identified vendor is approved for production use with real customer photographs.
+
+Vendor approval remains service-specific.
+
+## Current candidate cost interpretation
+
+Initial evidence indicates that external AI generation cost is not currently expected to be the dominant SPC unit-economics risk.
+
+The primary economic risks to measure later are:
+
+- human correction time;
+- regeneration burden;
+- print time;
+- material use;
+- multicolor purge/waste;
+- failed prints;
+- finishing;
+- packaging;
+- customer revisions.
+
+No final unit-cost assumption is locked at SPC-C0.
+
+## Gate transition
+
+`SPC-C0 = PASS`
+
+Next unresolved gate:
+
+`SPC-C1 — Chibi Product Definition`
+
+Immediate next work:
+
+1. Chibi Style Bible V0.
+2. Identity Anchor Contract.
+3. Initial Physical Chibi Contract.
+
+No 3D production implementation shall bypass SPC-C1.

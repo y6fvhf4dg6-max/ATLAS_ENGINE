@@ -23462,3 +23462,109 @@ The next execution work begins from the front of the SPC dependency chain:
 6. bounded 2D stylized identity feasibility.
 
 No downstream 3D implementation shall bypass the required upstream gates.
+
+---
+
+<!-- SPC_C0_CURRENT_STATUS_PASS_2026_09_04 -->
+
+# SPC-C0 — Current Status Closure
+
+**Decision date:** `2026-09-04`
+
+**Gate:** `SPC-C0 — Commercial / Legal Eligibility`
+
+**Result:** `PASS`
+
+SPC-C0 is closed because at least one commercially and technically plausible technology architecture exists for continuing SPC validation.
+
+## Current preferred architecture class
+
+`REAL CUSTOMER PHOTO(S)`
+->
+`LOCAL / PRIVATE 2D IDENTITY PROCESSING`
+->
+`APPROVED STYLIZED MASTER 2D`
+->
+`IDENTITY-CONSISTENT MULTI-VIEW`
+->
+`APPROVED EXTERNAL OR LOCAL 3D GENERATION`
+->
+`ATLAS CONTROL`
+
+## Current 2D direction
+
+Preferred first-line strategy:
+
+`LOCAL / SELF-HOSTED WHERE PRACTICAL`
+
+Current strong initial benchmark candidate class:
+
+`QWEN-CLASS SELF-HOSTED IDENTITY / IMAGE-EDITING SYSTEM`
+
+This is not a permanent vendor lock.
+
+The purpose is to validate:
+
+- identity preservation;
+- stylization quality;
+- multi-view consistency;
+- privacy-by-design;
+- practical local inference.
+
+## Current 3D direction
+
+Current benchmark candidate classes include:
+
+- `RODIN-CLASS MULTI-IMAGE / IMAGE-TO-3D`
+- `TRIPO-CLASS MULTI-VIEW / IMAGE-TO-3D`
+
+These remain benchmark candidates only.
+
+Production approval remains vendor-specific.
+
+## Active customer-data restriction
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_VENDOR_DPA_OR_WRITTEN_CONFIRMATION`
+
+Interpretation:
+
+- SPC-C0 PASS does not authorize unrestricted external upload of real customer raw face photographs;
+- external services require sufficient vendor-specific privacy/legal confirmation before real-customer use;
+- local/private handling of raw identity evidence remains preferred where practical;
+- synthetic, stylized, or otherwise appropriately authorized benchmark inputs may be used under the applicable test protocol.
+
+## Cost interpretation at SPC-C0
+
+Current evidence does not indicate that external AI generation cost is the dominant SPC economic risk.
+
+Later measurement must focus especially on:
+
+- human correction time;
+- regeneration burden;
+- print time;
+- material consumption;
+- multicolor purge/waste;
+- failures/reprints;
+- finishing;
+- packaging;
+- customer revisions.
+
+No final per-order cost is locked at SPC-C0.
+
+## Gate transition
+
+Current completed gate:
+
+`SPC-C0 = PASS`
+
+Current unresolved gate:
+
+`SPC-C1 — CHIBI PRODUCT DEFINITION`
+
+Immediate next work:
+
+1. `CHIBI STYLE BIBLE V0`
+2. `IDENTITY ANCHOR CONTRACT`
+3. `INITIAL PHYSICAL CHIBI CONTRACT`
+
+No downstream 3D production implementation shall bypass SPC-C1.

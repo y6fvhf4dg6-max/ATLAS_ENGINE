@@ -25596,3 +25596,132 @@ Then confirm:
 - Phase 9 = `NOT_AUTHORIZED / NOT_STARTED`
 
 Then continue from the earliest unresolved SPC gate.
+
+---
+
+<!-- SPC_C0_DEVIR_PASS_2026_09_04 -->
+
+# SPC-C0 — Devir Closure Update
+
+**Decision date:** `2026-09-04`
+
+**Gate:** `SPC-C0 — Commercial / Legal Eligibility`
+
+**Result:** `PASS`
+
+## Closure meaning
+
+SPC-C0 is closed because at least one technically and commercially plausible route exists for continuing the Stylized Personalized Collectible validation program.
+
+The closure does not constitute blanket vendor approval.
+
+The current architecture preference is:
+
+`REAL CUSTOMER PHOTO(S)`
+->
+`LOCAL / PRIVATE 2D IDENTITY PROCESSING`
+->
+`APPROVED STYLIZED MASTER 2D`
+->
+`IDENTITY-CONSISTENT MULTI-VIEW`
+->
+`APPROVED EXTERNAL OR LOCAL 3D GENERATION`
+->
+`ATLAS CONTROL`
+
+## Current 2D direction
+
+Preferred:
+
+`LOCAL / SELF-HOSTED WHERE PRACTICAL`
+
+Current strong benchmark candidate class:
+
+`QWEN-CLASS SELF-HOSTED IDENTITY / IMAGE-EDITING SYSTEM`
+
+This is not a permanent vendor lock.
+
+The benchmark shall determine whether this class can provide:
+
+- recognizable stylized identity;
+- controlled style;
+- sufficient character consistency;
+- useful viewpoint generation;
+- acceptable local performance.
+
+## Current 3D direction
+
+Current benchmark candidate classes:
+
+- `RODIN-CLASS`
+- `TRIPO-CLASS`
+
+These remain benchmark candidates only.
+
+Final production selection requires measured evidence for:
+
+- identity retention;
+- multi-view performance;
+- geometry quality;
+- cost;
+- latency;
+- failure/regeneration;
+- commercial terms;
+- privacy/data handling.
+
+## Active external-upload restriction
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_VENDOR_DPA_OR_WRITTEN_CONFIRMATION`
+
+Therefore:
+
+- do not send raw real-customer face photographs to external AI vendors merely because a vendor is technically attractive;
+- verify vendor-specific DPA, SCC, contractual terms, written confirmation, or equivalent sufficient legal/privacy basis;
+- prefer local/private processing for raw identity evidence where practical;
+- use appropriately authorized benchmark material during validation.
+
+## Economic interpretation
+
+At SPC-C0 closure, external AI generation cost does not appear to be the dominant expected unit-economics risk.
+
+The main risks to measure later remain:
+
+- human correction time;
+- regeneration;
+- print time;
+- material;
+- multicolor purge/waste;
+- failure/reprint;
+- finishing;
+- packaging;
+- customer revision burden.
+
+No final per-order cost is locked.
+
+## Gate transition
+
+Closed:
+
+`SPC-C0 = PASS`
+
+Next unresolved gate:
+
+`SPC-C1 — CHIBI PRODUCT DEFINITION`
+
+Immediate next work:
+
+1. `CHIBI STYLE BIBLE V0`
+2. `IDENTITY ANCHOR CONTRACT`
+3. `INITIAL PHYSICAL CHIBI CONTRACT`
+
+No downstream 3D implementation shall bypass SPC-C1.
+
+## Resume instruction
+
+When resuming from this checkpoint:
+
+- treat SPC-C0 as closed;
+- do not reopen vendor/legal research unless new evidence or a production-vendor decision requires it;
+- start at SPC-C1;
+- first define the Chibi product before running 2D generation benchmarks;
+- keep Phase 9 `NOT_AUTHORIZED / NOT_STARTED`.
