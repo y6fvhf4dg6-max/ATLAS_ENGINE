@@ -23568,3 +23568,150 @@ Immediate next work:
 3. `INITIAL PHYSICAL CHIBI CONTRACT`
 
 No downstream 3D production implementation shall bypass SPC-C1.
+
+---
+
+<!-- SPC_C1_CURRENT_STATUS_PASS_2026_09_04 -->
+
+# SPC-C1 — Current Status Closure
+
+**Decision date:** `2026-09-04`
+
+**Gate:** `SPC-C1 — Chibi Product Definition`
+
+**Result:** `PASS`
+
+SPC-C1 is closed because the initial Chibi V0 product definition, identity preservation rules, and initial physical product contract are sufficiently defined to proceed to 2D stylized identity validation.
+
+## Approved V0 product direction
+
+`STYLE = PREMIUM_STYLIZED_PERSONAL_SCULPTURE`
+
+Core principle:
+
+`IDENTITY_BEFORE_STYLE`
+
+Initial V0 benchmark dimensions:
+
+- `CHIBI_V0_TOTAL_HEIGHT_MM = 150`
+- `HEAD_TO_TOTAL_HEIGHT_RATIO = 0.35–0.40`
+- nominal starting point approximately `0.38`
+- `BASE_DIAMETER_MM = 70–75`
+- `BASE_HEIGHT_MM = 7–8`
+
+Initial pose:
+
+`POSE_CLASS = COMPACT_NATURAL_STANDING`
+
+Initial facial stylization:
+
+`FACIAL_STYLIZATION = LOW_TO_MODERATE`
+
+## Identity Anchor Contract
+
+Identity preservation is mandatory.
+
+Highest-priority identity characteristics include:
+
+- overall head / skull silhouette;
+- forehead / temporal / cheek / jaw / chin proportions;
+- eye spacing and orientation;
+- nose character;
+- mouth width and form;
+- jaw / chin relationship;
+- hairline.
+
+Additional high-priority characteristics include:
+
+- eye opening character;
+- eyebrows;
+- detailed nose and lip character;
+- ear openness / height / silhouette;
+- facial fullness;
+- age-related facial character;
+- recognizable asymmetry;
+- hair volume / parting / curl / mass.
+
+Contextual identity features shall be preserved when relevant, including:
+
+- beard;
+- moustache;
+- glasses;
+- moles;
+- scars;
+- distinctive marks;
+- characteristic accessories.
+
+If a stylized result is visually attractive but no longer clearly carries the subject's identity:
+
+`RESULT = FAIL`
+
+## Initial physical production direction
+
+Final physical production geometry:
+
+`FINAL_PRODUCTION_GEOMETRY = STL`
+
+Accepted richer intermediate/source formats may include:
+
+- `GLB`
+- `OBJ`
+
+For multicolor production:
+
+`MULTICOLOR_OUTPUT = PART_BASED_STL_ALLOWED`
+
+Initial physical expectations include:
+
+- integrated stable base;
+- both feet supported;
+- compact pose;
+- flat base underside;
+- manifold geometry;
+- slicer-safe geometry;
+- controlled support burden;
+- readable face and hair detail;
+- practical handling and packaging robustness.
+
+## Parameter policy
+
+The following remain tunable V0 benchmark parameters:
+
+- total height;
+- head ratio;
+- base diameter;
+- base height;
+- base shape;
+- pose;
+- accessory dimensions;
+- color-part segmentation.
+
+These may be revised later using physical and commercial evidence without automatically reopening SPC-C1.
+
+The following principles remain protected:
+
+- premium stylized personal sculpture positioning;
+- identity-before-style;
+- recognizable identity;
+- identity-anchor preservation;
+- low-to-moderate facial stylization direction;
+- human/customer identity judgment;
+- physical stability and production reliability.
+
+## Gate transition
+
+Closed:
+
+`SPC-C1 = PASS`
+
+Next active gate:
+
+`SPC-G1 — 2D STYLIZED IDENTITY`
+
+The next work is to validate whether source identity can be converted into a recognizable, premium stylized 2D master while preserving the defined identity anchors.
+
+No downstream 3D production implementation shall bypass SPC-G1.
+
+## Phase policy
+
+`PHASE9 = NOT_AUTHORIZED / NOT_STARTED`

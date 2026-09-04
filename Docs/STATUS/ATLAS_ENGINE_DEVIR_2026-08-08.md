@@ -25725,3 +25725,178 @@ When resuming from this checkpoint:
 - start at SPC-C1;
 - first define the Chibi product before running 2D generation benchmarks;
 - keep Phase 9 `NOT_AUTHORIZED / NOT_STARTED`.
+
+---
+
+<!-- SPC_C1_DEVIR_PASS_2026_09_04 -->
+
+# SPC-C1 — Devir Closure Update
+
+**Decision date:** `2026-09-04`
+
+**Gate:** `SPC-C1 — Chibi Product Definition`
+
+**Result:** `PASS`
+
+SPC-C1 is closed because the initial Chibi V0 product definition is sufficiently complete to support 2D stylized identity validation.
+
+## Approved product direction
+
+`STYLE = PREMIUM_STYLIZED_PERSONAL_SCULPTURE`
+
+Core principle:
+
+`IDENTITY_BEFORE_STYLE`
+
+Initial V0 benchmark values:
+
+- `CHIBI_V0_TOTAL_HEIGHT_MM = 150`
+- `HEAD_TO_TOTAL_HEIGHT_RATIO = 0.35–0.40`
+- nominal starting point approximately `0.38`
+- `BASE_DIAMETER_MM = 70–75`
+- `BASE_HEIGHT_MM = 7–8`
+- `POSE_CLASS = COMPACT_NATURAL_STANDING`
+- `FACIAL_STYLIZATION = LOW_TO_MODERATE`
+
+These values define the first benchmark, not immutable production constants.
+
+## Identity Anchor Contract
+
+Identity preservation remains mandatory.
+
+### CRITICAL identity anchors
+
+Highest-priority preservation includes:
+
+- overall head / skull silhouette;
+- forehead width and cranial character;
+- temporal width;
+- cheekbone width;
+- jaw width;
+- chin shape;
+- head length-to-width character;
+- eye spacing;
+- eye orientation / inclination;
+- nose character;
+- mouth width / form;
+- jaw / chin relationship;
+- hairline.
+
+### HIGH identity anchors
+
+High-priority preservation includes:
+
+- eye opening character;
+- eyebrows;
+- eyebrow-to-eye relationship;
+- detailed nose character;
+- lip / philtrum character;
+- chin projection;
+- ear openness / height / silhouette;
+- facial fullness;
+- age-related facial character;
+- periocular / nasolabial character;
+- recognizable asymmetry;
+- hair volume;
+- hair parting;
+- characteristic curl / wave / mass.
+
+### CONTEXTUAL identity anchors
+
+Preserve when relevant:
+
+- beard;
+- moustache;
+- glasses;
+- moles;
+- scars;
+- distinctive marks;
+- characteristic accessories;
+- other subject-specific signature features.
+
+Identity gate:
+
+If a stylized result looks attractive but no longer clearly carries the subject's identity:
+
+`RESULT = FAIL`
+
+## Initial physical production contract
+
+Final physical production geometry:
+
+`FINAL_PRODUCTION_GEOMETRY = STL`
+
+Accepted richer intermediate/source formats may include:
+
+- `GLB`
+- `OBJ`
+
+Multicolor production may use:
+
+`MULTICOLOR_OUTPUT = PART_BASED_STL_ALLOWED`
+
+Initial physical expectations:
+
+- integrated stable base;
+- both feet supported;
+- flat base underside;
+- compact pose;
+- reduced fragile appendage risk;
+- manifold geometry;
+- slicer-safe geometry;
+- controlled support burden;
+- readable face and hair detail;
+- practical handling / packaging robustness.
+
+## Tunable V0 product parameters
+
+The following may be changed after physical and commercial evidence without automatically reopening SPC-C1:
+
+- total height;
+- head ratio;
+- base diameter;
+- base height;
+- base shape;
+- pose;
+- accessory dimensions;
+- color-part segmentation.
+
+## Protected principles
+
+The following remain protected and require stronger evidence before change:
+
+- premium stylized personal sculpture positioning;
+- identity-before-style;
+- recognizable subject identity;
+- identity-anchor preservation;
+- low-to-moderate facial stylization direction;
+- human/customer identity judgment;
+- physical stability;
+- production reliability.
+
+## Gate transition
+
+Closed:
+
+`SPC-C1 = PASS`
+
+Next active gate:
+
+`SPC-G1 — 2D STYLIZED IDENTITY`
+
+The next work shall test whether source identity can be converted into a recognizable premium stylized 2D master while preserving the approved identity anchors.
+
+No downstream 3D implementation shall bypass SPC-G1.
+
+## Resume instruction
+
+When resuming after this checkpoint:
+
+- treat `SPC-C0` as closed / PASS;
+- treat `SPC-C1` as closed / PASS;
+- do not reopen Chibi product-definition decisions unless new evidence requires revision;
+- start directly at `SPC-G1 — 2D STYLIZED IDENTITY`;
+- first define the bounded 2D stylized-identity benchmark protocol before running generation;
+- preserve `IDENTITY_BEFORE_STYLE`;
+- keep `REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_VENDOR_DPA_OR_WRITTEN_CONFIRMATION`;
+- keep Phase 9 `NOT_AUTHORIZED / NOT_STARTED`.

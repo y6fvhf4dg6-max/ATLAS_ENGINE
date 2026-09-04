@@ -1066,3 +1066,387 @@ Immediate next work:
 3. Initial Physical Chibi Contract.
 
 No 3D production implementation shall bypass SPC-C1.
+
+---
+
+<!-- SPC_C1_CHIBI_PRODUCT_DEFINITION_BASELINE_2026_09_04 -->
+
+# SPC-C1 — Chibi Product Definition Baseline
+
+**Decision date:** `2026-09-04`
+
+**Gate:** `SPC-C1 — Chibi Product Definition`
+
+**Status:** `ACTIVE / BASELINE_DEFINED`
+
+This section defines the initial V0 benchmark product contract for the first SPC Chibi feasibility path.
+
+`SPC-C1` is NOT closed by this update.
+
+The purpose is to establish a controlled physical and visual baseline before 2D stylized identity benchmarking begins.
+
+## Product positioning
+
+`STYLE = PREMIUM_STYLIZED_PERSONAL_SCULPTURE`
+
+The intended product character is:
+
+- premium desktop collectible / mini sculpture;
+- personalized;
+- recognizable as the real subject;
+- clearly stylized;
+- not photo-real;
+- not strongly toy-like;
+- not anime / super-deformed by default.
+
+The dominant design rule is:
+
+`IDENTITY_BEFORE_STYLE`
+
+A visually attractive stylization that destroys recognizability is a FAIL.
+
+## V0 physical benchmark dimensions
+
+Initial benchmark target:
+
+`CHIBI_V0_TOTAL_HEIGHT_MM = 150`
+
+Initial head-to-total-height band:
+
+`HEAD_TO_TOTAL_HEIGHT_RATIO = 0.35–0.40`
+
+Nominal starting point:
+
+`HEAD_TO_TOTAL_HEIGHT_RATIO_NOMINAL = ~0.38`
+
+Initial integrated base target:
+
+`BASE_DIAMETER_MM = 70–75`
+
+`BASE_HEIGHT_MM = 7–8`
+
+These are V0 benchmark parameters, not immutable production constants.
+
+They may be revised after physical evidence for:
+
+- stability;
+- visual balance;
+- print time;
+- material use;
+- detail readability;
+- packaging;
+- customer preference.
+
+## Pose contract
+
+`POSE_CLASS = COMPACT_NATURAL_STANDING`
+
+Initial V0 pose rules:
+
+- both feet attached to the base;
+- center of mass kept near the base center;
+- mild natural shoulder / hip asymmetry allowed;
+- arms may separate from the torso but shall remain compact;
+- extreme arm extension is not part of the initial benchmark;
+- running, jumping, single-leg and highly dynamic poses are excluded from V0;
+- long fragile accessories are excluded from the initial benchmark;
+- head rotation should remain mild for the initial benchmark;
+- the overall silhouette should read as a small sculpture rather than an action toy.
+
+## Facial stylization contract
+
+`FACIAL_STYLIZATION = LOW_TO_MODERATE`
+
+The style may simplify or gently exaggerate selected forms, but identity-carrying proportions shall remain dominant.
+
+Design intent:
+
+- stylization should remain visibly present;
+- facial geometry should not collapse to a generic character template;
+- age and character should not be erased merely to increase cuteness;
+- subject-specific asymmetry may be preserved where it contributes to identity.
+
+The approximate design direction is:
+
+- identity retention visually dominant;
+- stylization secondary;
+- no numeric recognition score is implied by this wording.
+
+## Identity Anchor Contract
+
+Identity anchors are grouped by preservation priority.
+
+### CRITICAL
+
+The following identity anchors shall receive the highest preservation priority:
+
+- overall head / skull silhouette;
+- forehead width and cranial character;
+- temporal width;
+- cheekbone width;
+- jaw width;
+- chin shape;
+- head length-to-width character;
+- eye spacing;
+- eye inclination / orientation;
+- nose character;
+- mouth width and mouth form;
+- jaw / chin relationship;
+- hairline.
+
+### HIGH
+
+The following anchors are high-priority:
+
+- eye opening character;
+- eyebrow shape;
+- eyebrow-to-eye spacing;
+- nose length;
+- bridge character;
+- nose tip character;
+- nostril width;
+- nose-to-mouth spacing;
+- lip form;
+- philtrum character;
+- chin projection;
+- ear openness;
+- ear height;
+- ear silhouette;
+- facial fullness;
+- age-related facial character;
+- nasolabial character;
+- periocular character;
+- recognizable facial asymmetry;
+- hair volume;
+- hair parting direction;
+- characteristic curl / wave / mass.
+
+### CONTEXTUAL
+
+The following anchors shall be preserved when identity-relevant for the subject:
+
+- beard;
+- moustache;
+- glasses;
+- moles;
+- scars;
+- distinctive marks;
+- characteristic accessories;
+- other subject-specific signature features.
+
+## Identity acceptance principle
+
+If the stylized result is aesthetically successful but the combined anchor pattern no longer clearly carries the subject's identity:
+
+`RESULT = FAIL`
+
+Style quality cannot override identity failure.
+
+## Initial Physical Chibi Contract
+
+Primary physical output:
+
+`FINAL_PRODUCTION_GEOMETRY = STL`
+
+Accepted intermediate/source formats may include:
+
+- `GLB`
+- `OBJ`
+
+ATLAS shall not constrain upstream AI generation to STL if a richer intermediate format provides better geometry or material handling.
+
+For multicolor production, ATLAS may output separate print components such as:
+
+- skin;
+- hair;
+- clothing;
+- accessories;
+- base;
+- other color-separated geometry.
+
+Therefore:
+
+`MULTICOLOR_OUTPUT = PART_BASED_STL_ALLOWED`
+
+## Physical safety and printability rules
+
+The V0 benchmark shall prefer:
+
+- two-foot base attachment;
+- integrated base;
+- flat base underside;
+- compact pose;
+- reduced thin-ankle risk;
+- reduced thin-wrist risk;
+- reduced unsupported long appendages;
+- reduced fragile accessory risk;
+- manifold geometry;
+- slicer-safe geometry;
+- controlled support requirement;
+- readable facial and hair detail at approximately 150 mm total height.
+
+The design shall prioritize physical reliability without destroying visual quality.
+
+## Stability requirement
+
+The first V0 product shall not be accepted if it is prone to ordinary tabletop tipping.
+
+The current base band is intentionally conservative:
+
+`BASE_DIAMETER_MM = 70–75`
+
+This band may be adjusted after physical stability testing.
+
+Possible future variants may include smaller or larger bases if evidence supports them.
+
+## Initial physical acceptance criteria
+
+A first physical Chibi candidate may proceed only if all of the following are sufficiently satisfied:
+
+1. the person is recognizable;
+2. the object reads as a premium stylized personal sculpture;
+3. the result does not read as an overly toy-like generic character;
+4. the figure is stable on a tabletop;
+5. facial and hair detail remain readable;
+6. the mesh is manifold / slicer-safe;
+7. support and cleanup burden remain operationally reasonable;
+8. fragile regions remain acceptable for handling and packaging;
+9. multicolor separation is feasible where the product requires it;
+10. the result remains compatible with ATLAS-controlled production.
+
+## Parameter-change policy
+
+The following are explicitly treated as tunable product parameters:
+
+- total height;
+- head ratio;
+- base diameter;
+- base height;
+- base shape;
+- pose;
+- accessory dimensions;
+- color-part segmentation.
+
+These may be changed after physical evidence without redefining the entire SPC architecture.
+
+The following are more fundamental and require stronger justification before changing:
+
+- premium stylized sculpture positioning;
+- identity-before-style principle;
+- identity anchor preservation logic;
+- facial stylization philosophy;
+- customer identity acceptance logic.
+
+## Current SPC-C1 state
+
+`SPC-C1 = ACTIVE`
+
+Current baseline components defined:
+
+1. `CHIBI STYLE BIBLE V0`
+2. `IDENTITY ANCHOR CONTRACT`
+3. `INITIAL PHYSICAL CHIBI CONTRACT`
+
+This update does NOT declare:
+
+`SPC-C1 = PASS`
+
+SPC-C1 closure requires a dedicated closure check / decision after the baseline definition is reviewed for completeness and internal consistency.
+
+---
+
+<!-- SPC_C1_CHIBI_PRODUCT_DEFINITION_PASS_2026_09_04 -->
+
+# SPC-C1 — Chibi Product Definition Closure
+
+**Decision date:** `2026-09-04`
+
+**Gate:** `SPC-C1 — Chibi Product Definition`
+
+**Result:** `PASS`
+
+SPC-C1 is closed because the initial Chibi V0 product definition is sufficiently complete and internally consistent to support the next feasibility gate.
+
+## Closure basis
+
+The following baseline components are defined:
+
+1. `CHIBI STYLE BIBLE V0`
+2. `IDENTITY ANCHOR CONTRACT`
+3. `INITIAL PHYSICAL CHIBI CONTRACT`
+
+The approved V0 direction includes:
+
+- `STYLE = PREMIUM_STYLIZED_PERSONAL_SCULPTURE`
+- `IDENTITY_BEFORE_STYLE`
+- `CHIBI_V0_TOTAL_HEIGHT_MM = 150`
+- `HEAD_TO_TOTAL_HEIGHT_RATIO = 0.35–0.40`
+- nominal starting point approximately `0.38`
+- `BASE_DIAMETER_MM = 70–75`
+- `BASE_HEIGHT_MM = 7–8`
+- `POSE_CLASS = COMPACT_NATURAL_STANDING`
+- `FACIAL_STYLIZATION = LOW_TO_MODERATE`
+- identity-anchor preservation priorities;
+- integrated stable base;
+- two-foot support;
+- manifold / slicer-safe physical geometry;
+- STL as final production geometry;
+- GLB / OBJ allowed as richer intermediate formats;
+- part-based STL allowed for multicolor production.
+
+## V0 interpretation
+
+The above dimensional values are benchmark standards, not immutable product constants.
+
+The following may be revised after physical and commercial evidence:
+
+- total height;
+- head ratio;
+- base diameter;
+- base height;
+- base shape;
+- pose;
+- accessory dimensions;
+- color-part segmentation.
+
+Such revisions do not by themselves reopen SPC-C1 if the underlying product identity remains intact.
+
+## Protected product principles
+
+The following are more fundamental and shall not be changed casually:
+
+- premium stylized personal sculpture positioning;
+- identity-before-style principle;
+- recognizable subject identity;
+- identity anchor preservation;
+- low-to-moderate facial stylization direction;
+- customer/human identity judgment as an acceptance authority;
+- physical stability and production reliability.
+
+## Closure Challenge
+
+The dedicated SPC-C1 closure challenge passed on `2026-09-04`.
+
+Therefore:
+
+`SPC-C1 = PASS`
+
+## Gate transition
+
+Closed:
+
+`SPC-C1 — CHIBI PRODUCT DEFINITION`
+
+Next active gate:
+
+`SPC-G1 — 2D STYLIZED IDENTITY`
+
+The next work shall validate whether approved customer/source identity can be converted into a recognizable, premium stylized 2D master while preserving the defined identity anchors.
+
+No downstream 3D production implementation shall bypass SPC-G1.
+
+## Phase policy
+
+`PHASE9 = NOT_AUTHORIZED / NOT_STARTED`
+
+SPC progression does not authorize Phase 9.
