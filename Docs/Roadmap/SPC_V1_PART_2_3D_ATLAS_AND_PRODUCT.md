@@ -886,3 +886,45 @@ Only then does the program proceed toward broad pilot and product expansion.
 Next authority document:
 
 `SPC_V1_PART_3_BUSINESS_PILOT_AND_GOVERNANCE.md`
+
+
+<!-- SPC_G4_PRODUCTION_NORMALIZATION_CHECKPOINT_2026_09_05 -->
+## SPC-G4 Checkpoint — Production Topology + 150 mm Normalization — 2026-09-05
+
+**Status:** `ACTIVE / NOT YET CLOSED`
+
+### Closed in this checkpoint
+
+1. **Source-preserving topology cleanup — PASS**
+   - Exact-weld Tripo mesh retained as G4 source route.
+   - 4 components reduced to 1 by removing only 3 microscopic debris components.
+   - Faces: 1,428,723 → 1,428,718.
+   - Removed faces: 5.
+   - Main geometry: watertight and winding consistent.
+   - No smoothing, remeshing, or facial reshaping performed.
+
+2. **150 mm production normalization — PASS**
+   - Final dimensions: 117.293457 × 150.000000 × 123.782516 mm.
+   - Y = vertical axis.
+   - Lowest Y = 0 mm.
+   - X/Z centered at origin.
+   - Uniform scale only.
+   - Output SHA256: `29d56b1f1cdba6be9f5d9b77b6a3280baa1e90d1ac9509ca3aef8b8a0f73c667`.
+
+### Explicitly parked
+
+- Facial micro-artifact cleanup is `PARKED / NON-BLOCKING`.
+- G4.22 spatial-cluster diagnostic is cancelled/not required for the current commercial path.
+- No additional cheek-mask or micro-surface tuning should be performed unless a later physical/visual production test demonstrates a real blocker.
+
+### Remaining G4 work
+
+Only production-relevant checks remain: printability / fragile-feature feasibility and product integration needed to decide the final G4 gate.
+
+`SPC-G5 = NOT STARTED`.
+
+`Phase 9 = NOT AUTHORIZED / NOT STARTED`.
+
+Persistent evidence:
+`EVIDENCE/SPC_G4/production_normalization_2026_09_05/`
+<!-- /SPC_G4_PRODUCTION_NORMALIZATION_CHECKPOINT_2026_09_05 -->

@@ -23715,3 +23715,28 @@ No downstream 3D production implementation shall bypass SPC-G1.
 ## Phase policy
 
 `PHASE9 = NOT_AUTHORIZED / NOT_STARTED`
+
+
+<!-- SPC_G4_PRODUCTION_NORMALIZATION_CHECKPOINT_2026_09_05 -->
+## SPC-G4 Production Normalization Checkpoint — 2026-09-05
+
+- `SPC-G4 = ACTIVE / NOT YET CLOSED`
+- Selected source-preserving route: exact-weld Tripo geometry.
+- Facial micro-artifact investigation: `PARKED / NON-BLOCKING`; no further cheek ROI/cluster tuning is authorized as a current blocker.
+- Production topology cleanup: `PASS`.
+  - Source components: 4.
+  - Main component retained: 1,428,718 / 1,428,723 faces.
+  - Removed debris: 5 faces total.
+  - Result: 1 component, watertight, winding consistent.
+  - Production-clean SHA256: `5b18124c20bef76ab9b6335ed5b168cf8afef359ea82c1b524cebddd73707e0b`.
+- 150 mm production normalization: `PASS`.
+  - Final extents: 117.293457 × 150.000000 × 123.782516 mm.
+  - Vertical axis: Y.
+  - Ground: Y=0.
+  - X/Z centered at 0.
+  - Uniform scaling only; identity geometry proportions preserved.
+  - Normalized mesh SHA256: `29d56b1f1cdba6be9f5d9b77b6a3280baa1e90d1ac9509ca3aef8b8a0f73c667`.
+- Persistent evidence: `EVIDENCE/SPC_G4/production_normalization_2026_09_05/`.
+- `SPC-G5 = NOT STARTED`.
+- `Phase 9 = NOT AUTHORIZED / NOT STARTED`.
+<!-- /SPC_G4_PRODUCTION_NORMALIZATION_CHECKPOINT_2026_09_05 -->
