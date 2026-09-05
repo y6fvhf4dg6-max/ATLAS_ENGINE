@@ -1086,3 +1086,16 @@ This sequence shall govern SPC V1 unless new evidence justifies an explicit arch
 ---
 
 # END OF SPC V1 ROADMAP
+
+
+<!-- SPC_CHIBI_MAINLINE_RECONFIRMED_2026_09_05 -->
+### SPC_V1 — Chibi Mainline Reconfirmed (2026-09-05)
+
+- The 150 mm Meshy V7 bust is retained only as an **intermediate identity + physical-production proof specimen**; it is not the final SPC product.
+- The locked SPC-C1 product target remains unchanged: **150 mm stylized/chibi full-body figurine**, identity-first, compact body, integrated base.
+- Meshy V7 is the currently selected successful 3D identity/head source for this pilot subject.
+- SPC-G4 remains **ACTIVE**.
+- **Exact next mainline task:** preserve the successful Meshy V7 identity/head while integrating it into the locked 150 mm chibi full-body product.
+- After the chibi full-body milestone, continue with reusable/ready-made 3D asset integration, followed by the model/diorama base ("maket ayağı") product layer.
+- SPC-G5, SPC-G6 and SPC-G7 retain their existing order; this checkpoint does not insert or reorder main gates.
+<!-- /SPC_CHIBI_MAINLINE_RECONFIRMED_2026_09_05 -->
