@@ -25900,3 +25900,22 @@ When resuming after this checkpoint:
 - preserve `IDENTITY_BEFORE_STYLE`;
 - keep `REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_VENDOR_DPA_OR_WRITTEN_CONFIRMATION`;
 - keep Phase 9 `NOT_AUTHORIZED / NOT_STARTED`.
+
+
+<!-- SPC_BUST_INTERMEDIATE_PROOF_RECORDED_2026_09_05 -->
+### SPC_V1 — Intermediate Bust Proof (2026-09-05)
+
+- The 150 mm Meshy V7 bust is an **intermediate identity + physical-production proof specimen**, not the final SPC product.
+- The locked SPC-C1 product target is unchanged: **150 mm stylized/chibi full-body figurine**, identity-first, compact body, integrated base.
+- The bust side-proof established a viable production chain for the selected Meshy V7 identity geometry:
+  - geometry-only identity preservation,
+  - exact duplicate-vertex weld,
+  - minimal local topology repair,
+  - watertight / winding-consistent production mesh,
+  - uniform 150 mm normalization,
+  - verified STL export,
+  - Bambu Studio print-orientation, support and prototype slicing workflow.
+- SPC-G4 remains **ACTIVE**; the bust does **not** close the full chibi product gate.
+- **Exact next mainline task:** preserve the successful Meshy V7 identity/head while integrating it into the locked 150 mm chibi full-body product.
+- After the chibi full-body milestone, continue with reusable/ready-made 3D asset integration and then the model/diorama base ("maket ayağı") product layer.
+<!-- /SPC_BUST_INTERMEDIATE_PROOF_RECORDED_2026_09_05 -->
