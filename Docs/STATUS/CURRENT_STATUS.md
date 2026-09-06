@@ -24013,3 +24013,65 @@ Old Phase 9 remains:
 `NOT_AUTHORIZED / NOT_STARTED`
 
 [PERSONALIZED_FIGURINE_P0_GATE_CLOSED_2026_09_06:END]
+
+---
+
+[PERSONALIZED_FIGURINE_P1_GATE_CLOSED_2026_09_06:BEGIN]
+
+# Personalized 3D Figurine P-1 — Five Product Contracts Closure
+
+**Decision date:** `2026-09-06`
+
+**User decision:** `APPROVED`
+
+`GATE_P1 = PASS / FIVE_PRODUCT_CONTRACTS_LOCKED`
+
+Persistent product contract:
+
+`Docs/Roadmap/PERSONALIZED_3D_FIGURINE_FIVE_PRODUCT_CONTRACTS_V1.md`
+
+The approved contract covers:
+
+1. `PF-1 — PREMIUM REALISTIC FULL-BODY FIGURINE`
+2. `PF-2 — MODERN CHIBI FIGURINE`
+3. `PF-3 — COUPLE / FAMILY FIGURINE`
+4. `PF-4 — NATURAL KEEPSAKE FIGURINE`
+5. `PF-5 — BOBBLEHEAD / CHARACTER FIGURINE`
+
+Protected shared rule:
+
+`IDENTITY_BEFORE_STYLE`
+
+Locked decisions include:
+
+- PF-1 initially uses premium one-color resin with optional hand finish;
+- PF-3 uses one shared technical family with separate Couple and Family
+  commercial offers allowed;
+- PF-4 defaults to 150 mm;
+- PF-5 V0 is fixed-head only;
+- base inscription is optional across all five families;
+- one consolidated customer preference revision is included;
+- ATLAS/artist-caused mismatch correction is treated separately;
+- PF-2 remains 150 mm nominal and the first full-body physical target;
+- customer approval of the production-intent model is required before printing.
+
+This closure does not authorize commercial launch or production geometry.
+
+`PRODUCT_LAUNCH_AUTHORIZATION = NO`
+
+`PRODUCTION_GEOMETRY_AUTHORIZATION = NO`
+
+`CURRENT_WORK_PROGRAM = P-2`
+
+`CURRENT_GATE = GATE-P2`
+
+`EXACT_NEXT = DEFINE_CUSTOMER_CAPTURE_AND_REUSABLE_IDENTITY_PACKAGE`
+
+P-2 shall define the input-quality, consent, provenance, identity-anchor,
+uncertainty and reusable `PERSONAL_IDENTITY_PACKAGE` contract.
+
+Old Phase 9 remains:
+
+`NOT_AUTHORIZED / NOT_STARTED`
+
+[PERSONALIZED_FIGURINE_P1_GATE_CLOSED_2026_09_06:END]
