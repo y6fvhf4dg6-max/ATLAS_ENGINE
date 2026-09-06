@@ -847,3 +847,35 @@ Old Phase 9 remains:
 `NOT_AUTHORIZED / NOT_STARTED`
 
 [PERSONALIZED_FIGURINE_P1_GATE_CLOSED_2026_09_06:END]
+
+[PERSONALIZED_FIGURINE_P2_GATE_CLOSED_2026_09_06:BEGIN]
+
+# Personalized 3D Figurine P-2 — Customer Capture and Identity Package Closure
+
+**Decision date:** `2026-09-06`
+
+**User decision:** `APPROVED`
+
+`GATE_P2 = PASS / REUSABLE_IDENTITY_PACKAGE_CONTRACT_LOCKED`
+
+Persistent contract:
+
+`Docs/Roadmap/PERSONALIZED_3D_FIGURINE_CUSTOMER_CAPTURE_AND_IDENTITY_PACKAGE_V1.md`
+
+The locked contract establishes preferred multiview capture, a limited single-photo fallback, one identity package per depicted person, explicit customer authorization, provider-transfer controls, versioned approval, consent-scoped reuse, uncertainty tracking and provisional retention rules pending German/EU professional legal review.
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_APPROVED_VENDOR_ROUTE`
+
+`PRODUCT_LAUNCH_AUTHORIZATION = NO`
+
+`PRODUCTION_GEOMETRY_AUTHORIZATION = NO`
+
+`CURRENT_WORK_PROGRAM = P-3`
+
+`CURRENT_GATE = GATE-P3`
+
+`EXACT_NEXT = BENCHMARK_COMMERCIALLY_ADMISSIBLE_GENERATION_ROUTES`
+
+P-3 shall select primary and fallback generation routes only from verified identity, geometry, cost, latency, privacy, licensing and revision evidence. No real customer photograph may be externally uploaded before an approved provider route exists.
+
+[PERSONALIZED_FIGURINE_P2_GATE_CLOSED_2026_09_06:END]
