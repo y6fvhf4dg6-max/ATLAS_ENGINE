@@ -1,3 +1,34 @@
+<!-- PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1_SUPERSESSION_2026_09_06 -->
+
+# HISTORICAL ROADMAP — SUPERSEDED AS ACTIVE AUTHORITY
+
+**Supersession date:** `2026-09-06`
+
+**Status:** `SUPERSEDED_AS_ACTIVE_AUTHORITY / HISTORICAL_PRESERVED`
+
+The complete SPC V1 content below is preserved as historical strategy,
+technical evidence and decision provenance.
+
+It is no longer the active execution roadmap.
+
+Current active authority:
+
+`Docs/Roadmap/PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1.md`
+
+Important continuity rules:
+
+- do not delete or rewrite the historical SPC evidence below;
+- do not execute an old `next` instruction when it conflicts with the current
+  active roadmap;
+- the former subject-specific harmonic shelf repair is not the active mainline;
+- all five personalized figurine product families are now in program scope;
+- the exact next active task is `P-0 / BUILD_VERIFIED_ATLAS_CAPABILITY_MATRIX`;
+- old Phase 9 remains `NOT_AUTHORIZED / NOT_STARTED`.
+
+<!-- /PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1_SUPERSESSION_2026_09_06 -->
+
+---
+
 # ATLAS — Stylized Personalized Collectible Program V1
 ## PART 1 — Strategy, Identity and 2D Foundation
 

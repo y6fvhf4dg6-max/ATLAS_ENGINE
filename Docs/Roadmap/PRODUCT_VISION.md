@@ -276,3 +276,131 @@ Every meaningful place can become a physical object.
 Every memory has a location.
 
 ATLAS transforms locations into lasting objects.
+
+---
+
+<!-- PERSONALIZED_3D_FIGURINE_PRODUCT_VISION_EXPANSION_2026_09_06 -->
+
+# PRODUCT PLATFORM EXPANSION — PERSONALIZED 3D FIGURINES
+
+**Decision date:** `2026-09-06`
+
+**Status:** `ACTIVE_PRODUCT_PLATFORM_EXPANSION`
+
+The original ATLAS geographic product vision remains valid and preserved.
+
+ATLAS now has two complementary personalized physical-product pillars:
+
+## Pillar A — Personalized Geographic Products
+
+Examples:
+
+- My Life Map;
+- wall collections;
+- city and landmark reliefs;
+- location-based gifts;
+- model and diorama products.
+
+Core emotional input:
+
+`MEANINGFUL PLACE`
+
+## Pillar B — Personalized Human Figurine Products
+
+Examples:
+
+1. premium realistic full-body figurine;
+2. modern Chibi figurine;
+3. couple/family figurine;
+4. natural keepsake figurine;
+5. bobblehead/character figurine.
+
+Core emotional input:
+
+`MEANINGFUL PERSON`
+
+Active authority for Pillar B:
+
+`Docs/Roadmap/PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1.md`
+
+## Shared ATLAS platform role
+
+Across both pillars ATLAS shall convert imperfect digital or AI-generated
+inputs into controlled physical products.
+
+Shared responsibilities include:
+
+- provenance;
+- parameterized product specifications;
+- scale and coordinate normalization;
+- geometry validation and repair;
+- semantic/product-part control;
+- printability;
+- color and material strategy;
+- base and display integration;
+- manufacturing evidence;
+- repeatable QA;
+- unit-economics measurement.
+
+## Updated platform objective
+
+ATLAS is not limited to a single automatic city-modeling engine.
+
+The expanded platform objective is:
+
+> Build a controllable personalized 3D product engine that transforms
+> meaningful people and meaningful places into recognizable, desirable and
+> manufacturable physical objects.
+
+The geographic platform is not cancelled or downgraded by this expansion.
+
+The figurine program does not inherit unproven capability merely because
+geographic geometry automation exists.
+
+Each product pillar must pass its own identity, geometry, physical-production
+and economic gates.
+
+## Figurine current state
+
+Verified:
+
+- one subject-specific approved Meshy V7 head/identity;
+- one subject-specific physical bust proof;
+- production cleanup, scale normalization, STL and slicing evidence.
+
+Not yet verified:
+
+- reusable multi-subject identity packages;
+- adaptive head/body assembly;
+- full-body Chibi physical acceptance;
+- feasibility of all five figurine families;
+- repeatable commercial fulfillment.
+
+Exact current figurine task:
+
+`P-0 / BUILD_VERIFIED_ATLAS_CAPABILITY_MATRIX`
+
+## Protected interpretation
+
+`AI = GENERATE`
+
+`ATLAS = CONTROL`
+
+`HUMAN = JUDGE / CORRECT EXCEPTIONS`
+
+`PRODUCTION = MANUFACTURE / VERIFY`
+
+For figurines:
+
+`IDENTITY_BEFORE_STYLE`
+
+For geographic products:
+
+`PLACE_MEANING_AND_READABILITY_BEFORE_DECORATION`
+
+Both pillars serve the broader principle:
+
+> Personal meaning creates product value; ATLAS makes that meaning physically
+> controllable and manufacturable.
+
+<!-- /PERSONALIZED_3D_FIGURINE_PRODUCT_VISION_EXPANSION_2026_09_06 -->

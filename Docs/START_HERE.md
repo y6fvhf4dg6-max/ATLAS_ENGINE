@@ -21064,3 +21064,195 @@ The original 15-item roadmap and its remaining Items 12–15 shall be updated pr
 - **Exact next mainline task:** preserve the successful Meshy V7 identity/head while integrating it into the locked 150 mm chibi full-body product.
 - After the chibi full-body milestone, continue with reusable/ready-made 3D asset integration and then the model/diorama base ("maket ayağı") product layer.
 <!-- /SPC_BUST_INTERMEDIATE_PROOF_RECORDED_2026_09_05 -->
+
+
+---
+
+<!-- PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1_AUTHORITY_2026_09_06 -->
+
+# ATLAS Personalized 3D Figurine Product Family V1 — Active Authority
+
+**Decision date:** `2026-09-06`
+
+**User decision:** `APPROVED ROADMAP SUPERSESSION`
+
+**Active roadmap:**
+
+`Docs/Roadmap/PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1.md`
+
+**Program:**
+
+`ATLAS_PERSONALIZED_3D_FIGURINE_PRODUCT_FAMILY_V1`
+
+**Program status:**
+
+`FOUNDATION_AND_CAPABILITY_AUDIT_ACTIVE`
+
+## Commercial goal
+
+Build a repeatable system that converts customer photographs into recognizable,
+desirable and physically manufacturable personalized 3D figurines.
+
+All five product families are in program scope:
+
+1. `PF-1 — PREMIUM REALISTIC FULL-BODY FIGURINE`
+2. `PF-2 — MODERN CHIBI FIGURINE`
+3. `PF-3 — COUPLE / FAMILY FIGURINE`
+4. `PF-4 — NATURAL KEEPSAKE FIGURINE`
+5. `PF-5 — BOBBLEHEAD / CHARACTER FIGURINE`
+
+The five products shall share one reusable personal identity and
+production-control foundation.
+
+## Core operating model
+
+- `AI = GENERATE`
+- `ATLAS = CONTROL`
+- `HUMAN = JUDGE / CORRECT EXCEPTIONS`
+- `PRODUCTION = MANUFACTURE / VERIFY`
+
+Protected principle:
+
+`IDENTITY_BEFORE_STYLE`
+
+An attractive result that does not recognizably represent the customer is a
+failure.
+
+## Legacy SPC V1 status
+
+The former three-part SPC V1 roadmap is:
+
+`SUPERSEDED_AS_ACTIVE_AUTHORITY / HISTORICAL_PRESERVED`
+
+Historical files:
+
+1. `Docs/Roadmap/SPC_V1_PART_1_STRATEGY_AND_IDENTITY.md`
+2. `Docs/Roadmap/SPC_V1_PART_2_3D_ATLAS_AND_PRODUCT.md`
+3. `Docs/Roadmap/SPC_V1_PART_3_BUSINESS_PILOT_AND_GOVERNANCE.md`
+
+Their evidence and valid findings remain preserved. Old `next` instructions
+must not be executed when they conflict with the new active roadmap.
+
+## Preserved verified evidence
+
+The current pilot evidence establishes:
+
+- one Meshy V7 pilot identity/head selected through human visual judgment;
+- subject-specific preservation through a bust production route;
+- local production topology cleanup;
+- uniform 150 mm normalization;
+- STL export and Bambu Studio slicing;
+- successful physical bust manufacture.
+
+The bust remains:
+
+`SUBJECT_SPECIFIC_IDENTITY_AND_PHYSICAL_PROOF`
+
+It is not:
+
+- a full-body product pass;
+- a multi-subject generalization pass;
+- proof of all five product families;
+- proof of an adaptive head/body assembly system.
+
+## Step 2 harmonic result
+
+The fixed-coordinate harmonic head/body experiment produced a visible
+lower-head shelf/fan and stretched-triangle surface.
+
+Classification:
+
+`CURRENT_SUBJECT_SPECIFIC_HARMONIC_SHELF = REJECTED_AS_GENERAL_SOLUTION`
+
+The experiment and checkpoint files remain historical diagnostic evidence.
+
+Do not continue by blindly repairing that single shelf.
+
+The general requirement is now:
+
+`ADAPTIVE_HEAD_BODY_ASSEMBLY`
+
+For each approved head/body pair ATLAS must determine a safe lower-head
+attachment region, natural neck location/direction/scale, body alignment and a
+short controlled transition without altering visible identity geometry.
+
+## Current first full-body target
+
+The first physical full-body pilot remains:
+
+`PF-2 — MODERN CHIBI`
+
+Target:
+
+- approximately 150 mm total height;
+- approved Meshy V7 pilot identity;
+- compact stylized body;
+- stable integrated base;
+- recognizable premium personal sculpture;
+- printable and slicer-safe geometry.
+
+Chibi is the first development pilot, but the other four product families are
+not cancelled or permanently deferred.
+
+## Exact active work point
+
+`CURRENT_WORK_PROGRAM = P-0`
+
+`CURRENT_GATE = GATE-P0`
+
+`EXACT_NEXT = BUILD_VERIFIED_ATLAS_CAPABILITY_MATRIX`
+
+The P-0 audit must classify current capabilities as:
+
+- implemented;
+- tested;
+- supported by real-subject evidence;
+- physically proven;
+- subject-specific;
+- reusable;
+- manual;
+- dependent on external AI;
+- missing.
+
+No new production geometry shall be implemented before the P-0 capability
+matrix is reviewed.
+
+## Research streams after P-0 activation
+
+- market and delivered-product benchmark for all five families;
+- commercially admissible photo-to-3D generation routes;
+- adaptive head/body assembly;
+- body, pose, clothing and accessory assets;
+- FDM/resin manufacture, finishing and packaging;
+- human time and unit economics.
+
+## Customer-data boundary
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_APPROVED_VENDOR_ROUTE`
+
+Commercial licensing, privacy and data-processing suitability must be verified
+before raw real-customer photographs are sent to an external provider.
+
+## Continuity read order
+
+A new engine/session shall read:
+
+1. `Docs/START_HERE.md`
+2. `Docs/STATUS/CURRENT_STATUS.md`
+3. `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md`
+4. `Docs/Roadmap/PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1.md`
+
+The superseded three-part SPC V1 roadmap is read only when historical detail or
+evidence provenance is required.
+
+## Phase boundary
+
+Old exact-identity research remains:
+
+`PARKED / NON_BLOCKING`
+
+Old Phase 9 remains:
+
+`NOT_AUTHORIZED / NOT_STARTED`
+
+<!-- /PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1_AUTHORITY_2026_09_06 -->
