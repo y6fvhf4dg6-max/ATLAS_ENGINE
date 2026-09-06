@@ -23951,3 +23951,65 @@ Old Phase 9 remains:
 `NOT_AUTHORIZED / NOT_STARTED`
 
 <!-- /PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1_AUTHORITY_2026_09_06 -->
+
+---
+
+[PERSONALIZED_FIGURINE_P0_GATE_CLOSED_2026_09_06:BEGIN]
+
+# Personalized 3D Figurine P-0 — Verified Capability Matrix Closure
+
+**Decision date:** `2026-09-06`
+
+**User decision:** `APPROVED`
+
+`GATE_P0 = PASS`
+
+`CAPABILITY_BOUNDARIES = LOCKED`
+
+Persistent matrix:
+
+`Docs/STATUS/ATLAS_PERSONALIZED_FIGURINE_P0_VERIFIED_CAPABILITY_MATRIX_2026-09-06.md`
+
+The closure establishes:
+
+- ATLAS has reusable provenance, normalization, topology, validation, export
+  and production-control foundations;
+- commercially accepted photo-to-person identity generation remains dependent
+  on an approved external route plus human identity judgment;
+- current physical proof is limited to one subject-specific Meshy V7 bust;
+- adaptive head/body assembly is not implemented and remains the largest
+  technical product blocker;
+- reusable body, pose, clothing and accessory coverage is missing or partial;
+- customer approval/revision workflow and human-time economics remain missing;
+- competitor evidence supports an AI/initial-model plus artist review plus
+  customer proofing production model.
+
+This closure does not authorize commercial launch, claim multi-subject
+generalization, or claim that any full-body product family is production-ready.
+
+Customer photographs may be externally processed only after:
+
+1. explicit and recorded customer consent;
+2. confirmation that the customer has authority for every depicted person;
+3. selection of an approved commercial provider route;
+4. documented privacy, retention/deletion and output-license conditions.
+
+`PRODUCT_LAUNCH_AUTHORIZATION = NO`
+
+`CURRENT_WORK_PROGRAM = P-1`
+
+`CURRENT_GATE = GATE-P1`
+
+`EXACT_NEXT = DEFINE_FIVE_PRODUCT_AND_STYLE_CONTRACTS`
+
+The first downstream physical full-body target remains:
+
+`PF-2 — MODERN CHIBI`
+
+No production geometry is authorized merely by this P-0 closure.
+
+Old Phase 9 remains:
+
+`NOT_AUTHORIZED / NOT_STARTED`
+
+[PERSONALIZED_FIGURINE_P0_GATE_CLOSED_2026_09_06:END]
