@@ -49,3 +49,43 @@ Any later external transfer requires:
 - these real-person files remain local-only while provider approval is pending.
 
 `EVIDENCE_SET_STATUS = AUTHORIZED_FOR_LOCAL_P3_BENCHMARK_ONLY`
+
+## User-approved capture qualification
+
+**Qualification decision:** `2026-09-07`
+
+**User decision:** `APPROVED`
+
+`SUBJECT_01_CAPTURE_CLASS = MULTIVIEW_PARTIAL`
+
+`SUBJECT_02_CAPTURE_CLASS = MULTIVIEW_PARTIAL`
+
+`LOCAL_REAL_SUBJECT_REFERENCE = USABLE_WITH_LIMITATIONS`
+
+The two sets contain one frontal view and two oblique/three-quarter views per
+subject. They do not contain verified true-profile views and therefore shall not
+be represented as preferred complete multiview capture.
+
+Verified supporting evidence:
+
+- every image is 1536 by 1152 pixels;
+- MediaPipe produced 478 landmarks with recorded confidence 1.0 for every view;
+- landmark source-image hashes match all six authorized local photographs;
+- raw diagnostic luminance, clipping, landmark bounding-box and uncalibrated
+  Laplacian measurements were produced without modifying the source files.
+
+The raw diagnostic measurements are not ATLAS gate scores because no implemented
+metric producer currently owns the required calibrated face-coverage, occlusion,
+blur and perspective-distortion observations.
+
+`PREFERRED_MULTIVIEW_CLAIM = NO`
+
+`FUTURE_RECAPTURE = TRUE_LEFT_AND_RIGHT_PROFILE_RECOMMENDED`
+
+Equivalent external-provider comparison shall use standardized synthetic male
+and female evidence until a provider route and a new explicit transfer
+authorization are approved.
+
+`EXTERNAL_PROVIDER_BENCHMARK_INPUT = STANDARDIZED_SYNTHETIC_MALE_AND_FEMALE`
+
+`EXTERNAL_REAL_PERSON_TRANSFER = NOT_AUTHORIZED`
