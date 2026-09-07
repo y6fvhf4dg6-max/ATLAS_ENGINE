@@ -633,3 +633,237 @@ The locked contract establishes preferred multiview capture, a limited single-ph
 P-3 shall select primary and fallback generation routes only from verified identity, geometry, cost, latency, privacy, licensing and revision evidence. No real customer photograph may be externally uploaded before an approved provider route exists.
 
 [PERSONALIZED_FIGURINE_P2_GATE_CLOSED_2026_09_06:END]
+
+---
+
+[PERSONALIZED_FIGURINE_P3_4_RODIN_CHECKPOINT_2026_09_07:BEGIN]
+
+# Personalized 3D Figurine P-3.4 — Rodin Synthetic Benchmark Current Checkpoint
+
+**Checkpoint date:** `2026-09-07`
+
+## Latest-authority rule
+
+This is the latest appended operational checkpoint in this handoff.
+
+It supersedes earlier `CURRENT_WORK_PROGRAM`, `CURRENT_GATE`, `EXACT_NEXT` and
+first-session instructions only where those earlier values describe an older
+execution point. Earlier completed decisions and historical evidence remain
+valid and must not be deleted or rewritten.
+
+A new engine must read this final checkpoint before acting. It must not begin
+again at P-0, P-1 or P-2.
+
+## Exact first instruction for a new engine
+
+> Continue `/Users/Kubi/ATLAS_ENGINE` from the latest appended P-3.4 checkpoint
+> in `Docs/STATUS/ATLAS_ENGINE_HANDOFF_2026-09-06_PERSONALIZED_FIGURINE_V1.md`.
+> First read the authority chain and the Rodin benchmark README. Before changing
+> anything, verify Git state, evidence inventory and hashes. Preserve all
+> unrelated dirty work. Do not rerun paid provider calls, upload real-person
+> photographs, select a provider route, create production geometry, stage files
+> or commit until the active checklist explicitly reaches that step. Use exactly
+> one terminal command per step with visible output, tee logging and pbcopy.
+
+## Required read order
+
+1. `Docs/START_HERE.md`
+2. `Docs/STATUS/CURRENT_STATUS.md`
+3. `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md`
+4. `Docs/Roadmap/PERSONALIZED_3D_FIGURINE_BUSINESS_PLAN_V1.md`
+5. this handoff file, especially its final P-3.4 checkpoint
+6. `EVIDENCE/PERSONALIZED_FIGURINE/P3/rodin_v2_5_synthetic_benchmark_2026_09_07/README.md`
+
+## Repository checkpoint before persistence
+
+`BRANCH = main`
+
+`HEAD = 5e6509bf679e97b620f00573da89b129ebbd1722`
+
+`ORIGIN_MAIN = 5e6509bf679e97b620f00573da89b129ebbd1722`
+
+`STAGED_FILE_COUNT = 0`
+
+The complete Rodin P-3.4 evidence root is currently untracked and contains
+`19` files. This handoff becomes modified by this appended checkpoint.
+
+All unrelated dirty work must remain untouched and unstaged.
+
+## Active program state
+
+`CURRENT_WORK_PROGRAM = P-3`
+
+`CURRENT_GATE = GATE-P3`
+
+`CURRENT_SUBSTEP = P-3.4_RODIN_SYNTHETIC_BENCHMARK_CHECKPOINT`
+
+`GATE_P3 = ACTIVE / NOT_DECIDED`
+
+`PRIMARY_PROVIDER_ROUTE = NOT_SELECTED`
+
+`FALLBACK_PROVIDER_ROUTE = NOT_SELECTED`
+
+`PRODUCTION_GEOMETRY_AUTHORIZATION = NO`
+
+`PRODUCT_LAUNCH_AUTHORIZATION = NO`
+
+`PHASE9 = NOT_AUTHORIZED / NOT_STARTED`
+
+## Privacy and scope boundary
+
+Only approved synthetic male and synthetic female five-view image packages were
+uploaded to fal.ai.
+
+`REAL_PERSON_IMAGE_EXTERNAL_UPLOAD = NO`
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_APPROVED_VENDOR_ROUTE`
+
+No real-person photograph was imported into this Rodin evidence root.
+
+## Rodin V2.5 locked benchmark configuration
+
+Both synthetic subjects used the same configuration:
+
+- endpoint: `fal-ai/hyper3d/rodin/v2.5`;
+- tier: `Gen-2.5-Minimum`;
+- geometry format: `GLB`;
+- material: `All`;
+- mesh option: `50K Quad`;
+- texture mode: `high`;
+- creative mode: `OFF`;
+- HD texture: `OFF`;
+- Texture Delight: `OFF`;
+- prompt: blank;
+- charged cost per run: `USD 0.40`;
+- total charged benchmark cost: `USD 0.80`;
+- displayed balance after both runs: `USD 3.43`.
+
+Do not repeat either paid run unless the user explicitly authorizes a new run.
+
+## Evidence root
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/rodin_v2_5_synthetic_benchmark_2026_09_07/`
+
+The root contains:
+
+- one decision and measurement README;
+- male PBR GLB, shaded GLB and provider preview;
+- five male neutral views and one male contact sheet;
+- female PBR GLB, shaded GLB and provider preview;
+- five female neutral views and one female contact sheet.
+
+`P3_4_EVIDENCE_FILE_COUNT = 19`
+
+## Male measured result
+
+- source vertices: `45116`;
+- faces: `50000`;
+- vertices after diagnostic weld: `24996`;
+- merged vertices: `20120`;
+- boundary edges after diagnostic weld: `0`;
+- non-manifold edges after diagnostic weld: `0`;
+- watertight after diagnostic weld: `YES`;
+- winding consistent: `YES`;
+- degenerate triangles: `0`.
+
+Important hashes:
+
+- male PBR GLB:
+  `7c77a4e915d6b6a6a34b0dadad962c4874f88eb53b499d1f82d378ab7a12c50d`;
+- male shaded GLB:
+  `c71e85f39ee8aa61fd5288a7f10813e354fc9ea516c2fd76504a822d8f371dac`;
+- male contact sheet:
+  `a6e3a89757bcd40b791202912659499984cc4839280ec16220d790dbb8e79b76`.
+
+Human decision:
+
+`MALE_HUMAN_IDENTITY_DECISION = BORDERLINE_ACCEPT_PLUS`
+
+`MALE_IDENTITY_SURVIVING_CANDIDATE = YES`
+
+`MALE_PRODUCTION_READY = NO`
+
+`MALE_CORRECTION_BURDEN = MATERIAL_HAIR_AND_FACIAL_DETAIL`
+
+The male result survives only the initial identity gate for continued benchmark
+comparison. It does not authorize route selection or production.
+
+## Female measured result
+
+- source vertices: `43854`;
+- faces: `50000`;
+- vertices after diagnostic weld: `27014`;
+- merged vertices: `16840`;
+- boundary edges after diagnostic weld: `3920`;
+- non-manifold edges after diagnostic weld: `0`;
+- watertight after diagnostic weld: `NO`;
+- winding consistent: `YES`;
+- degenerate triangles: `0`.
+
+Important hashes:
+
+- female PBR GLB:
+  `9b2a49a4f25633b71322c9358a1b18fa63fb7d9b793fcc14e8be52aff9791961`;
+- female shaded GLB:
+  `a4b16378484931873849bd212b770cda31e61684aa3876605e056d23fd071329`;
+- female contact sheet:
+  `5d9908c0f9c0e3872a42e4a577555e0d4d5be316290053f5c96641d7ab892148`.
+
+Human decision:
+
+`FEMALE_HUMAN_IDENTITY_DECISION = REJECT`
+
+`FEMALE_IDENTITY_SURVIVING_CANDIDATE = NO`
+
+`FEMALE_PRODUCTION_READY = NO`
+
+`FEMALE_PRIMARY_FAILURE = IDENTITY_LOSS_AND_OPEN_TOPOLOGY`
+
+The female result does not survive the identity gate.
+
+## Known failed or rejected diagnostic paths
+
+Do not repeat these as if they were unresolved work:
+
+1. The first male Blender attempt passed an environment assignment as part of
+   the source path and failed. Environment variables must precede Blender.
+2. `BLENDER_EEVEE_NEXT` is unavailable in the installed Blender build.
+   The successful engine identifier is `BLENDER_EEVEE`.
+3. The first heavy GLB geometry audit exited with code `137`.
+   The accepted diagnostic route is the lightweight mesh audit.
+4. Raw GLB watertight checks are insufficient because exported UV seams may
+   duplicate vertices. Always record raw topology and diagnostic-weld topology.
+5. Male geometry becomes watertight after diagnostic weld.
+6. Female geometry remains open after diagnostic weld with `3920` boundary
+   edges. Do not describe it as watertight or production-ready.
+7. Texture appearance must not substitute for neutral-geometry identity review.
+
+Diagnostic welds were performed in memory only.
+
+`SOURCE_GLB_CHANGED = NO`
+
+## Current pause and exact next action
+
+The user requested a continuity safeguard because a chat/session may end during
+critical work. Technical benchmark expansion is paused until this checkpoint is
+made persistent.
+
+`EXACT_NEXT = VALIDATE_AND_PERSIST_P3_4_CHECKPOINT_WITH_EXPLICIT_FILE_SCOPE`
+
+Required sequence:
+
+1. verify this checkpoint block and the Rodin README;
+2. run target-scoped diff and evidence completeness checks;
+3. inspect the explicit staged file list before any commit;
+4. stage only this handoff and the 19 files under the Rodin evidence root;
+5. never use `git add .`;
+6. commit only after target checks pass and user authorizes persistence;
+7. push `main`;
+8. verify `HEAD == origin/main`;
+9. only then resume P-3 provider benchmarking or gate analysis.
+
+This checkpoint does not select Rodin as primary or fallback route. The mixed
+human result, especially the rejected female identity and open female topology,
+prevents a route decision based on this evidence alone.
+
+[PERSONALIZED_FIGURINE_P3_4_RODIN_CHECKPOINT_2026_09_07:END]
