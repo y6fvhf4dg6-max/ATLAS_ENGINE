@@ -867,3 +867,70 @@ human result, especially the rejected female identity and open female topology,
 prevents a route decision based on this evidence alone.
 
 [PERSONALIZED_FIGURINE_P3_4_RODIN_CHECKPOINT_2026_09_07:END]
+
+---
+
+[PERSONALIZED_FIGURINE_P3_4_RODIN_PERSISTENCE_CLOSED_2026_09_07:BEGIN]
+
+# P-3.4 Rodin Synthetic Benchmark — Persistence Closure
+
+**Closure date:** `2026-09-07`
+
+The P-3.4 Rodin synthetic benchmark evidence and the detailed continuity
+checkpoint were committed and pushed successfully.
+
+`P3_4_PERSISTED_COMMIT = ba59d9855528410392b49d3191e7286d0074f229`
+
+At persistence verification:
+
+`HEAD = ba59d9855528410392b49d3191e7286d0074f229`
+
+`ORIGIN_MAIN = ba59d9855528410392b49d3191e7286d0074f229`
+
+`HEAD_EQUALS_ORIGIN_MAIN = YES`
+
+`P3_4_TRACKED_FILE_COUNT = 19`
+
+`STAGED_FILE_COUNT = 0`
+
+The previous checkpoint instruction
+`VALIDATE_AND_PERSIST_P3_4_CHECKPOINT_WITH_EXPLICIT_FILE_SCOPE` is complete and
+must not be repeated as active work.
+
+## Current operational authority
+
+`CURRENT_WORK_PROGRAM = P-3`
+
+`CURRENT_GATE = GATE-P3`
+
+`CURRENT_SUBSTEP = POST_RODIN_ROUTE_BENCHMARK_CONTINUATION`
+
+`GATE_P3 = ACTIVE / NOT_DECIDED`
+
+`PRIMARY_PROVIDER_ROUTE = NOT_SELECTED`
+
+`FALLBACK_PROVIDER_ROUTE = NOT_SELECTED`
+
+`EXACT_NEXT = BENCHMARK_COMMERCIALLY_ADMISSIBLE_GENERATION_ROUTES`
+
+The next engine must continue comparative provider-route benchmarking from the
+mixed Rodin result. It must not select Rodin based on the male result alone and
+must retain the rejected female identity result and open female topology as
+negative evidence.
+
+Before any new external provider call, the engine must identify the candidate,
+commercial admissibility, privacy conditions, expected cost and exact synthetic
+input scope, then obtain explicit user approval for any charged run.
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_APPROVED_VENDOR_ROUTE`
+
+`PRODUCTION_GEOMETRY_AUTHORIZATION = NO`
+
+`PRODUCT_LAUNCH_AUTHORIZATION = NO`
+
+`PHASE9 = NOT_AUTHORIZED / NOT_STARTED`
+
+Use the exact new-session instruction stored in the preceding P-3.4 checkpoint,
+but resolve execution state from this final persistence-closure block.
+
+[PERSONALIZED_FIGURINE_P3_4_RODIN_PERSISTENCE_CLOSED_2026_09_07:END]
