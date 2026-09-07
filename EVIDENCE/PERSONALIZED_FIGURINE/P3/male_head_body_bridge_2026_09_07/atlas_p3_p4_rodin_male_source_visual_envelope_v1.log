@@ -1,0 +1,38 @@
+=== ACTIVE CHECKLIST: P-3/P-4 — RODIN MALE SOURCE VISUAL ENVELOPE ===
+MALE_BODY_VISUAL_DECISION=PASS_AS_TECHNICAL_DONOR
+RODIN_PBR_SHADED_GEOMETRY=EXACTLY_EQUAL
+DISPLAY_SOURCE=SHADED
+STEP=RENDER_TRUE_FOUR_VIEW_SOURCE_ENVELOPE
+
+=== SCRIPT PROVENANCE ===
+a9113fde3465c4d760af15f1ea7894918bf754ce1eff58f107c67faa2486681b  /private/tmp/atlas_p3_p4_render_rodin_male_source_v1.py
+10:00:27 | INFO: Data are loaded, start creating Blender stuff
+10:00:27 | INFO: Blender create Mesh node model
+10:00:27 | INFO: glTF import finished in 0.06s
+00:01.307  render           | Saved: '/private/tmp/atlas_p3_p4_rodin_male_source_four_view_v1.png'
+Info: Saved as "atlas_p3_p4_rodin_male_source_four_view_v1.blend"
+=== RODIN MALE VISUAL ENVELOPE ===
+SOURCE=/Users/Kubi/ATLAS_ENGINE/EVIDENCE/PERSONALIZED_FIGURINE/P3/rodin_v2_5_synthetic_benchmark_2026_09_07/male/rodin_v2_5_minimum_50k_quad_texture_high_shaded.glb
+OUTPUT=/private/tmp/atlas_p3_p4_rodin_male_source_four_view_v1.png
+OUTPUT_EXISTS=True
+OUTPUT_BYTES=2389769
+SOURCE_GEOMETRY_CHANGED=NO
+MAKEHUMAN_BODY_ATTACHED=NO
+STATUS=READY_FOR_HEAD_NECK_SHOULDER_ENVELOPE_DECISION
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit
+
+BLENDER_EXIT=0
+VISUAL_OUTPUT_GATE=PASS
+OUTPUT=/private/tmp/atlas_p3_p4_rodin_male_source_four_view_v1.png
+OUTPUT_BYTES=2389769|MODIFIED=2026-09-07T10:00:28+0200
+a73d6d808ebc181553282bd92cd7375c289c59ef34a2a69ba88b39f09331173f  /private/tmp/atlas_p3_p4_rodin_male_source_four_view_v1.png
+/private/tmp/atlas_p3_p4_rodin_male_source_four_view_v1.png
+  pixelWidth: 1600
+  pixelHeight: 1400
+SOURCE_GEOMETRY_CHANGED=NO
+MAKEHUMAN_BODY_CHANGED=NO
+REPO_CHANGED_BY_RENDER=NO
+EXTERNAL_PROVIDER_CALL=NO
+PRODUCTION_GEOMETRY_AUTHORIZATION=NO

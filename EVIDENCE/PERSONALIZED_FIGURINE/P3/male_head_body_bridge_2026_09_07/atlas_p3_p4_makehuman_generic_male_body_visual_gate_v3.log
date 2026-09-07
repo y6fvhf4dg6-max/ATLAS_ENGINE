@@ -1,0 +1,45 @@
+=== ACTIVE CHECKLIST: P-3/P-4 — GENERIC MALE BODY VISUAL GATE V3 ===
+MALE_FRONT_CLASSIFICATION=PASS
+V2_MULTIVIEW=INVALID / GLTF_QUATERNION_MODE_IGNORED_EULER_ROTATION
+STEP=FORCE_XYZ_ROTATION_AND_RENDER_TRUE_FOUR_VIEWS
+
+PATCHED_SCRIPT=/private/tmp/atlas_p3_p4_render_generic_male_body_v1.py
+V3_OUTPUT=/private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1_contact_sheet_v3.png
+PATCH_EXIT=0
+
+=== V3 SCRIPT PROVENANCE ===
+f85633aa78fc5ce8b7198b04ed02552dacfe14fb3651fe3b8428059d206e64fe  /private/tmp/atlas_p3_p4_render_generic_male_body_v1.py
+7:OUTPUT = Path("/private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1_contact_sheet_v3.png")
+57:    obj.rotation_mode = "XYZ"
+58:    obj.rotation_euler = (0.0, 0.0, math.radians(angle))
+92:camera.data.ortho_scale = 44.0
+09:47:16 | INFO: Data are loaded, start creating Blender stuff
+09:47:16 | INFO: Blender create Mesh node geometry_0
+09:47:16 | INFO: glTF import finished in 0.01s
+00:00.580  render           | Saved: '/private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1_contact_sheet_v3.png'
+Info: Saved as "atlas_p3_p4_generic_male_body_visual_gate_v1.blend"
+=== VISUAL OUTPUT ===
+SOURCE=/private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1.glb
+OUTPUT=/private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1_contact_sheet_v3.png
+OUTPUT_EXISTS=True
+OUTPUT_BYTES=1920529
+SOURCE_GEOMETRY_CHANGED=NO
+RODIN_MALE_ATTACHED=NO
+STATUS=READY_FOR_HUMAN_VISUAL_DECISION
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit
+
+BLENDER_EXIT=0
+V3_VISUAL_OUTPUT_GATE=PASS
+OUTPUT=/private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1_contact_sheet_v3.png
+OUTPUT_BYTES=1920529|MODIFIED=2026-09-07T09:47:16+0200
+5c2c5f3dcd23e48f2aa1116a46bb2a8d1fca64879ef99b034ea07ee1a8d17ed7  /private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1_contact_sheet_v3.png
+/private/tmp/atlas_p3_p4_makehuman_generic_male_compact_body_v1_contact_sheet_v3.png
+  pixelWidth: 1600
+  pixelHeight: 1400
+SOURCE_GEOMETRY_CHANGED=NO
+RODIN_MALE_ATTACHED=NO
+REPO_CHANGED_BY_RENDER=NO
+EXTERNAL_PROVIDER_CALL=NO
+PRODUCTION_GEOMETRY_AUTHORIZATION=NO

@@ -934,3 +934,116 @@ Use the exact new-session instruction stored in the preceding P-3.4 checkpoint,
 but resolve execution state from this final persistence-closure block.
 
 [PERSONALIZED_FIGURINE_P3_4_RODIN_PERSISTENCE_CLOSED_2026_09_07:END]
+
+---
+
+[PERSONALIZED_FIGURINE_P3_P4_MALE_BRIDGE_PAUSE_CHECKPOINT_2026_09_07:BEGIN]
+
+# P-3/P-4 Male Head/Body Bridge — Pause Checkpoint
+
+**Checkpoint date:** `2026-09-07`
+
+The user authorized technical bridge work using the accepted Rodin synthetic
+male identity candidate and a MakeHuman male body donor.
+
+## Corrected subject source
+
+The earlier Meshy V7 head used in a temporary dry-fit was visually identified
+as the wrong female subject.
+
+`WRONG_MESHY_FEMALE_DRYFIT = REJECTED / WRONG_SUBJECT`
+
+`CORRECT_IDENTITY_SOURCE = RODIN_V2_5_SYNTHETIC_MALE`
+
+Do not resume the rejected Meshy female dry-fit.
+
+## Male technical body
+
+A reproducible generic male MakeHuman body was created with equal one-third
+African, Asian and Caucasian male-young macro weights plus the validated
+compact normal-proportion target stack.
+
+`MALE_BODY_SHA256 = 273fb03792ea7078f6a018139ee0511659d6bfdf7df44b10c42052a81bc418ad`
+
+`MALE_BODY_VERTICES = 13380`
+
+`MALE_BODY_FACES = 26756`
+
+`MALE_BODY_WATERTIGHT = YES`
+
+`MALE_BODY_VISUAL_DECISION = PASS_AS_TECHNICAL_DONOR`
+
+`SUBJECT_SPECIFIC_BODY_LIKENESS = NOT_CLAIMED`
+
+## Rodin male source
+
+PBR and shaded files have exactly equal geometry.
+
+`RODIN_MALE_GEOMETRY_SIGNATURE = 6ef6bdfcb088d06d83a8fc3341675b79e9f18d035dda04cc3bdea005c3ec6bb4`
+
+After in-memory exact-position seam reconciliation:
+
+`RODIN_MALE_VERTICES_AFTER_DIAGNOSTIC_WELD = 24996`
+
+`RODIN_MALE_WATERTIGHT_AFTER_DIAGNOSTIC_WELD = YES`
+
+`RODIN_MALE_WINDING_CONSISTENT = YES`
+
+`SOURCE_GLB_CHANGED = NO`
+
+## Current cut-plane gate
+
+The source includes head, natural neck, shirt, shoulders and a squared bust
+base. The working candidate is to retain head plus natural neck and exclude
+shirt, shoulders and bust base.
+
+`NUMERIC_CUT_LEADER = Y_-0.350`
+
+`Y_-0.325 = REJECT / SECONDARY_LOOP`
+
+`HUMAN_CUT_PLANE_DECISION = PENDING`
+
+`CUT_PERFORMED = NO`
+
+`MAKEHUMAN_BODY_ATTACHED = NO`
+
+Exact visual evidence:
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/male_head_body_bridge_2026_09_07/atlas_p3_p4_rodin_male_neck_cut_plane_candidates_v1.png`
+
+## Exact next action
+
+`EXACT_NEXT = HUMAN_SELECT_OR_REJECT_RODIN_MALE_NECK_CUT_PLANE`
+
+At resume, show or open the saved three-plane comparison and obtain the user's
+decision among:
+
+1. `Y=-0.375`;
+2. `Y=-0.350` — numeric recommendation;
+3. `Y=-0.300`.
+
+Do not generate a cropped candidate before this decision.
+
+## Persistence and authority
+
+Evidence directory:
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/male_head_body_bridge_2026_09_07`
+
+`PERSISTENCE_STATUS = EVIDENCE_AND_CHECKPOINT_WRITTEN / NOT_YET_STAGED`
+
+`PRIMARY_PROVIDER_ROUTE = NOT_SELECTED`
+
+`FALLBACK_PROVIDER_ROUTE = NOT_SELECTED`
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_APPROVED_VENDOR_ROUTE`
+
+`PRODUCTION_GEOMETRY_AUTHORIZATION = NO`
+
+`PRODUCT_LAUNCH_AUTHORIZATION = NO`
+
+`PHASE9 = NOT_AUTHORIZED / NOT_STARTED`
+
+`EXTERNAL_PROVIDER_CALL = NO`
+
+[PERSONALIZED_FIGURINE_P3_P4_MALE_BRIDGE_PAUSE_CHECKPOINT_2026_09_07:END]

@@ -1,0 +1,48 @@
+=== ACTIVE CHECKLIST: P-3/P-4 — RODIN MALE NECK CUT-PLANE VISUAL GATE ===
+LOWER_NECK_SECTION_AUDIT=PASS
+NUMERIC_LEADER=Y_-0.350
+Y_-0.325=REJECT / SECONDARY_LOOP
+CUT_PERFORMED=NO
+STEP=VISUALIZE_THREE_CANDIDATE_PLANES
+
+=== SCRIPT PROVENANCE ===
+3e33e556addee36fff4e4b77a04c8a10d0ac78d0b343b509ccf8fad686f10f04  /private/tmp/atlas_p3_p4_render_rodin_male_neck_cut_planes_v1.py
+10:07:18 | INFO: Data are loaded, start creating Blender stuff
+10:07:18 | INFO: Blender create Mesh node model
+10:07:18 | INFO: glTF import finished in 0.05s
+00:00.749  render           | Saved: '/private/tmp/atlas_p3_p4_rodin_male_neck_cut_plane_candidates_v1.png'
+=== AXIS MAPPING CHECK ===
+BLENDER_LOCAL_Z_MIN=-0.95448899269104
+BLENDER_LOCAL_Z_MAX=0.9321897029876709
+EXPECTED_RODIN_Y_MIN=-0.95448899269104
+EXPECTED_RODIN_Y_MAX=0.9321897029876709
+Info: Saved as "atlas_p3_p4_rodin_male_neck_cut_plane_candidates_v1.blend"
+
+=== VISUAL CUT-PLANE OUTPUT ===
+CANDIDATE=LOWER / Y=-0.375|RODIN_Y=-0.375|DISPLAY_Z=-2.699932418
+CANDIDATE=LEADER / Y=-0.350|RODIN_Y=-0.350|DISPLAY_Z=-2.514421233
+CANDIDATE=UPPER / Y=-0.300|RODIN_Y=-0.300|DISPLAY_Z=-2.143398863
+OUTPUT=/private/tmp/atlas_p3_p4_rodin_male_neck_cut_plane_candidates_v1.png
+OUTPUT_EXISTS=True
+OUTPUT_BYTES=1961131
+SOURCE_GEOMETRY_CHANGED=NO
+CUT_PERFORMED=NO
+STATUS=READY_FOR_HUMAN_CUT_PLANE_DECISION
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit
+
+BLENDER_EXIT=0
+VISUAL_OUTPUT_GATE=PASS
+OUTPUT=/private/tmp/atlas_p3_p4_rodin_male_neck_cut_plane_candidates_v1.png
+OUTPUT_BYTES=1961131|MODIFIED=2026-09-07T10:07:18+0200
+eeeccd4d3e6036c6e674742c46dd13d831f02d73016ef989357467393a8f82cd  /private/tmp/atlas_p3_p4_rodin_male_neck_cut_plane_candidates_v1.png
+/private/tmp/atlas_p3_p4_rodin_male_neck_cut_plane_candidates_v1.png
+  pixelWidth: 1600
+  pixelHeight: 1000
+SOURCE_GEOMETRY_CHANGED=NO
+CUT_PERFORMED=NO
+MAKEHUMAN_BODY_CHANGED=NO
+REPO_CHANGED_BY_RENDER=NO
+EXTERNAL_PROVIDER_CALL=NO
+PRODUCTION_GEOMETRY_AUTHORIZATION=NO
