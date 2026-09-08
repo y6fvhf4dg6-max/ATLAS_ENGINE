@@ -1,0 +1,65 @@
+=== ACTIVE CHECKLIST: P-3/P-4 — FEMALE VERTICAL COLLAR NECK CLOSEUP RENDER ===
+FOUR_VIEW_RENDER_GATE=PASS
+INDEPENDENT_COLLAR_PRESERVATION_TOPOLOGY_GATE=PASS
+SOURCE_CANDIDATE_SHA256=74df51ab416e0559cd32b473ebf42ef27fac7c76fea231f6eb5c4ceb1315f594
+UPPER_COLLAR_TO_ANNULUS_GT90=96_OF_96 / WARNING
+HUMAN_VISUAL_GATE=ACTIVE / NOT_DECIDED
+OUTPUT_MODE=TEMP_DIAGNOSTIC_ONLY
+STEP=CREATE_AND_RENDER_NECK_CLOSEUPS
+
+SOURCE_RENDERER_SHA256=fb62a185348dbc31ae15b887cc3f3e7c62f3cf9ee17906bea05e35f7edd1810e
+SOURCE_CANDIDATE_SHA256=74df51ab416e0559cd32b473ebf42ef27fac7c76fea231f6eb5c4ceb1315f594
+INPUT_HASH_GATE=PASS
+PATCH_MATCH=OUTDIR_BINDING|COUNT=1|EXPECTED=1
+PATCH_MATCH=TARGET_BINDING|COUNT=1|EXPECTED=1
+PATCH_MATCH=FRONT_BACK_SCALES|COUNT=2|EXPECTED=2
+PATCH_MATCH=RIGHT_3Q_SCALE|COUNT=1|EXPECTED=1
+PATCH_MATCH=RIGHT_PROFILE_SCALE|COUNT=1|EXPECTED=1
+RENDERER=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1.py
+SOURCE_AND_MATERIAL_CHANGED=NO
+CAMERA_TARGET=NECK_HEIGHT_0P80
+CLOSEUP_ORTHO_SCALE=0P22_TO_0P24_MAX_DIM
+PATCH_EXIT=0
+SYNTAX_EXIT=0
+CLOSEUP_RENDERER_SHA256=3d7685299fe404c1e39c9958fd501e4003db2bb60eb9b2c8833f06c2293bc8e3
+BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
+
+=== BLENDER OUTPUT ===
+/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1.py:21: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+22:47:59 | INFO: Data are loaded, start creating Blender stuff
+22:47:59 | INFO: Blender create Mesh node geometry_0
+22:47:59 | INFO: glTF import finished in 0.01s
+/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1.py:34: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+00:01.184  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/front.png'
+00:02.001  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/right_3q.png'
+00:02.636  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/right_profile.png'
+00:03.356  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/back.png'
+RENDERED=FRONT|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/front.png
+RENDERED=RIGHT_3Q|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/right_3q.png
+RENDERED=RIGHT_PROFILE|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/right_profile.png
+RENDERED=BACK|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/back.png
+NEXT=HUMAN_VISUAL_GATE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit
+
+RENDER_EXIT=0
+
+=== NECK CLOSEUP OUTPUT GATE ===
+CLOSEUP_GATE=PASS|VIEW=front|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/front.png|BYTES=628098|SHA256=93c2d78b29626012a7df4cdd3e0a997ae1f7373aba0e8127505bf5dae6f5f8a0
+CLOSEUP_GATE=PASS|VIEW=right_3q|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/right_3q.png|BYTES=609169|SHA256=48f86dc89d4640e795eac7e630cd5012a244c6bec64fa3082473c2a9524a62b0
+CLOSEUP_GATE=PASS|VIEW=right_profile|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/right_profile.png|BYTES=580693|SHA256=9df7a3ec20fd1427ca26fe5f3eb5aabcb8d65ac79e8536b3b068875c0387d39e
+CLOSEUP_GATE=PASS|VIEW=back|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_neck_closeup_visual_gate_v1/back.png|BYTES=640009|SHA256=313d6d50af0f3f6e2faf68733e39d221b67c789b10764df750aba62de5bb1597
+
+=== SAFETY STATE ===
+CANDIDATE_SHA256_AFTER=74df51ab416e0559cd32b473ebf42ef27fac7c76fea231f6eb5c4ceb1315f594
+STAGED_FILE_COUNT=0
+NECK_CLOSEUP_RENDER_GATE=PASS
+SOURCE_GEOMETRY_CHANGED=NO
+REPO_CHANGED_BY_RENDER=NO
+HUMAN_VISUAL_GATE=PENDING
+NEXT=INSPECT_FOUR_CLOSEUPS_AND_ACCEPT_OR_REJECT_COLLAR_ARCHITECTURE
+PERSISTENCE_REQUIRED_AFTER_VALIDATED_ARCHITECTURE=YES
+PRODUCTION_GEOMETRY_AUTHORIZATION=NO

@@ -1,0 +1,34 @@
+=== ACTIVE CHECKLIST: P-3/P-4 — FEMALE TECHNICAL ASSEMBLY ===
+6_FEMALE_ALIGNMENT_AND_LOCAL_CORRECTION=ACTIVE
+SUBSTEP=HEAD_FORWARD_AND_CENTER_OVER_BODY_DRYFIT_V1
+HEAD_DX=0.005623056596
+HEAD_DY=5.560677617788
+HEAD_DZ=0.504931415230
+INTERFACE_PLANE_ERROR_MAX=0.000000000000e+00
+HORIZONTAL_CENTER_ERROR_X=1.962405932199e-17
+HORIZONTAL_CENTER_ERROR_Z=5.551115123126e-17
+OUTPUT=/private/tmp/atlas_p3_p4_female_head_plus_ratio5p30_neck_shortened_head_forward_centered_dryfit_v1.glb
+RENDER_SCRIPT=/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1.py
+HEAD_GEOMETRY_CHANGED=NO
+BODY_GEOMETRY_CHANGED=NO
+REPO_FILES_CHANGED=NO
+/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1.py:21: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+12:51:23 | INFO: Data are loaded, start creating Blender stuff
+12:51:23 | INFO: Blender create Mesh node geometry_0
+12:51:23 | INFO: Blender create Mesh node geometry_1
+12:51:23 | INFO: glTF import finished in 0.02s
+/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1.py:34: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+00:01.055  render           | Saved: '/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/front.png'
+00:01.695  render           | Saved: '/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/right_3q.png'
+00:02.373  render           | Saved: '/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/right_profile.png'
+00:03.141  render           | Saved: '/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/back.png'
+RENDERED=FRONT|FILE=/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/front.png
+RENDERED=RIGHT_3Q|FILE=/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/right_3q.png
+RENDERED=RIGHT_PROFILE|FILE=/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/right_profile.png
+RENDERED=BACK|FILE=/private/tmp/atlas_p3_p4_head_forward_center_over_body_visual_dryfit_v1/back.png
+NEXT=HUMAN_VISUAL_GATE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit

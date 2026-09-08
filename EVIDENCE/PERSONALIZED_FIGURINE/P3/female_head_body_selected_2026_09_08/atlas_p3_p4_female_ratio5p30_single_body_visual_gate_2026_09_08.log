@@ -1,0 +1,19 @@
+/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate.py:21: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+13:02:19 | INFO: Data are loaded, start creating Blender stuff
+13:02:19 | INFO: Blender create Mesh node geometry_0
+13:02:19 | INFO: glTF import finished in 0.01s
+/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate.py:34: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+00:01.044  render           | Saved: '/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/front.png'
+00:01.710  render           | Saved: '/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/right_3q.png'
+00:02.297  render           | Saved: '/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/right_profile.png'
+00:02.956  render           | Saved: '/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/back.png'
+RENDERED=FRONT|FILE=/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/front.png
+RENDERED=RIGHT_3Q|FILE=/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/right_3q.png
+RENDERED=RIGHT_PROFILE|FILE=/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/right_profile.png
+RENDERED=BACK|FILE=/private/tmp/atlas_p3_p4_female_ratio5p30_single_body_visual_gate/back.png
+NEXT=HUMAN_VISUAL_GATE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit

@@ -1,0 +1,45 @@
+{
+  "domain_vertex_count": 627,
+  "fixed_vertex_count": 19315,
+  "hashes": {
+    "domain_ids": "db26d5d37a06cf1128e464fc74fbe8208ec2a0069ea0a712be2a01de10cc751c",
+    "domain_vertices": "61d249e133af872b635392ef7f983fa5caaed43faab31f28bfaad0e543a58e43",
+    "fixed_ids": "9581d4e763fc85de82008ea433f53054d0bf0b57827fde8e34c2612034e8ae17",
+    "fixed_vertices": "99c84807191fbf8649374031009aaebd466d62c514c063299feb6b57496e080e",
+    "frontier_edges": "acaa02a3ec9dae579f6a4669a83080cb632dc93af08e21c601c1f60ed9b27cb2",
+    "frontier_ids": "a07e6e6630a0be2071364c4ae9d70a4fd57b28132bae5f52a249986e642eed5b",
+    "frontier_vertices": "59709d201f9993b50831d32c7a1eb321420a5f4970f901f8a2f878235fdc627d",
+    "removed_face_ids": "26f9fdb3c76757adf1465d8b16981d70f0f90aa745ebdf4aced64b3a1c38af61",
+    "removed_faces": "bdc8634164fcca1eea7e8e063abadebf249093f42388ac7ebc54c88dad4fdc4b",
+    "retained_face_ids": "fc888715024646d75d497caa89025c605bf6c7f9fcb9d18fa5a015957cfc19f2",
+    "retained_faces": "621eea64f493584ea01a56030f95a2e026dff518e3702c184d4514937b521e16",
+    "ring0_ids": "31b2823fce6c542bbaf14ecf96975ef213fc8a96764e2ed0aef9d863f1c6a992",
+    "ring1_ids": "2d787a8c950e031cd70a6728f87dcfe2102ebc21bea02cf09759826fcc24f672",
+    "ring2_ids": "e9c7304c5228e6c246efee4f14e2b6396b5fb17bdba78873e2dc4fc27ec17b61",
+    "ring3_ids": "9df32018cf31b4b0da7609d7b28f20f922b3e90e5e197cd372879419907b4738",
+    "source_faces": "fcfbf0ede6e1707896f425f471ee00ae77ef886a3d1bd6d4c1e27458d42a975e",
+    "source_vertices": "80c0a41dafaf7134c706650fef81d0156c0dbea46ccce4db96516920d063d259"
+  },
+  "interface_y": 5.148177623749,
+  "locks": {
+    "body_vertex_displacement_zero": true,
+    "production_geometry_authorized": false,
+    "ring_3_and_above_faces_preserved": true,
+    "ring_3_and_above_positions_exact": true,
+    "visible_face_chin_hair_geometry_unchanged": true
+  },
+  "removable_face_count": 810,
+  "retained_face_count": 38802,
+  "retained_frontier_edge_count": 142,
+  "retained_frontier_vertex_count": 142,
+  "retopology_domain": "topological_rings_0_to_2",
+  "ring_counts": {
+    "ring_0": 302,
+    "ring_1": 154,
+    "ring_2": 171,
+    "ring_3_first_fixed": 185
+  },
+  "schema": "atlas.female_head_underside_ring2_preservation_contract.v1",
+  "source_file": "/private/tmp/atlas_p3_p4_zero_deformation_female_head_for_dp_v1.glb",
+  "source_sha256": "749974cd50423411cd9ae5e703d101bb3a6caee7d169469ca29a5ecff6bbd22f"
+}

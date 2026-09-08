@@ -1,0 +1,111 @@
+=== ACTIVE CHECKLIST: P-3/P-4 — FINAL FEMALE CANDIDATE INDEPENDENT VERIFY + VISUALS ===
+FINAL_CANDIDATE_EXECUTION_GATE=PASS
+CANDIDATE_SHA256=aea417e6352a059894f58318df9ba2a83157df347f78215f97178fedddf5a32f
+ATTEMPT_BUDGET_CONSUMED=YES
+GEOMETRY_MODIFICATION_ALLOWED=NO
+HEAD_VISIBLE_GEOMETRY=LOCKED_UNCHANGED
+BODY_RING4_PLUS=LOCKED_UNCHANGED
+ARM_SHOULDER_TORSO=LOCKED_UNCHANGED
+HUMAN_VISUAL_GATE=ACTIVE / FINAL_DECISION_PENDING
+STEP=INDEPENDENT_VERIFY_RENDER_AND_OPEN
+
+CANDIDATE_SHA256=aea417e6352a059894f58318df9ba2a83157df347f78215f97178fedddf5a32f
+CANDIDATE_HASH_GATE=PASS
+
+=== INDEPENDENT VERIFICATION ===
+HEAD_RELOAD_POSITION_MAX_ERROR=0.000000000000e+00
+FIXED_VISIBLE_HEAD_POSITION_MAX_ERROR=0.000000000000e+00
+HEAD_RING3_POSITION_MAX_ERROR=0.000000000000e+00
+BODY_SOURCE_POSITION_MAX_ERROR=0.000000000000e+00
+VERTICES=29939
+FACES=58552
+BOUNDARY_EDGES=0
+NONMANIFOLD_EDGES=0
+DEGENERATE_FACES=0
+AREA_MIN=6.683184704055e-08
+IS_WATERTIGHT=True
+IS_WINDING_CONSISTENT=True
+GATE=head_reload_within_tolerance|PASS=True
+GATE=fixed_visible_head_within_tolerance|PASS=True
+GATE=head_ring3_within_tolerance|PASS=True
+GATE=all_source_body_vertices_within_tolerance|PASS=True
+GATE=expected_vertex_count|PASS=True
+GATE=expected_face_count|PASS=True
+GATE=boundary_zero|PASS=True
+GATE=nonmanifold_zero|PASS=True
+GATE=degenerate_zero|PASS=True
+GATE=watertight|PASS=True
+GATE=winding_consistent|PASS=True
+INDEPENDENT_FINAL_PRESERVATION_TOPOLOGY_GATE=PASS
+INDEPENDENT_VERIFY_EXIT=0
+RENDERER_CREATED=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1.py
+RENDERER_CREATED=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1.py
+RENDERER_BINDING_GATE=PASS
+RENDERER_PATCH_EXIT=0
+RENDERER_SYNTAX_EXIT=0
+
+=== FINAL FULL-VIEW RENDER ===
+/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1.py:21: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+23:09:37 | INFO: Data are loaded, start creating Blender stuff
+23:09:37 | INFO: Blender create Mesh node geometry_0
+23:09:37 | INFO: glTF import finished in 0.01s
+/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1.py:34: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+00:01.058  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/front.png'
+00:01.726  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/right_3q.png'
+00:02.382  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/right_profile.png'
+00:03.111  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/back.png'
+RENDERED=FRONT|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/front.png
+RENDERED=RIGHT_3Q|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/right_3q.png
+RENDERED=RIGHT_PROFILE|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/right_profile.png
+RENDERED=BACK|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/back.png
+NEXT=HUMAN_VISUAL_GATE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit
+FULL_RENDER_EXIT=0
+
+=== FINAL NECK-CLOSEUP RENDER ===
+/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1.py:21: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+23:09:40 | INFO: Data are loaded, start creating Blender stuff
+23:09:40 | INFO: Blender create Mesh node geometry_0
+23:09:40 | INFO: glTF import finished in 0.01s
+/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1.py:34: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+00:01.213  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/front.png'
+00:01.945  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/right_3q.png'
+00:02.590  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/right_profile.png'
+00:03.290  render           | Saved: '/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/back.png'
+RENDERED=FRONT|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/front.png
+RENDERED=RIGHT_3Q|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/right_3q.png
+RENDERED=RIGHT_PROFILE|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/right_profile.png
+RENDERED=BACK|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/back.png
+NEXT=HUMAN_VISUAL_GATE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit
+CLOSEUP_RENDER_EXIT=0
+
+=== FINAL IMAGE GATES ===
+IMAGE_GATE=PASS|SCOPE=full|VIEW=front|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/front.png|SHA256=3fe403abad6586ba706b294c8da4260cf2b1b1fb310c8e6f17126d4774092ed8
+IMAGE_GATE=PASS|SCOPE=full|VIEW=right_3q|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/right_3q.png|SHA256=ae22d6b21a1e1e140316fdf44cf96a382b79ef23f32108db49b07decef1b5ffe
+IMAGE_GATE=PASS|SCOPE=full|VIEW=right_profile|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/right_profile.png|SHA256=66f01cce9d5140fd770b1f53597f90e690087df511685ccb7b7c545849c09fb5
+IMAGE_GATE=PASS|SCOPE=full|VIEW=back|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_four_view_v1/back.png|SHA256=5cdd196ce1ac600dd45b1f718f563701c4d70274efaefff6dc2dc46d90193dd3
+IMAGE_GATE=PASS|SCOPE=closeup|VIEW=front|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/front.png|SHA256=14b935125e9609aa2cf0d305bc280c5b13ff736af0eea2d574ad3034ff823f3e
+IMAGE_GATE=PASS|SCOPE=closeup|VIEW=right_3q|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/right_3q.png|SHA256=55e0475567ebefcb7a941c624078611a69c453e5968f4d7967737dd5911e9a64
+IMAGE_GATE=PASS|SCOPE=closeup|VIEW=right_profile|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/right_profile.png|SHA256=7ba4a07b1ae35babb6d1b011fb738e9db46fada41fd9f9fadfc29024dfa98624
+IMAGE_GATE=PASS|SCOPE=closeup|VIEW=back|FILE=/private/tmp/atlas_p3_p4_female_final_multiring_neck_closeup_v1/back.png|SHA256=b98c697125fa48590b11662354feb2d56c5e0fe9f9f89386c8248960c2fa83ef
+
+=== FINAL SAFETY STATE ===
+CANDIDATE_SHA256_AFTER=aea417e6352a059894f58318df9ba2a83157df347f78215f97178fedddf5a32f
+STAGED_FILE_COUNT=0
+SOURCE_FILES_CHANGED=NO
+CANDIDATE_GEOMETRY_CHANGED_BY_VERIFICATION=NO
+REPO_CHANGED_BY_FINAL_GATE=NO
+ATTEMPT_BUDGET_CONSUMED=YES
+HUMAN_VISUAL_GATE=PENDING / FINAL_DECISION
+NEXT=UPLOAD_FINAL_FULL_AND_CLOSEUP_IMAGES_FOR_ACCEPT_OR CLOSE
+PERSISTENCE_REQUIRED_AFTER_FINAL_DECISION=YES
+PRODUCTION_GEOMETRY_AUTHORIZATION=NO

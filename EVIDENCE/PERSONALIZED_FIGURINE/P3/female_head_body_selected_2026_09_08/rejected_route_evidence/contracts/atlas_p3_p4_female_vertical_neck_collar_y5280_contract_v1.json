@@ -1,0 +1,50 @@
+{
+  "body_source": "/private/tmp/atlas_p3_p4_zero_deformation_female_body_for_dp_v1.glb",
+  "body_source_sha256": "9740ba5308bbd5dfaa065967119fed3b4bd753aed8e697e66eda1478d7c848de",
+  "collar_height": 0.13182237625100068,
+  "counts": {
+    "body_lower_loop_vertices": 96,
+    "collar_side_faces": 192,
+    "head_frontier_vertices": 142,
+    "new_upper_loop_vertices": 96,
+    "removed_body_faces": 0,
+    "removed_head_faces": 810,
+    "total_new_faces": 430,
+    "upper_annulus_faces": 238
+  },
+  "hashes": {
+    "body_faces": "f474f3f06c5496d495f14d26ff1a1a754dd1f594b693245ba9a267e94df246ea",
+    "body_loop_ids": "ec4c968a78316ae1eaa4f6f36a83621c9e0f918916e84442bfef65dcc152db20",
+    "body_lower_loop_positions": "a1e5600a8fe353f98411b8b5dcd54250e185cd9d5f68806080a6ff238a59243b",
+    "body_vertices": "4bde5df99581cdb37283c03f3b2553f1dc6c8df69684ce19d23391e8c7dec378",
+    "fixed_head_ids": "9581d4e763fc85de82008ea433f53054d0bf0b57827fde8e34c2612034e8ae17",
+    "head_faces": "fcfbf0ede6e1707896f425f471ee00ae77ef886a3d1bd6d4c1e27458d42a975e",
+    "head_frontier_edges": "acaa02a3ec9dae579f6a4669a83080cb632dc93af08e21c601c1f60ed9b27cb2",
+    "head_frontier_ids": "a07e6e6630a0be2071364c4ae9d70a4fd57b28132bae5f52a249986e642eed5b",
+    "head_vertices": "80c0a41dafaf7134c706650fef81d0156c0dbea46ccce4db96516920d063d259",
+    "lower_loop_edges": "8c8abd2ea8e66d9472895d5443ac5c40d5f0c863f071fdd276bbd67f65ebc023",
+    "new_upper_loop_positions": "d2d08dbf72763c58fe8f85193a9aafc40c651eb24eafcd04b92c87b3572d1d8a",
+    "removed_head_face_ids": "26f9fdb3c76757adf1465d8b16981d70f0f90aa745ebdf4aced64b3a1c38af61",
+    "retained_head_face_ids": "fc888715024646d75d497caa89025c605bf6c7f9fcb9d18fa5a015957cfc19f2",
+    "ring3_ids": "9df32018cf31b4b0da7609d7b28f20f922b3e90e5e197cd372879419907b4738",
+    "upper_local_edges": "1b170eedcfde245537f842ae2467f2a8d0d0149fba761be91ffbbe52ec4e0fe0"
+  },
+  "head_frontier_y_max": 5.265041351318359,
+  "head_source": "/private/tmp/atlas_p3_p4_zero_deformation_female_head_for_dp_v1.glb",
+  "head_source_sha256": "749974cd50423411cd9ae5e703d101bb3a6caee7d169469ca29a5ecff6bbd22f",
+  "interface_y": 5.148177623749,
+  "locks": {
+    "body_faces_exact": true,
+    "body_vertex_positions_exact": true,
+    "head_existing_vertex_positions_exact": true,
+    "head_ring3_and_above_positions_exact": true,
+    "production_geometry_authorized": false,
+    "retained_head_faces_exact": true,
+    "upper_loop_xz_equals_body_boundary_xz": true
+  },
+  "ring2_contract": "/private/tmp/atlas_p3_p4_female_head_underside_ring2_preservation_contract_v1.npz",
+  "ring2_contract_sha256": "85449a1f6f43cb611d5f831106fffcc9d8ebff8bfb955723095d8c864c676363",
+  "schema": "atlas.female_vertical_neck_collar_y5280_contract.v1",
+  "upper_above_head_frontier_max": 0.014958648681640874,
+  "upper_collar_y": 5.28
+}

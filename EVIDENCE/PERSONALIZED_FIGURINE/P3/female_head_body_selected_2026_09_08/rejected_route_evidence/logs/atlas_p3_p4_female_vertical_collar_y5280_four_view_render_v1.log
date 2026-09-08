@@ -1,0 +1,60 @@
+=== ACTIVE CHECKLIST: P-3/P-4 — FEMALE VERTICAL COLLAR FOUR-VIEW RENDER ===
+INDEPENDENT_COLLAR_PRESERVATION_TOPOLOGY_GATE=PASS
+SOURCE_CANDIDATE_SHA256=74df51ab416e0559cd32b473ebf42ef27fac7c76fea231f6eb5c4ceb1315f594
+UPPER_COLLAR_SEAM_WARNING=ACTIVE
+HUMAN_VISUAL_GATE=ACTIVE / NOT_DECIDED
+OUTPUT_MODE=TEMP_DIAGNOSTIC_ONLY
+STEP=REBIND_AND_RENDER_FOUR_VIEWS
+
+SOURCE_RENDERER_SHA256=271f60d07de67529512fa4d25a0f8b4f7188ea18c334663a64b5a5e8dc0edc6a
+SOURCE_CANDIDATE_SHA256=74df51ab416e0559cd32b473ebf42ef27fac7c76fea231f6eb5c4ceb1315f594
+INPUT_HASH_GATE=PASS
+PATCH_MATCH=SOURCE_BINDING|COUNT=1|EXPECTED=1
+PATCH_MATCH=OUTDIR_BINDING|COUNT=1|EXPECTED=1
+RENDERER=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1.py
+MECHANICAL_REPLACEMENT_COUNT=2
+CAMERA_LIGHTING_ALGORITHM_CHANGED=NO
+PATCH_EXIT=0
+SYNTAX_EXIT=0
+RENDERER_SHA256=fb62a185348dbc31ae15b887cc3f3e7c62f3cf9ee17906bea05e35f7edd1810e
+BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
+
+=== BLENDER OUTPUT ===
+/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1.py:21: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+22:46:10 | INFO: Data are loaded, start creating Blender stuff
+22:46:10 | INFO: Blender create Mesh node geometry_0
+22:46:10 | INFO: glTF import finished in 0.01s
+/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1.py:34: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+00:01.044  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/front.png'
+00:01.716  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/right_3q.png'
+00:02.381  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/right_profile.png'
+00:03.033  render           | Saved: '/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/back.png'
+RENDERED=FRONT|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/front.png
+RENDERED=RIGHT_3Q|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/right_3q.png
+RENDERED=RIGHT_PROFILE|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/right_profile.png
+RENDERED=BACK|FILE=/private/tmp/atlas_p3_p4_female_vertical_collar_y5280_four_view_visual_gate_v1/back.png
+NEXT=HUMAN_VISUAL_GATE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit
+
+RENDER_EXIT=0
+
+=== FOUR-VIEW OUTPUT GATE ===
+RENDER_GATE=PASS|VIEW=front|BYTES=430781|SHA256=5623bbfb73a9ee6a7956657c3b329c13260e29a091ba80665ad457a9e0dc182a
+RENDER_GATE=PASS|VIEW=right_3q|BYTES=428056|SHA256=9c1936eb9af21788855c52083809b7794b05cc78eb9bfaabcb2e74c231c8b5b4
+RENDER_GATE=PASS|VIEW=right_profile|BYTES=406396|SHA256=6bf8119ae6d79599a57eba7778a8646efc1870eb7f3a486331e65f5ae4ca1506
+RENDER_GATE=PASS|VIEW=back|BYTES=438266|SHA256=eaf2e4102021d816fc1e1c38e053ac9bb70445ff5958e294a907b3a6cbeda829
+
+=== SAFETY STATE ===
+CANDIDATE_SHA256_AFTER=74df51ab416e0559cd32b473ebf42ef27fac7c76fea231f6eb5c4ceb1315f594
+STAGED_FILE_COUNT=0
+FOUR_VIEW_RENDER_GATE=PASS
+SOURCE_GEOMETRY_CHANGED=NO
+REPO_CHANGED_BY_RENDER=NO
+HUMAN_VISUAL_GATE=PENDING
+NEXT=RENDER_NECK_CLOSEUP_AND_DECIDE_VISUAL_GATE
+PERSISTENCE_REQUIRED_AFTER_VALIDATED_ARCHITECTURE=YES
+PRODUCTION_GEOMETRY_AUTHORIZATION=NO
