@@ -21412,3 +21412,291 @@ The locked contract establishes preferred multiview capture, a limited single-ph
 P-3 shall select primary and fallback generation routes only from verified identity, geometry, cost, latency, privacy, licensing and revision evidence. No real customer photograph may be externally uploaded before an approved provider route exists.
 
 [PERSONALIZED_FIGURINE_P2_GATE_CLOSED_2026_09_06:END]
+
+---
+
+[PERSONALIZED_FIGURINE_P3_P4_MALE_ASSEMBLY_V2_SELECTED_2026_09_08:BEGIN]
+
+# Personalized Figurine P-3/P-4 — Rodin Male / MakeHuman Assembly V2 Selected
+
+**Latest checkpoint date:** `2026-09-08`
+
+## Authority / scope
+
+This block updates the three primary ATLAS continuity documents with the
+meaningful Personalized Figurine work completed after the P-2 closure.
+
+It is append-only latest authority. Earlier completed records remain valid.
+
+The official roadmap gates remain distinct:
+
+`CURRENT_WORK_PROGRAM = P-3`
+
+`CURRENT_GATE = GATE-P3`
+
+`GATE_P3 = ACTIVE / NOT_DECIDED`
+
+`PRIMARY_PROVIDER_ROUTE = NOT_SELECTED`
+
+`FALLBACK_PROVIDER_ROUTE = NOT_SELECTED`
+
+The technical work below is an explicitly authorized P-3/P-4 subject-specific
+assembly proof. It does **not** by itself establish:
+
+`GATE-P4 = ADAPTIVE_ASSEMBLY_PROVEN`
+
+Reusable/general adaptive head-body assembly remains unproven.
+
+## P-3.4 Rodin benchmark persistence
+
+The Rodin V2.5 synthetic benchmark was persisted successfully on `2026-09-07`.
+
+Persistent commit:
+
+`ba59d9855528410392b49d3191e7286d0074f229`
+
+Evidence root:
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/rodin_v2_5_synthetic_benchmark_2026_09_07/`
+
+Important result:
+
+- synthetic male candidate was accepted for continued technical work;
+- synthetic female identity result was rejected;
+- Rodin was therefore **not** selected as a universal primary/fallback provider
+  route from that benchmark alone;
+- real-customer external upload remained blocked.
+
+## Male head/body source decisions
+
+The earlier Meshy V7 female dry-fit was identified as the wrong subject and is
+inactive:
+
+`WRONG_MESHY_FEMALE_DRYFIT = REJECTED / WRONG_SUBJECT`
+
+Correct head source:
+
+`CORRECT_IDENTITY_SOURCE = RODIN_V2_5_SYNTHETIC_MALE`
+
+Generic technical body donor:
+
+`MAKEHUMAN_GENERIC_MALE = ACCEPTED_AS_TECHNICAL_DONOR`
+
+Subject-specific body likeness is not claimed.
+
+Primitive/capsule body construction and the previously tested unsuitable Chibi
+target routes remain rejected/inactive. MakeHuman remains the canonical
+technical body-source direction for this branch.
+
+## Locked true cuts
+
+Rodin male true geometric cut:
+
+`RODIN_CUT_PLANE = Y=-0.350`
+
+Selected open Rodin donor SHA256:
+
+`1be9f78a91c254c17eeed3a2d9cef4626d370e5d53c302442e8cf74771384b06`
+
+Verified Rodin cut properties:
+
+- vertices: `20571`
+- faces: `40903`
+- boundary edges/vertices: `249`
+- boundary components: `1`
+- boundary exactly at `Y=-0.350`
+- off-plane boundary vertices: `0`
+- nonmanifold edges: `0`
+- winding consistent: `YES`
+
+MakeHuman male true body cut:
+
+`MAKEHUMAN_BODY_CUT_PLANE = Y=6.500`
+
+Selected open MakeHuman body donor SHA256:
+
+`b631064bb0b09cabc86aee4b90f2d3cb45b4641a2ca6b2f99d59542a32c4aabd`
+
+Verified MakeHuman cut properties:
+
+- vertices: `9289`
+- faces: `18484`
+- boundary edges/vertices: `92`
+- boundary components: `1`
+- boundary exactly at `Y=6.500`
+- off-plane boundary vertices: `0`
+- nonmanifold edges: `0`
+- winding consistent: `YES`
+
+## Locked head pose and local neck correction
+
+Rigid alignment established the head/body scale and position.
+
+The human-selected global pose is locked at:
+
+`HEAD_DZ_FROM_V1 = -0.125 native units`
+
+This corresponds to the V1 aligned head moved `12.5 mm` posterior under the
+temporary 100 mm/native working convention used during the alignment stage.
+
+The global head pose shall not be moved again merely to repair a local neck
+interface mismatch.
+
+A deterministic MakeHuman upper-neck local correction was then applied:
+
+- Rodin head vertices changed: `0`
+- body correction limited to local X/Z upper-neck region;
+- body Y coordinates preserved;
+- moved body vertices: `254`
+- outside-scope moved vertices: `0`
+- target boundary error: `0`
+- nonmanifold edges: `0`
+- reversed faces: `0`
+
+This resolved the previously observed posterior neck overhang without changing
+the approved head pose.
+
+## Bridge architecture result
+
+The corrected Rodin 249-vertex boundary and MakeHuman 92-vertex opening were
+effectively coplanar and contour-coincident.
+
+Therefore:
+
+`CLASSICAL_BRIDGE_BAND = BLOCKED`
+
+A conventional finite-width bridge band was not geometrically appropriate.
+
+The MakeHuman first interior layer was verified as a simple `46`-vertex cycle.
+The accepted assembly architecture therefore became local retriangulation from:
+
+`RODIN_BOUNDARY_249 -> MAKEHUMAN_FIRST_INNER_RING_46`
+
+V1 compactness-only retriangulation was watertight but visually rejected due to
+seam/tangent artifacts, including pathological lower-front folds near `167 deg`.
+
+The selected V2 changed only the deterministic retriangulation path using a
+seam-aware lexicographic objective.
+
+## Selected V2 geometry
+
+Authoritative persistent geometry:
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/male_head_body_bridge_2026_09_07/atlas_p3_p4_rodin_makehuman_neck_integration_v2_SELECTED_2026_09_08.glb`
+
+SHA256:
+
+`40fe3757ea28c23d30260f9977db403a5a894f4837c99e48edc7833e42312c1c`
+
+Persistent decision record:
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/male_head_body_bridge_2026_09_07/P3_P4_MALE_NECK_INTEGRATION_V2_SELECTED_2026_09_08.md`
+
+Selection commit:
+
+`e0fc8be7e42802f7709644a7733369ab050b9979`
+
+At persistence verification:
+
+`HEAD = e0fc8be7e42802f7709644a7733369ab050b9979`
+
+`ORIGIN_MAIN = e0fc8be7e42802f7709644a7733369ab050b9979`
+
+`HEAD_EQUALS_ORIGIN_MAIN = YES`
+
+## V2 topology and seam result
+
+Final selected V2:
+
+- vertices: `29768`
+- faces: `59544`
+- boundary edges: `0`
+- nonmanifold edges: `0`
+- zero-area faces: `0`
+- watertight: `True`
+- winding consistent: `True`
+
+Upper Rodin seam:
+
+- mean: `12.483651 deg`
+- P95: `30.768255 deg`
+- max: `41.874131 deg`
+
+Lower MakeHuman seam:
+
+- mean: `9.055577 deg`
+- P95: `22.035626 deg`
+- max: `27.648179 deg`
+- edges over 30 deg: `0`
+
+The V1 lower-front approximately `167 deg` pathological folds are resolved.
+
+## Rejected local repair branches
+
+Back-sector body fairing V1 is rejected because it worsened upper seam
+continuity.
+
+Single tangent-support-ring V1 is rejected because it improved the upper Rodin
+seam but transferred severe discontinuity downward into the support/body seams.
+
+These branches are inactive and must not be resumed by blind iteration.
+
+## 150 mm physical-scale verification
+
+The authoritative ATLAS/trimesh vertical axis is:
+
+`Y`
+
+Selected V2 native full-body height:
+
+`16.154171944`
+
+Correct nominal 150 mm scale:
+
+`9.285527016 mm/native-unit`
+
+The earlier temporary `100 mm/native-unit` working assumption overstated the
+physical dimensions by:
+
+`10.769448x`
+
+At the corrected 150 mm scale:
+
+- previous posterior mean overhang: `0.411906 mm`
+- previous posterior max overhang: `0.547475 mm`
+- boundary correction mean: `0.244209 mm`
+- boundary correction P95: `0.544875 mm`
+- boundary correction max: `0.742656 mm`
+- seam-to-inner-ring mean transition height: `0.552832 mm`
+
+Human visual review of the smooth-shaded full-body candidate concluded:
+
+`FRONT = PASS`
+
+`PROFILE = PASS`
+
+`BACK = PASS_WITH_MINOR_SUBMILLIMETER_RESIDUAL`
+
+`P3_P4_MALE_NECK_INTEGRATION_V2 = PASS / SELECTED`
+
+This is a subject-specific technical assembly proof and selected rollback-safe
+checkpoint. It is not yet a claim of reusable multi-subject adaptive assembly.
+
+## Current program boundaries
+
+`REAL_CUSTOMER_EXTERNAL_UPLOAD = BLOCKED_PENDING_APPROVED_VENDOR_ROUTE`
+
+`PRODUCT_LAUNCH_AUTHORIZATION = NO`
+
+`PRODUCTION_GEOMETRY_AUTHORIZATION = NO`
+
+`PHASE9 = NOT_AUTHORIZED / NOT_STARTED`
+
+P-3 still requires an explicit primary/fallback commercially admissible
+generation-route decision before `GATE-P3 = GENERATION_ROUTE_SELECTED` can be
+claimed.
+
+P-4 still requires reusable/general adaptive assembly evidence before
+`GATE-P4 = ADAPTIVE_ASSEMBLY_PROVEN` can be claimed.
+
+[PERSONALIZED_FIGURINE_P3_P4_MALE_ASSEMBLY_V2_SELECTED_2026_09_08:END]
