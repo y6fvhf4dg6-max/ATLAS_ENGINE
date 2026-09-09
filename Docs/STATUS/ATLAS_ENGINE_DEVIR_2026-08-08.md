@@ -26555,3 +26555,88 @@ P-4 still requires reusable/general adaptive assembly evidence before
 `GATE-P4 = ADAPTIVE_ASSEMBLY_PROVEN` can be claimed.
 
 [PERSONALIZED_FIGURINE_P3_P4_MALE_ASSEMBLY_V2_SELECTED_2026_09_08:END]
+
+---
+
+[P3_P4_FEMALE_HEAD_BODY_REJECTION_CLOSURE_2026_09_09:START]
+
+# P-3/P-4 Female Head–Body Pairing — Authoritative Rejection Closure
+
+**Recorded:** 2026-09-09
+**Closure commit:** `315484dd56a28efc24ffb71aa23e83233a235d43`
+
+## Current authoritative decision
+
+`FINAL_HUMAN_VISUAL_GATE = FAIL`
+
+`HEAD_BODY_PAIRING = REJECTED / CLOSED`
+
+`ATTEMPT_BUDGET = EXHAUSTED`
+
+`NEW_GEOMETRY_AUTHORIZATION = NO`
+
+`PRODUCTION_GEOMETRY_AUTHORIZATION = NO`
+
+`PHASE9 = NOT_AUTHORIZED / NOT_STARTED`
+
+The earlier female technical selection and all earlier female neck-recovery
+resume instructions are superseded. They remain historical evidence only and
+must not be interpreted as active work.
+
+The rejected pairing is:
+
+- Rodin female head
+- MakeHuman ratio-5.30 female body
+
+This pairing must not be reopened through additional DP weighting, extra
+transition rings, collar variants, stronger smoothing, wider body deformation,
+new cut-plane searches, or further changes to the locked head identity.
+
+## Preserved conclusion
+
+Multiple routes produced watertight, winding-consistent and manifold meshes but
+failed the human anatomical visual gate. The underlying head-underside and body
+neck envelopes are materially incompatible under the locked identity and
+bounded-deformation requirements.
+
+Rejected temporary GLB candidates were not promoted. Reproducibility evidence,
+contracts, scripts, logs and visual failures are preserved at:
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/female_head_body_selected_2026_09_08/`
+
+Read first:
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/female_head_body_selected_2026_09_08/P3_P4_FEMALE_HEAD_BODY_REJECTION_CLOSURE_2026_09_08.md`
+
+## Exact next authorized project decision
+
+Start a separate, explicitly authorized source-selection step and choose one
+materially different compatible input:
+
+1. a female body with a native anatomical neck envelope compatible with the
+   retained head; or
+2. a female head source generated with a real narrow anatomical neck interface
+   intended for full-body attachment.
+
+No new geometry work begins until that source-selection step is explicitly
+authorized.
+
+## Mandatory operating protocol
+
+- Read `Docs/START_HERE.md`, `Docs/STATUS/CURRENT_STATUS.md` and
+  `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md` before acting.
+- Verify `HEAD == origin/main`, staged count zero and preserve the unrelated
+  dirty worktree.
+- Give exactly one terminal command per step.
+- Include terminal output capture through `tee` and `pbcopy`.
+- Wait for the user to paste the result before continuing.
+- Do not use `git add .`, broad reset, checkout or clean operations.
+- Stage only an explicitly authorized allowlist.
+- Commit and push only after green gates and explicit human authorization.
+- Phase 9 remains unauthorized.
+
+## Exact first instruction for the next engine
+
+> ATLAS_ENGINE için Kitaplıktaki `ATLAS_ENGINE_HANDOFF_FEMALE_NECK_RECOVERY_2026-09-08.md` dosyasını ve repo içindeki `Docs/START_HERE.md`, `Docs/STATUS/CURRENT_STATUS.md`, `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md` dosyalarını tamamen oku. Önce hiçbir dosyaya dokunmadan `HEAD == origin/main`, staged alanın boş olduğunu ve mevcut unrelated dirty worktree'nin korunacağını doğrula. P-3/P-4 Rodin female head + MakeHuman ratio-5.30 body pairing `REJECTED / CLOSED`; bu eşleştirmeyi veya reddedilmiş neck-recovery yollarını yeniden açma. Sonraki ayrı yetkili iş, anatomik neck interface'i uyumlu yeni bir female head veya body source seçmektir. Phase 9 yetkili değildir. Her seferinde tek terminal komutu ver, çıktıyı `tee` ve `pbcopy` ile al ve ben sonucu paylaşmadan ilerleme.
+
+[P3_P4_FEMALE_HEAD_BODY_REJECTION_CLOSURE_2026_09_09:END]
