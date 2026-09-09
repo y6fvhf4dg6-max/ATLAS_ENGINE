@@ -24480,3 +24480,57 @@ authorized.
 > ATLAS_ENGINE için Kitaplıktaki `ATLAS_ENGINE_HANDOFF_FEMALE_NECK_RECOVERY_2026-09-08.md` dosyasını ve repo içindeki `Docs/START_HERE.md`, `Docs/STATUS/CURRENT_STATUS.md`, `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md` dosyalarını tamamen oku. Önce hiçbir dosyaya dokunmadan `HEAD == origin/main`, staged alanın boş olduğunu ve mevcut unrelated dirty worktree'nin korunacağını doğrula. P-3/P-4 Rodin female head + MakeHuman ratio-5.30 body pairing `REJECTED / CLOSED`; bu eşleştirmeyi veya reddedilmiş neck-recovery yollarını yeniden açma. Sonraki ayrı yetkili iş, anatomik neck interface'i uyumlu yeni bir female head veya body source seçmektir. Phase 9 yetkili değildir. Her seferinde tek terminal komutu ver, çıktıyı `tee` ve `pbcopy` ile al ve ben sonucu paylaşmadan ilerleme.
 
 [P3_P4_FEMALE_HEAD_BODY_REJECTION_CLOSURE_2026_09_09:END]
+
+---
+
+[FEMALE_IDENTITY_NECK_RODIN_V25_APPROVED_2026_09_09:BEGIN]
+
+# Female Identity + Anatomical Neck — Rodin V2.5 Approved (2026-09-09)
+
+## Decision
+
+A new standalone Rodin V2.5 female identity/head-neck-bust source was generated from five human-approved views and accepted by human visual judgment.
+
+- `IDENTITY_AND_SKULL = PASS`
+- `ANATOMICAL_NECK = PASS`
+- `NAPE_AND_REAR_NECK_VISIBILITY = PASS`
+- `EXACT_WELD_SHAPE_PRESERVATION = PASS`
+- Previous Rodin-female + MakeHuman ratio-5.30 pairing remains `REJECTED / CLOSED`.
+- Rejected 170-loop and related neck-retopo routes remain closed.
+
+## Locked evidence
+
+`EVIDENCE/PERSONALIZED_FIGURINE/P3/female_identity_neck_rodin_v25_approved_2026_09_09/`
+
+- Textured source GLB SHA256:
+  `c4971c51415283b55ac67f364fc31deaec1f7b00438910fad86185058213e809`
+- Geometry-only exact-weld GLB SHA256:
+  `1848d8bfabe39d9b8e4cc98147c023c851c40066801c2d6c3d35772ec0bbcb35`
+- Final `SHA256SUMS.txt` SHA256:
+  `2f99436fe49d1c4642e887a11eb6b76c2e21fc9a199f52b7e63cd212df5d64b8`
+
+The package contains the five ordered input PNGs, textured source GLB, geometry-only exact-weld GLB, README and hash manifest.
+
+## Verified geometry
+
+- 249,992 exact-welded vertices
+- 500,000 faces
+- 0 boundary edges
+- 0 non-manifold edges
+- watertight
+- winding-consistent
+- maximum vertex delta from source unique positions: 0
+
+## Safety and next step
+
+- Existing unrelated dirty worktree must remain untouched.
+- No staging, commit or push has been authorized.
+- Phase 9 remains `NOT AUTHORIZED`.
+- Exact next task: preserve this accepted source and perform a read-only anatomical head/neck interface and extraction-zone audit before proposing any new head/body assembly operation.
+- Do not reopen rejected direct 170-loop retopology.
+
+## Exact first instruction for the next engine
+
+> ATLAS_ENGINE için Kitaplıktaki `ATLAS_ENGINE_HANDOFF_FEMALE_RODIN_V25_ACCEPTED_2026-09-09.md` dosyasını ve repo içindeki `Docs/START_HERE.md`, `Docs/STATUS/CURRENT_STATUS.md`, `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md` dosyalarını tamamen oku. Önce hiçbir dosyaya dokunmadan repo ve evidence hash durumunu doğrula; unrelated dirty worktree'yi koru. Yeni Rodin V2.5 female identity, kafatası ve anatomik boyun kaynağı HUMAN PASS'tir. Eski Rodin-female + MakeHuman pairing ve 170-loop retopo yolları reddedilmiş olarak kapalı kalacaktır. Sonraki iş yalnızca read-only head/neck interface ve extraction-zone auditidir. Phase 9 yetkili değildir. Her seferinde tek terminal komutu ver ve çıktıyı tee ile kaydedip pbcopy ile panoya al.
+
+[FEMALE_IDENTITY_NECK_RODIN_V25_APPROVED_2026_09_09:END]
