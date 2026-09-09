@@ -355,6 +355,263 @@ Web/storefront work begins only after this physical-product state is reached.
 
 ---
 
+## 12A — GENERALIZED PERSONALIZED HUMAN PRODUCT PLATFORM — FINAL SYSTEM TARGET
+
+Commercial success is not defined as “one successful male + one successful female figurine.” The final target is a reusable system that preserves a real person's identity while independently varying body morphology, pose, activity, profession, clothing, props, scene, product format and manufacturing constraints.
+
+### 12A.1 — Canonical product decomposition
+
+Every product must be representable as:
+
+`PERSON IDENTITY + BODY MORPHOLOGY + POSE/ACTION + ROLE/CLOTHING + PROPS + SCENE/BASE + PRODUCT FORMAT + MANUFACTURING/QC`
+
+Changing pose, clothing, profession, hobby, body presentation, accessories or product format must not require rebuilding the person's identity from zero.
+
+### 12A.2 — Human diversity / identity generalization
+
+Before claiming a generalized system, controlled real-customer evidence must cover materially different:
+- [ ] ancestry / phenotype presentations, including African, East Asian, South Asian, Middle Eastern, European and mixed-heritage appearances;
+- [ ] craniofacial proportions and feature distributions;
+- [ ] ages / age appearances where commercially supported;
+- [ ] hairlines, hairstyles, baldness, beards and moustaches;
+- [ ] ear, nose, jaw, cheek, forehead and head-shape morphology;
+- [ ] eyeglasses and identity-relevant wearable accessories.
+
+Likeness must survive front, profile, rear and three-quarter inspection and must not depend on texture alone.
+
+`GATE_IDENTITY_DIVERSITY = VERIFIED_ON_CONTROLLED_REAL_CUSTOMER_MATRIX`
+
+### 12A.3 — Body morphology generalization
+
+The same identity architecture must support:
+- [ ] short / average / tall stature;
+- [ ] slim / average / heavy / large-abdomen body shapes;
+- [ ] athletic / muscular body shapes;
+- [ ] broad / narrow shoulders;
+- [ ] different torso-to-leg and limb-length proportions;
+- [ ] age-appropriate body presentation where supported;
+- [ ] clothing adaptation without loss of anatomical plausibility;
+- [ ] print-safe geometry across the approved commercial body range.
+
+Body morphology must be controlled independently from face/head identity.
+
+`GATE_BODY_MORPHOLOGY_GENERALIZATION = PASS`
+
+### 12A.4 — Pose / action / activity system
+
+The system must support semantically meaningful actions, not only neutral standing poses:
+- [ ] walking / standing / seated;
+- [ ] running / sprinting / marathon;
+- [ ] hiking / mountaineering / climbing;
+- [ ] cycling with bicycle;
+- [ ] fishing with rod and equipment;
+- [ ] selected sports such as football, basketball, tennis, golf and fitness;
+- [ ] lecturing / presenting / desk-work;
+- [ ] holding tools, books, instruments, medals, trophies or work equipment;
+- [ ] couple / family interaction;
+- [ ] celebration / retirement / achievement;
+- [ ] customer-requested custom poses within manufacturability limits.
+
+Every supported pose must pass anatomical plausibility, collision, balance/center-of-mass, contact stability, printable thickness, support-scar and human-likeness gates.
+
+`GATE_POSE_ACTIVITY_GENERALIZATION = PASS`
+
+### 12A.5 — Profession / role / clothing system
+
+Identity must combine with reusable role packages such as:
+- [ ] doctor / medical professional;
+- [ ] professor / teacher / academic;
+- [ ] pilot / aviation professional;
+- [ ] police / public-service uniform where legally and commercially permissible;
+- [ ] chef / hospitality;
+- [ ] engineer / technician / tradesperson;
+- [ ] office / executive / business;
+- [ ] athlete / sports;
+- [ ] outdoor / mountaineering;
+- [ ] hobby / club / ceremonial;
+- [ ] customer-specific clothing or uniform.
+
+Each role package must define clothing geometry, body-fit rules, props, optional headwear, insignia/logo policy, color/material mapping, printability limits and licensing restrictions.
+
+`GATE_ROLE_UNIFORM_SYSTEM = PASS`
+
+### 12A.6 — Props / equipment / hobby objects
+
+Reusable or customer-specific objects may include bicycle, fishing equipment, backpack, trekking poles, climbing equipment, sports gear, books, diploma, stethoscope, laptop, tools, musical instruments, trophies, medals, pets/companions where supported, and symbolic personal objects.
+
+Every prop must pass scale, hand/body contact, collision, minimum-thickness, breakage, transport-durability, print-orientation/support and licensing/IP review.
+
+`GATE_PROP_EQUIPMENT_SYSTEM = PASS`
+
+### 12A.7 — Scene / environment / diorama composition
+
+The personalized person may be integrated into a meaningful physical scene rather than existing only as an isolated figurine.
+
+The system must support:
+- [ ] simple contextual bases;
+- [ ] profession-specific environments;
+- [ ] hobby/activity environments;
+- [ ] mountain / trail / outdoor compositions;
+- [ ] cycling scenes;
+- [ ] fishing scenes;
+- [ ] office / laboratory / classroom / academic scenes;
+- [ ] sports scenes;
+- [ ] retirement / achievement / commemorative scenes;
+- [ ] symbolic architecture, terrain or location elements where commercially appropriate;
+- [ ] integration with ATLAS / My Life Map location-derived geometry where useful;
+- [ ] customer-specific scene elements within complexity and manufacturing limits.
+
+Scene generation must preserve visual hierarchy: the personalized human remains the primary identity-bearing subject. Background geometry must not unnecessarily increase print failure, support damage, packaging volume or production cost.
+
+`GATE_SCENE_DIORAMA_SYSTEM = PASS`
+
+### 12A.8 — Award / plaque / recognition product system
+
+The platform must support personalized figurative award and recognition products in addition to standalone figurines.
+
+Supported product concepts must include:
+- [ ] retirement awards;
+- [ ] service-anniversary awards;
+- [ ] employee recognition;
+- [ ] academic / professor recognition;
+- [ ] sports achievement awards;
+- [ ] club / association awards;
+- [ ] graduation / qualification awards;
+- [ ] competition / event awards;
+- [ ] professional milestone gifts;
+- [ ] commemorative and honorary products.
+
+A recognition product may combine:
+`PERSONALIZED FIGURE OR BUST + ROLE/ACTION + SYMBOLIC PROP + PLAQUE/BASE + NAME + TITLE + DATE + ACHIEVEMENT TEXT + OPTIONAL ORGANIZATION BRANDING`
+
+The system must support:
+- [ ] full-body figure on award base;
+- [ ] bust on award base;
+- [ ] relief portrait / figurative relief;
+- [ ] integrated text plate;
+- [ ] replaceable/customizable text fields;
+- [ ] logo/emblem placement when authorized;
+- [ ] trophy / medal / symbolic-object integration;
+- [ ] premium presentation-base variants;
+- [ ] stable desk/display geometry;
+- [ ] packaging appropriate for presentation/gifting.
+
+Text legibility, logo authorization, trademark/IP policy, minimum feature size and premium finish must be validated independently from identity likeness.
+
+`GATE_AWARD_PLAQUE_PRODUCT_SYSTEM = PASS`
+
+### 12A.9 — Modular reusable asset architecture
+
+The production system must avoid rebuilding common components for every customer.
+
+Reusable libraries/contracts must exist for:
+- [ ] body morphology families;
+- [ ] canonical poses;
+- [ ] profession clothing;
+- [ ] uniforms;
+- [ ] generic clothing;
+- [ ] footwear;
+- [ ] hairstyles where identity-safe;
+- [ ] props/equipment;
+- [ ] sports equipment;
+- [ ] hobby objects;
+- [ ] bases;
+- [ ] plaque architectures;
+- [ ] text/nameplate systems;
+- [ ] scene modules;
+- [ ] packaging envelopes.
+
+Reusable assets must be parameterizable and composable without corrupting the customer's identity geometry.
+
+Customer-specific geometry remains allowed where the reusable library cannot faithfully represent the requested subject.
+
+`GATE_MODULAR_ASSET_ARCHITECTURE = PASS`
+
+### 12A.10 — Automation and bounded manual correction
+
+Commercial operation must not depend on unrestricted expert sculpting for every order.
+
+The preferred flow is:
+
+`CUSTOMER INPUT -> IDENTITY PACKAGE -> PERSON GENERATION -> BODY/ROLE/POSE SELECTION -> ADAPTIVE ASSEMBLY -> PROP/SCENE COMPOSITION -> VALIDATION -> HUMAN REVIEW -> MANUFACTURING`
+
+For supported product classes:
+- [ ] routine geometry operations are automated or parameter-driven;
+- [ ] topology checks are automated;
+- [ ] manufacturability checks are automated where measurable;
+- [ ] known failure classes are detected;
+- [ ] human intervention is bounded and recorded;
+- [ ] manual correction time is measured;
+- [ ] exception cases can be classified `AUTO / MANUAL-FIX / REGENERATE / REJECT`;
+- [ ] the system can reject requests outside the validated production envelope instead of silently producing poor products.
+
+`GATE_BOUNDED_MANUAL_WORK = PASS`
+
+### 12A.11 — Generalization validation matrix
+
+A generalized-platform claim requires cross-combination testing rather than one example per category.
+
+The controlled validation matrix must deliberately include combinations spanning:
+- [ ] different facial/cranial morphology;
+- [ ] different ancestry/phenotype presentations;
+- [ ] different body sizes and proportions;
+- [ ] different hair/headwear conditions;
+- [ ] neutral and dynamic poses;
+- [ ] seated and standing configurations;
+- [ ] profession/uniform cases;
+- [ ] sport/activity cases;
+- [ ] hand-held props;
+- [ ] large props such as bicycle/equipment;
+- [ ] single-person products;
+- [ ] couple/family products;
+- [ ] standalone figurines;
+- [ ] scene/diorama products;
+- [ ] award/plaque products.
+
+The matrix must include difficult cross-combinations, for example:
+- short/heavy customer + dynamic activity;
+- tall/slim customer + professional uniform;
+- customer with distinctive hair + headwear;
+- cyclist + bicycle + personalized identity;
+- mountaineer + backpack/poles + terrain base;
+- professor + personalized identity + fishing hobby + commemorative plaque;
+- athlete + sports equipment + achievement award;
+- multi-person family + materially different heights/body types.
+
+A category is not generalized merely because one hand-tuned demonstration succeeded.
+
+`GATE_CROSS_COMBINATION_GENERALIZATION = PASS`
+
+### 12A.12 — Final platform acceptance criteria
+
+The personalized figurine program reaches its intended system-level target only when:
+
+- [ ] identity is reusable independently of product styling;
+- [ ] validated body diversity is supported;
+- [ ] validated pose/activity diversity is supported;
+- [ ] validated profession/clothing diversity is supported;
+- [ ] props/equipment are composable;
+- [ ] scene/diorama products are producible;
+- [ ] award/plaque products are producible;
+- [ ] all five PF product families have physical-product PASS;
+- [ ] common manufacturing is repeatable;
+- [ ] finishing and packaging are operational;
+- [ ] unit economics are commercially acceptable;
+- [ ] controlled real-customer pilots pass;
+- [ ] cross-combination generalization is demonstrated;
+- [ ] manual intervention remains within the defined commercial envelope;
+- [ ] privacy, consent, licensing and IP requirements are operationally enforced;
+- [ ] unsupported requests fail safely through explicit rejection/escalation;
+- [ ] accepted products are reproducible from persisted source/evidence/configuration.
+
+Only then may the program claim:
+
+`PERSONALIZED_HUMAN_PRODUCT_PLATFORM = GENERALIZED / COMMERCIALLY_PRODUCTION_READY`
+
+The final objective is therefore not merely to generate a figurine from photographs. It is to transform a specific person's preserved identity into a configurable, manufacturable physical product across validated combinations of body morphology, pose, activity, profession, clothing, hobby, props, scene, relationship/composition and award/commemorative format without rebuilding the identity solution from zero for each product.
+
+---
+
 # CURRENT ACTIVE POSITION — CANONICAL
 
 ```text
