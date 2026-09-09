@@ -26694,3 +26694,11 @@ The package contains the five ordered input PNGs, textured source GLB, geometry-
 > ATLAS_ENGINE için Kitaplıktaki `ATLAS_ENGINE_HANDOFF_FEMALE_RODIN_V25_ACCEPTED_2026-09-09.md` dosyasını ve repo içindeki `Docs/START_HERE.md`, `Docs/STATUS/CURRENT_STATUS.md`, `Docs/STATUS/ATLAS_ENGINE_DEVIR_2026-08-08.md` dosyalarını tamamen oku. Önce hiçbir dosyaya dokunmadan repo ve evidence hash durumunu doğrula; unrelated dirty worktree'yi koru. Yeni Rodin V2.5 female identity, kafatası ve anatomik boyun kaynağı HUMAN PASS'tir. Eski Rodin-female + MakeHuman pairing ve 170-loop retopo yolları reddedilmiş olarak kapalı kalacaktır. Sonraki iş yalnızca read-only head/neck interface ve extraction-zone auditidir. Phase 9 yetkili değildir. Her seferinde tek terminal komutu ver ve çıktıyı tee ile kaydedip pbcopy ile panoya al.
 
 [FEMALE_IDENTITY_NECK_RODIN_V25_APPROVED_2026_09_09:END]
+
+
+[PERSONALIZED_3D_FIGURINE_MASTER_CHECKLIST_V1_CANONICAL]
+Canonical operational execution checklist:
+`Docs/Roadmap/PERSONALIZED_3D_FIGURINE_MASTER_CHECKLIST_V1.md`
+Do not reconstruct the figurine execution checklist from historical handoffs.
+Current exact position: `PF1_FEMALE_HEAD_NECK_INTERFACE_AND_EXTRACTION_ZONE_AUDIT`.
+[/PERSONALIZED_3D_FIGURINE_MASTER_CHECKLIST_V1_CANONICAL]
