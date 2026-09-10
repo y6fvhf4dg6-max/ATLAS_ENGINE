@@ -26815,3 +26815,20 @@ PF1_FEMALE_PRIOR_3Q_EYE_ANOMALY = RENDER_DEPTH_ORDER_ARTIFACT / NO_GEOMETRY_DEFE
 CURRENT_EXACT_POSITION = PF1_FEMALE_FINAL_NORMAL_PROPORTION_CANDIDATE_CLOSED_2026_09_10
 PHASE9 = NOT AUTHORIZED / NOT STARTED
 [PF1_FEMALE_FINAL_NORMAL_PROPORTION_CLOSURE_2026_09_10:END]
+
+---
+
+## PF2_ITEM8_ADAPTIVE_HEAD_BODY_ASSEMBLY_CLOSED_2026_09_10
+
+- PF-2 Modern Chibi Item 8 `Adaptive head/body assembly` = PASS / CLOSED.
+- Accepted architecture = `EMBEDDED_NECK_ROOT_PLUS_LOCAL_TRAPEZIUS_SURFACE`.
+- Male human visual gate = PASS.
+- Female human visual gate = PASS.
+- Rejected architectures: linear boundary connector; direct 249/324→10 stitch; tiny-body-opening target; explicit vertical neck tube.
+- Accepted neck-width target = 0.38 × robust lower-face width.
+- Identity-bearing head region outside the local lower-neck adaptation remains unchanged.
+- Body outside the local upper-torso/trapezius adaptation remains unchanged.
+- Third-party Dreamloft-derived GLBs are not persisted; hashes/provenance and ATLAS-owned procedure/visual evidence are persisted.
+- Evidence: `EVIDENCE/PERSONALIZED_FIGURINE/PF2/adaptive_head_body_assembly_pass_2026_09_10/`.
+- NEXT = PF-2 Item 9 `Hair / ear / finger / limb printability`.
+- Phase 9 = NOT AUTHORIZED / NOT STARTED.

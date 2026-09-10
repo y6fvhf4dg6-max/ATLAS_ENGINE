@@ -118,7 +118,7 @@ Web/storefront/payment/advertising work is outside this checklist.
 - [x] Male Chibi candidate. — PASS / HUMAN ACCEPTED; Dreamloft 3HT male body + verified Rodin V2.5 synthetic male identity/head, HEAD_TO_TOTAL_HEIGHT_RATIO=0.38, native glTF/Blender orientation accepted. Adaptive neck/body integration remains deferred to PF-2 Item 8.
 - [x] Female Chibi candidate. — PASS / HUMAN ACCEPTED; Dreamloft 3HT female body + accepted Rodin V2.5 female identity/head, selected HEAD_TO_TOTAL_HEIGHT_RATIO=0.35 after bounded 0.38/0.36/0.35 visual comparison. Orientation accepted. Head centering / neck placement remains deferred to PF-2 Item 8.
 - [x] Identity gate. — PASS / CLOSED; accepted male and female identity-bearing head geometry is preserved exactly through PF-2 extraction and dry-fit preparation. Male and female canonical max/mean vertex delta = 0, face arrays equal, no facial stylization deformation applied; transforms are rigid + uniform scale only. Head centering / neck placement remains deferred to PF-2 Item 8.
-- [ ] Adaptive head/body assembly.
+- [x] Adaptive head/body assembly. — PASS / CLOSED (2026-09-10); male and female Dreamloft 3HT bodies integrated with the accepted Rodin identity heads using the embedded-neck-root + local trapezius architecture. Neck-width target = 0.38 × robust lower-face width; explicit vertical neck connector and tiny-body-opening strategy rejected. Male + female human visual gate PASS; identity-bearing head region and non-local body geometry remain protected.
 - [ ] Hair / ear / finger / limb printability.
 - [ ] Stable integrated base.
 - [ ] 150 mm normalization.
