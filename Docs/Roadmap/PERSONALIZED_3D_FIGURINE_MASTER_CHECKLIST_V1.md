@@ -58,7 +58,7 @@ Web/storefront/payment/advertising work is outside this checklist.
 
 `PF1_MALE_TECHNICAL_ASSEMBLY = PASS / SELECTED`
 
-## 1B — Normal-Proportion Female — ACTIVE
+## 1B — Normal-Proportion Female — PASS / CLOSED
 
 - [x] New Rodin V2.5 female identity generated.
 - [x] Identity/skull human gate PASS.
@@ -75,13 +75,13 @@ Web/storefront/payment/advertising work is outside this checklist.
 - [x] Boundary correspondence established. — TECHNICAL PASS.
 - [x] Local connector / bridge constructed. — TECHNICAL PASS; C3 complete exact-head-to-body connector checkpoint persisted 2026-09-09 (C2 preserved as intermediate checkpoint).
 - [x] Identity-bearing head geometry preservation proven. — Original TECHNICAL PASS persisted; accepted Rodin V2.5 identity-bearing head remains KEEP. Later user-authorized correction permits only a narrow non-identity lower-neck interface adaptation.
-- [ ] Anatomical neck/shoulder continuity proven. — **ITEM 10 ACTIVE / NOT PASS; current PF1 female blocker.**
-- [ ] Watertight / nonmanifold / winding validation PASS.
-- [ ] Front / profile / back / 3Q human visual gate PASS.
-- [ ] Final normal-proportion female candidate selected.
-- [ ] Persistent evidence / hashes / reproducibility closure.
+- [x] Anatomical neck/shoulder continuity proven. — PASS / LOCKED; native-surface retopology V1 accepted after front/profile/back/3Q human visual gate.
+- [x] Watertight / nonmanifold / winding validation PASS. — PASS / LOCKED; V6 boundary=0, nonmanifold=0, winding=true, watertight=true, zero-area=0.
+- [x] Front / profile / back / 3Q human visual gate PASS. — PASS / HUMAN ACCEPTED on V6 corrected orthographic 4-view, 2026-09-10.
+- [x] Final normal-proportion female candidate selected. — PASS; V6 selected 2026-09-10 after Item 18 human visual acceptance.
+- [x] Persistent evidence / hashes / reproducibility closure. — PASS / CLOSED; final V6 GLB, corrected 4-view visual evidence, hashes, and authority-state synchronization persisted 2026-09-10.
 
-`CURRENT_EXACT_POSITION = PF1_FEMALE_ITEM10_ANATOMICAL_NECK_SHOULDER_CONTINUITY_CORRECTIVE_PATH`
+`CURRENT_EXACT_POSITION = PF1_FEMALE_FINAL_NORMAL_PROPORTION_CANDIDATE_CLOSED_2026_09_10`
 
 ### Hard closures
 
