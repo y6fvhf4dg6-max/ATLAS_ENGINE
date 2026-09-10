@@ -111,10 +111,10 @@ Web/storefront/payment/advertising work is outside this checklist.
 
 # 2 — PF-2 MODERN CHIBI FIGURINE
 
-- [ ] Chibi style contract confirmed.
-- [ ] Identity-preservation / stylization boundary locked.
-- [ ] Head exaggeration ratio locked.
-- [ ] Compact anatomical body selected/proven.
+- [x] Chibi style contract confirmed. — PASS; existing SPC-C1 Chibi Product Definition closure (2026-09-04) adopted as PF-2 style contract.
+- [x] Identity-preservation / stylization boundary locked. — PASS; SPC-C1 Identity Anchor Contract adopted: IDENTITY_BEFORE_STYLE, FACIAL_STYLIZATION=LOW_TO_MODERATE, identity-carrying proportions dominant.
+- [x] Head exaggeration ratio locked. — PASS; PF-2 pilot nominal HEAD_TO_TOTAL_HEIGHT_RATIO=0.38, within approved SPC-C1 evaluation envelope 0.35–0.40; reopen only on explicit physical/visual evidence.
+- [x] Compact anatomical body selected/proven. — PASS; Dreamloft3D Chibi Base Meshes 3HT male/female family selected after human visual gate; commercial use and modification permitted by bundled license. Raw source topology is not production-ready and remains subject to the later PF-2 topological validation gate.
 - [ ] Male Chibi candidate.
 - [ ] Female Chibi candidate.
 - [ ] Identity gate.
