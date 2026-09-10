@@ -117,7 +117,7 @@ Web/storefront/payment/advertising work is outside this checklist.
 - [x] Compact anatomical body selected/proven. — PASS; Dreamloft3D Chibi Base Meshes 3HT male/female family selected after human visual gate; commercial use and modification permitted by bundled license. Raw source topology is not production-ready and remains subject to the later PF-2 topological validation gate.
 - [x] Male Chibi candidate. — PASS / HUMAN ACCEPTED; Dreamloft 3HT male body + verified Rodin V2.5 synthetic male identity/head, HEAD_TO_TOTAL_HEIGHT_RATIO=0.38, native glTF/Blender orientation accepted. Adaptive neck/body integration remains deferred to PF-2 Item 8.
 - [x] Female Chibi candidate. — PASS / HUMAN ACCEPTED; Dreamloft 3HT female body + accepted Rodin V2.5 female identity/head, selected HEAD_TO_TOTAL_HEIGHT_RATIO=0.35 after bounded 0.38/0.36/0.35 visual comparison. Orientation accepted. Head centering / neck placement remains deferred to PF-2 Item 8.
-- [ ] Identity gate.
+- [x] Identity gate. — PASS / CLOSED; accepted male and female identity-bearing head geometry is preserved exactly through PF-2 extraction and dry-fit preparation. Male and female canonical max/mean vertex delta = 0, face arrays equal, no facial stylization deformation applied; transforms are rigid + uniform scale only. Head centering / neck placement remains deferred to PF-2 Item 8.
 - [ ] Adaptive head/body assembly.
 - [ ] Hair / ear / finger / limb printability.
 - [ ] Stable integrated base.
