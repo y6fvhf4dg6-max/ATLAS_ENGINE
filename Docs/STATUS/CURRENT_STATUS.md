@@ -24540,5 +24540,95 @@ The package contains the five ordered input PNGs, textured source GLB, geometry-
 Canonical operational execution checklist:
 `Docs/Roadmap/PERSONALIZED_3D_FIGURINE_MASTER_CHECKLIST_V1.md`
 Do not reconstruct the figurine execution checklist from historical handoffs.
-Current exact position: `PF1_FEMALE_HEAD_NECK_INTERFACE_AND_EXTRACTION_ZONE_AUDIT`.
+Current exact position: `PF1_FEMALE_ITEM10_ANATOMICAL_NECK_SHOULDER_CONTINUITY_CORRECTIVE_PATH`.
 [/PERSONALIZED_3D_FIGURINE_MASTER_CHECKLIST_V1_CANONICAL]
+
+---
+
+[PF1_FEMALE_ITEM10_CURRENT_STATE_OVERRIDE_2026_09_10:BEGIN]
+
+# PF1 Female Item 10 — Current Authoritative State (2026-09-10)
+
+This block supersedes older PF1-female `exact next task` and `current position`
+statements where they conflict with the state below. Historical records remain
+preserved.
+
+## Current program / gate
+
+`CURRENT_WORK_PROGRAM = P-3`
+
+`CURRENT_GATE = GATE-P3`
+
+`GATE_P3 = ACTIVE / NOT_DECIDED`
+
+`PF1_FEMALE_FULL_BODY_ASSEMBLY = ACTIVE / NOT COMPLETE`
+
+`CURRENT_EXACT_POSITION = PF1_FEMALE_ITEM10_ANATOMICAL_NECK_SHOULDER_CONTINUITY_CORRECTIVE_PATH`
+
+## KEEP — accepted inputs and decisions
+
+- Rodin V2.5 female identity / head / anatomical-neck source:
+  `HUMAN PASS / KEEP`
+- MakeHuman generic female body:
+  `KEEP`
+- body/head ratio:
+  `8.25 / HUMAN PASS / KEEP`
+- rigid head placement:
+  `PASS / KEEP`
+- accepted body-neck preparation:
+  `TECHNICAL PASS + HUMAN VISUAL PASS / KEEP`
+
+The accepted Rodin V2.5 head and accepted MakeHuman female body must not be
+discarded or regenerated merely because subsequent attachment experiments
+failed.
+
+## Current blocker
+
+`ITEM 10 — ANATOMICAL NECK / SHOULDER CONTINUITY = ACTIVE / NOT PASS`
+
+The unresolved problem is production-quality anatomical integration of the
+accepted Rodin V2.5 female head/neck with the retained MakeHuman female body.
+
+## CLOSED / DO NOT REOPEN BY BLIND ITERATION
+
+- direct connector / bridge iteration family;
+- C5F connector-only continuation route;
+- N1/N2 local neck-relaxation route;
+- direct male-V2-style female seam adaptation;
+- nearest-vertex canonical wrap;
+- independent continuous-surface canonical wrap;
+- full MakeHuman head+neck canonical-carrier wrap;
+- lambda-256 canonical wrapped carrier;
+- further blind lambda tuning.
+
+Latest full-head canonical-wrap human visual decision:
+
+`IDENTITY_LIKENESS = FAIL`
+
+`NECK_ANATOMY = FAIL`
+
+`PRODUCTION_CANDIDATE = FAIL`
+
+Therefore:
+
+`FULL_MAKEHUMAN_HEAD_NECK_CANONICAL_WRAP = REJECTED / CLOSED`
+
+## Correct Item 10 scope
+
+Do not reinterpret the failed attachment experiments as proof that another
+female head source or another female body source is required.
+
+Current accepted sources remain fixed.
+
+The corrective task is:
+
+**Preserve the accepted Rodin V2.5 identity-bearing head and retained MakeHuman
+female body, and reconstruct only the localized production neck interface
+needed for anatomically credible head/body continuity.**
+
+No new source generation, provider route, roadmap change or phase change is
+authorized by this persistence update.
+
+`PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF1_FEMALE_ITEM10_CURRENT_STATE_OVERRIDE_2026_09_10:END]

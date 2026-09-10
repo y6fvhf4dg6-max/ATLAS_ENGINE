@@ -14,7 +14,7 @@ Web/storefront/payment/advertising work is outside this checklist.
 - [x] PF-1 normal-proportion male — PASS / SELECTED
 - [ ] **PF-1 normal-proportion female — ACTIVE**
   - [x] New Rodin V2.5 female identity/head/anatomical neck — HUMAN PASS
-  - [ ] **Head/neck interface + extraction-zone audit — ACTIVE / NEXT**
+  - [x] **Head/neck interface + extraction-zone audit — PASS / CLOSED; current blocker is Item 10 anatomical neck/shoulder continuity.**
 - [ ] PF-2 Modern Chibi
 - [ ] PF-3 Couple / Family
 - [ ] PF-4 Natural Keepsake
@@ -66,22 +66,22 @@ Web/storefront/payment/advertising work is outside this checklist.
 - [x] Nape/rear-neck visibility PASS.
 - [x] Exact-weld geometry verification PASS.
 - [x] Accepted source persisted with hashes.
-- [ ] Read-only anatomical head/neck interface audit.
-- [ ] Read-only extraction-zone audit.
-- [ ] Compatible female body donor/baseline selected.
-- [ ] Head/body proportion established.
-- [ ] Rigid head placement established.
-- [ ] Body neck surface prepared.
-- [ ] Boundary correspondence established.
-- [ ] Local connector / bridge constructed.
-- [ ] Identity-bearing head geometry preservation proven.
-- [ ] Anatomical neck/shoulder continuity proven.
+- [x] Read-only anatomical head/neck interface audit. — PASS.
+- [x] Read-only extraction-zone audit. — PASS; Rodin V2.5 extraction plane Y=-0.180 selected.
+- [x] Compatible female body donor/baseline selected. — PASS; MakeHuman generic female body = KEEP.
+- [x] Head/body proportion established. — HUMAN PASS / KEEP; ratio 8.25.
+- [x] Rigid head placement established. — PASS / KEEP.
+- [x] Body neck surface prepared. — TECHNICAL PASS + HUMAN VISUAL PASS / KEEP.
+- [x] Boundary correspondence established. — TECHNICAL PASS.
+- [x] Local connector / bridge constructed. — TECHNICAL PASS; C3 complete exact-head-to-body connector checkpoint persisted 2026-09-09 (C2 preserved as intermediate checkpoint).
+- [x] Identity-bearing head geometry preservation proven. — Original TECHNICAL PASS persisted; accepted Rodin V2.5 identity-bearing head remains KEEP. Later user-authorized correction permits only a narrow non-identity lower-neck interface adaptation.
+- [ ] Anatomical neck/shoulder continuity proven. — **ITEM 10 ACTIVE / NOT PASS; current PF1 female blocker.**
 - [ ] Watertight / nonmanifold / winding validation PASS.
 - [ ] Front / profile / back / 3Q human visual gate PASS.
 - [ ] Final normal-proportion female candidate selected.
 - [ ] Persistent evidence / hashes / reproducibility closure.
 
-`CURRENT_EXACT_POSITION = PF1_FEMALE_HEAD_NECK_INTERFACE_AND_EXTRACTION_ZONE_AUDIT`
+`CURRENT_EXACT_POSITION = PF1_FEMALE_ITEM10_ANATOMICAL_NECK_SHOULDER_CONTINUITY_CORRECTIVE_PATH`
 
 ### Hard closures
 
@@ -619,7 +619,7 @@ MASTER_CHECKLIST = PERSONALIZED_3D_FIGURINE_MASTER_CHECKLIST_V1
 PF1_MALE = PASS / SELECTED
 PF1_FEMALE_IDENTITY_HEAD_NECK = HUMAN PASS
 PF1_FEMALE_FULL_BODY_ASSEMBLY = ACTIVE / NOT COMPLETE
-CURRENT_EXACT_POSITION = PF1_FEMALE_HEAD_NECK_INTERFACE_AND_EXTRACTION_ZONE_AUDIT
+CURRENT_EXACT_POSITION = PF1_FEMALE_ITEM10_ANATOMICAL_NECK_SHOULDER_CONTINUITY_CORRECTIVE_PATH
 PF2 = NOT STARTED
 PF3 = NOT STARTED
 PF4 = NOT STARTED
