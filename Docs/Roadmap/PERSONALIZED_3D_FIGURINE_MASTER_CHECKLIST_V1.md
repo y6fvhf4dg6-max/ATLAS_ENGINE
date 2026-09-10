@@ -115,7 +115,7 @@ Web/storefront/payment/advertising work is outside this checklist.
 - [x] Identity-preservation / stylization boundary locked. — PASS; SPC-C1 Identity Anchor Contract adopted: IDENTITY_BEFORE_STYLE, FACIAL_STYLIZATION=LOW_TO_MODERATE, identity-carrying proportions dominant.
 - [x] Head exaggeration ratio locked. — PASS; PF-2 pilot nominal HEAD_TO_TOTAL_HEIGHT_RATIO=0.38, within approved SPC-C1 evaluation envelope 0.35–0.40; reopen only on explicit physical/visual evidence.
 - [x] Compact anatomical body selected/proven. — PASS; Dreamloft3D Chibi Base Meshes 3HT male/female family selected after human visual gate; commercial use and modification permitted by bundled license. Raw source topology is not production-ready and remains subject to the later PF-2 topological validation gate.
-- [ ] Male Chibi candidate.
+- [x] Male Chibi candidate. — PASS / HUMAN ACCEPTED; Dreamloft 3HT male body + verified Rodin V2.5 synthetic male identity/head, HEAD_TO_TOTAL_HEIGHT_RATIO=0.38, native glTF/Blender orientation accepted. Adaptive neck/body integration remains deferred to PF-2 Item 8.
 - [ ] Female Chibi candidate.
 - [ ] Identity gate.
 - [ ] Adaptive head/body assembly.
