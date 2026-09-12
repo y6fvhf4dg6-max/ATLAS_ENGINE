@@ -21977,3 +21977,908 @@ PHASE9 = NOT AUTHORIZED / NOT STARTED
 - Evidence: `EVIDENCE/PERSONALIZED_FIGURINE/PF2/adaptive_head_body_assembly_pass_2026_09_10/`.
 - NEXT = PF-2 Item 9 `Hair / ear / finger / limb printability`.
 - Phase 9 = NOT AUTHORIZED / NOT STARTED.
+
+
+[PF2_ITEM9_SOURCE_LEVEL_DISTAL_FOREARM_WRIST_HAND_RECONSTRUCTION_PLAN_2026_09_10:BEGIN]
+
+# PF-2 Item 9 — Source-Level Distal Forearm / Wrist / Hand Reconstruction Plan
+
+`PF2_ITEM9 = ACTIVE / NOT PASS`
+
+## Superseded route
+
+`WRIST_RING_DEPENDENT_ROUTE = REJECTED / STOP`
+
+Read-only source evaluation found:
+
+- female: one bilateral 4-vertex closed candidate loop at approximately
+  `|X|=1.220`, but its anatomical wrist identity was not established;
+- male: no closed candidate loop;
+- therefore no reusable clean source wrist-ring contract was established.
+
+The prior exported-GLB wrist-transition route remains `REJECTED / STOP`.
+No V2 render, blind V3/V4 iteration or further wrist-ring parameter sweep is
+authorized.
+
+## Approved replacement route
+
+`SOURCE_LEVEL_DISTAL_FOREARM_WRIST_HAND_RECONSTRUCTION_V1 = ACTIVE`
+
+Execution order:
+
+1. Use the original Dreamloft Blender source objects:
+   female `Chibi Base Mesh 3HT (FFT)` and male
+   `Chibi Base Mesh 3HT (MFT)`.
+2. Select a stable proximal forearm attachment zone independently for each
+   source from its real topology and geometry.
+3. Reconstruct only the local distal forearm / wrist / hand region.
+4. Preserve all non-local body geometry and all accepted identity-bearing
+   head/neck geometry.
+5. Produce one bounded Chibi Hand V1; do not open a blind iteration chain.
+6. Validate topology, bilateral consistency and minimum printable features.
+7. Produce female and male visual evidence for authoritative human judgment.
+8. Persist the resulting `PASS / HOLD / REJECT` decision.
+
+`CURRENT_EXACT_POSITION =
+PF2_ITEM9_SOURCE_LEVEL_DISTAL_FOREARM_ATTACHMENT_ZONE_SELECTION`
+
+`NEXT = SELECT_FEMALE_AND_MALE_PROXIMAL_FOREARM_ATTACHMENT_ZONES`
+
+`REPO_STAGING = NOT_AUTHORIZED`
+
+`PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF2_ITEM9_SOURCE_LEVEL_DISTAL_FOREARM_WRIST_HAND_RECONSTRUCTION_PLAN_2026_09_10:END]
+
+
+[PF2_ITEM9_CHIBI_HAND_V1_HUMAN_VISUAL_REJECTION_2026_09_10:BEGIN]
+
+# PF-2 Item 9 — Chibi Hand V1 Human Visual Rejection
+
+`PF2_ITEM9 = ACTIVE / HOLD-BLOCKED`
+
+`CHIBI_HAND_V1 = REJECT / CLOSED`
+
+## Executed V1
+
+The approved source-level distal forearm / wrist / hand reconstruction V1 was
+executed once for the original Dreamloft female FFT and male MFT sources.
+
+Selected bilateral attachment plane:
+
+`|X| = 0.86000`
+
+Both source sections contained a stable `23`-point geometric cross-section.
+The generated mesh boundary after source cutting contained `23` geometric
+section points but `23` was not retained as a fixed source vertex-ring
+contract. The final constructed attachment cycle used the resulting evaluated
+cut boundary.
+
+Technical results:
+
+- female boundary edges: `0`;
+- female nonmanifold edges: `0`;
+- female zero-area faces: `0`;
+- male boundary edges: `0`;
+- male nonmanifold edges: `0`;
+- male zero-area faces: `0`;
+- preserved proximal vertex maximum error: `0`;
+- bilateral construction consistency: supported.
+
+Technical topology cleanliness does not establish visual or physical product
+acceptance.
+
+## Authoritative human visual decision
+
+`FINAL_HUMAN_VISUAL_GATE = REJECT`
+
+Observed failure:
+
+- generated form reads as a mitten/paddle rather than a Chibi hand;
+- thumb silhouette is not readable;
+- wrist-to-hand transition contains an abrupt corner/lower protrusion;
+- palm, finger mass and wrist anatomy do not separate credibly;
+- the same fundamental failure is present in female and male results.
+
+## Closed routes
+
+- exported-GLB wrist-transition route: `REJECTED / STOP`;
+- source wrist-ring-dependent route: `REJECTED / STOP`;
+- source-level distal forearm/wrist/hand reconstruction V1:
+  `REJECTED / CLOSED`.
+
+Do not produce a blind V2/V3 continuation from this architecture.
+Do not tune its ring scales, thumb-bulge coefficient or attachment plane.
+
+## Current boundary
+
+A materially different hand-reconstruction architecture requires an explicit
+new plan decision before further geometry generation.
+
+`CURRENT_EXACT_POSITION =
+PF2_ITEM9_HAND_RECONSTRUCTION_ARCHITECTURE_DECISION_REQUIRED`
+
+`NEXT = PLAN_DECISION_REQUIRED`
+
+`NEW_GEOMETRY_AUTHORIZATION = NO`
+
+`REPO_STAGING = NOT AUTHORIZED`
+
+`PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF2_ITEM9_CHIBI_HAND_V1_HUMAN_VISUAL_REJECTION_2026_09_10:END]
+
+
+[PF2_ITEM9_SOURCE_HAND_LOCAL_PRINTABILITY_REINFORCEMENT_PLAN_2026_09_10:BEGIN]
+
+# PF-2 Item 9 — Preserve Source Hand + Local Printability Reinforcement
+
+`PF2_ITEM9 = ACTIVE`
+
+`PLAN_CHANGE = USER APPROVED`
+
+## Selected architecture
+
+`PRESERVE_SOURCE_HAND_PLUS_LOCAL_PRINTABILITY_REINFORCEMENT`
+
+The original Dreamloft female FFT and male MFT source-hand geometry remains the
+shape owner.
+
+The hand will not be replaced by a procedurally generated mitten, paddle,
+capsule or generic reconstructed hand.
+
+Only measured local printability risks may be corrected:
+
+- insufficient finger separation or unsafe gaps;
+- insufficient local finger thickness;
+- weak thumb-to-palm attachment;
+- locally fragile wrist/hand connection.
+
+## Execution order
+
+1. Audit the original female and male source-hand geometry at nominal 150 mm
+   product scale.
+2. Identify measured printability risks only.
+3. Define the smallest eligible local reinforcement region.
+4. Produce one bounded source-hand reinforcement V1.
+5. Preserve the original source-hand outer silhouette and all non-local body
+   geometry.
+6. Validate topology, preservation and minimum printable features.
+7. Render female and male evidence for authoritative human visual judgment.
+8. Persist `PASS / HOLD / REJECT`.
+
+## Prohibitions
+
+- no reconstructed mitten/paddle hand;
+- no blind V2/V3 sequence;
+- no wrist-ring parameter sweep;
+- no whole-arm deformation;
+- no change to accepted head/neck geometry;
+- no change to Item 8 neck architecture;
+- no unmeasured thickening.
+
+`CURRENT_EXACT_POSITION =
+PF2_ITEM9_ORIGINAL_SOURCE_HAND_150MM_PRINTABILITY_AUDIT`
+
+`NEXT = AUDIT_ORIGINAL_FEMALE_AND_MALE_SOURCE_HANDS_AT_150MM`
+
+`NEW_GEOMETRY_AUTHORIZATION =
+AFTER_MEASURED_SOURCE_HAND_AUDIT_ONLY`
+
+`REPO_STAGING = NOT AUTHORIZED`
+
+`PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF2_ITEM9_SOURCE_HAND_LOCAL_PRINTABILITY_REINFORCEMENT_PLAN_2026_09_10:END]
+
+
+[PF2_ITEM9_SOURCE_HAND_KEEP_CLOSURE_2026_09_10:BEGIN]
+
+# PF-2 Item 9 — Original Source Hand Keep Closure
+
+`SOURCE_HAND_GEOMETRY = KEEP / LOCKED`
+
+`HAND_FINGER_SUBSCOPE = PASS / CLOSED`
+
+`LOCAL_PRINTABILITY_REINFORCEMENT_V1 = NOT JUSTIFIED / NOT EXECUTED`
+
+## Corrected source-hand finding
+
+The original Dreamloft female FFT and male MFT hands are each part of one
+connected watertight source mesh:
+
+- full connected components: `1`;
+- global boundary edges: `0`;
+- global nonmanifold edges: `0`;
+- distal hand boundary edges: `0`.
+
+The visually flat finger ends are closed low-poly source geometry, not open
+finger-tip boundaries.
+
+The earlier distal-region `64 + 8` induced-component result was caused by the
+audit threshold `|X| >= 0.94`; it was not a real disconnected-mesh defect.
+
+## Nominal 150 mm measurements
+
+Female:
+
+- hand length: `14.963350 mm`;
+- hand Y span: `18.540082 mm`;
+- hand Z span: `11.426026 mm`;
+- minimum valid measured Z section: `1.139189 mm`;
+- minimum audited edge length: `1.177084 mm`.
+
+Male:
+
+- hand length: `14.996381 mm`;
+- hand Y span: `18.702784 mm`;
+- hand Z span: `11.623347 mm`;
+- minimum valid measured Z section: `1.314488 mm`;
+- minimum audited edge length: `1.053873 mm`.
+
+No minimum-feature production threshold was invented from these measurements.
+Final physical survivability remains subject to the later slicer and physical
+print gates.
+
+## Authoritative human decision
+
+`ORIGINAL_SOURCE_HAND_VISUAL_DECISION = KEEP`
+
+The source hand preserves readable palm, thumb and finger structure and is
+materially preferable to the rejected procedural Hand V1.
+
+No source-hand reinforcement geometry is currently authorized or necessary.
+
+## Item 9 boundary
+
+PF-2 Item 9 remains active because hair, ears and remaining limb printability
+checks are not yet closed.
+
+`PF2_ITEM9 = ACTIVE`
+
+`CURRENT_EXACT_POSITION = PF2_ITEM9_HAIR_PRINTABILITY_AUDIT`
+
+`NEXT = AUDIT_ACCEPTED_MALE_AND_FEMALE_HAIR_GEOMETRY_AT_150MM`
+
+`REPO_STAGING = NOT AUTHORIZED`
+
+`PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF2_ITEM9_SOURCE_HAND_KEEP_CLOSURE_2026_09_10:END]
+
+
+[PF2_ITEM9_HAIR_GEOMETRY_KEEP_DECISION_2026_09_10:BEGIN]
+
+# PF-2 Item 9 — Hair Geometry Printability Decision
+
+`PF2_ITEM9 = ACTIVE`
+
+## Audit correction
+
+The initial GLB-import boundary/nonmanifold counts were invalid because imported
+corner vertices were split. They were not accepted as source topology results.
+
+An in-memory exact-weld audit established:
+
+Female:
+
+- main component: `167861` vertices;
+- five smaller components also exist, but this audit did not establish that
+  they are hair components;
+- post-weld boundary edges: `7`;
+- post-weld nonmanifold edges: `8`;
+- the defect locations were not attributed to hair;
+- visual hair/bun geometry is continuous and contains no proven independent
+  fragile strand.
+
+Male:
+
+- one connected component;
+- post-weld boundary edges: `0`;
+- post-weld nonmanifold edges: `0`;
+- visual hair is integrated;
+- high-frequency surface noise exists, but no independent fragile hair strand
+  was established.
+
+Small mesh edges and triangle areas are tessellation measurements, not direct
+physical hair-thickness measurements. They were not promoted to invented
+printability thresholds.
+
+## Authoritative decision
+
+`FEMALE_HAIR = KEEP`
+
+`MALE_HAIR = KEEP_WITH_SLICER_SURFACE_CHECK`
+
+`HAIR_GEOMETRY_MODIFICATION = NOT JUSTIFIED`
+
+`PHYSICAL_DETAIL_RESOLUTION = DEFER_TO_SLICER_AND_PRINT_GATE`
+
+The user accepted these decisions.
+
+## Exact continuation
+
+`CURRENT_EXACT_POSITION = PF2_ITEM9_EAR_PRINTABILITY_AUDIT`
+
+`NEXT = AUDIT_ACCEPTED_MALE_AND_FEMALE_EAR_GEOMETRY_AT_150MM`
+
+`REPO_STAGING = NOT AUTHORIZED`
+
+`PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF2_ITEM9_HAIR_GEOMETRY_KEEP_DECISION_2026_09_10:END]
+
+[PF2_ITEM9_EAR_PRINTABILITY_KEEP_CLOSURE_2026_09_10:BEGIN]
+
+# PF-2 Item 9 — Ear Printability KEEP Closure (2026-09-10)
+
+- Status: `EAR_SUBSCOPE = PASS / CLOSED`
+- Human decision: `APPROVED`
+- `FEMALE_EAR = KEEP`
+- `MALE_EAR = KEEP`
+- Both ears remain connected to the head through broad continuous roots.
+- No visibly detached or independently fragile ear element was demonstrated.
+- Ear anatomy remains visually readable at the 150 mm nominal evaluation scale.
+- Bilateral differences remain preserved as source identity geometry.
+- `EAR_GEOMETRY_MODIFICATION = NOT_JUSTIFIED / NOT EXECUTED`
+- The reported 30 mm ear-proximity bands are broad head-region measurements, not anatomical ear-thickness measurements.
+- Digital visual acceptance does not establish physical durability.
+- `PHYSICAL_EAR_SURVIVABILITY = DEFERRED_TO_SLICER_AND_PRINT_GATE`
+- Accepted male and female geometry was not modified.
+- `PF2_ITEM9 = ACTIVE`
+- `CURRENT_EXACT_POSITION = PF2_ITEM9_REMAINING_LIMB_PRINTABILITY_AUDIT`
+- `NEXT = AUDIT_ACCEPTED_MALE_AND_FEMALE_REMAINING_LIMB_GEOMETRY_AT_150MM`
+- `STAGING = NO`
+- `PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF2_ITEM9_EAR_PRINTABILITY_KEEP_CLOSURE_2026_09_10:END]
+
+[PF2_ITEM10_STABLE_INTEGRATED_BASE_FINAL_CLOSURE_2026_09_10:BEGIN]
+
+# PF-2 Item 10 — Stable Integrated Base Final Closure (2026-09-10)
+
+- `PF2_ITEM10 = PASS / CLOSED`
+- Human visual decision: `PASS`
+- Accepted bounded V1 base:
+  - shape: `CIRCULAR`
+  - diameter: `72.5 mm`
+  - height: `7.5 mm`
+  - flat underside: `YES`
+  - bilateral foot embed: `0.75 mm`
+- `CHIBI_V0_TOTAL_HEIGHT_MM = 150`
+- Required figurine pre-embed height in this bounded V1: `143.25 mm`
+- Reconstructed total product height: `150.0 mm`
+- Female bottom footprint radial clearance to base edge at prior 150 mm audit: `10.542850 mm`
+- Male bottom footprint radial clearance to base edge at prior 150 mm audit: `11.812548 mm`
+- Female bilateral foot/base triangle overlap: `32 + 32 triangles`
+- Male bilateral foot/base triangle overlap: `32 + 32 triangles`
+- Male watertight-source digital COM projection radius: `3.285284 mm`
+- Male digital COM radial margin to base edge: `32.964716 mm`
+- Female volume-COM claim: `NOT USED`; accepted female source contains pre-existing topology defects.
+- Current V1 figurine + base geometry remains part-based / overlapping rather than boolean-unioned.
+- `MULTICOLOR_OUTPUT = PART_BASED_STL_ALLOWED`
+- Item 10 does NOT claim final single-body topology, manifold closure, slicer safety or physical stability.
+- Those remain owned by the later PF-2 topological validation / slicer / physical-print gates.
+- Clear-background human visual evidence: `PASS`
+- Physical tabletop stability: `NOT ESTABLISHED / DEFERRED TO PHYSICAL TEST`
+- Accepted source assembly geometry was not destructively modified.
+- Third-party-derived accepted assembly GLBs were not copied into repository evidence.
+- Final evidence package: `EVIDENCE/PERSONALIZED_FIGURINE/PF2/item10_stable_integrated_base_pass_2026_09_10/`
+- Evidence file count: `24`
+- SHA256SUMS entries: `23`
+- `SHA256SUMS.txt` SHA256: `953af0ae5315f53f013736a72b270632f1387849e393a1b30fcda2f69f59940c`
+- `CURRENT_EXACT_POSITION = PF2_ITEM10_CLOSED`
+- `NEXT = PF2_ITEM11_150MM_NORMALIZATION`
+- `STAGING = NO`
+- `PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+[PF2_ITEM10_STABLE_INTEGRATED_BASE_FINAL_CLOSURE_2026_09_10:END]
+
+[PF2_ITEM11_150MM_NORMALIZATION_ACTIVE_SYNC_2026_09_10:BEGIN]
+
+# PF-2 Item 11 — 150 mm Normalization Active State (2026-09-10)
+
+- `PROGRAM = PF-2 MODERN CHIBI`
+- `PF2_ITEMS_1_10 = PASS / CLOSED`
+- `PF2_ITEM10_STABLE_INTEGRATED_BASE = PASS / CLOSED`
+- `CURRENT_EXACT_POSITION = PF2_ITEM11_150MM_NORMALIZATION`
+- `PF2_ITEM11 = ACTIVE / NOT PASS`
+
+## Locked input state
+
+- Female accepted assembly source:
+  `/private/tmp/atlas_pf2_item8_female_embedded_neck_root_trapezius_v1.glb`
+- Female source SHA256:
+  `3325680137fc67248876c197444c1e525370e77812a9ad82ce14ec1e4e9656d3`
+- Male accepted assembly source:
+  `/private/tmp/atlas_pf2_item8_male_embedded_neck_root_trapezius_v1.glb`
+- Male source SHA256:
+  `9b9156456438fb237fad626a7309a91595a5d0f76608f914dab779fd9fa3e3d6`
+
+## Item 10 locked base result
+
+- shape: `CIRCULAR`
+- diameter: `72.5 mm`
+- height: `7.5 mm`
+- bilateral foot embed: `0.75 mm`
+- flat underside: `YES`
+- human visual gate: `PASS`
+- reconstructed total product height: `150.0 mm`
+- current representation: `OVERLAPPING PART-BASED GEOMETRY`
+- boolean union: `NOT EXECUTED`
+- physical tabletop stability: `DEFERRED TO PHYSICAL TEST`
+
+## Item 11 execution boundary
+
+- Item 11 owns `150 mm normalization`.
+- Do not reopen Item 10 without new failure evidence.
+- Do not silently redefine the 150 mm contract.
+- Do not claim Item 11 PASS until its normalization measurements and required validation are executed.
+- `NEXT_SINGLE_ACTION = READ_AND_EXECUTE_ITEM11_150MM_NORMALIZATION_CONTRACT`
+- `PHASE9 = NOT AUTHORIZED / NOT STARTED`
+- `STAGING = NO`
+- `COMMIT = NO`
+- `PUSH = NO`
+
+[PF2_ITEM11_150MM_NORMALIZATION_ACTIVE_SYNC_2026_09_10:END]
+
+[PF2_ITEM8_RECOVERY_ITEM11_BLOCKER_SYNC_2026_09_11:BEGIN]
+
+# PF-2 Item 8 Recovery / Item 11 Execution Blocker Sync (2026-09-11)
+
+- `PROGRAM = PF-2 MODERN CHIBI`
+- `PF2_ITEMS_1_10 = PASS / CLOSED`
+- `CURRENT_EXACT_POSITION = PF2_ITEM11_150MM_NORMALIZATION`
+- `PF2_ITEM11 = ACTIVE / NOT PASS`
+- `ITEM8_REOPENED = NO`
+- `ITEM9_REOPENED = NO`
+- `ITEM10_REOPENED = NO`
+- `PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+## Reboot / transient-artifact supersession
+
+The previously recorded Item 11 locked assembly paths under `/private/tmp` are now
+`HISTORICAL / UNAVAILABLE AFTER REBOOT`.
+
+Historical accepted assembly hashes remain authoritative evidence of the previously
+accepted Item 8 result:
+
+- Female historical accepted assembly SHA256:
+  `3325680137fc67248876c197444c1e525370e77812a9ad82ce14ec1e4e9656d3`
+- Male historical accepted assembly SHA256:
+  `9b9156456438fb237fad626a7309a91595a5d0f76608f914dab779fd9fa3e3d6`
+
+The accepted Item 8 architecture remains:
+`EMBEDDED_NECK_ROOT_PLUS_LOCAL_TRAPEZIUS_SURFACE`
+
+Historical human/technical PASS of Item 8 is not invalidated by the transient-file loss.
+
+## Male prepared-head recovery
+
+- `MALE_PREPARED_HEAD_RECOVERY = PASS / GEOMETRY_IDENTITY_ACCEPTED`
+- `HISTORICAL_BYTE_SHA_STATUS = NOT_REPRODUCED / NOT_RELABELED`
+- Exact historical topology fingerprint recovered:
+  `20571 vertices / 40903 faces / boundary 249 / cut Y=-0.350`
+- Persistent accepted V2 geometry gives `20571/20571` bijective correspondence
+  within `1e-6` and order-independent triangle-set identity.
+- Historical byte-identical serialization was not recovered.
+- Recovery evidence:
+  `EVIDENCE/PERSONALIZED_FIGURINE/PF2/item8_recovery_2026_09_11/MALE_PREPARED_HEAD_GEOMETRY_IDENTITY_RECOVERY_ACCEPTANCE.md`
+- Evidence SHA256:
+  `3403ad9b1516f90f11db8fac0387d94c6b913759b7e6d21afe4adcf195f67d6c`
+
+## Female prepared-head bounded recovery
+
+- Accepted identity source SHA256:
+  `1848d8bfabe39d9b8e4cc98147c023c851c40066801c2d6c3d35772ec0bbcb35`
+- Historical Item 8 female target:
+  `HEAD_LOOP_N = 324`
+- Historical post-scale lower-face width:
+  `0.485909449`
+- `FEMALE_PREPARED_HEAD_RECOVERY = BLOCKED`
+- `HISTORICAL_324_PRODUCER = UNRECOVERED`
+- `GEOMETRY_IDENTITY_ACCEPTANCE = NOT_GRANTED`
+- `FORCE_FIT = PROHIBITED`
+- `BLIND_CUT_PLANE_SWEEP = PROHIBITED`
+- `V2_V3_TUNING = PROHIBITED`
+
+Bounded recovery established:
+- fixed `Y=-0.180000` source contour = one `647`-node closed edge-plane cycle;
+- persisted historical H646 endpoint = exact `647 cycle - node 19 + reconnection (18,29)`;
+- H646 mapping error is within `1e-7`;
+- natural/alternating geometric-redundancy analysis does not defensibly explain
+  `646 -> 324`.
+
+Female recovery evidence:
+`EVIDENCE/PERSONALIZED_FIGURINE/PF2/item8_recovery_2026_09_11/FEMALE_PREPARED_HEAD_BOUNDED_GEOMETRY_RECOVERY_BLOCKED.md`
+
+Evidence SHA256:
+`d641ffdeaebc7d27f542ed342518d298baa21fa16d3372019398fe7624f72df8`
+
+## Current Item 11 blocker
+
+- `ITEM11_EXECUTION_BLOCKER = ACCEPTED_ITEM8_ASSEMBLY_BYTES_LOST_AFTER_REBOOT`
+- Male recovery has a geometry-identity acceptance with serialization exception.
+- Female prepared-head reconstruction remains blocked under the approved bounded
+  recovery protocol.
+- Do not silently substitute another female head/prepared-head candidate.
+- Do not reopen Item 8 architecture.
+- Do not reopen Item 9 or Item 10 without new failure evidence.
+- Do not advance to Item 12.
+- No boolean union is authorized by this recovery work.
+- Item 11 remains `ACTIVE / NOT PASS`.
+
+`NEXT_SINGLE_ACTION = SYNC_LATEST_LIBRARY_HANDOFF_THEN_REASSESS_ITEM11_EXECUTION_INPUT`
+`STAGING = NO`
+`COMMIT = NO`
+`PUSH = NO`
+
+[PF2_ITEM8_RECOVERY_ITEM11_BLOCKER_SYNC_2026_09_11:END]
+
+[PF2_ITEM11_EXECUTION_INPUT_REASSESSMENT_BLOCKED_2026_09_11:BEGIN]
+
+# PF-2 Item 11 — Execution Input Reassessment Closure / Verified Blocker (2026-09-11)
+
+- `CURRENT_EXACT_POSITION = PF2_ITEM11_150MM_NORMALIZATION`
+- `PF2_ITEM11 = ACTIVE / BLOCKED / NOT PASS`
+- `ITEM8_REOPENED = NO`
+- `ITEM9_REOPENED = NO`
+- `ITEM10_REOPENED = NO`
+- `PHASE9 = NOT AUTHORIZED / NOT STARTED`
+
+## Reassessment result
+
+Item 10 established only the dimensional V1 dry-run contract:
+
+- `TOTAL_PRODUCT_TARGET_MM = 150.000000`
+- `BASE_HEIGHT_MM = 7.500000`
+- `FOOT_EMBED_MM = 0.750000`
+- `REQUIRED_FIGURINE_HEIGHT_BEFORE_EMBED_MM = 143.250000`
+- `SCALE_FROM_CURRENT_150MM_ASSEMBLY = 0.955000000`
+
+Item 10 README explicitly records that accepted source geometry was not modified
+except for temporary uniform scale/placement in V1 dry-run outputs.
+
+Therefore the Item 10 dimensional solve is NOT equivalent to PF-2 Item 11 closure
+and MUST NOT be retroactively relabeled as Item 11 PASS.
+
+## Required Item 11 execution input
+
+Actual Item 11 normalization requires the accepted Item 8 assembly geometry or a
+recovered geometry-equivalent accepted input sufficient to execute and validate the
+normalization result.
+
+Current state:
+
+- Male prepared-head recovery:
+  `PASS / GEOMETRY_IDENTITY_ACCEPTED_WITH_SERIALIZATION_EXCEPTION`
+- Female prepared-head recovery:
+  `BLOCKED`
+- Historical accepted Item 8 assembly GLBs:
+  `UNAVAILABLE AFTER REBOOT`
+- Persistent PF2 production geometry:
+  `NONE`
+
+Therefore:
+
+`ITEM11_EXECUTION_BLOCKER = FEMALE_ACCEPTED_ASSEMBLY_INPUT_NOT_RECOVERABLE_UNDER_CURRENT_APPROVED_BOUNDED_ROUTE`
+
+No numerical log, render, or prior Item 10 dry-run is sufficient to substitute for
+the missing accepted female production geometry.
+
+## Boundary
+
+- Do not force-fit a female 324 prepared-head.
+- Do not perform blind cut-plane or parameter sweeps.
+- Do not silently substitute another female candidate.
+- Do not reopen accepted Item 8 architecture.
+- Do not advance to Item 12.
+- Item 11 remains `ACTIVE / BLOCKED / NOT PASS`.
+
+Further technical execution requires an explicit user-approved:
+
+`PLAN DEĞİŞİKLİĞİ`
+
+`NEXT_SINGLE_ACTION = USER_DECISION_ON_NEW_FEMALE_RECOVERY_OR_RECONSTRUCTION_ROUTE`
+`STAGING = NO`
+`COMMIT = NO`
+`PUSH = NO`
+
+[PF2_ITEM11_EXECUTION_INPUT_REASSESSMENT_BLOCKED_2026_09_11:END]
+
+[PF2_ITEM11_FEMALE_RECOVERY_HUMAN_VISUAL_PASS_2026_09_11]
+- CURRENT_EXACT_POSITION: PF2_ITEM11_150MM_NORMALIZATION
+- Female deterministic reconstruction technical recovery: PASS.
+- PF2_FEMALE_RECOVERY_COMPARISON_PROTOCOL_V1: APPROVED.
+- User human visual decision: PASS.
+- Assistant visual assessment: PASS.
+- FEMALE_RECOVERY_HUMAN_VISUAL_GATE: PASS.
+- Recovered Item8 candidate SHA256: d1350f6639794b6c0c023bb852b776473eed2558cfae4a7fce61ae04abcdcdbb.
+- Prepared-head candidate SHA256: 598427b5b7df387a73bb63eba3bff254129a8c4652f91c4e96392d429ae31ec1.
+- Historical-vs-candidate board SHA256: 581bf14520f75f19c73b7be87bfc928f395ac1f44869ac03f4ff5709473bcac6.
+- Historical render parity claim: NO.
+- Item8/Item9/Item10 remain CLOSED; none reopened.
+- Recovered geometry remains transient under /private/tmp.
+- RECOVERED_ASSEMBLY_PERSISTENCE_GATE: OPEN.
+- PF2 Item11 remains ACTIVE / NOT PASS until persistent recovery input is established.
+- Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+- NEXT_SINGLE_ACTION: establish persistent recovery artifact location and copy with SHA/provenance.
+
+[PF2_ITEM11_FEMALE_RECOVERY_PERSISTENCE_PASS_2026_09_11]
+- CURRENT_EXACT_POSITION: PF2_ITEM11_150MM_NORMALIZATION
+- FEMALE_RECOVERY_HUMAN_VISUAL_GATE: PASS.
+- RECOVERED_ASSEMBLY_PERSISTENCE_GATE: PASS.
+- Persistent external root: /Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item8_recovery_2026_09_11
+- Prepared head SHA256: 598427b5b7df387a73bb63eba3bff254129a8c4652f91c4e96392d429ae31ec1.
+- Recovered Item8 assembly SHA256: d1350f6639794b6c0c023bb852b776473eed2558cfae4a7fce61ae04abcdcdbb.
+- Candidate 4-view SHA256: 287109c59b934952c3370285a14eef196bedf488fe8606b4448dfcd4338b8758.
+- Historical-vs-candidate board SHA256: 581bf14520f75f19c73b7be87bfc928f395ac1f44869ac03f4ff5709473bcac6.
+- Repository geometry persistence: NO; modified Dreamloft third-party geometry remains outside Git.
+- Item8/Item9/Item10 remain CLOSED and are not reopened.
+- PF2 Item11 remains ACTIVE / NOT PASS pending Item11 normalization execution/closure.
+- Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+[PF2_ITEM11_MALE_PREPARED_HEAD_PERSISTENCE_PASS_2026_09_11]
+- CURRENT_EXACT_POSITION: PF2_ITEM11_150MM_NORMALIZATION
+- MALE_PREPARED_HEAD_RECOVERY: PASS / GEOMETRY_IDENTITY_ACCEPTED.
+- Recovery source: accepted persistent V2 head domain only; P3 body geometry was not used as PF2 input.
+- Persistent recovered male prepared head: /Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item8_recovery_2026_09_11/atlas_pf2_male_prepared_head_from_accepted_v2_domain_v1.glb
+- Persistent recovered male prepared-head SHA256: ccb806f384cd4c90594381781f50ca16ca7086ac69a8a54036fbf5f027df7b9e.
+- Historical prepared-head byte SHA remains NOT_REPRODUCED / NOT_RELABELED.
+- Exact historical topology fingerprint: 20571 vertices / 40903 faces / 249 boundary edges / one boundary component / nonmanifold 0 / winding consistent.
+- ORDER_INDEPENDENT_TRIANGLE_SET_EQUAL: TRUE.
+- V2 head-domain forward reproduction max error: 2.224778631027185e-16.
+- Item8 remains CLOSED; replay support does not reopen the architecture.
+- Item8 replay: NOT YET EXECUTED.
+- PF2 Item11 remains ACTIVE / NOT PASS.
+- Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+- NEXT_SINGLE_ACTION: replay canonical Item8 male assembly from this persistent accepted prepared-head input.
+
+[PF2_ITEM11_MALE_ITEM8_REPLAY_PERSISTENCE_PASS_2026_09_11]
+- CURRENT_EXACT_POSITION: PF2_ITEM11_150MM_NORMALIZATION.
+- Canonical PF2 Item8 male replay executed from persistent geometry-identity-accepted prepared head.
+- Architecture remains EMBEDDED_NECK_ROOT_PLUS_LOCAL_TRAPEZIUS_SURFACE; canonical geometry logic unchanged; parameter sweep NO.
+- Persistent recovered male Item8 assembly: /Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item8_recovery_2026_09_11/atlas_pf2_item8_male_embedded_neck_root_trapezius_recovered_v1.glb
+- SHA256: b475b2b2bbe1292c90c893283e62f1e560065968d3081040157b0926c275928e
+- Exact-position weld audit: 21134 vertices / 42276 faces / boundary 0 / nonmanifold 0 / face-connected components 1 / zero-area 0.
+- Historical replay metrics agree at approximately 8e-8 relative scale; BODY_LOOP_N=10, HEAD_LOOP_N=249, TERMINAL_RING_N=24 all match.
+- HEAD_PROTECTED_MAX_DELTA=0; BODY_NONLOCAL_MAX_DELTA=0.
+- TECHNICAL_REPLAY_STATUS: PASS.
+- HUMAN_VISUAL_RECOVERY_EQUIVALENCE: NOT YET CLAIMED.
+- Item8 remains CLOSED; this is bounded recovery support under Item11.
+- PF2 Item11 remains ACTIVE / NOT PASS.
+- Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+[PF2_ITEM11_150MM_NORMALIZATION_PERSISTENCE_PASS_2026_09_11]
+- CURRENT_EXACT_POSITION: PF2_ITEM11_150MM_NORMALIZATION.
+- Persistent Item11 root: /Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item11_150mm_normalization_2026_09_11
+- Female and male persistent recovered Item8 assemblies were normalized from their actual native Y extents by uniform scale.
+- Figurine pre-embed height: 143.25 mm.
+- Base: accepted Item10 circular base, diameter 72.5 mm, height 7.5 mm.
+- Foot embed: 0.75 mm.
+- Total integrated product height: 150.0 mm for both female and male.
+- Female persistent integrated product extent: 131.77781677246094 x 150.0 x 72.5 mm.
+- Male persistent integrated product extent: 125.4526138305664 x 150.0 x 72.5 mm.
+- Boolean union was not used; accepted part-based multicolor architecture preserved.
+- Item11 technical normalization gate: PASS.
+- Item11 persistence gate: PASS if persistent roundtrip verification above succeeds.
+- Item8, Item9, Item10 remain CLOSED.
+- Item12 remains NOT STARTED.
+- Phase 9 remains NOT AUTHORIZED / NOT STARTED.
+
+[PF2_ITEM11_150MM_NORMALIZATION_CLOSED_PASS_2026_09_11]
+# PF-2 Item 11 — 150 mm Normalization Closure / PASS (2026-09-11)
+
+- PROGRAM = PF-2 MODERN CHIBI
+- PF2_ITEM11 = PASS / CLOSED
+- Closure basis:
+  - female technical normalization gate = PASS
+  - male technical normalization gate = PASS
+  - female integrated-product dimensional gate = PASS
+  - male integrated-product dimensional gate = PASS
+  - persistent roundtrip dimensional verification = PASS
+  - persistent manifest verification = PASS
+- Female persistent total product height = 150.000000 mm.
+- Male persistent total product height = 150.000000 mm.
+- Figurine pre-embed height = 143.250000 mm.
+- Base contract = accepted Item10 circular base Ø72.5 mm × 7.5 mm.
+- Foot embed = 0.750000 mm.
+- Normalization method = actual persistent native Y extent -> 143.25 mm by uniform scale.
+- Blind native multiplication by 0.955 was NOT used.
+- Boolean union was NOT used.
+- Accepted MULTICOLOR_OUTPUT=PART_BASED_STL_ALLOWED architecture remains unchanged.
+- Persistent evidence root:
+  /Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item11_150mm_normalization_2026_09_11
+- Item8 remains CLOSED.
+- Item9 remains CLOSED.
+- Item10 remains CLOSED.
+- Item12 = NOT STARTED.
+- Item14 human visual gate remains a separate future checklist item.
+- PHASE9 = NOT AUTHORIZED / NOT STARTED.
+- NEXT_SINGLE_ACTION = READ_AND_DEFINE_PF2_ITEM12_TOPOLOGICAL_VALIDATION_CONTRACT.
+
+[PF2_ITEM12_TOPOLOGICAL_VALIDATION_TECHNICAL_PASS_2026_09_11]
+
+PF2 Item12 — Topological validation:
+- STATUS = TECHNICAL PASS / CLOSURE_SYNC_PENDING
+- Female final integrated product topology gate = PASS.
+- Male final integrated product topology gate = PASS.
+- Accepted shells: OPEN_EDGES=0 and NONMANIFOLD_EDGES=0.
+- UNINTENDED_DISCONNECTED_COMPONENTS=0.
+- Female five small closed shells are provenance-confirmed inherited accepted-source surface-detail shells; they were not created by recovery, Item8 assembly, or Item11 normalization.
+- Intentional product architecture remains FIGURINE + BASE; boolean union is not required and was not executed.
+- No topology repair or geometry mutation was executed.
+- Self-intersection / thickness remain owned by Item13.
+- Persistent evidence: EVIDENCE/PERSONALIZED_FIGURINE/PF2/item12_topological_validation_pass_2026_09_11/
+- ITEM13=NOT_STARTED.
+- PHASE9=NOT_AUTHORIZED / NOT_STARTED.
+- Full CLOSED status awaits latest Library handoff synchronization.
+
+[PF2_ITEM12_TOPOLOGICAL_VALIDATION_CLOSED_PASS_2026_09_11]
+
+PF2 Item12 — Topological validation:
+- STATUS = PASS / CLOSED
+- PF2_ITEMS_1_TO_12 = CLOSED
+- Female final integrated product topology gate = PASS.
+- Male final integrated product topology gate = PASS.
+- Every accepted shell has OPEN_EDGES=0 and NONMANIFOLD_EDGES=0.
+- UNINTENDED_DISCONNECTED_COMPONENTS=0.
+- Female five small closed shells are accepted-source surface-detail shells inherited unchanged from the accepted Rodin V2.5 female identity source.
+- They were not created by recovery, Item8 assembly, or Item11 normalization.
+- Intentional product architecture remains FIGURINE + BASE.
+- Boolean union is not required and was not executed.
+- No topology repair or geometry mutation was executed.
+- Persistent evidence: EVIDENCE/PERSONALIZED_FIGURINE/PF2/item12_topological_validation_pass_2026_09_11/
+- Evidence manifest SHA256 = eb1d7c0a158acede2fbc24bbf0f64cc3ffbf559df663c6603e2aa1e5e45d859f
+- Library current handoff synchronization = COMPLETE.
+- ITEM13 = NOT STARTED.
+- PHASE9 = NOT AUTHORIZED / NOT STARTED.
+
+
+---
+
+[PF2_ITEM13_GEOMETRIC_VALIDATION_ACTIVE_CHECKPOINT_2026_09_12]
+
+# PF-2 Item 13 — Geometric Validation / ACTIVE CHECKPOINT — 2026-09-12
+
+## Canonical program state
+- PROGRAM = PF-2 MODERN CHIBI
+- PF2 Items 1–12 = PASS / CLOSED
+- PF2 Item13 = ACTIVE / NOT PASS
+- PF2 Item14 Human Visual Gate = NOT STARTED
+- PF2 Items15–17 = NOT STARTED
+- Phase9 = NOT AUTHORIZED / NOT STARTED
+
+## Current verified repo checkpoint
+- HEAD == origin/main == `506400b0dc391afafbc7c5b6557f6ba13488da10`
+- STAGED_COUNT = 0 at latest verified checkpoint
+- No Item13 experiment has been committed or pushed.
+
+## Active Item13 subtask
+- ACTIVE_SUBTASK = `MALE_BOUNDED_SELF_INTERSECTION_REPAIR`
+- Female branch = UNTOUCHED
+- Thickness branch = UNTOUCHED / numeric minimum-thickness threshold unresolved
+- Do not invent a thickness threshold.
+
+## Current authorized architecture
+`HEAD_COORDINATE_LOCKED_TRANSITION_RECONSTRUCTION`
+
+Architecture contract:
+- all HEAD coordinates remain EXACT LOCKED;
+- canonical HEAD-local defects are separated from assembly/interface repair;
+- current HEAD-only baseline = 24 noncoplanar defects:
+  - 21 locked inherited prepared-head defects;
+  - 3 canonical Item8 local HEAD defects;
+- current neck/transition acceptance requirement:
+  - HEAD-only defects may remain exactly 24 at this intermediate gate;
+  - new/non-HEAD/assembly/interface defect count must be 0;
+  - watertight = TRUE;
+  - winding consistent = TRUE;
+  - boundary edges = 0;
+  - nonmanifold edges = 0.
+
+## Current exact stopping point
+Current candidate:
+`FIXED_HEAD_BODY18_HEAD249_54DOF_DIRICHLET_V1`
+
+IMPORTANT:
+- candidate command was prepared;
+- user paused before supplying terminal output;
+- candidate result is therefore UNKNOWN;
+- do NOT claim PASS or FAIL;
+- do NOT generate V2/V3 or tune weights/anchors/rings/parameters unless V1 fails and a new evidence-based architecture is explicitly approved.
+
+## Last completed preflight
+`FIXED_HEAD_54_DOF_DIRICHLET_PREFLIGHT = PASS`
+
+Verified:
+- reconstruction domain faces = 375
+- domain vertices = 321
+- fixed HEAD vertices = 249
+- fixed outer-boundary vertices = 267
+- free vertices = 54
+- Dirichlet matrix = 54 x 54
+- matrix nnz = 306
+- finite solution = TRUE
+- residual max = 6.8989631462422729e-16
+- residual RMS = 1.3614388257045250e-16
+- all HEAD coordinate max delta = 0
+- fixed-boundary max delta = 0
+- free displacement P50 = 0.066711770079
+- free displacement P95 = 0.156267626397
+- free displacement max = 0.175026813561
+
+## Rejected / STOP routes — do not reopen by blind tuning
+1. deterministic source-level BODY14→MID24→HEAD253 reconstruction:
+   - 172 → 127 defects
+   - REJECT / STOP
+2. MID_RING_AXIAL_MINIMUM_DISPLACEMENT_RELAXATION:
+   - 127 → 114
+   - REJECT / STOP
+3. fixed-boundary direct BODY14→HEAD253 annulus:
+   - 114 → 48
+   - REJECT / STOP
+4. one-ring identity-protected expanded reconstruction:
+   - 48 → 300
+   - REJECT / STOP
+5. source-level BODY18→MID24→HEAD143 reconstruction:
+   - total 177; new/interface 156
+   - REJECT / STOP
+6. common-axis cylindrical parameterization:
+   - HEAD monotonic/star-shaped gate FAIL
+   - REJECT / STOP
+7. fixed BODY18+HEAD143 global Dirichlet V1:
+   - total 26 = locked inherited 21 + 5 newly introduced HEAD defects
+   - REJECT / STOP
+   - no V2 / tuning
+
+## Evidence-derived transition domain
+With all HEAD coordinates locked:
+- BODY collar faces = 68
+- old transition faces = 307
+- domain faces = 375
+- domain vertices = 321
+- boundary components = 2
+- BODY outer boundary = 18 vertices
+- HEAD interface boundary = 249 vertices
+- potential free vertices = 54
+- free HEAD overlap = 0
+- all free vertices form one fixed-anchored component
+- topology preflight = PASS
+
+## Locked inherited HEAD defect contract
+- locked inherited defect pair count = 21
+- pair-set SHA256 =
+  `bbaa2d832135650d192984c31b34aa845313e57e4879ed89c8b85d3b3aa26fb9`
+- these 21 are distributed beyond the bounded neck domain;
+- do not silently expand current neck repair to repair them.
+
+## Exact resume policy
+On resume:
+1. do not assume the V1 candidate result;
+2. if user already ran the prepared command, request/wait for its terminal output;
+3. otherwise re-present the same single command only if requested;
+4. if candidate PASS:
+   - persist accepted candidate/provenance before depending on `/private/tmp`;
+   - then address the separate 3 canonical local HEAD defects;
+   - then separately resolve the 21 inherited distributed HEAD defects;
+   - then resolve Item13 thickness threshold/validation;
+5. if candidate FAIL:
+   - STOP / REASSESS;
+   - NO V2;
+   - NO blind tuning;
+   - new architecture requires explicit approval.
+
+## Working protocol
+- exactly one terminal command per step;
+- wait for user output before next command;
+- active checklist visible;
+- no `git add .`;
+- no broad reset / restore / clean / stash;
+- preserve unrelated dirty/untracked work;
+- commit only after green gates and authorized scope;
+- push origin/main only after commit;
+- verify HEAD == origin/main;
+- Phase9 remains NOT AUTHORIZED / NOT STARTED.
+
+[PF2_ITEM13_GEOMETRIC_VALIDATION_ACTIVE_CHECKPOINT_2026_09_12:END]
