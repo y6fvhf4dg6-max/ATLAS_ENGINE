@@ -1,0 +1,47 @@
+{
+  "accepted_geometry": {
+    "geometry_mutation": false,
+    "path": "/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item11_150mm_normalization_2026_09_11/atlas_pf2_item11_female_normalized_150mm_v1.glb",
+    "sha256": "4562d5be9ccc9e899b9af4ffd7397ba75b0ef8981808c2d3f2e9c777f727b14d"
+  },
+  "checklist_item": "13_GEOMETRIC_VALIDATION",
+  "classification": {
+    "accepted_neck_interface_region_raw_crossings": 1520,
+    "domain_ownership": {
+      "BODY__HEAD": 706,
+      "HEAD__HEAD": 626,
+      "HEAD__TRANSITION": 188
+    },
+    "high_z_raw_crossings": 5,
+    "inherited_closed_detail_shell_pairs": 1,
+    "main_head_local_topological_neighbor_pairs": 4,
+    "proven_unintended_separate_surface_penetration_pairs": 0,
+    "raw_self_intersection_pairs": 1525
+  },
+  "crossing_lengths_mm": {
+    "inherited_shell": 0.073241743,
+    "main_head_local_max": 0.019498134,
+    "main_head_local_min": 0.005961601,
+    "neck_max": 2.341523817,
+    "neck_min": 7.419e-06,
+    "neck_p50": 0.035198687,
+    "neck_p95": 0.133029419,
+    "neck_p99": 0.23491081
+  },
+  "decision": {
+    "female_geometric_validation": "PASS_BY_CLASSIFICATION",
+    "female_self_intersection_classification": "PASS",
+    "item14_human_visual_gate": "ACTIVE_NOT_PASS",
+    "phase9": "NOT_AUTHORIZED_NOT_STARTED"
+  },
+  "evidence_id": "PF2_ITEM13_FEMALE_RECLASSIFICATION_2026_09_13",
+  "former_repair": {
+    "decision": "REJECTED",
+    "downstream_accepted_source": false,
+    "path": "/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_female_head_locked_zero_defect_2026_09_13/atlas_pf2_item13_female_head_locked_zero_defect_v1.glb",
+    "sha256": "f85b42cb255e6847d3d8f1b77cc1d805be29392d644d998dd08772cbc1b047ef",
+    "visual_assessment": "FAIL"
+  },
+  "scope": "FEMALE_SELF_INTERSECTION_RECLASSIFICATION",
+  "status": "PASS_BY_CLASSIFICATION"
+}
