@@ -25840,3 +25840,114 @@ Unchanged:
 - PHASE9 = NOT AUTHORIZED / NOT STARTED
 
 [PF2_ITEM13_FEMALE_RECLASSIFICATION_SUPERSESSION_2026_09_13:END]
+
+---
+
+[PF2_WARDROBE_FIRST_PRODUCT_ARCHITECTURE_SUPERSESSION_2026_09_13]
+
+# PF-2 Wardrobe-First Product Architecture Supersession — 2026-09-13
+
+## Supersession scope
+
+This block supersedes prior PF-2 current-state instructions wherever they treat the
+previous anatomical-body / Item8 neck-interface / Item13 geometry lineage as the
+mandatory final PF-2 production-product architecture.
+
+Historical evidence and completed technical gates remain preserved.
+
+## Product architecture decision
+
+PF2_PRODUCT_ARCHITECTURE =
+`WARDROBE_FIRST_CANONICAL_CHIBI_PLATFORM`
+
+STANDARD_PF2_PRODUCT =
+`PERSONALIZED_IDENTITY_HEAD`
++ `CANONICAL_CHIBI_BODY_SUBSTRATE`
++ `MODULAR_WARDROBE`
++ `ACCESSORIES`
++ `POSE`
++ `BASE`
+
+The canonical body is primarily a stable stylized mannequin / substrate for the
+visible wardrobe and personalized product composition.
+
+## Standard-scope decisions
+
+- PERSONALIZED_IDENTITY_HEAD = REQUIRED / IDENTITY_PRESERVATION_REMAINS_BINDING
+- SHORT_EMBEDDED_NECK_ROOT = REQUIRED
+- CLEAN_ROUNDED_SHOULDER_FORM = REQUIRED
+- FUNCTIONAL_STYLIZED_LEG_FORM = REQUIRED
+- FUNCTIONAL_STYLIZED_HAND_FORM = REQUIRED
+- FUNCTIONAL_STYLIZED_FOOT_FORM = REQUIRED
+- WARDROBE_READY_BODY_INTERFACE = REQUIRED
+- WARDROBE = PRIMARY_EXTERNAL_BODY_SURFACE FOR STANDARD CLOTHED PF-2 PRODUCTS
+- DETAILED_BREAST_ANATOMY = OUT_OF_STANDARD_PF2_SCOPE
+- DETAILED_TORSO_ANATOMY = OUT_OF_STANDARD_PF2_SCOPE
+- SPECIAL_EXPOSED_ANATOMY = BESPOKE / SEPARATE FUTURE WORK ONLY
+- DO_NOT_PREBUILD_BESPOKE_ANATOMY_CAPABILITY
+
+## Historical technical work
+
+PF2 Items 1–13 remain PASS / CLOSED as historical technical validation and
+recovery evidence.
+
+Their evidence is not deleted, rewritten, or invalidated.
+
+However:
+
+- Dreamloft 3HT remains an evaluated / accepted technical baseline and possible
+  substrate; it does not by itself define the final visible PF-2 body product.
+- `EMBEDDED_NECK_ROOT_PLUS_LOCAL_TRAPEZIUS_SURFACE` remains historical Item8
+  evidence; it is not mandatory as the final implementation if the wardrobe-first
+  Item14 visual product gate requires a cleaner shoulder / neck-root solution.
+- Female chest / breast-specific correction experiments are STOP / REJECT /
+  diagnostic only and must not continue as V3/V4 parameter tuning.
+- Current Item11 / Item13 male and female geometry remains technical historical
+  checkpoint material; it is not automatically the final PF-2 visual product
+  candidate.
+
+## Revised PF-2 Item14
+
+PF2_ITEM14 =
+`WARDROBE_FIRST_CANONICAL_BODY_AND_HUMAN_VISUAL_GATE`
+
+Item14 execution order:
+
+1. Preserve accepted personalized head / identity contract.
+2. Build and human-check short embedded neck-root + clean shoulder form.
+3. Develop functional stylized leg form.
+4. Develop functional stylized hand form.
+5. Develop functional stylized foot form.
+6. Establish wardrobe-ready body interface.
+7. Produce at least one representative clothed PF-2 visual proof.
+8. Obtain explicit human visual PASS for the complete standard PF-2 product form.
+
+CURRENT_ACTIVE_ITEM =
+`PF2_ITEM14`
+
+CURRENT_SINGLE_TECHNICAL_TARGET =
+`SHORT_EMBEDDED_NECK_ROOT_PLUS_CLEAN_SHOULDER_FORM`
+
+Breast anatomy, detailed torso anatomy, legs, hands, feet and wardrobe must not
+be worked in parallel with the current shoulder / neck-root target.
+
+## Downstream gates
+
+- PF2 Item15 Physical Print = NOT STARTED
+- PF2 Item16 Slicer / Support Inspection = NOT STARTED
+- PF2 Item17 Final Chibi Product Candidate Lock = NOT STARTED
+- GATE_PF2 = PHYSICAL_PRODUCT_PASS
+- PHASE9 = NOT AUTHORIZED / NOT STARTED
+
+## Execution discipline
+
+- One active implementation target at a time.
+- No speculative reusable framework or future capability work.
+- No parameter sweep without explicit evidence and approval.
+- No return to detailed breast / chest anatomy for the standard PF-2 product.
+- Wardrobe development starts only after the canonical shoulder / neck-root and
+  required body forms reach their relevant visual gates.
+- Historical evidence remains available for provenance but must not override this
+  current product architecture decision.
+
+[PF2_WARDROBE_FIRST_PRODUCT_ARCHITECTURE_SUPERSESSION_2026_09_13:END]
