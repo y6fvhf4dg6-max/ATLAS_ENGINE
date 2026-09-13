@@ -25577,3 +25577,148 @@ On resume:
 - Phase9 remains NOT AUTHORIZED / NOT STARTED.
 
 [PF2_ITEM13_GEOMETRIC_VALIDATION_ACTIVE_CHECKPOINT_2026_09_12:END]
+
+
+---
+
+[PF2_ITEM13_GEOMETRIC_VALIDATION_TECHNICAL_PASS_2026_09_13]
+
+# PF-2 Item 13 — Geometric Validation / TECHNICAL PASS — 2026-09-13
+
+## Canonical program state
+- PROGRAM = PF-2 MODERN CHIBI
+- PF2 Items 1–12 = PASS / CLOSED
+- PF2 Item13 = TECHNICAL PASS / CLOSURE_SYNC_PENDING
+- PF2 Item14 Human Visual Gate = NOT STARTED
+- PF2 Items15–17 = NOT STARTED
+- Phase9 = NOT AUTHORIZED / NOT STARTED
+
+## Supersession
+- This block supersedes the execution-state fields in `[PF2_ITEM13_GEOMETRIC_VALIDATION_ACTIVE_CHECKPOINT_2026_09_12]`.
+- Historical evidence in that checkpoint remains preserved.
+- Latest verified safe repo checkpoint before this authority write:
+  `HEAD == origin/main == 86487b529d1c6e7df0b58241c57fb7fdeda5e967`.
+- Staging / commit / push for this Item13 closure are NOT yet authorized or executed.
+
+## Self-intersection closure
+- Male bounded self-intersection branch = TECHNICAL PASS.
+- Male accepted zero-defect witness is persistently stored under:
+  `/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_male_zero_defect_candidate_2026_09_13/`.
+- Female accepted pre-repair Item8 assembly produced 1525 noncoplanar defect pairs.
+- Accepted female Rodin source main surface = 0 defect pairs.
+- Female prepared head = 0 defect pairs.
+- Domain localization isolated the introduced female defects to Item8 head/interface processing.
+- Bounded female repair kept the prepared head coordinates locked by disabling the local terminal-neck head morph while preserving body adaptation and the embedded-neck-root / local-trapezius transition architecture.
+- Female repaired candidate:
+  `TOTAL_DEFECT_PAIRS = 0`.
+- Persistent female repaired candidate:
+  `/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_female_head_locked_zero_defect_2026_09_13/atlas_pf2_item13_female_head_locked_zero_defect_v1.glb`
+- Female repaired candidate SHA256:
+  `f85b42cb255e6847d3d8f1b77cc1d805be29392d644d998dd08772cbc1b047ef`.
+- Female repair producer SHA256:
+  `03af3384cebbb44f0dd36d1f325ccb26dd71118231fd420c99d8312f240ccc74`.
+- Female self-intersection validation log SHA256:
+  `4c4333b237ba5959ef359c3f74822ee934a4d24a8ae3dcc6412b6b7e9d578052`.
+
+## Thickness closure contract
+- PF-2 has no authority-defined numeric minimum-thickness threshold.
+- `AtlasMinimumThicknessAnalyzer` requires `minimum_thickness_mm` as an external input and does not establish a PF-2 threshold.
+- No numeric thickness threshold is invented or inferred from tessellation, edge length, triangle area, or unrelated test values.
+- Item9 already defers minimum local-feature / physical survivability to later slicer and physical-print validation.
+- Therefore Item13 numeric thickness threshold = NOT DEFINED / NOT INVENTED.
+- Minimum local-feature / wall survivability = DEFERRED_TO_ITEM15_PHYSICAL_PRINT_AND_ITEM16_SLICER.
+- This deferral contract was explicitly approved by the user on 2026-09-13.
+
+## Item13 decision
+- SELF_INTERSECTION = TECHNICAL PASS.
+- THICKNESS_CONTRACT = PASS_WITH_EXPLICIT_DOWNSTREAM_PHYSICAL_VALIDATION.
+- PF2_ITEM13 = TECHNICAL PASS / CLOSURE_SYNC_PENDING.
+- Item14 remains NOT STARTED.
+- Item15 physical print remains NOT STARTED.
+- Item16 slicer / support inspection remains NOT STARTED.
+- Item17 final Chibi product candidate lock remains NOT STARTED.
+- Phase9 remains NOT AUTHORIZED / NOT STARTED.
+
+[PF2_ITEM13_GEOMETRIC_VALIDATION_TECHNICAL_PASS_2026_09_13:END]
+
+[PF2_ITEM13_GEOMETRIC_VALIDATION_CLOSED_2026_09_13]
+
+# PF-2 Item 13 — Geometric Validation / PASS / CLOSED — 2026-09-13
+
+## Authority state
+
+- PF2 Items 1–12 = PASS / CLOSED
+- PF2 Item13 Geometric Validation = PASS / CLOSED
+- PF2 Item14 Human Visual Gate = NEXT / NOT STARTED
+- PF2 Item15 Physical Print = NOT STARTED
+- PF2 Item16 Slicer / Support Inspection = NOT STARTED
+- PF2 Item17 Final Chibi Product Candidate Lock = NOT STARTED
+- PHASE9 = NOT AUTHORIZED / NOT STARTED
+
+This block supersedes Item13 execution-state fields in:
+`[PF2_ITEM13_GEOMETRIC_VALIDATION_TECHNICAL_PASS_2026_09_13]`.
+Historical evidence is preserved.
+
+## Closure basis
+
+### Male
+
+- Accepted recovery artifact:
+  `/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_male_zero_defect_candidate_2026_09_13/atlas_pf2_item13_male_zero_defect_witness_exact_v1.npz`
+- NPZ SHA256:
+  `680728590119240f0c847912e3824088f673e8c06f8183d6c4ff81248a368ce9`
+- Accepted transport GLB:
+  `/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_male_zero_defect_candidate_2026_09_13/atlas_pf2_item13_male_zero_defect_candidate_v1.glb`
+- GLB SHA256:
+  `c536f7a56a3eedd28a0b9232348f4254c7ed42fa2737ef4c3add2cd3652f1996`
+- Remaining HEAD24 classification = KEEP / TECHNICAL PASS.
+- 24 / 24 pairs are same or immediate topological neighborhood.
+- Maximum graph distance <= 1.
+- Maximum measured crossing length at 150 mm scale = 0.410903 mm.
+- Separate-surface penetration = NO.
+- Final topology/local-shape gate = PASS.
+- Exact producer terminal command = NOT_RECOVERED; no producer command was reconstructed or invented.
+- Recovery-critical final diagnostic logs are persisted in:
+  `EVIDENCE/PERSONALIZED_FIGURINE/PF2/item13_male_zero_defect_candidate_2026_09_13/`.
+
+### Female
+
+- Original Item13 normalized figurine self-intersection count = 1525.
+- Accepted identity-source main surface defects = 0.
+- Prepared-head defects = 0.
+- Defect source was isolated to Item8 local head morph / embedded-interface processing.
+- Accepted bounded head-locked repair:
+  `HEAD_LOCAL_MORPH_VERTICES=0`
+- Repaired self-intersection defect pairs = 0.
+- Accepted persistent GLB:
+  `/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_female_head_locked_zero_defect_2026_09_13/atlas_pf2_item13_female_head_locked_zero_defect_v1.glb`
+- GLB SHA256:
+  `f85b42cb255e6847d3d8f1b77cc1d805be29392d644d998dd08772cbc1b047ef`
+- Producer SHA256:
+  `03af3384cebbb44f0dd36d1f325ccb26dd71118231fd420c99d8312f240ccc74`
+- Producer log SHA256:
+  `795205806dad3f8cc12e6aad38446682adc79ab3b6b33b871d05beb3e03cf1b4`
+- Validation log SHA256:
+  `4c4333b237ba5959ef359c3f74822ee934a4d24a8ae3dcc6412b6b7e9d578052`
+
+## Thickness / physical-survivability contract
+
+- PF-2 has no authority-defined numeric minimum-thickness threshold.
+- No numeric thickness threshold was invented for Item13.
+- Item13 closes explicit geometric/self-intersection/topology defects only.
+- Real minimum-feature and local-wall survivability remain physical/downstream gates:
+  - Item15 Physical Print
+  - Item16 Slicer / Support Inspection
+- This closure does NOT claim physical-print survivability PASS.
+
+## Closure declaration
+
+- SELF_INTERSECTION = PASS
+- GEOMETRIC_VALIDATION = PASS
+- THICKNESS_CONTRACT = PASS_WITH_EXPLICIT_DOWNSTREAM_PHYSICAL_VALIDATION
+- PF2_ITEM13 = PASS / CLOSED
+- NEXT = PF2_ITEM14_HUMAN_VISUAL_GATE
+- ITEM14_EXECUTION = NOT STARTED
+- PHASE9 = NOT AUTHORIZED / NOT STARTED
+
+[PF2_ITEM13_GEOMETRIC_VALIDATION_CLOSED_2026_09_13:END]

@@ -1,0 +1,49 @@
+{
+  "architecture": "EMBEDDED_NECK_ROOT_PLUS_LOCAL_TRAPEZIUS_SURFACE",
+  "artifacts": [
+    {
+      "name": "atlas_pf2_item13_female_head_locked_zero_defect_v1.glb",
+      "sha256": "f85b42cb255e6847d3d8f1b77cc1d805be29392d644d998dd08772cbc1b047ef",
+      "storage": "PERSISTENT_EXTERNAL_ATLAS"
+    },
+    {
+      "name": "atlas_pf2_item13_female_head_locked_producer_v1.py",
+      "sha256": "03af3384cebbb44f0dd36d1f325ccb26dd71118231fd420c99d8312f240ccc74",
+      "storage": "PERSISTENT_EXTERNAL_ATLAS"
+    },
+    {
+      "name": "producer_log.txt",
+      "sha256": "795205806dad3f8cc12e6aad38446682adc79ab3b6b33b871d05beb3e03cf1b4",
+      "storage": "PERSISTENT_EXTERNAL_ATLAS"
+    },
+    {
+      "name": "self_intersection_validation.txt",
+      "sha256": "4c4333b237ba5959ef359c3f74822ee934a4d24a8ae3dcc6412b6b7e9d578052",
+      "storage": "PERSISTENT_EXTERNAL_ATLAS"
+    }
+  ],
+  "checklist_item": "13_GEOMETRIC_VALIDATION",
+  "evidence_id": "PF2_ITEM13_FEMALE_HEAD_LOCKED_ZERO_DEFECT_2026_09_13",
+  "geometry_copied_into_repo": false,
+  "human_visual_gate": "NOT_STARTED",
+  "persistent_root": "/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_female_head_locked_zero_defect_2026_09_13",
+  "phase9": "NOT_AUTHORIZED / NOT_STARTED",
+  "physical_print_gate": "NOT_STARTED",
+  "program": "PF-2 MODERN CHIBI",
+  "repair_contract": {
+    "body_adaptation": "PRESERVED",
+    "item8_local_terminal_neck_head_morph": "DISABLED",
+    "parameter_sweep": false,
+    "prepared_head_geometry": "LOCKED",
+    "transition_architecture": "PRESERVED"
+  },
+  "scope": "FEMALE_SELF_INTERSECTION",
+  "status": "TECHNICAL_PASS",
+  "validation": {
+    "pre_repair_noncoplanar_defect_pairs": 1525,
+    "repaired_coplanar_defect_pairs": 0,
+    "repaired_duplicate_face_pairs": 0,
+    "repaired_noncoplanar_defect_pairs": 0,
+    "repaired_total_defect_pairs": 0
+  }
+}

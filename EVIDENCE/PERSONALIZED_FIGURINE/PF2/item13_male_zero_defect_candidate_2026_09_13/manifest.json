@@ -1,0 +1,63 @@
+{
+  "acceptance": {
+    "area_ratio_min": 0.989797449685,
+    "boundary_edges": 0,
+    "collapsed_faces": 0,
+    "head_coordinate_delta": 0.0,
+    "non_head_interface_new_defects": 0,
+    "nonmanifold_edges": 0,
+    "orientation_dot_min": 0.995975938003,
+    "reversed_faces": 0,
+    "watertight": true,
+    "whole_coplanar": 0,
+    "whole_duplicate": 0,
+    "whole_noncoplanar": 24,
+    "winding_consistent": true
+  },
+  "active_checklist": "PF2_ITEM13_GEOMETRIC_VALIDATION",
+  "active_subtask": "MALE_BOUNDED_SELF_INTERSECTION_REPAIR",
+  "architecture": "HEAD_LOCKED_COLLISION_CONSTRAINED_SHAPE_PRESERVING_TRANSITION_RECONSTRUCTION",
+  "authoritative_numeric_artifact": "NPZ float64",
+  "changed_vertices": [
+    7960,
+    10590
+  ],
+  "diagnostic_step": 0.00029785223795558176,
+  "exact_geometry_npz": "/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_male_zero_defect_candidate_2026_09_13/atlas_pf2_item13_male_zero_defect_witness_exact_v1.npz",
+  "faces": 42276,
+  "glb_role": "downstream transport/inspection artifact",
+  "moves_from_v1": {
+    "10590": [
+      0.0005957044759111635,
+      -0.0017871134277334904,
+      0.00029785223795558176
+    ],
+    "7960": [
+      -0.0005957044759111635,
+      0.0,
+      0.0
+    ]
+  },
+  "recovery_provenance": {
+    "authoritative_recovery_artifact": "/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_male_zero_defect_candidate_2026_09_13/atlas_pf2_item13_male_zero_defect_witness_exact_v1.npz",
+    "note": "Historical exact producer command could not be recovered; no command was reconstructed or invented.",
+    "original_producer_command": "NOT_RECOVERED"
+  },
+  "remaining_head24_classification": {
+    "decision": "KEEP / TECHNICAL PASS",
+    "head_coordinate_delta": 0,
+    "maximum_crossing_length_at_150mm_mm": 0.410903,
+    "maximum_graph_distance": 1,
+    "new_non_head_interface_defects": 0,
+    "ownership": "HEAD",
+    "remaining_noncoplanar_pairs": 24,
+    "same_or_immediate_topological_neighborhood_pairs": 24,
+    "separate_surface_penetration": false
+  },
+  "repo_stage_commit_push": false,
+  "source": "/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item8_recovery_2026_09_11/atlas_pf2_item8_male_embedded_neck_root_trapezius_recovered_v1.glb",
+  "source_sha256": "b475b2b2bbe1292c90c893283e62f1e560065968d3081040157b0926c275928e",
+  "status": "MALE_TECHNICAL_GEOMETRY_PASS_PERSISTED",
+  "transport_glb": "/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item13_male_zero_defect_candidate_2026_09_13/atlas_pf2_item13_male_zero_defect_candidate_v1.glb",
+  "vertices": 21134
+}
