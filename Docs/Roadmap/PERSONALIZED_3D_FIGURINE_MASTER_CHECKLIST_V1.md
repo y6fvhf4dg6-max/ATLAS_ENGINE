@@ -1334,3 +1334,203 @@ PF2 Item14 remains ACTIVE.
 - Item15 / Item16 / Item17 = NOT STARTED
 - Phase9 = NOT AUTHORIZED / NOT STARTED
 <!-- /PF2_ITEM14_KOBAN_FINAL_CANONICAL_BODY_SELECTED_2026_09_14 -->
+
+[PF2_ITEM14_WARDROBE_PAUSE_RECOVERY_CHECKPOINT_2026_09_14]
+
+# PF-2 Item 14 — Wardrobe Pause / Recovery Checkpoint — 2026-09-14
+
+This block supersedes earlier PF-2 Item14 execution-state fields wherever they
+still show the representative own-wardrobe proof as NOT STARTED or imply that
+wardrobe execution should continue immediately.
+
+## Current authoritative PF-2 state
+
+- PF2_ITEM14 = ACTIVE / NOT PASS
+- PF2 Items 1–13 = PASS / CLOSED
+- KOBAN_FINAL_CANONICAL_BODY_DECISION = PASS / SELECTED / USER CONFIRMED
+- KOBAN_CANONICAL_BODY = PASS / LOCKED
+- CANONICAL_BODY_WARDROBE_SUITABILITY = PASS
+- MORE_KOBAN_BODY_TUNING = STOP
+- BODY_TUNING = FORBIDDEN
+- REPRESENTATIVE_OWN_WARDROBE_PROOF = PAUSED / NOT PASS
+- SHORT_SLEEVE_TOP = UNSOLVED
+- SHORTS_PANTS = NOT STARTED
+- COMPLETE_PF2_FORM_HUMAN_VISUAL_GATE = NOT STARTED
+- PF2_ITEM15 = NOT STARTED
+- PF2_ITEM16 = NOT STARTED
+- PF2_ITEM17 = NOT STARTED
+- PHASE9 = NOT AUTHORIZED / NOT STARTED
+
+Accepted Koban architecture remains:
+
+`KOBAN_NATIVE_BODY_PRESERVED + PERSONALIZED_HEAD_TERMINAL_ONLY_ADAPTATION + DIRECT_LOCAL_NECK_INTERFACE`
+
+Accepted Koban persistent checkpoint:
+
+`/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item14_koban_native_body_head_only_pass_2026_09_14/`
+
+Do not reopen Koban body selection, proportions, shoulder, torso, hand, foot or
+other canonical-body tuning as part of wardrobe recovery.
+
+## Representative wardrobe proof status
+
+Required Item14 representative product proof remains:
+
+`ONE_REPRESENTATIVE_CLOTHED_PF2_PROOF_FROM_OWN_REUSABLE_WARDROBE_SYSTEM`
+
+That proof has NOT passed.
+
+The short-sleeve-top subproblem is explicitly UNSOLVED and work is PAUSED.
+Do not infer PASS from technical garment generation, simulation completion,
+source-topology quality, or successful render generation.
+
+## Houdini / Vellum route closure
+
+Houdini 22.0.442 itself remains installed and technically usable.
+
+Verified technical results:
+
+- Koban import = PASS
+- collision-ready geometry = PASS
+- Vellum runtime = PASS
+- Prototype #1 technical generation = PASS
+- Prototype #1 human visual = FAIL
+- bounded Correction #1 technical generation = PASS
+- shoulder retention = PASS
+- correction budget = 1/1 USED
+
+A render-debug audit established that an apparent detached lower object was not
+a helper Cube in the Koban GLB. The Koban GLB contains the actual accepted body
+mesh only.
+
+The Houdini-to-Blender OBJ path had a double-axis-conversion error:
+the OBJ vertices had already been converted to Blender coordinates and the
+Blender OBJ importer applied another axis transform. The import transform was
+identified and neutralized. The corrected clean render is valid evidence.
+
+After the axis fix, the corrected Vellum garment still failed the human visual gate:
+
+- torso surface did not read as a coherent T-shirt;
+- shoulder panels folded/opened incorrectly;
+- sleeves formed pointed / wing-like shapes;
+- neckline collapsed;
+- acceptable short-sleeve T-shirt silhouette was not achieved.
+
+Decision:
+
+`HOUDINI_VELLUM_PF2_GARMENT_ROUTE = STOP / REJECT`
+
+Do not resume Vellum tuning, additional solver sweeps, V2/V3/V4 garment
+iterations, or further bounded corrections on this route.
+
+This rejects the tested PF-2 Houdini/Vellum implementation, not Houdini as an
+application.
+
+## Marvelous Designer status
+
+Marvelous Designer was considered as a possible specialist garment provider
+after the Houdini/Vellum failure.
+
+- MARVELOUS_DESIGNER_INSTALLED = NO
+- MARVELOUS_PROTOTYPE = NOT STARTED
+- MARVELOUS_PURCHASE = NOT AUTHORIZED
+
+No Marvelous route may be described as tested or accepted.
+
+## Static reusable garment experiment
+
+A subsequent plan change tested a reusable static-garment-source approach.
+The architecture was explored only as an Item14 wardrobe experiment and did
+not produce an accepted PF-2 T-shirt.
+
+Source pack:
+
+`/Users/Kubi/Downloads/clothing and character kit_1.0.blend`
+
+Source pack SHA256:
+
+`69b40d48d848342410896c47abfd47d87acd290a5b648ef690a1fa40f62b50ef`
+
+Audited source candidates included:
+
+- `low_poly_shirt.001_Retopo_Mesh_Plane.001`
+- `low_poly_trousers.001_Retopo_Mesh.001_Plane.001`
+- `tshirt_Cylinder`
+- `tshirt_retopo.001_Plane.002`
+- `tshirt_retopo_Plane.001`
+
+`tshirt_retopo.001_Plane.002`:
+
+- vertices = 2742
+- polygons = 2806
+- connected components = 1
+- boundary edges = 0
+- nonmanifold edges = 0
+- source topology = PASS
+- Koban prototype human visual = FAIL
+- decision = REJECT / STOP
+
+`tshirt_Cylinder`:
+
+- vertices = 13940
+- polygons = 16193
+- source profiling = PASS
+- Koban-specific static-fit prototype = GENERATED
+- human visual = FAIL
+- source garment form incompatible with required compact short-sleeve Chibi top
+- decision = REJECT / STOP
+
+The remaining meshes from that pack were not accepted as a PF-2 short-sleeve
+production solution.
+
+Decision:
+
+`STATIC_REUSABLE_GARMENT_EXPERIMENT = PAUSED / NOT ACCEPTED`
+
+Do not describe the static-garment experiment as PASS, and do not resume the
+rejected `tshirt_retopo.001_Plane.002` or `tshirt_Cylinder` candidates.
+
+## Recovery-safe persistence
+
+Wardrobe pause / recovery package:
+
+`/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item14_wardrobe_pause_backup_2026_09_14/`
+
+Independent integrity verification:
+
+- backup file count = 13
+- SHA256 manifest verification = PASS
+- recovery package = PASS / VERIFIED
+
+The package contains the critical Houdini/Vellum artifacts, corrected valid
+render evidence, static-garment diagnostic renders, tested source `.blend`,
+README recovery state and SHA256 fingerprints.
+
+Safe repository checkpoint at pause:
+
+`HEAD = origin/main = 7e42e8e7bde8deb2389be6cab5d35373dcccd74c`
+
+`STAGED_COUNT = 0`
+
+## Exact resume contract
+
+When PF-2 wardrobe work resumes:
+
+1. Resume at PF-2 Item14.
+2. Treat Koban canonical body as LOCKED / PASS.
+3. Treat representative wardrobe proof as PAUSED / NOT PASS.
+4. Treat short-sleeve top as UNSOLVED.
+5. Do not resume rejected Houdini/Vellum tuning.
+6. Do not resume rejected static candidates listed above.
+7. Do not claim Marvelous Designer was tested.
+8. Do not advance to shorts/pants as if the top proof passed.
+9. Do not start Item15.
+10. Select a new wardrobe strategy explicitly before further garment geometry work.
+
+CURRENT_EXACT_POSITION =
+`PF2_ITEM14_REPRESENTATIVE_WARDROBE_PROOF_PAUSED_UNSOLVED`
+
+NEXT =
+`EXPLICIT_NEW_WARDROBE_STRATEGY_SELECTION_BEFORE_FURTHER_GEOMETRY`
+
+[PF2_ITEM14_WARDROBE_PAUSE_RECOVERY_CHECKPOINT_2026_09_14:END]
