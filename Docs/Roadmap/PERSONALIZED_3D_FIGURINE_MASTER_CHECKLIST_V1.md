@@ -1292,3 +1292,28 @@ be worked in parallel with the current shoulder / neck-root target.
   current product architecture decision.
 
 [PF2_WARDROBE_FIRST_PRODUCT_ARCHITECTURE_SUPERSESSION_2026_09_13:END]
+
+
+<!-- PF2_ITEM14_KOBAN_NATIVE_BODY_HEAD_ONLY_PASS_2026_09_14 -->
+### PF-2 Item 14 — Koban native-body personalized-head integration checkpoint — 2026-09-14
+
+- PF2 Item 14 remains ACTIVE.
+- KOBAN_NATIVE_BODY_PRESERVED_PLUS_HEAD_TERMINAL_ONLY_PLUS_DIRECT_LOCAL_INTERFACE = TECHNICAL PASS + HUMAN VISUAL PASS.
+- Canonical true-chibi body visual gate = PASS_TO_CONTINUE.
+- Personalized head/body proportion = PASS, female + male.
+- Short clean neck integration = HUMAN VISUAL PASS, female + male.
+- Native shoulder / upper-torso preservation = PASS.
+- HEAD_PROTECTED_MAX_DELTA = 0 for both accepted candidates.
+- BODY_MAX_DELTA = 0 for both accepted candidates.
+- BOUNDARY_EDGES = 0 and NONMANIFOLD_EDGES = 0 for both accepted candidates.
+- Dreamloft Item8 body-adaptation-on-Koban route = STOP / REJECT after V1 and one bounded V2 correction; no V3/V4 sweep.
+- Accepted persistent checkpoint: /Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item14_koban_native_body_head_only_pass_2026_09_14/
+- Female GLB SHA256 = ff4c0b50d3c21efc68fc26825761abf604690d153fb6058621e9f718e0188a7e.
+- Male GLB SHA256 = 049409272aa35b3e484ff16ef04f7606a437d925227f3529c8a4677e058cf376.
+- Human visual board SHA256 = 93d0da1e55966007d8da19d1e51101e2b8890ecb56a4974bb56e47e6c069206a.
+- KOBAN_FINAL_CANONICAL_BODY_DECISION = DEFERRED.
+- CANONICAL_BODY_WARDROBE_SUITABILITY = NEXT.
+- REPRESENTATIVE_OWN_WARDROBE_PROOF = NOT STARTED.
+- Item 15/16/17 = NOT STARTED.
+- Phase 9 = NOT AUTHORIZED / NOT STARTED.
+<!-- /PF2_ITEM14_KOBAN_NATIVE_BODY_HEAD_ONLY_PASS_2026_09_14 -->

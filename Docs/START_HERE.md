@@ -23256,3 +23256,246 @@ be worked in parallel with the current shoulder / neck-root target.
   current product architecture decision.
 
 [PF2_WARDROBE_FIRST_PRODUCT_ARCHITECTURE_SUPERSESSION_2026_09_13:END]
+
+---
+
+[PF2_ITEM14_CANONICAL_CHIBI_WARDROBE_PLATFORM_UPDATE_2026_09_14]
+
+# PF-2 Item14 — Canonical Chibi / Own-Wardrobe Platform Update — 2026-09-14
+
+## Supersession scope
+
+This block updates the current execution state of the earlier
+`PF2_WARDROBE_FIRST_PRODUCT_ARCHITECTURE_SUPERSESSION_2026_09_13`.
+
+The wardrobe-first product decision remains active.
+
+This update records the results of the subsequent wardrobe experiments,
+the premade-clothed-body proof, the rejection of the Cartoon Teen Boy body,
+and the current Koban true-chibi platform evaluation.
+
+Historical evidence is preserved and is not rewritten.
+
+## Current product architecture
+
+PF2_PRODUCT_ARCHITECTURE =
+`CANONICAL_TRUE_CHIBI_BODY_PLUS_OWN_REUSABLE_WARDROBE`
+
+STANDARD_PF2_PRODUCT =
+`PERSONALIZED_IDENTITY_HEAD`
++ `TRUE_CHIBI_CANONICAL_BODY`
++ `OWN_REUSABLE_WARDROBE_LIBRARY`
++ `ACCESSORIES`
++ `POSE`
++ `BASE`
+
+The own-wardrobe concept is NOT abandoned.
+
+The objective is NOT to remodel clothing independently for every customer.
+
+The intended production model is:
+
+1. select / validate one canonical true-chibi body platform;
+2. preserve the personalized identity-head contract;
+3. create garments against that exact canonical body;
+4. reuse those garments as a controlled PF-2 wardrobe library;
+5. combine customer identity, wardrobe choice, accessories, pose and base.
+
+## Wardrobe-route decisions already closed
+
+The following implementation routes are STOP / REJECT and must not be reopened
+without explicit plan-change approval:
+
+- BODY_SURFACE_DERIVED_FACE_EXTRACTION
+- NAIVE_ELLIPTICAL_CLOSED_ENVELOPE
+- MAKEHUMAN_MONOLITHIC_CASUAL_SUIT_ROUTE
+- CLOTHLIB_GLOBAL_AFFINE_FIT_SWEEPS
+- CLOTHLIB_SHRINKWRAP_ROUTE
+- CLOTHLIB_REGIONAL_AFFINE_CONTINUATION
+- SUBDIVIDED_BODY_CLOTHING_PROXY_V2_V3_CONTINUATION
+
+These failures reject the specific garment-construction / fitting methods.
+They do NOT reject the own-wardrobe product strategy.
+
+## Premade clothed-body proof
+
+`Cartoon teen Boy` was used as a bounded architecture proof.
+
+Results:
+
+- native separate clothing topology = PASS AS ARCHITECTURE EVIDENCE
+- head-replacement feasibility = PASS
+- wardrobe-construction avoidance proof = PASS
+- final PF-2 body visual gate = FAIL
+
+Rejection reasons include:
+
+- body is cartoon-teen rather than true chibi;
+- torso / legs are too long and thin for the target PF-2 silhouette;
+- arms are too long;
+- shoes are disproportionately large;
+- personalized realistic identity-head style does not integrate acceptably;
+- neck transition visual result is unacceptable.
+
+Therefore:
+
+`CARTOON_TEEN_BOY_CLOTHED_BODY = REJECT_FOR_FINAL_PF2`
+
+No neck V2/V3, body-shortening, shoe-scaling, limb tuning or proportion sweep
+must continue on that rejected body.
+
+## Current canonical-body candidate — Koban Chibi Base Mesh
+
+Downloaded local source:
+
+`~/Downloads/Koban Chibi Base Mesh/Koban Chibi Base Mesh 1.0.blend`
+
+Current technical audit:
+
+- main product mesh = `Chibi Base Mesh`
+- vertices = 5664
+- edges = 11312
+- polygons = 5674
+- triangles = 356
+- quads = 5318
+- quad ratio = 0.937258
+- connected components = 18
+- largest connected component = 4542 vertices
+- armature = PRESENT
+- armature object = `Chibi RIG Actual`
+
+Current interpretation:
+
+- TRUE_CHIBI_PROPORTION = PASS_TO_TECHNICAL_EVALUATION
+- TOPOLOGY_QUALITY = PROMISING / PASS_TO_NEXT_CHECK
+- HEAD_REPLACEMENT_FEASIBILITY = TECHNICALLY PROMISING
+- FINAL_CANONICAL_BODY_ACCEPTANCE = NOT YET GRANTED
+
+## Koban neck-interface evidence
+
+World-space rig references:
+
+- neck root = Z 2.660187
+- neck tail / head root = Z 2.766115
+
+A bounded neck-section audit found one continuous closed section throughout the
+candidate neck corridor.
+
+Selected technical proof section:
+
+- Z = 2.700000
+- segments = 24
+- connected components = 1
+- closed loops = 1
+- X span = 0.187517
+- Y span = 0.215021
+
+Therefore:
+
+`KOBAN_HEAD_REPLACEMENT_INTERFACE = TECHNICAL PASS_TO_VISUAL_PROOF`
+
+Z 2.700 is a technical proof cut only.
+It is NOT yet a production-locked neck plane.
+
+## Current headless-proof state
+
+A temporary headless Koban geometry proof successfully produced:
+
+- vertices = 2962
+- polygons = 2962
+
+The subsequent render did NOT complete because of a Blender Python render-setup
+exception.
+
+Therefore:
+
+- KOBAN_HEADLESS_GEOMETRY_PROOF = GENERATED_TEMPORARILY
+- KOBAN_HEADLESS_RENDER = NOT YET PRODUCED
+- KOBAN_HUMAN_VISUAL_GATE = NOT YET PERFORMED
+- KOBAN_CANONICAL_BODY = NOT ACCEPTED / NOT LOCKED
+
+No accepted Koban artifact currently exists that may be treated as final or
+persistent production geometry.
+
+## Current execution state
+
+PF2 Items 1–13 remain PASS / CLOSED as historical technical evidence.
+
+PF2_ITEM14 =
+`WARDROBE_FIRST_CANONICAL_BODY_AND_HUMAN_VISUAL_GATE`
+
+CURRENT_ACTIVE_ITEM =
+`PF2_ITEM14`
+
+CURRENT_SINGLE_TECHNICAL_TARGET =
+`KOBAN_TRUE_CHIBI_CANONICAL_BODY_VISUAL_PROOF`
+
+Immediate order:
+
+1. complete one bounded Koban headless-body render;
+2. perform explicit human visual evaluation of body proportions / silhouette;
+3. reject Koban immediately if the visual gate fails;
+4. only if Koban visually passes, evaluate personalized-head integration;
+5. only after canonical body acceptance, continue the own reusable wardrobe work.
+
+Do NOT start garment production on Koban before the canonical-body human visual
+gate passes.
+
+## Downstream gates
+
+- PF2 Item14 = ACTIVE / NOT PASS
+- PF2 Item15 Physical Print = NOT STARTED
+- PF2 Item16 Slicer / Support Inspection = NOT STARTED
+- PF2 Item17 Final Chibi Product Candidate Lock = NOT STARTED
+- GATE_PF2 = PHYSICAL_PRODUCT_PASS
+- PHASE9 = NOT AUTHORIZED / NOT STARTED
+
+## Execution discipline
+
+- One active implementation target at a time.
+- No speculative reusable framework.
+- No capability built merely because it may be useful later.
+- No parameter sweep before a bounded visual decision.
+- Do not return to rejected wardrobe-construction routes.
+- Do not tune rejected body candidates into a new body.
+- Human visual judgment remains authoritative.
+- Technical PASS does not equal visual or physical PASS.
+
+[PF2_ITEM14_CANONICAL_CHIBI_WARDROBE_PLATFORM_UPDATE_2026_09_14:END]
+
+
+<!-- PF2_ITEM14_KOBAN_NATIVE_BODY_HEAD_ONLY_PASS_2026_09_14 -->
+## PF-2 Item 14 — Koban Native Body + Personalized Head-Only Interface PASS — 2026-09-14
+
+PF2_ITEM14 = ACTIVE
+KOBAN_NATIVE_BODY_PRESERVED_PLUS_HEAD_TERMINAL_ONLY_PLUS_DIRECT_LOCAL_INTERFACE = TECHNICAL PASS + HUMAN VISUAL PASS
+KOBAN_TRUE_CHIBI_BODY = PASS_TO_CONTINUE
+PERSONALIZED_HEAD_BODY_PROPORTION = PASS
+SHORT_CLEAN_NECK_INTEGRATION = PASS
+NATIVE_SHOULDER_UPPER_TORSO_PRESERVATION = PASS
+KOBAN_FINAL_CANONICAL_BODY_DECISION = DEFERRED
+CANONICAL_BODY_WARDROBE_SUITABILITY = NEXT
+REPRESENTATIVE_OWN_WARDROBE_PROOF = NOT STARTED
+PF2_ITEM15 = NOT STARTED
+PHASE_9 = NOT AUTHORIZED / NOT STARTED
+
+Accepted persistent checkpoint:
+/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item14_koban_native_body_head_only_pass_2026_09_14/
+
+Female GLB SHA256:
+ff4c0b50d3c21efc68fc26825761abf604690d153fb6058621e9f718e0188a7e
+
+Male GLB SHA256:
+049409272aa35b3e484ff16ef04f7606a437d925227f3529c8a4677e058cf376
+
+Human visual board SHA256:
+93d0da1e55966007d8da19d1e51101e2b8890ecb56a4974bb56e47e6c069206a
+
+Rejected Koban route:
+DREAMLOFT_ITEM8_BODY_ADAPTATION_ON_KOBAN = STOP / REJECT
+V1 = HUMAN_VISUAL_REJECT
+V2_BOUNDED_LATERAL_GATING_CORRECTION = HUMAN_VISUAL_REJECT
+MORE_V3_V4_PARAMETER_SWEEPS = STOP
+
+Recovery rule: accepted/recovery-critical artifacts must not rely on /tmp or /private/tmp; persistent checkpoint, hashes, producer, log and visual evidence above are authoritative.
+<!-- /PF2_ITEM14_KOBAN_NATIVE_BODY_HEAD_ONLY_PASS_2026_09_14 -->
