@@ -26194,3 +26194,55 @@ MORE_V3_V4_PARAMETER_SWEEPS = STOP
 
 Recovery rule: accepted/recovery-critical artifacts must not rely on /tmp or /private/tmp; persistent checkpoint, hashes, producer, log and visual evidence above are authoritative.
 <!-- /PF2_ITEM14_KOBAN_NATIVE_BODY_HEAD_ONLY_PASS_2026_09_14 -->
+
+<!-- PF2_ITEM14_KOBAN_FINAL_CANONICAL_BODY_SELECTED_2026_09_14 -->
+# PF-2 Item 14 — Koban Final Canonical Body Selection — 2026-09-14
+
+PF2_ITEM14 = ACTIVE
+
+KOBAN_FINAL_CANONICAL_BODY_DECISION = PASS / SELECTED / USER CONFIRMED
+FINAL_VISUAL_RECHECK = PASS
+CANONICAL_BODY_WARDROBE_SUITABILITY = PASS
+MORE_KOBAN_BODY_TUNING = STOP
+
+Accepted architecture:
+KOBAN_NATIVE_BODY_PRESERVED_PLUS_HEAD_TERMINAL_ONLY_PLUS_DIRECT_LOCAL_INTERFACE
+
+Locked gates:
+- KOBAN_TRUE_CHIBI_BODY_HUMAN_VISUAL = PASS
+- PERSONALIZED_HEAD_BODY_PROPORTION = PASS
+- SHORT_CLEAN_NECK_INTEGRATION = PASS
+- NATIVE_SHOULDER_UPPER_TORSO_PRESERVATION = PASS
+- HEAD_ONLY_INTERFACE = TECHNICAL PASS + HUMAN VISUAL PASS
+- HEADLESS_BODY_TOPOLOGY_FOR_WARDROBE = PASS
+- CANONICAL_BODY_WARDROBE_SUITABILITY = PASS
+
+Wardrobe-substrate evidence:
+- Z <= 2.700 headless body face components = 1
+- boundary edges below cut = 0
+- nonmanifold edges below cut = 0
+- body faces = 2962
+- quads = 2946
+- tris = 16
+- quad ratio = 0.994598
+- weighted body vertices = 2962 / 2962
+- weight coverage ratio = 1.000000
+- rig = Chibi RIG Actual
+- wardrobe-relevant bilateral torso / shoulder / arm / leg / foot vertex groups verified
+
+Accepted persistent checkpoint:
+`/Users/Kubi/ATLAS_PF2_PERSISTENT_GEOMETRY/item14_koban_native_body_head_only_pass_2026_09_14/`
+
+Accepted human-visual board SHA256:
+`93d0da1e55966007d8da19d1e51101e2b8890ecb56a4974bb56e47e6c069206a`
+
+NEXT_GATE =
+ONE_REPRESENTATIVE_CLOTHED_PF2_PROOF_FROM_OWN_REUSABLE_WARDROBE_SYSTEM
+
+REPRESENTATIVE_OWN_WARDROBE_PROOF = NOT STARTED
+COMPLETE_PF2_FORM_HUMAN_VISUAL_GATE = NOT STARTED
+ITEM15 = NOT STARTED
+ITEM16 = NOT STARTED
+ITEM17 = NOT STARTED
+PHASE9 = NOT AUTHORIZED / NOT STARTED
+<!-- /PF2_ITEM14_KOBAN_FINAL_CANONICAL_BODY_SELECTED_2026_09_14 -->
