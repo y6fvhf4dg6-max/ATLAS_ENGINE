@@ -1534,3 +1534,135 @@ NEXT =
 `EXPLICIT_NEW_WARDROBE_STRATEGY_SELECTION_BEFORE_FURTHER_GEOMETRY`
 
 [PF2_ITEM14_WARDROBE_PAUSE_RECOVERY_CHECKPOINT_2026_09_14:END]
+
+[PERSONALIZED_FIGURINE_FIVE_PRODUCT_MASTER_PROGRAM_SUPERSESSION_2026_09_14]
+
+# Personalized Figurine Program — Five-Product Master Definition — 2026-09-14
+
+This block is the current authoritative definition of the five target product
+families in the Personalized 3D Figurine program.
+
+It supersedes earlier product-family naming or ordering wherever older roadmap
+sections define PF-3 as Couple / Family, PF-4 as Natural Keepsake, or PF-5 as
+Bobblehead / Character.
+
+Historical blocks remain preserved as execution history. They must not override
+this current master product definition.
+
+## Current five-product program
+
+### PF-1 — Premium Realistic Full-Body Figurine
+
+STATUS = PASS / CLOSED
+
+Purpose:
+personalized normal-proportion full-body figurine using the accepted
+identity-preserving head and production body assembly architecture.
+
+Current program decision:
+
+- PF1_MALE = PASS / SELECTED
+- PF1_FEMALE = PASS / CLOSED
+- PF1_PRODUCT_FAMILY = CLOSED_FOR_CURRENT_PROGRAM_STAGE
+
+PF-1 is not the current active development target.
+
+### PF-2 — Modern Chibi Figurine
+
+STATUS = ACTIVE / NOT CLOSED
+
+PF2 Items 1–13 = PASS / CLOSED
+
+PF2_ITEM14 =
+`WARDROBE_FIRST_CANONICAL_BODY_AND_HUMAN_VISUAL_GATE`
+
+Current locked body state:
+
+- KOBAN_FINAL_CANONICAL_BODY_DECISION = PASS / SELECTED / USER CONFIRMED
+- KOBAN_CANONICAL_BODY = PASS / LOCKED
+- CANONICAL_BODY_WARDROBE_SUITABILITY = PASS
+- MORE_KOBAN_BODY_TUNING = STOP
+- BODY_TUNING = FORBIDDEN
+
+Current unresolved gate:
+
+- REPRESENTATIVE_OWN_WARDROBE_PROOF = PAUSED / NOT PASS
+- SHORT_SLEEVE_TOP = UNSOLVED
+- SHORTS_PANTS = NOT STARTED
+- COMPLETE_PF2_FORM_HUMAN_VISUAL_GATE = NOT STARTED
+- PF2_ITEM15 = NOT STARTED
+- PF2_ITEM16 = NOT STARTED
+- PF2_ITEM17 = NOT STARTED
+
+CURRENT_EXACT_POSITION =
+`PF2_ITEM14_REPRESENTATIVE_WARDROBE_PROOF_PAUSED_UNSOLVED`
+
+NEXT =
+`EXPLICIT_NEW_WARDROBE_STRATEGY_SELECTION_BEFORE_FURTHER_GEOMETRY`
+
+### PF-3 — Stylized Bust
+
+STATUS = NOT STARTED
+
+PF-3 target product family is a personalized stylized bust.
+
+The former roadmap definition:
+
+`PF-3 = Couple / Family`
+
+is superseded for the current program.
+
+No PF-3 implementation work is authorized until the active PF-2 program gate
+allows progression or the user explicitly changes priority.
+
+### PF-4 — Bobblehead
+
+STATUS = NOT STARTED
+
+PF-4 target product family is a personalized Bobblehead.
+
+The former roadmap definition:
+
+`PF-4 = Natural Keepsake`
+
+is superseded for the current program.
+
+No PF-4 implementation work is currently started or authorized.
+
+### PF-5 — Portrait / Relief Product
+
+STATUS = NOT STARTED
+
+PF-5 target product family is a personalized portrait / relief product.
+
+The former roadmap definition:
+
+`PF-5 = Bobblehead / Character`
+
+is superseded for the current program.
+
+PF-5 product-family work is distinct from Phase 9 authorization state.
+Nothing in this master-product definition authorizes Phase 9.
+
+## Authoritative product-family order
+
+1. PF-1 — Premium Realistic Full-Body Figurine
+2. PF-2 — Modern Chibi Figurine
+3. PF-3 — Stylized Bust
+4. PF-4 — Bobblehead
+5. PF-5 — Portrait / Relief Product
+
+## Current global program position
+
+- ACTIVE_PRODUCT_FAMILY = PF-2 MODERN CHIBI
+- PF1 = PASS / CLOSED
+- PF2 = ACTIVE / ITEM14 / NOT PASS
+- PF3 = NOT STARTED
+- PF4 = NOT STARTED
+- PF5 = NOT STARTED
+- PHASE9 = NOT AUTHORIZED / NOT STARTED
+
+This five-product definition is the product-family authority for future session
+recovery unless explicitly superseded by a later user-approved authority block.
+
+[PERSONALIZED_FIGURINE_FIVE_PRODUCT_MASTER_PROGRAM_SUPERSESSION_2026_09_14:END]
